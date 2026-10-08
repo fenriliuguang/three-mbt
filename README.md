@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph: math, objects, cameras, `BoxGeometry`, a basic material, and lights, checked against r186 fixtures. The rotating cube is phase 3. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -26,7 +26,15 @@ Copy `target/clear.component.wasm` to `examples/apps/clear/clear.component.wasm`
 cargo xtask run-demo --name clear
 ```
 
-The component exports async `start` and imports `wasi:webgpu`, `wasi-gfx:surface`, and `print`. `moon run src/examples/cube` is still a placeholder.
+The component exports async `start` and imports `wasi:webgpu`, `wasi-gfx:surface`, and `print`.
+
+Build the cube the same way:
+
+```sh
+sh scripts/build-cube.sh
+```
+
+Copy `target/cube.component.wasm` to `examples/apps/cube/cube.component.wasm` in wasi-gfx-runtime, then `cargo xtask run-demo --name cube`. `moon run src/examples/cube/app` only builds the scene and does not open a window.
 
 ## License
 

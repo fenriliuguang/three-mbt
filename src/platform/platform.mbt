@@ -35,6 +35,21 @@ pub async fn SurfaceTarget::open() -> SurfaceTarget? {
 }
 
 ///|
+pub fn SurfaceTarget::device(self : SurfaceTarget) -> @webgpu.GpuDevice {
+  self.device
+}
+
+///|
+pub fn SurfaceTarget::window(self : SurfaceTarget) -> @surface.Surface {
+  self.window
+}
+
+///|
+pub fn SurfaceTarget::context(self : SurfaceTarget) -> @canvas.Context {
+  self.context
+}
+
+///|
 /// Clears the current swapchain texture and presents it.
 pub fn SurfaceTarget::clear(
   self : SurfaceTarget,

@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 and phase 1 have landed: the module, pinned WIT, and a swapchain clear. Phase 2 has landed the CPU scene graph. The first drawn frame is phase 3.
+Phase 0 through phase 3 have landed: the module, a swapchain clear, the CPU scene graph, and an unlit rotating cube. A second material is phase 4.
 
 ## Pins
 
@@ -159,6 +159,8 @@ This phase has landed. Package tests compare compose and decompose, the WebGPU p
 ### 3. First frame of the world
 
 A minimal `WebGPURenderer.render`: matrix updates, one opaque list, a depth buffer, unlit WGSL, vertex buffers, and an MVP uniform. `examples/cube` is a rotating cube. Frustum culling, sorting, and multi-pass wait.
+
+This phase has landed. `WebGPURenderer` updates matrices, collects visible opaque meshes, uploads positions and indices, and draws them with one unlit WGSL program. The cube scene lives in `examples/cube`. The window sample is the wasm component built by `scripts/build-cube.sh`. Frustum culling, sorting, transparency, and wireframe stay later.
 
 ### 4. A second material
 

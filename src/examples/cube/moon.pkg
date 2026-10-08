@@ -1,7 +1,14 @@
 import {
-  "fenriliuguang/three-mbt",
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
 }
 
-pkgtype(kind: "executable")
+import {
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
 
-// 阶段 3：旋转立方体，世界第一次上屏。
+// 阶段 3：旋转立方体的场景。窗口入口在 component，本地入口在 app。

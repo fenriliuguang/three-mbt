@@ -1,11 +1,37 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/renderer/common"
 
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
+}
+
 // Values
+pub fn collect_opaque(@core.Object3D) -> Array[RenderItem]
+
+pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
+
+pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
+
+pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
+
+pub fn pack_uniforms(@math.Matrix4, @math.Color, Double) -> FixedArray[Byte]
+
+pub let uniform_bytes : Int
+
+pub fn update_frame(@core.Object3D, @core.Object3D) -> Unit
 
 // Errors
 
 // Types and methods
+pub(all) struct RenderItem {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  color : @math.Color
+  side : @constants.Side
+  opacity : Double
+}
 
 // Type aliases
 

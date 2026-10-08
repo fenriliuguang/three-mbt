@@ -1,2 +1,13 @@
-// 阶段 3。WebGPUBackend 与 WGSL。
-// 计划依赖 fenriliuguang/three-mbt/renderer/common 与 platform。
+// 阶段 3。不光照的 WebGPU 绘制路径。
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface",
+  "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface-webgpu" @canvas,
+  "fenriliuguang/three-mbt/interface/wasi/webgpu/webgpu" @gpu,
+  "fenriliuguang/three-mbt/platform",
+  "fenriliuguang/three-mbt/renderer/common",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+supported_targets = "+wasm"
