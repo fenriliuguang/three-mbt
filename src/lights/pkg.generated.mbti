@@ -1,11 +1,29 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/lights"
 
+import {
+  "fenriliuguang/three-mbt/core",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct AmbientLight {
+  node : @core.Object3D
+}
+pub fn AmbientLight::new(hex? : Int, intensity? : Double) -> Self
+pub fn AmbientLight::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for AmbientLight
+
+pub(all) struct DirectionalLight {
+  node : @core.Object3D
+  target : @core.Object3D
+}
+pub fn DirectionalLight::new(hex? : Int, intensity? : Double) -> Self
+pub fn DirectionalLight::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for DirectionalLight
 
 // Type aliases
 

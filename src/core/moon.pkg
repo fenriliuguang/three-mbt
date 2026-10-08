@@ -1,2 +1,6 @@
 // 阶段 2。Object3D、BufferGeometry、BufferAttribute。
-// 计划依赖 fenriliuguang/three-mbt/math。
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/math",
+  "moonbitlang/core/math" @std,
+}

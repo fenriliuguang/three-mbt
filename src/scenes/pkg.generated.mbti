@@ -1,11 +1,27 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/scenes"
 
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct Scene {
+  node : @core.Object3D
+  mut background : @math.Color?
+  mut background_blurriness : Double
+  mut background_intensity : Double
+}
+pub fn[T : @core.AsNode] Scene::add(Self, T) -> Self
+pub fn Scene::new() -> Self
+pub fn Scene::set_background(Self, @math.Color) -> Unit
+pub fn Scene::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Scene
 
 // Type aliases
 

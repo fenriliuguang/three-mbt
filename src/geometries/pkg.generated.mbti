@@ -1,11 +1,29 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/geometries"
 
+import {
+  "fenriliuguang/three-mbt/core",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct BoxGeometry {
+  geometry : @core.BufferGeometry
+  parameters : BoxParameters
+}
+pub fn BoxGeometry::new(width? : Double, height? : Double, depth? : Double, width_segments? : Int, height_segments? : Int, depth_segments? : Int) -> Self
+
+pub(all) struct BoxParameters {
+  width : Double
+  height : Double
+  depth : Double
+  width_segments : Int
+  height_segments : Int
+  depth_segments : Int
+}
 
 // Type aliases
 

@@ -1,2 +1,5 @@
 // 阶段 2。Scene。
-// 计划依赖 fenriliuguang/three-mbt/core。
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
+}

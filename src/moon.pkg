@@ -1,2 +1,12 @@
-// 对外门面 fenriliuguang/three-mbt。
-// 子包导出稳定 API 之后，再在本包重新导出。
+// 对外门面 fenriliuguang/three-mbt。阶段 2 的场景图类型从这里重新导出。
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}

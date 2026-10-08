@@ -1,2 +1,4 @@
 // 阶段 2。PerspectiveCamera、OrthographicCamera。
-// 计划依赖 fenriliuguang/three-mbt/math 与 core。
+import {
+  "fenriliuguang/three-mbt/core",
+}

@@ -1,1 +1,6 @@
 // 阶段 2。对齐 three.js r186 src/math。无 WASI 依赖。
+import {
+  "fenriliuguang/three-mbt/constants",
+  "moonbitlang/core/double",
+  "moonbitlang/core/math" @std,
+}

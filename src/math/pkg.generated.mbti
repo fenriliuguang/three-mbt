@@ -1,11 +1,240 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/math"
 
+import {
+  "fenriliuguang/three-mbt/constants",
+}
+
 // Values
+pub fn deg_to_rad(Double) -> Double
+
+pub fn linear_to_srgb(Double) -> Double
+
+pub fn rad_to_deg(Double) -> Double
+
+pub fn srgb_to_linear(Double) -> Double
 
 // Errors
 
 // Types and methods
+pub(all) struct Box3 {
+  min : Vector3
+  max : Vector3
+}
+pub fn Box3::apply_matrix4(Self, Matrix4) -> Self
+pub fn Box3::empty() -> Self
+pub fn Box3::expand_by_point(Self, Vector3) -> Self
+pub fn Box3::get_center(Self, Vector3) -> Vector3
+pub fn Box3::get_size(Self, Vector3) -> Vector3
+pub fn Box3::is_empty(Self) -> Bool
+pub fn Box3::make_empty(Self) -> Self
+pub fn Box3::new(Vector3, Vector3) -> Self
+pub fn Box3::set(Self, Vector3, Vector3) -> Self
+pub fn Box3::set_from_points(Self, Array[Vector3]) -> Self
+pub fn Box3::union(Self, Self) -> Self
+
+pub(all) struct Color {
+  mut r : Double
+  mut g : Double
+  mut b : Double
+}
+pub fn Color::clone(Self) -> Self
+pub fn Color::copy(Self, Self) -> Self
+pub fn Color::get_hex(Self) -> Int
+pub fn Color::lerp(Self, Self, Double) -> Self
+pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self
+pub fn Color::set_hex(Self, Int) -> Self
+pub fn Color::set_rgb(Self, Double, Double, Double) -> Self
+
+pub(all) struct Euler {
+  mut x : Double
+  mut y : Double
+  mut z : Double
+  mut order : EulerOrder
+  mut on_change : (() -> Unit)?
+}
+pub fn Euler::copy(Self, Self) -> Self
+pub fn Euler::new(x? : Double, y? : Double, z? : Double, order? : EulerOrder) -> Self
+pub fn Euler::reorder(Self, EulerOrder) -> Self
+pub fn Euler::set(Self, Double, Double, Double, order? : EulerOrder) -> Self
+pub fn Euler::set_from_quaternion(Self, Quaternion, order? : EulerOrder, update? : Bool) -> Self
+pub fn Euler::set_from_rotation_matrix(Self, Matrix4, order? : EulerOrder, update? : Bool) -> Self
+pub fn Euler::set_order(Self, EulerOrder) -> Self
+pub fn Euler::set_x(Self, Double) -> Self
+pub fn Euler::set_y(Self, Double) -> Self
+pub fn Euler::set_z(Self, Double) -> Self
+
+pub(all) enum EulerOrder {
+  XYZ
+  YXZ
+  ZXY
+  ZYX
+  YZX
+  XZY
+}
+
+pub(all) struct Frustum {
+  planes : Array[Plane]
+}
+pub fn Frustum::intersects_sphere(Self, Sphere) -> Bool
+pub fn Frustum::new() -> Self
+pub fn Frustum::set_from_projection_matrix(Self, Matrix4, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
+
+pub(all) struct Matrix3 {
+  elements : FixedArray[Double]
+}
+pub fn Matrix3::clone(Self) -> Self
+pub fn Matrix3::copy(Self, Self) -> Self
+pub fn Matrix3::determinant(Self) -> Double
+pub fn Matrix3::get_normal_matrix(Self, Matrix4) -> Self
+pub fn Matrix3::identity(Self) -> Self
+pub fn Matrix3::invert(Self) -> Self
+pub fn Matrix3::new() -> Self
+pub fn Matrix3::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
+pub fn Matrix3::set_from_matrix4(Self, Matrix4) -> Self
+pub fn Matrix3::transpose(Self) -> Self
+
+pub(all) struct Matrix4 {
+  elements : FixedArray[Double]
+}
+pub fn Matrix4::clone(Self) -> Self
+pub fn Matrix4::compose(Self, Vector3, Quaternion, Vector3) -> Self
+pub fn Matrix4::copy(Self, Self) -> Self
+pub fn Matrix4::decompose(Self, Vector3, Quaternion, Vector3) -> Self
+pub fn Matrix4::determinant(Self) -> Double
+pub fn Matrix4::determinant_affine(Self) -> Double
+pub fn Matrix4::equals(Self, Self) -> Bool
+pub fn Matrix4::extract_rotation(Self, Self) -> Self
+pub fn Matrix4::get_max_scale_on_axis(Self) -> Double
+pub fn Matrix4::identity(Self) -> Self
+pub fn Matrix4::invert(Self) -> Self
+pub fn Matrix4::look_at(Self, Vector3, Vector3, Vector3) -> Self
+pub fn Matrix4::make_orthographic(Self, Double, Double, Double, Double, Double, Double, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
+pub fn Matrix4::make_perspective(Self, Double, Double, Double, Double, Double, Double, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
+pub fn Matrix4::make_rotation_from_euler(Self, Euler) -> Self
+pub fn Matrix4::make_rotation_from_quaternion(Self, Quaternion) -> Self
+pub fn Matrix4::make_translation(Self, Double, Double, Double) -> Self
+pub fn Matrix4::multiply(Self, Self) -> Self
+pub fn Matrix4::multiply_matrices(Self, Self, Self) -> Self
+pub fn Matrix4::new() -> Self
+pub fn Matrix4::premultiply(Self, Self) -> Self
+pub fn Matrix4::scale(Self, Vector3) -> Self
+pub fn Matrix4::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
+pub fn Matrix4::set_position(Self, Double, Double, Double) -> Self
+pub fn Matrix4::set_position_vector(Self, Vector3) -> Self
+pub fn Matrix4::transpose(Self) -> Self
+
+pub(all) struct Plane {
+  normal : Vector3
+  mut constant : Double
+}
+pub fn Plane::copy(Self, Self) -> Self
+pub fn Plane::distance_to_point(Self, Vector3) -> Double
+pub fn Plane::new(normal? : Vector3, constant? : Double) -> Self
+pub fn Plane::normalize(Self) -> Self
+pub fn Plane::set_components(Self, Double, Double, Double, Double) -> Self
+
+pub(all) struct Quaternion {
+  mut x : Double
+  mut y : Double
+  mut z : Double
+  mut w : Double
+  mut on_change : (() -> Unit)?
+}
+pub fn Quaternion::clone(Self) -> Self
+pub fn Quaternion::conjugate(Self) -> Self
+pub fn Quaternion::copy(Self, Self) -> Self
+pub fn Quaternion::dot(Self, Self) -> Double
+pub fn Quaternion::identity(Self) -> Self
+pub fn Quaternion::invert(Self) -> Self
+pub fn Quaternion::length(Self) -> Double
+pub fn Quaternion::multiply(Self, Self) -> Self
+pub fn Quaternion::multiply_quaternions(Self, Self, Self) -> Self
+pub fn Quaternion::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
+pub fn Quaternion::normalize(Self) -> Self
+pub fn Quaternion::premultiply(Self, Self) -> Self
+pub fn Quaternion::set(Self, Double, Double, Double, Double) -> Self
+pub fn Quaternion::set_from_axis_angle(Self, Vector3, Double) -> Self
+pub fn Quaternion::set_from_euler(Self, Euler, update? : Bool) -> Self
+pub fn Quaternion::set_from_rotation_matrix(Self, Matrix4) -> Self
+pub fn Quaternion::slerp(Self, Self, Double) -> Self
+
+pub(all) struct Sphere {
+  center : Vector3
+  mut radius : Double
+}
+pub fn Sphere::apply_matrix4(Self, Matrix4) -> Self
+pub fn Sphere::contains_point(Self, Vector3) -> Bool
+pub fn Sphere::copy(Self, Self) -> Self
+pub fn Sphere::intersects_sphere(Self, Self) -> Bool
+pub fn Sphere::is_empty(Self) -> Bool
+pub fn Sphere::make_empty(Self) -> Self
+pub fn Sphere::new(center? : Vector3, radius? : Double) -> Self
+pub fn Sphere::set_from_points(Self, Array[Vector3], optional_center? : Vector3) -> Self
+
+pub(all) struct Vector2 {
+  mut x : Double
+  mut y : Double
+}
+pub fn Vector2::add(Self, Self) -> Self
+pub fn Vector2::clone(Self) -> Self
+pub fn Vector2::copy(Self, Self) -> Self
+pub fn Vector2::dot(Self, Self) -> Double
+pub fn Vector2::equals(Self, Self) -> Bool
+pub fn Vector2::length(Self) -> Double
+pub fn Vector2::length_sq(Self) -> Double
+pub fn Vector2::lerp(Self, Self, Double) -> Self
+pub fn Vector2::multiply_scalar(Self, Double) -> Self
+pub fn Vector2::new(x? : Double, y? : Double) -> Self
+pub fn Vector2::normalize(Self) -> Self
+pub fn Vector2::set(Self, Double, Double) -> Self
+pub fn Vector2::sub(Self, Self) -> Self
+
+pub(all) struct Vector3 {
+  mut x : Double
+  mut y : Double
+  mut z : Double
+}
+pub fn Vector3::add(Self, Self) -> Self
+pub fn Vector3::add_vectors(Self, Self, Self) -> Self
+pub fn Vector3::apply_matrix4(Self, Matrix4) -> Self
+pub fn Vector3::clone(Self) -> Self
+pub fn Vector3::copy(Self, Self) -> Self
+pub fn Vector3::cross(Self, Self) -> Self
+pub fn Vector3::cross_vectors(Self, Self, Self) -> Self
+pub fn Vector3::distance_to_squared(Self, Self) -> Double
+pub fn Vector3::dot(Self, Self) -> Double
+pub fn Vector3::equals(Self, Self) -> Bool
+pub fn Vector3::length(Self) -> Double
+pub fn Vector3::length_sq(Self) -> Double
+pub fn Vector3::lerp(Self, Self, Double) -> Self
+pub fn Vector3::max(Self, Self) -> Self
+pub fn Vector3::min(Self, Self) -> Self
+pub fn Vector3::multiply_scalar(Self, Double) -> Self
+pub fn Vector3::negate(Self) -> Self
+pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
+pub fn Vector3::normalize(Self) -> Self
+pub fn Vector3::set(Self, Double, Double, Double) -> Self
+pub fn Vector3::set_from_matrix_column(Self, Matrix4, Int) -> Self
+pub fn Vector3::set_from_matrix_position(Self, Matrix4) -> Self
+pub fn Vector3::sub(Self, Self) -> Self
+pub fn Vector3::sub_vectors(Self, Self, Self) -> Self
+
+pub(all) struct Vector4 {
+  mut x : Double
+  mut y : Double
+  mut z : Double
+  mut w : Double
+}
+pub fn Vector4::apply_matrix4(Self, Matrix4) -> Self
+pub fn Vector4::clone(Self) -> Self
+pub fn Vector4::copy(Self, Self) -> Self
+pub fn Vector4::dot(Self, Self) -> Double
+pub fn Vector4::length(Self) -> Double
+pub fn Vector4::length_sq(Self) -> Double
+pub fn Vector4::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
+pub fn Vector4::normalize(Self) -> Self
+pub fn Vector4::set(Self, Double, Double, Double, Double) -> Self
 
 // Type aliases
 

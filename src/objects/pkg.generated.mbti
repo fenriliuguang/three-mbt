@@ -1,11 +1,35 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/objects"
 
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/materials",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct Group {
+  node : @core.Object3D
+}
+pub fn[T : @core.AsNode] Group::add(Self, T) -> Self
+pub fn Group::new() -> Self
+pub fn Group::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Group
+
+pub(all) struct Mesh {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  material : @materials.Material
+}
+pub fn Mesh::new(@core.BufferGeometry, @materials.Material) -> Self
+pub fn Mesh::refresh(Self) -> Unit
+pub fn Mesh::set_side(Self, @constants.Side) -> Unit
+pub fn Mesh::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Mesh
 
 // Type aliases
 

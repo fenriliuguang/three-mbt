@@ -1,2 +1,13 @@
 // 阶段 2。Group、Mesh。
-// 计划依赖 fenriliuguang/three-mbt/core。
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/materials",
+}
+
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/scenes",
+} for "test"

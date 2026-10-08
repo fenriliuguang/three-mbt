@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 has landed the module, directories, and pinned WIT. Binding generation and drawing come next.
+Phase 0 and phase 1 have landed: the module, pinned WIT, and a swapchain clear. Phase 2 has landed the CPU scene graph. The first drawn frame is phase 3.
 
 ## Pins
 
@@ -153,6 +153,8 @@ Call `gpu.request-adapter`, then `request-device`. Create a `surface`, call `con
 ### 2. World (CPU)
 
 `Vector3`, `Matrix4`, `Quaternion`, `Euler`, `Color`, `Object3D`, `PerspectiveCamera`, `Scene`, `BufferGeometry`, `BoxGeometry`, `Mesh`. Fixture tests cover r186 matrices, decomposition, and projection.
+
+This phase has landed. Package tests compare compose and decompose, the WebGPU perspective and orthographic projections, a parent-child world matrix, `lookAt`, color hex, and the unit box against three.js r186. The numbers are also stored in `tests/fixtures/r186-world.json`. Cameras default to the WebGPU depth range. Drawing the cube stays in phase 3, and the phase 1 clear sample is still the host check.
 
 ### 3. First frame of the world
 

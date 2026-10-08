@@ -1,12 +1,184 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/core"
 
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/math",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct BufferAttribute {
+  array : Array[Double]
+  item_size : Int
+  mut normalized : Bool
+  count : Int
+}
+pub fn BufferAttribute::from_ints(Array[Int], Int) -> Self
+pub fn BufferAttribute::get_component(Self, Int, Int) -> Double
+pub fn BufferAttribute::get_x(Self, Int) -> Double
+pub fn BufferAttribute::get_y(Self, Int) -> Double
+pub fn BufferAttribute::get_z(Self, Int) -> Double
+pub fn BufferAttribute::new(Array[Double], Int, normalized? : Bool) -> Self
+pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
+
+pub(all) struct BufferGeometry {
+  attributes : Map[String, BufferAttribute]
+  mut index : BufferAttribute?
+  groups : Array[GeometryGroup]
+  mut bounding_box : @math.Box3?
+  mut bounding_sphere : @math.Sphere?
+}
+pub fn BufferGeometry::add_group(Self, Int, Int, material_index? : Int) -> Unit
+pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
+pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
+pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
+pub fn BufferGeometry::new() -> Self
+pub fn BufferGeometry::set_attribute(Self, String, BufferAttribute) -> Self
+pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self
+pub fn BufferGeometry::set_index_array(Self, Array[Int]) -> Self
+
+pub(all) struct CameraState {
+  projection : @math.Matrix4
+  projection_inverse : @math.Matrix4
+  matrix_world_inverse : @math.Matrix4
+  mut fov : Double
+  mut aspect : Double
+  mut zoom : Double
+  mut near : Double
+  mut far : Double
+  mut left : Double
+  mut right : Double
+  mut top : Double
+  mut bottom : Double
+  mut film_gauge : Double
+  mut film_offset : Double
+  mut coordinate_system : @constants.CoordinateSystem
+  mut reversed_depth : Bool
+  kind : ProjectionKind
+}
+pub fn CameraState::orthographic(Double, Double, Double, Double, Double, Double) -> Self
+pub fn CameraState::perspective(Double, Double, Double, Double) -> Self
+pub fn CameraState::update_projection(Self) -> Unit
+
+pub(all) struct GeometryGroup {
+  start : Int
+  count : Int
+  material_index : Int
+}
+
+pub(all) struct Layers {
+  mut mask : Int
+}
+pub fn Layers::disable(Self, Int) -> Unit
+pub fn Layers::disable_all(Self) -> Unit
+pub fn Layers::enable(Self, Int) -> Unit
+pub fn Layers::enable_all(Self) -> Unit
+pub fn Layers::intersects(Self, Self) -> Bool
+pub fn Layers::is_enabled(Self, Int) -> Bool
+pub fn Layers::new() -> Self
+pub fn Layers::set(Self, Int) -> Unit
+pub fn Layers::toggle(Self, Int) -> Unit
+
+pub(all) enum LightKind {
+  Ambient
+  Directional
+}
+
+pub(all) struct LightState {
+  color : @math.Color
+  mut intensity : Double
+  mut target : Object3D?
+  kind : LightKind
+}
+
+pub(all) struct MeshBinding {
+  geometry : BufferGeometry
+  color : @math.Color
+  mut side : @constants.Side
+  mut opacity : Double
+  mut transparent : Bool
+  mut wireframe : Bool
+}
+
+pub(all) enum NodeKind {
+  Object
+  Group
+  Mesh
+  Scene
+  PerspectiveCamera
+  OrthographicCamera
+  AmbientLight
+  DirectionalLight
+}
+
+pub(all) struct Object3D {
+  id : Int
+  mut name : String
+  kind : NodeKind
+  position : @math.Vector3
+  rotation : @math.Euler
+  quaternion : @math.Quaternion
+  scale : @math.Vector3
+  up : @math.Vector3
+  matrix : @math.Matrix4
+  matrix_world : @math.Matrix4
+  model_view_matrix : @math.Matrix4
+  normal_matrix : @math.Matrix3
+  mut matrix_auto_update : Bool
+  mut matrix_world_auto_update : Bool
+  mut matrix_world_needs_update : Bool
+  mut parent : Object3D?
+  children : Array[Object3D]
+  layers : Layers
+  mut visible : Bool
+  mut cast_shadow : Bool
+  mut receive_shadow : Bool
+  mut frustum_culled : Bool
+  mut render_order : Int
+  mut pivot : @math.Vector3?
+  mut camera : CameraState?
+  mut mesh : MeshBinding?
+  mut light : LightState?
+  listeners : Map[String, Array[(ObjectEvent) -> Unit]]
+}
+pub fn Object3D::add(Self, Self) -> Self
+pub fn Object3D::add_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
+pub fn Object3D::clear(Self) -> Self
+pub fn Object3D::dispatch_event(Self, ObjectEvent) -> Unit
+pub fn Object3D::get_world_position(Self, @math.Vector3) -> @math.Vector3
+pub fn Object3D::look_at(Self, Double, Double, Double) -> Unit
+pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit
+pub fn Object3D::new(kind? : NodeKind) -> Self
+pub fn Object3D::remove(Self, Self) -> Self
+pub fn Object3D::remove_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
+pub fn Object3D::remove_from_parent(Self) -> Self
+pub fn Object3D::to_node(Self) -> Self
+pub fn Object3D::traverse(Self, (Self) -> Unit) -> Unit
+pub fn Object3D::traverse_visible(Self, (Self) -> Unit) -> Unit
+pub fn Object3D::update_matrix(Self) -> Unit
+pub fn Object3D::update_matrix_world(Self, force? : Bool) -> Unit
+pub fn Object3D::update_world_matrix(Self, update_parents? : Bool, update_children? : Bool, force? : Bool) -> Unit
+pub impl AsNode for Object3D
+
+pub(all) struct ObjectEvent {
+  kind : String
+  mut target : Object3D?
+  mut child : Object3D?
+}
+pub fn ObjectEvent::new(String) -> Self
+
+pub(all) enum ProjectionKind {
+  Perspective
+  Orthographic
+}
 
 // Type aliases
 
 // Traits
+pub(open) trait AsNode {
+  fn to_node(Self) -> Object3D
+}

@@ -1,11 +1,33 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/cameras"
 
+import {
+  "fenriliuguang/three-mbt/core",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct OrthographicCamera {
+  node : @core.Object3D
+}
+pub fn OrthographicCamera::new(left? : Double, right? : Double, top? : Double, bottom? : Double, near? : Double, far? : Double) -> Self
+pub fn OrthographicCamera::set_zoom(Self, Double) -> Unit
+pub fn OrthographicCamera::to_node(Self) -> @core.Object3D
+pub fn OrthographicCamera::update_projection(Self) -> Unit
+pub impl @core.AsNode for OrthographicCamera
+
+pub(all) struct PerspectiveCamera {
+  node : @core.Object3D
+}
+pub fn PerspectiveCamera::new(fov? : Double, aspect? : Double, near? : Double, far? : Double) -> Self
+pub fn PerspectiveCamera::set_aspect(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_fov(Self, Double) -> Unit
+pub fn PerspectiveCamera::to_node(Self) -> @core.Object3D
+pub fn PerspectiveCamera::update_projection(Self) -> Unit
+pub impl @core.AsNode for PerspectiveCamera
 
 // Type aliases
 

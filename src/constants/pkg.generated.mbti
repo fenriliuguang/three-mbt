@@ -2,10 +2,31 @@
 package "fenriliuguang/three-mbt/constants"
 
 // Values
+pub const BACK_SIDE : Int = 1
+
+pub const DOUBLE_SIDE : Int = 2
+
+pub const FRONT_SIDE : Int = 0
+
+pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
+
+pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
 
 // Errors
 
 // Types and methods
+pub(all) enum CoordinateSystem {
+  WebGL
+  WebGPU
+}
+pub fn CoordinateSystem::to_int(Self) -> Int
+
+pub(all) enum Side {
+  Front
+  Back
+  Double
+}
+pub fn Side::to_int(Self) -> Int
 
 // Type aliases
 

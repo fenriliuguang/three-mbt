@@ -1,7 +1,37 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt"
 
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
 // Values
+pub const BACK_SIDE : Int = 1
+
+pub const DOUBLE_SIDE : Int = 2
+
+pub const FRONT_SIDE : Int = 0
+
+pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
+
+pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
+
+pub fn deg_to_rad(Double) -> Double
+
+pub fn linear_to_srgb(Double) -> Double
+
+pub fn rad_to_deg(Double) -> Double
+
+pub fn srgb_to_linear(Double) -> Double
+
 pub let upstream_revision : String
 
 // Errors
@@ -9,5 +39,74 @@ pub let upstream_revision : String
 // Types and methods
 
 // Type aliases
+pub using @lights {type AmbientLight}
+
+pub using @math {type Box3}
+
+pub using @geometries {type BoxGeometry}
+
+pub using @geometries {type BoxParameters}
+
+pub using @core {type BufferAttribute}
+
+pub using @core {type BufferGeometry}
+
+pub using @math {type Color}
+
+pub using @constants {type CoordinateSystem}
+
+pub using @lights {type DirectionalLight}
+
+pub using @math {type Euler}
+
+pub using @math {type EulerOrder}
+
+pub using @math {type Frustum}
+
+pub using @core {type GeometryGroup}
+
+pub using @objects {type Group}
+
+pub using @core {type Layers}
+
+pub using @materials {type Material}
+
+pub using @materials {type MaterialKind}
+
+pub using @math {type Matrix3}
+
+pub using @math {type Matrix4}
+
+pub using @objects {type Mesh}
+
+pub using @materials {type MeshBasicMaterial}
+
+pub using @core {type NodeKind}
+
+pub using @core {type Object3D}
+
+pub using @core {type ObjectEvent}
+
+pub using @cameras {type OrthographicCamera}
+
+pub using @cameras {type PerspectiveCamera}
+
+pub using @math {type Plane}
+
+pub using @math {type Quaternion}
+
+pub using @scenes {type Scene}
+
+pub using @constants {type Side}
+
+pub using @math {type Sphere}
+
+pub using @math {type Vector2}
+
+pub using @math {type Vector3}
+
+pub using @math {type Vector4}
+
+pub using @core {trait AsNode}
 
 // Traits
