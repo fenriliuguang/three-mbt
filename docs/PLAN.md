@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 5 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, and an `rgba8` textured cube whose camera follows pointer events. PBR is phase 6.
+Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Later scenes are phase 7.
 
 ## Pins
 
@@ -117,6 +117,7 @@ src/examples/clear/          phase 1
 src/examples/cube/           phase 3
 src/examples/lit/            phase 4
 src/examples/textured/       phase 5
+src/examples/standard/       phase 6
 ```
 
 Samples live under `src/examples` because only packages inside the `source` directory belong to the module. The clear sample is the Wasm component built from `src/gen`; `moon run src/examples/cube` stays a placeholder until phase 3.
@@ -180,6 +181,8 @@ This phase has landed. `Texture` is width, height, and `rgba8` bytes. Materials 
 
 `MeshStandardMaterial` with baseColor, roughness, and metalness, plus the directional light already in place. Environment maps and PMREM stay later.
 
+This phase has landed. `MeshStandardMaterial` defaults to roughness 1 and metalness 0. The shader is the direct Cook-Torrance term from r186: GGX distribution, Smith correlated visibility, Schlick fresnel, dielectric F0 of 0.04, and a roughness floor of 0.0525. Ambient light only multiplies the diffuse lobe. `examples/standard` is the rotating cube. The window sample is `scripts/build-standard.sh`. Host playback of that component stays out of this pass. Environment maps stay later.
+
 ### 7. Whatever the next scene needs
 
 Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute. Each addition changes the matching row below from "later" to "ported".
@@ -206,7 +209,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 3 | The clear and draw path of `src/renderers/webgpu/WebGPURenderer.js` and `WebGPUBackend.js` | `renderer/webgpu` |
 | planned | 3 | Hand-written unlit WGSL, with no single upstream file | `renderer/webgpu` |
 | planned | 1 | `src/renderers/common/CanvasTarget.js` | `platform` |
-| planned | 4 | The nodes in `src/nodes` that the second material reaches | `nodes` |
+| planned | 4, 6 | The nodes in `src/nodes` that Lambert and Standard reach | `nodes` |
 | later | 7 | Points, Line, InstancedMesh, shadows, RenderTarget, fog, `src/animation`, a glTF loader subset, compute, PostProcessing | A new package, or an extension of an existing one |
 | later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
 | excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |

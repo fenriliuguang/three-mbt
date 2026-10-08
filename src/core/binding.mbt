@@ -9,6 +9,8 @@ pub(all) struct MeshBinding {
   mut transparent : Bool
   mut wireframe : Bool
   map : @textures.Texture?
+  roughness : Double
+  metalness : Double
 }
 
 ///|

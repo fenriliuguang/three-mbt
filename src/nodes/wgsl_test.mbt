@@ -38,3 +38,22 @@ test "lambert material uses ambient and one directional light" {
     true,
   )
 }
+
+///|
+test "standard material uses direct GGX and keeps ambient diffuse" {
+  let wgsl = @nodes.standard_wgsl()
+  assert_eq(includes(wgsl, "fn D_GGX("), true)
+  assert_eq(includes(wgsl, "fn V_GGX_SmithCorrelated("), true)
+  assert_eq(includes(wgsl, "fn F_Schlick("), true)
+  assert_eq(includes(wgsl, "max((uniforms.surface).x, 0.0525)"), true)
+  assert_eq(includes(wgsl, "mix(vec3<f32>(0.04), base.xyz, metalness)"), true)
+  assert_eq(includes(wgsl, "exp2((-5.55473 * VoH - 6.98316) * VoH)"), true)
+  assert_eq(includes(wgsl, "uniforms.model"), true)
+  assert_eq(includes(wgsl, "uniforms.camera_position"), true)
+  assert_eq(includes(wgsl, "@location(2) v_world : vec3<f32>"), true)
+  assert_eq(includes(wgsl, "(uniforms.ambient).xyz * diffuse"), true)
+  assert_eq(
+    includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
+    true,
+  )
+}

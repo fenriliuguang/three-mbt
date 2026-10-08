@@ -12,6 +12,10 @@ pub fn lambert_program() -> Program
 
 pub fn lambert_wgsl() -> String
 
+pub fn standard_program() -> Program
+
+pub fn standard_wgsl() -> String
+
 // Errors
 
 // Types and methods
@@ -28,6 +32,7 @@ pub(all) enum Node {
   Vec4(Node, Node)
   Swizzle(Node, String)
   TextureSample(Node)
+  StandardLit(Node)
 }
 
 pub(all) struct Program {
@@ -38,6 +43,7 @@ pub(all) struct Program {
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
   sampled : Bool
+  preamble : String
 }
 
 pub(all) enum ValueType {

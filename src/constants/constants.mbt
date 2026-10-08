@@ -43,10 +43,11 @@ pub fn Side::to_int(self : Side) -> Int {
 }
 
 ///|
-/// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光。
+/// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
 pub(all) enum Shading {
   Basic
   Lambert
+  Standard
 }
 
 ///|

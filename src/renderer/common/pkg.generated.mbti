@@ -25,7 +25,7 @@ pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @c
 
 pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 
-pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3) -> FixedArray[Byte]
+pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double) -> FixedArray[Byte]
 
 pub fn pad_texture_rows(FixedArray[Byte], Int, Int) -> (FixedArray[Byte], Int)
 
@@ -52,6 +52,8 @@ pub(all) struct RenderItem {
   side : @constants.Side
   opacity : Double
   map : @textures.Texture?
+  roughness : Double
+  metalness : Double
 }
 
 // Type aliases

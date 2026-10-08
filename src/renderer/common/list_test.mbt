@@ -92,6 +92,7 @@ test "packed vertices and uniforms are little-endian f32" {
   let color = @math.Color::new(r=0.0, g=1.0, b=0.0)
   let zero = @math.Vector3::new()
   let up = @math.Vector3::new(y=1.0)
+  let eye = @math.Vector3::new(y=1.0)
   let uniforms = @common.pack_uniforms(
     mvp,
     @common.normal_matrix(mvp),
@@ -100,6 +101,10 @@ test "packed vertices and uniforms are little-endian f32" {
     zero,
     zero,
     up,
+    mvp,
+    eye,
+    0.5,
+    1.0,
   )
   assert_eq(uniforms.length(), @common.uniform_bytes)
   assert_eq(uniforms[0], b'\x00')
@@ -114,6 +119,44 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(uniforms[181], b'\x00')
   assert_eq(uniforms[182], b'\x80')
   assert_eq(uniforms[183], b'\x3F')
+  assert_eq(uniforms[192], b'\x00')
+  assert_eq(uniforms[193], b'\x00')
+  assert_eq(uniforms[194], b'\x80')
+  assert_eq(uniforms[195], b'\x3F')
+  assert_eq(uniforms[260], b'\x00')
+  assert_eq(uniforms[261], b'\x00')
+  assert_eq(uniforms[262], b'\x80')
+  assert_eq(uniforms[263], b'\x3F')
+  assert_eq(uniforms[272], b'\x00')
+  assert_eq(uniforms[273], b'\x00')
+  assert_eq(uniforms[274], b'\x00')
+  assert_eq(uniforms[275], b'\x3F')
+  assert_eq(uniforms[276], b'\x00')
+  assert_eq(uniforms[277], b'\x00')
+  assert_eq(uniforms[278], b'\x80')
+  assert_eq(uniforms[279], b'\x3F')
+}
+
+///|
+test "standard material keeps roughness and metalness" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let standard = @materials.MeshStandardMaterial::new(
+    roughness=0.25,
+    metalness=0.75,
+  )
+  assert_eq(standard.material.roughness, 0.25)
+  assert_eq(standard.material.metalness, 0.75)
+  let defaults = @materials.MeshStandardMaterial::new()
+  assert_eq(defaults.material.roughness, 1.0)
+  assert_eq(defaults.material.metalness, 0.0)
+  let mesh = @objects.Mesh::new(box.geometry, standard.material)
+  ignore(scene.add(mesh))
+  let items = @common.collect_opaque(scene.node)
+  assert_eq(items.length(), 1)
+  assert_eq(items[0].shading is @constants.Standard, true)
+  assert_eq(items[0].roughness, 0.25)
+  assert_eq(items[0].metalness, 0.75)
 }
 
 ///|

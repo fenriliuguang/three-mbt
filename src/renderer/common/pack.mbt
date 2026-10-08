@@ -2,8 +2,9 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 两块 `mat4x4<f32>` 和四块 `vec4<f32>`。192 字节，两种材质共用。
-pub let uniform_bytes : Int = 192
+/// 三块 `mat4x4<f32>` 和六块 `vec4<f32>`。288 字节，三种材质共用。
+/// 末尾是模型矩阵、相机位置，以及 `surface = (roughness, metalness, 0, 0)`。
+pub let uniform_bytes : Int = 288
 
 ///|
 /// 位置、法线、uv 交错存放时每个顶点的字节数。
@@ -163,7 +164,7 @@ pub fn normal_matrix(model : @math.Matrix4) -> @math.Matrix4 {
 }
 
 ///|
-/// `mvp`、法线矩阵、颜色、环境光、平行光颜色和方向。
+/// `mvp`、法线矩阵、颜色、环境光、平行光，然后是模型矩阵、相机位置、粗糙度和金属度。
 pub fn pack_uniforms(
   mvp : @math.Matrix4,
   normals : @math.Matrix4,
@@ -172,6 +173,10 @@ pub fn pack_uniforms(
   ambient : @math.Vector3,
   light_color : @math.Vector3,
   light_direction : @math.Vector3,
+  model : @math.Matrix4,
+  camera_position : @math.Vector3,
+  roughness : Double,
+  metalness : Double,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -183,5 +188,9 @@ pub fn pack_uniforms(
   write_vec3(dst, 144, ambient.x, ambient.y, ambient.z)
   write_vec3(dst, 160, light_color.x, light_color.y, light_color.z)
   write_vec3(dst, 176, light_direction.x, light_direction.y, light_direction.z)
+  write_matrix4(dst, 192, model)
+  write_vec3(dst, 256, camera_position.x, camera_position.y, camera_position.z)
+  write_f32(dst, 272, roughness)
+  write_f32(dst, 276, metalness)
   dst
 }

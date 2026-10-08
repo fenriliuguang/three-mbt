@@ -9,7 +9,7 @@ pub(all) enum ValueType {
 }
 
 ///|
-/// 材质图里的一个节点。只覆盖基础材质和 Lambert 会走到的运算。
+/// 材质图里的一个节点。覆盖基础材质、Lambert，以及 Standard 的直接光。
 pub(all) enum Node {
   Uniform(String, ValueType)
   Attribute(String, Int, ValueType)
@@ -23,6 +23,7 @@ pub(all) enum Node {
   Vec4(Node, Node)
   Swizzle(Node, String)
   TextureSample(Node)
+  StandardLit(Node)
 }
 
 ///|
@@ -34,6 +35,7 @@ pub(all) struct Program {
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
   sampled : Bool
+  preamble : String
 }
 
 ///|
@@ -45,7 +47,39 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("ambient", Vec4),
     ("light_color", Vec4),
     ("light_direction", Vec4),
+    ("model", Mat4),
+    ("camera_position", Vec4),
+    ("surface", Vec4),
   ]
+}
+
+///|
+/// 直接光的 Cook-Torrance。粗糙度下限 0.0525，电介质 F0 为 0.04，与 r186 的物理光照一致。
+/// 环境光只乘漫反射。没有环境贴图，所以金属在背光处是黑的。
+fn standard_preamble() -> String {
+  let lines = [
+    "fn D_GGX(alpha : f32, NoH : f32) -> f32 {\n", "  let a2 = alpha * alpha;\n",
+    "  let d = (NoH * a2 - NoH) * NoH + 1.0;\n", "  return 0.3183098861837907 * a2 / (d * d);\n",
+    "}\n\n", "fn V_GGX_SmithCorrelated(alpha : f32, NoL : f32, NoV : f32) -> f32 {\n",
+    "  let a2 = alpha * alpha;\n", "  let gv = NoL * sqrt(a2 + (1.0 - a2) * (NoV * NoV));\n",
+    "  let gl = NoV * sqrt(a2 + (1.0 - a2) * (NoL * NoL));\n", "  return 0.5 / max(gv + gl, 0.000001);\n",
+    "}\n\n", "fn F_Schlick(f0 : vec3<f32>, VoH : f32) -> vec3<f32> {\n", "  let fresnel = exp2((-5.55473 * VoH - 6.98316) * VoH);\n",
+    "  return f0 * (1.0 - fresnel) + fresnel;\n", "}\n\n", "fn standard_lit(base : vec4<f32>, normal : vec3<f32>, world : vec3<f32>) -> vec4<f32> {\n",
+    "  let roughness = max((uniforms.surface).x, 0.0525);\n", "  let metalness = clamp((uniforms.surface).y, 0.0, 1.0);\n",
+    "  let alpha = roughness * roughness;\n", "  let diffuse_color = base.xyz * (1.0 - metalness);\n",
+    "  let f0 = mix(vec3<f32>(0.04), base.xyz, metalness);\n", "  let N = normalize(normal);\n",
+    "  let V = normalize((uniforms.camera_position).xyz - world);\n", "  let L = normalize((uniforms.light_direction).xyz);\n",
+    "  let H = normalize(V + L);\n", "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n",
+    "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
+    "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  let direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL;\n",
+    "  let indirect = (uniforms.ambient).xyz * diffuse;\n", "  return vec4<f32>(direct + indirect, base.w);\n",
+    "}\n\n",
+  ]
+  let mut text = ""
+  for line in lines {
+    text = text + line
+  }
+  text
 }
 
 ///|
@@ -68,6 +102,7 @@ pub fn basic_program() -> Program {
     vertex_varyings: [("v_uv", Attribute("uv", 2, Vec2))],
     fragment_color: Mul(Uniform("color", Vec4), sample),
     sampled: true,
+    preamble: "",
   }
 }
 
@@ -108,5 +143,40 @@ pub fn lambert_program() -> Program {
       Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
     ),
     sampled: true,
+    preamble: "",
+  }
+}
+
+///|
+/// Standard：`baseColor * (1 - metalness)` 的 Lambert 漫反射，加上 GGX 高光。`baseColor` 已乘贴图。
+pub fn standard_program() -> Program {
+  let position = Attribute("position", 0, Vec3)
+  let normal = Attribute("normal", 1, Vec3)
+  let world_normal = Swizzle(
+    Mul(Uniform("normal_matrix", Mat4), Vec4(normal, Float(0.0))),
+    "xyz",
+  )
+  let world = Swizzle(
+    Mul(Uniform("model", Mat4), Vec4(position, Float(1.0))),
+    "xyz",
+  )
+  let sample = TextureSample(Varying("v_uv", Vec2))
+  let base = Node::Vec4(
+    Mul(Swizzle(Uniform("color", Vec4), "xyz"), Swizzle(sample, "xyz")),
+    Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+  )
+  {
+    uniforms: frame_uniforms(),
+    attributes: position_attributes(),
+    varyings: [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
+    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
+    vertex_varyings: [
+      ("v_normal", world_normal),
+      ("v_uv", Attribute("uv", 2, Vec2)),
+      ("v_world", world),
+    ],
+    fragment_color: StandardLit(base),
+    sampled: true,
+    preamble: standard_preamble(),
   }
 }

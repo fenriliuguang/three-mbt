@@ -42,6 +42,7 @@ pub fn CoordinateSystem::to_int(Self) -> Int
 pub(all) enum Shading {
   Basic
   Lambert
+  Standard
 }
 
 pub(all) enum Side {

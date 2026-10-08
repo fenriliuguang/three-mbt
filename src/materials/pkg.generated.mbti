@@ -19,15 +19,19 @@ pub(all) struct Material {
   mut transparent : Bool
   mut wireframe : Bool
   mut map : @textures.Texture?
+  mut roughness : Double
+  mut metalness : Double
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
 pub fn Material::lambert(hex? : Int) -> Self
 pub fn Material::shading(Self) -> @constants.Shading
+pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 
 pub(all) enum MaterialKind {
   Basic
   Lambert
+  Standard
 }
 
 pub(all) struct MeshBasicMaterial {
@@ -39,6 +43,11 @@ pub(all) struct MeshLambertMaterial {
   material : Material
 }
 pub fn MeshLambertMaterial::new(hex? : Int) -> Self
+
+pub(all) struct MeshStandardMaterial {
+  material : Material
+}
+pub fn MeshStandardMaterial::new(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 
 // Type aliases
 

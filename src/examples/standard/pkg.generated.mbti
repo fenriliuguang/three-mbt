@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/standard"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct StandardScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  mesh : @objects.Mesh
+  mut angle : Double
+}
+pub fn StandardScene::new() -> Self
+pub fn StandardScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

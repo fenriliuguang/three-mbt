@@ -57,7 +57,7 @@ struct CullPipelines {
 
 ///|
 /// 一帧里的不透明网格。深度比较是 `less`，近平面为 0。
-/// 没有贴图的材质使用一张 1×1 白纹理，因此两种着色器始终采样。
+/// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
@@ -67,6 +67,7 @@ pub struct WebGPURenderer {
   texture_layout : GpuBindGroupLayout
   basic : CullPipelines
   lambert : CullPipelines
+  standard : CullPipelines
   white : TextureGpu
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
@@ -348,6 +349,11 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let format = @gpu.get_gpu().get_preferred_canvas_format()
   let basic_shader = shader_module(device, @nodes.basic_wgsl(), "basic")
   let lambert_shader = shader_module(device, @nodes.lambert_wgsl(), "lambert")
+  let standard_shader = shader_module(
+    device,
+    @nodes.standard_wgsl(),
+    "standard",
+  )
   let layout = device.create_bind_group_layout({
     entries: [
       {
@@ -417,6 +423,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     texture_layout,
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
+    standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
     white,
     depth: None,
     geometries: [],
@@ -437,6 +444,7 @@ fn WebGPURenderer::pipeline(
   let group = match shading {
     @constants.Basic => self.basic
     @constants.Lambert => self.lambert
+    @constants.Standard => self.standard
   }
   match side {
     @constants.Front => group.front
@@ -735,6 +743,7 @@ pub fn WebGPURenderer::render(
       Some(geometry) => {
         let mvp = @common.model_view_projection(state, item.node)
         let gpu = self.object_gpu(item.node)
+        let eye = camera.matrix_world.elements
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -743,6 +752,10 @@ pub fn WebGPURenderer::render(
           lights.ambient,
           lights.color,
           lights.direction,
+          item.node.matrix_world,
+          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
+          item.roughness,
+          item.metalness,
         )
         ignore(
           self.device

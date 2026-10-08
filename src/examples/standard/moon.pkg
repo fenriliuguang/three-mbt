@@ -1,0 +1,16 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 6：MeshStandardMaterial 的直接光。没有环境贴图。

@@ -76,6 +76,7 @@ pub using @materials {
   type MaterialKind,
   type MeshBasicMaterial,
   type MeshLambertMaterial,
+  type MeshStandardMaterial,
 }
 
 ///|

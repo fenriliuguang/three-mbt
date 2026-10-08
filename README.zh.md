@@ -4,7 +4,7 @@
 
 把 [three.js](https://github.com/mrdoob/three.js) **r186** 的 WebGPU 世界迁到 MoonBit。GPU 使用 [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu)，窗口、帧循环和输入使用 [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx)。
 
-阶段 1 会打开 wasi-gfx 窗口，配置 WebGPU 交换链，并在每一帧清屏。阶段 2 是 CPU 场景图，并用 r186 的数值做对照。阶段 3 绘制一个不受光照的旋转立方体。阶段 4 加上 Lambert 着色、环境光和一盏平行光。阶段 5 加上 `rgba8` 纹理，在窗口缩放时重建交换链，并在样本里用指针事件转动相机。范围写在 [docs/PLAN.md](docs/PLAN.md)。
+阶段 1 会打开 wasi-gfx 窗口，配置 WebGPU 交换链，并在每一帧清屏。阶段 2 是 CPU 场景图，并用 r186 的数值做对照。阶段 3 绘制一个不受光照的旋转立方体。阶段 4 加上 Lambert 着色、环境光和一盏平行光。阶段 5 加上 `rgba8` 纹理，在窗口缩放时重建交换链，并在样本里用指针事件转动相机。阶段 6 加上 `MeshStandardMaterial` 的粗糙度、金属度和平行光。范围写在 [docs/PLAN.md](docs/PLAN.md)。
 
 ## 检查
 
@@ -51,6 +51,14 @@ sh scripts/build-textured.sh
 ```
 
 把 `target/textured.component.wasm` 复制到 `examples/apps/textured/textured.component.wasm`，然后 `cargo xtask run-demo --name textured`。`moon run src/examples/textured/app` 不会打开窗口。
+
+Standard 样本是一个带粗糙度和金属度的旋转立方体：
+
+```sh
+sh scripts/build-standard.sh
+```
+
+把 `target/standard.component.wasm` 复制到 `examples/apps/standard/standard.component.wasm`，然后 `cargo xtask run-demo --name standard`。`moon run src/examples/standard/app` 不会打开窗口。
 
 ## 许可
 

@@ -102,6 +102,8 @@ pub using @materials {type MeshBasicMaterial}
 
 pub using @materials {type MeshLambertMaterial}
 
+pub using @materials {type MeshStandardMaterial}
+
 pub using @core {type NodeKind}
 
 pub using @core {type Object3D}

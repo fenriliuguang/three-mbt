@@ -35,6 +35,8 @@ fn emit_expr(node : Node) -> String {
     Swizzle(value, suffix) => "(\{emit_expr(value)}).\{suffix}"
     TextureSample(uv) =>
       "textureSample(map_texture, map_sampler, \{emit_expr(uv)})"
+    StandardLit(base) =>
+      "standard_lit(\{emit_expr(base)}, input.v_normal, input.v_world)"
   }
 }
 
@@ -50,7 +52,7 @@ fn emit_fields(
 }
 
 ///|
-/// 把材质节点编成一段 WGSL。两种材质共用同一块 uniform。
+/// 把材质节点编成一段 WGSL。三种材质共用同一块 uniform。
 pub fn emit_wgsl(program : Program) -> String {
   let lines = []
   lines.push("struct Uniforms {\n")
@@ -61,6 +63,9 @@ pub fn emit_wgsl(program : Program) -> String {
     lines.push("@group(1) @binding(1) var map_sampler : sampler;\n")
   }
   lines.push("\n")
+  if program.preamble != "" {
+    lines.push(program.preamble)
+  }
   lines.push("struct VertexInput {\n")
   for attribute in program.attributes {
     let (name, location, ty) = attribute
@@ -101,4 +106,9 @@ pub fn basic_wgsl() -> String {
 ///|
 pub fn lambert_wgsl() -> String {
   emit_wgsl(lambert_program())
+}
+
+///|
+pub fn standard_wgsl() -> String {
+  emit_wgsl(standard_program())
 }
