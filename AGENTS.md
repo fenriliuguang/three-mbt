@@ -17,3 +17,7 @@ MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](
 - 代码按 `///|` 分块。
 - 改完后运行 `moon info && moon fmt`，并查看 `.mbti` 差异。
 - 运行 `moon test`。稳定结果用 `assert_eq`。
+
+## 提交
+
+仓库尚未正式发版。云 Agent 在 `main` 上提交并 `git push origin main`，不建功能分支、不开 Pull Request。步骤见 [.cursor/skills/direct-to-main/SKILL.md](.cursor/skills/direct-to-main/SKILL.md)。
