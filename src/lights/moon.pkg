@@ -1,0 +1,2 @@
+// 阶段 2 放灯光对象，阶段 4 起参与着色。
+// 计划依赖 fenriliuguang/three-mbt/core 与 math。

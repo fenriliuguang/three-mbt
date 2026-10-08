@@ -1,0 +1,2 @@
+// 阶段 2。先实现 BoxGeometry。
+// 计划依赖 fenriliuguang/three-mbt/core 与 math。

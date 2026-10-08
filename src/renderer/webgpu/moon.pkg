@@ -1,0 +1,2 @@
+// 阶段 3。WebGPUBackend 与 WGSL。
+// 计划依赖 fenriliuguang/three-mbt/renderer/common 与 platform。

@@ -1,0 +1,3 @@
+// 阶段 1。Gpu 与 SurfaceTarget。
+// 计划依赖 fenriliuguang/three-mbt/bindings。
+// 场景图各包不得依赖本包。

@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt",
+}
+
+pkgtype(kind: "executable")
+
+// 阶段 3：旋转立方体，世界第一次上屏。

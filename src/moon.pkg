@@ -1,0 +1,2 @@
+// 对外门面 fenriliuguang/three-mbt。
+// 子包导出稳定 API 之后，再在本包重新导出。

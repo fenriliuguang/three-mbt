@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt",
+}
+
+pkgtype(kind: "executable")
+
+// 阶段 1 接入 platform，用 surface-webgpu 清屏并 present。

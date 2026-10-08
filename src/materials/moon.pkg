@@ -1,0 +1,2 @@
+// 阶段 2 放材质数据，阶段 3 起接入着色。
+// 计划依赖 fenriliuguang/three-mbt/constants 与 math。

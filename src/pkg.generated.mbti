@@ -1,0 +1,13 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt"
+
+// Values
+pub let upstream_revision : String
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

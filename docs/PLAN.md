@@ -1,0 +1,213 @@
+# three-mbt migration plan
+
+Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
+
+Phase 0 has landed the module, directories, and pinned WIT. Binding generation and drawing come next.
+
+## Pins
+
+| Item | Value |
+|---|---|
+| three.js | Tag `r186`, matching `src/Three.WebGPU.js` (published entry `three/webgpu`) |
+| GPU | `wit/webgpu`, `wasi:webgpu@0.3.0-rc.2` |
+| Window and input | `wit/surface`, `wasi-gfx:surface@0.2.0` and `surface-webgpu` |
+| Host | [wasi-gfx-runtime](https://github.com/wasi-gfx/wasi-gfx), which provides both surface and wasi:webgpu |
+| This repository | Apache-2.0 |
+| Upstream three.js | MIT |
+
+Commit hashes are in [wit/README.md](../wit/README.md). `wasi:webgpu` is in Phase 2. A WIT upgrade touches `wit/` and `bindings`, then both of those records.
+
+## Scope
+
+The world is the scene description and the draw of that scene:
+
+- Math, scene graph, cameras, geometries, meshes, materials, lights, textures
+- The traverse, lists, objects, and bindings from `src/renderers/common` that the WebGPU path uses
+- `WebGPUBackend` and the WGSL it depends on
+
+r186's `WebGPURenderer` falls back to `WebGLBackend` when WebGPU is missing. This project has a WebGPU interface only, so that fallback stays upstream, including `forceWebGL`.
+
+After the world draws reliably, add features by how much they add to one scene: animation, a glTF subset, post-processing, shadows, instancing, points and lines, compute.
+
+Out of scope:
+
+- `WebGLRenderer`, `src/renderers/webgl`, `webgl-fallback`, `src/renderers/shaders` (GLSL)
+- `webxr`, audio, CSS2D / CSS3D, the editor
+- DOM image paths (`HTMLImageElement`, `createImageBitmap`). Textures enter the library as width, height, and `rgba8` bytes
+- `wasi-gfx`'s `frame-buffer`. WebGPU presentation uses `surface-webgpu`
+
+## Interface split
+
+`wasi:webgpu` leaves presentation to the host. The current texture comes from `surface-webgpu.context`, and a finished frame calls `present`.
+
+| Capability | Interface | Replaces in r186 |
+|---|---|---|
+| Device, buffers, textures, pipelines, drawing | `webgpu` in `wasi:webgpu@0.3.0-rc.2` | `GPUDevice`, `GPUQueue`, and the rest of the device API |
+| Window, size, frames, keyboard, pointer | `surface` in `wasi-gfx:surface@0.2.0` | The canvas and DOM events |
+| Turn the window into a swapchain | `configure`, `get-current-texture`, `present` on `surface-webgpu.context` | `CanvasTarget` |
+
+`request-adapter` and `request-device` are async in the WIT. Phase 1 starts by confirming the MoonBit bindings can complete both calls.
+
+## Architecture
+
+Dependencies point downward. The scene graph has no WIT imports. `platform` and `renderer/webgpu` are the packages that import the WebGPU bindings. `platform` and the application shell are the packages that touch surface.
+
+```text
+src/examples                 executable samples
+        |
+src (facade fenriliuguang/three-mbt)
+        |
++---------------------------+-------------------------------+
+| world, CPU only           | renderer                      |
+| math core cameras         | common: traverse, lists,      |
+| scenes objects            |   objects, bindings           |
+| geometries materials      | webgpu: backend, WGSL,        |
+| lights textures constants |   pipelines                   |
++---------------------------+-------------------------------+
+        |
+src/platform                 Gpu, SurfaceTarget
+        |
+src/bindings                 generated from wit/
+        |
+wit/                         pinned webgpu and surface
+        |
+wasi-gfx-runtime
+```
+
+`moon.mod` sets `source = "src"`, so import paths omit `src`. `src/math` is imported as `fenriliuguang/three-mbt/math`. The public facade is the source-root package `fenriliuguang/three-mbt`.
+
+One frame:
+
+```text
+surface.on-frame
+  -> the application updates Object3D
+  -> WebGPURenderer.render(scene, camera)
+       -> update world matrices and the camera projection
+       -> build the opaque render list
+       -> context.get-current-texture()
+       -> upload vertices and uniforms, draw
+       -> context.present()
+```
+
+## Layout
+
+```text
+moon.mod
+docs/PLAN.md
+wit/webgpu/                  wasi:webgpu@0.3.0-rc.2
+wit/surface/                 surface@0.2.0 and surface-webgpu
+tests/fixtures/              r186 numeric fixtures, from phase 2
+src/                         facade
+src/bindings/
+src/platform/
+src/constants/
+src/math/
+src/core/
+src/cameras/
+src/scenes/
+src/objects/
+src/geometries/
+src/materials/
+src/lights/
+src/textures/
+src/renderer/common/
+src/renderer/webgpu/
+src/nodes/                   empty until phase 4
+src/examples/clear/          phase 1
+src/examples/cube/           phase 3
+```
+
+Samples live under `src/examples` because only packages inside the `source` directory belong to the module. Run them with:
+
+```sh
+moon run src/examples/clear
+moon run src/examples/cube
+```
+
+## Correspondence with r186
+
+| This repository | r186 |
+|---|---|
+| `math` `core` `cameras` `scenes` `objects` `geometries` `materials` `lights` `textures` `constants` | The same directories, plus the used subset of `src/constants.js` |
+| `renderer/common` | The list, object, and binding files in `src/renderers/common` |
+| `renderer/webgpu` | `WebGPURenderer.js`, `WebGPUBackend.js`, `utils/*`, `nodes/WGSLNodeBuilder.js` |
+| `platform` | `CanvasTarget.js`, retargeted at `surface` + `surface-webgpu.context` |
+| `nodes` | The on-demand subset of `src/nodes` |
+| No package | `WebGLBackend`, `webgl/`, `shaders/`, `webxr/`, `audio/` |
+
+`Renderer.js` (about 108KB), `WebGPUBackend.js` (about 94KB), and `WGSLNodeBuilder.js` (about 81KB) move along the draw path, one slice at a time.
+
+## Rules
+
+1. The world comes before shaders. Scene-graph and matrix tests use r186 numbers and run without a GPU. Fixtures live in `tests/fixtures/`.
+2. Hard-coded WGSL comes before the node graph. In r186, materials become TSL, then `WGSLNodeBuilder` emits WGSL. The first shading implementation is one WGSL program for `MeshBasicMaterial`. The node system grows later, following only the nodes that material actually reaches.
+3. three.js runtime tags become MoonBit types. `isMesh` becomes a trait or an enum. Uniforms use explicit layouts. Constant numeric values stay aligned with r186 so fixtures compare directly.
+4. Every phase has a runnable sample. The next phase starts after that sample runs.
+5. This is a semantic port. Upstream files that the port uses are listed in the table below.
+
+## Phases
+
+### 0. Skeleton
+
+The module, package directories, pinned WIT, and `moon check`. Binding generation is the first step of phase 1.
+
+### 1. Swapchain
+
+Call `gpu.request-adapter`, then `request-device`. Create a `surface`, call `context.configure`, and on `on-frame` clear and `present`. This phase has no three.js types yet. `examples/clear` ends as a real clear. Upstream still marks `present` on `surface-webgpu` as TODO. Confirm the current-texture and present behavior on wasi-gfx-runtime, then freeze `SurfaceTarget`.
+
+### 2. World (CPU)
+
+`Vector3`, `Matrix4`, `Quaternion`, `Euler`, `Color`, `Object3D`, `PerspectiveCamera`, `Scene`, `BufferGeometry`, `BoxGeometry`, `Mesh`. Fixture tests cover r186 matrices, decomposition, and projection.
+
+### 3. First frame of the world
+
+A minimal `WebGPURenderer.render`: matrix updates, one opaque list, a depth buffer, unlit WGSL, vertex buffers, and an MVP uniform. `examples/cube` is a rotating cube. Frustum culling, sorting, and multi-pass wait.
+
+### 4. A second material
+
+Ambient light, one directional light, and `MeshLambertMaterial` or a thin Standard. This is the point to add a minimal node set (uniform, attribute, varying, a few vector operations) or a small compiler that knows these two materials. `WGSLNodeBuilder.js` stays whole upstream.
+
+### 5. Textures and window events
+
+`rgba8` textures and samplers. `on-resize` rebuilds the swapchain. A sample uses `on-pointer-*` to move the camera. Input stays in the sample.
+
+### 6. PBR subset
+
+`MeshStandardMaterial` with baseColor, roughness, and metalness, plus the directional light already in place. Environment maps and PMREM stay later.
+
+### 7. Whatever the next scene needs
+
+Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute. Each addition changes the matching row below from "later" to "ported".
+
+Phase 3 ends with a world that can turn. TSL stays closed until phase 4.
+
+## Upstream file map
+
+Status: planned = ported in that phase; later = decided in phase 7; excluded = stays out of this repository.
+
+| Status | Phase | r186 | This repository |
+|---|---|---|---|
+| planned | 2 | Vector2/3/4, Matrix3/4, Quaternion, Euler, Color, Box3, Sphere, Frustum from `src/math` | `math` |
+| planned | 2 | Object3D, BufferAttribute, BufferGeometry, Layers from `src/core`. EventDispatcher keeps the part the scene graph uses | `core` |
+| planned | 2 | Camera, PerspectiveCamera, OrthographicCamera from `src/cameras` | `cameras` |
+| planned | 2 | `src/scenes/Scene.js` | `scenes` |
+| planned | 2 | Group, Mesh from `src/objects` | `objects` |
+| planned | 2 | `src/geometries/BoxGeometry.js` | `geometries` |
+| planned | 2–6 | Material and MeshBasicMaterial from `src/materials`, then Lambert and Standard | `materials` |
+| planned | 2, 4 | Light, AmbientLight, DirectionalLight from `src/lights` | `lights` |
+| planned | 5 | `src/textures/Texture.js` | `textures` |
+| planned | 2 onward | Enums from `src/constants.js` as they are used | `constants` |
+| planned | 3 | The Renderer, RenderList, RenderObject, Geometries, and Attributes subset of `src/renderers/common` | `renderer/common` |
+| planned | 3 | The clear and draw path of `src/renderers/webgpu/WebGPURenderer.js` and `WebGPUBackend.js` | `renderer/webgpu` |
+| planned | 3 | Hand-written unlit WGSL, with no single upstream file | `renderer/webgpu` |
+| planned | 1 | `src/renderers/common/CanvasTarget.js` | `platform` |
+| planned | 4 | The nodes in `src/nodes` that the second material reaches | `nodes` |
+| later | 7 | Points, Line, InstancedMesh, shadows, RenderTarget, fog, `src/animation`, a glTF loader subset, compute, PostProcessing | A new package, or an extension of an existing one |
+| later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
+| excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
+
+## Risks
+
+- If phase 1 shows that the component-model bindings cannot express async `request-adapter` / `request-device`, the scene graph keeps its own call shape. `bindings` is a separate package so that layer can be replaced.
+- Schedule risk sits in the node compiler. Hard-coded WGSL pushes that risk to phase 4.
+- Phase 1 checks the host meaning of `present` on wasi-gfx-runtime before `SurfaceTarget` is written.
