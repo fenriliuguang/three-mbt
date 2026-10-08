@@ -5,6 +5,7 @@ import {
   "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface",
   "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface-webgpu" @canvas,
   "fenriliuguang/three-mbt/interface/wasi/webgpu/webgpu" @gpu,
+  "fenriliuguang/three-mbt/nodes",
   "fenriliuguang/three-mbt/platform",
   "fenriliuguang/three-mbt/renderer/common",
   "fenriliuguang/three-mbt/scenes",

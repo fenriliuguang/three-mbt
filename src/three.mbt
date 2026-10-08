@@ -10,6 +10,7 @@ pub using @constants {
   WEBGL_COORDINATE_SYSTEM,
   WEBGPU_COORDINATE_SYSTEM,
   type CoordinateSystem,
+  type Shading,
   type Side,
 }
 
@@ -59,7 +60,12 @@ pub using @objects {type Group, type Mesh}
 pub using @geometries {type BoxGeometry, type BoxParameters}
 
 ///|
-pub using @materials {type Material, type MaterialKind, type MeshBasicMaterial}
+pub using @materials {
+  type Material,
+  type MaterialKind,
+  type MeshBasicMaterial,
+  type MeshLambertMaterial,
+}
 
 ///|
 pub using @lights {type AmbientLight, type DirectionalLight}

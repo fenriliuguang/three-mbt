@@ -20,15 +20,23 @@ pub(all) struct Material {
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
+pub fn Material::lambert(hex? : Int) -> Self
+pub fn Material::shading(Self) -> @constants.Shading
 
 pub(all) enum MaterialKind {
   Basic
+  Lambert
 }
 
 pub(all) struct MeshBasicMaterial {
   material : Material
 }
 pub fn MeshBasicMaterial::new(hex? : Int) -> Self
+
+pub(all) struct MeshLambertMaterial {
+  material : Material
+}
+pub fn MeshLambertMaterial::new(hex? : Int) -> Self
 
 // Type aliases
 

@@ -2,8 +2,8 @@
 using @core {type BufferAttribute}
 
 ///|
-/// `mat4x4<f32>` 加 `vec4<f32>`。80 字节，16 字节对齐。
-pub let uniform_bytes : Int = 80
+/// 两块 `mat4x4<f32>` 和四块 `vec4<f32>`。192 字节，两种材质共用。
+pub let uniform_bytes : Int = 192
 
 ///|
 fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
@@ -22,6 +22,30 @@ fn write_u32(dst : FixedArray[Byte], offset : Int, value : Int) -> Unit {
   dst[offset + 1] = (bits >> 8).to_byte()
   dst[offset + 2] = (bits >> 16).to_byte()
   dst[offset + 3] = (bits >> 24).to_byte()
+}
+
+///|
+fn write_vec3(
+  dst : FixedArray[Byte],
+  offset : Int,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> Unit {
+  write_f32(dst, offset, x)
+  write_f32(dst, offset + 4, y)
+  write_f32(dst, offset + 8, z)
+}
+
+///|
+fn write_matrix4(
+  dst : FixedArray[Byte],
+  offset : Int,
+  matrix : @math.Matrix4,
+) -> Unit {
+  for index in 0..<16 {
+    write_f32(dst, offset + index * 4, matrix.elements[index])
+  }
 }
 
 ///|
@@ -45,19 +69,74 @@ pub fn pack_u32_indices(index : BufferAttribute) -> FixedArray[Byte] {
 }
 
 ///|
-/// 模型视图投影在前 64 字节，线性颜色和透明度在后 16 字节。
+/// 位置和法线交错存放，每个顶点 24 字节。缺少法线时写成 `(0, 0, 1)`。
+pub fn pack_position_normal(
+  position : BufferAttribute,
+  normal : BufferAttribute?,
+) -> FixedArray[Byte] {
+  let dst = FixedArray::make(position.count * 24, b'\x00')
+  for index in 0..<position.count {
+    let base = index * 24
+    write_vec3(
+      dst,
+      base,
+      position.get_x(index),
+      position.get_y(index),
+      position.get_z(index),
+    )
+    match normal {
+      Some(normal) if index < normal.count =>
+        write_vec3(
+          dst,
+          base + 12,
+          normal.get_x(index),
+          normal.get_y(index),
+          normal.get_z(index),
+        )
+      _ => write_f32(dst, base + 20, 1.0)
+    }
+  }
+  dst
+}
+
+///|
+/// 把模型矩阵的法线矩阵放进 4×4 的左上角，供 WGSL 的 `mat4x4` 使用。
+pub fn normal_matrix(model : @math.Matrix4) -> @math.Matrix4 {
+  let source = @math.Matrix3::new().get_normal_matrix(model).elements
+  let matrix = @math.Matrix4::new()
+  let destination = matrix.elements
+  destination[0] = source[0]
+  destination[1] = source[1]
+  destination[2] = source[2]
+  destination[4] = source[3]
+  destination[5] = source[4]
+  destination[6] = source[5]
+  destination[8] = source[6]
+  destination[9] = source[7]
+  destination[10] = source[8]
+  matrix
+}
+
+///|
+/// `mvp`、法线矩阵、颜色、环境光、平行光颜色和方向。
 pub fn pack_uniforms(
   mvp : @math.Matrix4,
+  normals : @math.Matrix4,
   color : @math.Color,
   opacity : Double,
+  ambient : @math.Vector3,
+  light_color : @math.Vector3,
+  light_direction : @math.Vector3,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
-  for index in 0..<16 {
-    write_f32(dst, index * 4, mvp.elements[index])
-  }
-  write_f32(dst, 64, color.r)
-  write_f32(dst, 68, color.g)
-  write_f32(dst, 72, color.b)
-  write_f32(dst, 76, opacity)
+  write_matrix4(dst, 0, mvp)
+  write_matrix4(dst, 64, normals)
+  write_f32(dst, 128, color.r)
+  write_f32(dst, 132, color.g)
+  write_f32(dst, 136, color.b)
+  write_f32(dst, 140, opacity)
+  write_vec3(dst, 144, ambient.x, ambient.y, ambient.z)
+  write_vec3(dst, 160, light_color.x, light_color.y, light_color.z)
+  write_vec3(dst, 176, light_direction.x, light_direction.y, light_direction.z)
   dst
 }

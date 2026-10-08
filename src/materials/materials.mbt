@@ -1,7 +1,8 @@
 ///|
-/// 阶段 2 只有不受光照的基础材质。Lambert 和 Standard 留到后面的阶段。
+/// 不受光照的基础材质，以及 Lambert。Standard 留到阶段 6。
 pub(all) enum MaterialKind {
   Basic
+  Lambert
 }
 
 ///|
@@ -36,4 +37,35 @@ pub(all) struct MeshBasicMaterial {
 ///|
 pub fn MeshBasicMaterial::new(hex? : Int = 0xFFFFFF) -> MeshBasicMaterial {
   { material: Material::basic(hex~), }
+}
+
+///|
+pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
+  {
+    color: @math.Color::new().set_hex(hex),
+    side: @constants.Front,
+    opacity: 1.0,
+    transparent: false,
+    wireframe: false,
+    kind: Lambert,
+  }
+}
+
+///|
+/// Lambert 漫反射。环境光和一盏平行光由渲染器写入 uniform。
+pub(all) struct MeshLambertMaterial {
+  material : Material
+}
+
+///|
+pub fn MeshLambertMaterial::new(hex? : Int = 0xFFFFFF) -> MeshLambertMaterial {
+  { material: Material::lambert(hex~), }
+}
+
+///|
+pub fn Material::shading(self : Material) -> @constants.Shading {
+  match self.kind {
+    Basic => @constants.Basic
+    Lambert => @constants.Lambert
+  }
 }

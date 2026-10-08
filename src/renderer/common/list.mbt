@@ -7,6 +7,7 @@ pub(all) struct RenderItem {
   node : Object3D
   geometry : BufferGeometry
   color : @math.Color
+  shading : @constants.Shading
   side : @constants.Side
   opacity : Double
 }
@@ -26,6 +27,7 @@ pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
                 node,
                 geometry: binding.geometry,
                 color: binding.color,
+                shading: binding.shading,
                 side: binding.side,
                 opacity: binding.opacity,
               })

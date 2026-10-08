@@ -59,6 +59,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
   self.node.mesh = Some(MeshBinding::{
     geometry: self.geometry,
     color: self.material.color,
+    shading: self.material.shading(),
     side: self.material.side,
     opacity: self.material.opacity,
     transparent: self.material.transparent,

@@ -3,6 +3,7 @@
 pub(all) struct MeshBinding {
   geometry : BufferGeometry
   color : @math.Color
+  shading : @constants.Shading
   mut side : @constants.Side
   mut opacity : Double
   mut transparent : Bool

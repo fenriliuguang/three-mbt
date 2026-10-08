@@ -39,17 +39,22 @@ struct ObjectGpu {
 }
 
 ///|
+struct CullPipelines {
+  front : GpuRenderPipeline
+  back : GpuRenderPipeline
+  double : GpuRenderPipeline
+}
+
+///|
 /// 一帧里的不透明网格。深度比较是 `less`，近平面为 0。
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
   context : @canvas.Context
   format : GpuTextureFormat
-  shader : GpuShaderModule
   layout : GpuBindGroupLayout
-  front : GpuRenderPipeline
-  back : GpuRenderPipeline
-  double : GpuRenderPipeline
+  basic : CullPipelines
+  lambert : CullPipelines
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
   uniforms : Array[ObjectGpu]
@@ -100,13 +105,18 @@ fn unlit_pipeline(
     vertex: {
       buffers: Some([
         Some({
-          array_stride: 12UL,
+          array_stride: 24UL,
           step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
           attributes: [
             {
               format: @gpu.GpuVertexFormat::FLOAT32X3,
               offset: 0UL,
               shader_location: 0U,
+            },
+            {
+              format: @gpu.GpuVertexFormat::FLOAT32X3,
+              offset: 12UL,
+              shader_location: 1U,
             },
           ],
         }),
@@ -147,14 +157,56 @@ fn unlit_pipeline(
 }
 
 ///|
+fn shader_module(
+  device : GpuDevice,
+  code : String,
+  label : String,
+) -> GpuShaderModule {
+  device.create_shader_module({
+    code,
+    compilation_hints: None,
+    label: Some(label),
+  })
+}
+
+///|
+fn cull_pipelines(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+) -> CullPipelines {
+  {
+    front: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::BACK,
+    ),
+    back: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::FRONT,
+    ),
+    double: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+    ),
+  }
+}
+
+///|
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
-  let shader = device.create_shader_module({
-    code: unlit_wgsl(),
-    compilation_hints: None,
-    label: Some("unlit"),
-  })
+  let basic_shader = shader_module(device, @nodes.basic_wgsl(), "basic")
+  let lambert_shader = shader_module(device, @nodes.lambert_wgsl(), "lambert")
   let layout = device.create_bind_group_layout({
     entries: [
       {
@@ -182,29 +234,9 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     window: target.window(),
     context: target.context(),
     format,
-    shader,
     layout,
-    front: unlit_pipeline(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::BACK,
-    ),
-    back: unlit_pipeline(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::FRONT,
-    ),
-    double: unlit_pipeline(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-    ),
+    basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
+    lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
     depth: None,
     geometries: [],
     uniforms: [],
@@ -214,12 +246,17 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
 ///|
 fn WebGPURenderer::pipeline(
   self : WebGPURenderer,
+  shading : @constants.Shading,
   side : @constants.Side,
 ) -> GpuRenderPipeline {
+  let group = match shading {
+    @constants.Basic => self.basic
+    @constants.Lambert => self.lambert
+  }
   match side {
-    @constants.Front => self.front
-    @constants.Back => self.back
-    @constants.Double => self.double
+    @constants.Front => group.front
+    @constants.Back => group.back
+    @constants.Double => group.double
   }
 }
 
@@ -273,7 +310,10 @@ fn WebGPURenderer::geometry_gpu(
       } else {
         let vertices = pack_buffer(
           self.device,
-          @common.pack_f32(position),
+          @common.pack_position_normal(
+            position,
+            geometry.get_attribute("normal"),
+          ),
           vertex=true,
           index=false,
           uniform=false,
@@ -424,6 +464,7 @@ pub fn WebGPURenderer::render(
     max_draw_count: None,
     label: Some("frame"),
   })
+  let lights = @common.collect_lights(scene.node)
   let items = @common.collect_opaque(scene.node)
   for item in items {
     match self.geometry_gpu(item.geometry) {
@@ -431,13 +472,21 @@ pub fn WebGPURenderer::render(
       Some(geometry) => {
         let mvp = @common.model_view_projection(state, item.node)
         let gpu = self.object_gpu(item.node)
-        let uniforms = @common.pack_uniforms(mvp, item.color, item.opacity)
+        let uniforms = @common.pack_uniforms(
+          mvp,
+          @common.normal_matrix(item.node.matrix_world),
+          item.color,
+          item.opacity,
+          lights.ambient,
+          lights.color,
+          lights.direction,
+        )
         ignore(
           self.device
           .queue()
           .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
         )
-        pass.set_pipeline(self.pipeline(item.side))
+        pass.set_pipeline(self.pipeline(item.shading, item.side))
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
         ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
         match geometry.indices {

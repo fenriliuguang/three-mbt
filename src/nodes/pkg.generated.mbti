@@ -2,10 +2,48 @@
 package "fenriliuguang/three-mbt/nodes"
 
 // Values
+pub fn basic_program() -> Program
+
+pub fn basic_wgsl() -> String
+
+pub fn emit_wgsl(Program) -> String
+
+pub fn lambert_program() -> Program
+
+pub fn lambert_wgsl() -> String
 
 // Errors
 
 // Types and methods
+pub(all) enum Node {
+  Uniform(String, ValueType)
+  Attribute(String, Int, ValueType)
+  Varying(String, ValueType)
+  Float(Double)
+  Add(Node, Node)
+  Mul(Node, Node)
+  Dot(Node, Node)
+  Max(Node, Node)
+  Normalize(Node)
+  Vec4(Node, Node)
+  Swizzle(Node, String)
+}
+
+pub(all) struct Program {
+  uniforms : Array[(String, ValueType)]
+  attributes : Array[(String, Int, ValueType)]
+  varyings : Array[(String, ValueType)]
+  vertex_clip : Node
+  vertex_varyings : Array[(String, Node)]
+  fragment_color : Node
+}
+
+pub(all) enum ValueType {
+  F32
+  Vec3
+  Vec4
+  Mat4
+}
 
 // Type aliases
 

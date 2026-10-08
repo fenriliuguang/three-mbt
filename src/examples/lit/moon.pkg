@@ -1,15 +1,16 @@
-// 阶段 3。遍历、渲染列表、顶点打包。不依赖 bindings。
-import {
-  "fenriliuguang/three-mbt/constants",
-  "fenriliuguang/three-mbt/core",
-  "fenriliuguang/three-mbt/math",
-}
-
 import {
   "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/geometries",
   "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
   "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/renderer/common",
 } for "test"
+
+// 阶段 4：Lambert 立方体、环境光和一盏平行光。

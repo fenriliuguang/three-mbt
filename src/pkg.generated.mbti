@@ -81,6 +81,8 @@ pub using @objects {type Mesh}
 
 pub using @materials {type MeshBasicMaterial}
 
+pub using @materials {type MeshLambertMaterial}
+
 pub using @core {type NodeKind}
 
 pub using @core {type Object3D}
@@ -96,6 +98,8 @@ pub using @math {type Plane}
 pub using @math {type Quaternion}
 
 pub using @scenes {type Scene}
+
+pub using @constants {type Shading}
 
 pub using @constants {type Side}
 

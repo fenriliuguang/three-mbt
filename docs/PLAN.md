@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 3 have landed: the module, a swapchain clear, the CPU scene graph, and an unlit rotating cube. A second material is phase 4.
+Phase 0 through phase 4 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, and a Lambert cube with ambient and directional light. Textures are phase 5.
 
 ## Pins
 
@@ -166,6 +166,8 @@ This phase has landed. `WebGPURenderer` updates matrices, collects visible opaqu
 
 Ambient light, one directional light, and `MeshLambertMaterial` or a thin Standard. This is the point to add a minimal node set (uniform, attribute, varying, a few vector operations) or a small compiler that knows these two materials. `WGSLNodeBuilder.js` stays whole upstream.
 
+This phase has landed. `nodes` builds `MeshBasicMaterial` and `MeshLambertMaterial` from uniform, attribute, varying, and a few vector operations, then emits WGSL. The renderer uploads positions and normals, and packs ambient light plus the first directional light into the same uniform buffer. `examples/lit` is the rotating Lambert cube. The window sample is `scripts/build-lit.sh`. Host playback of that component stays out of this pass.
+
 ### 5. Textures and window events
 
 `rgba8` textures and samplers. `on-resize` rebuilds the swapchain. A sample uses `on-pointer-*` to move the camera. Input stays in the sample.
@@ -178,7 +180,7 @@ Ambient light, one directional light, and `MeshLambertMaterial` or a thin Standa
 
 Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute. Each addition changes the matching row below from "later" to "ported".
 
-Phase 3 ends with a world that can turn. TSL stays closed until phase 4.
+Phase 4 adds the two-material compiler. The rest of TSL and `WGSLNodeBuilder.js` stay upstream.
 
 ## Upstream file map
 

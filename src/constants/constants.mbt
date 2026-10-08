@@ -43,6 +43,13 @@ pub fn Side::to_int(self : Side) -> Int {
 }
 
 ///|
+/// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光。
+pub(all) enum Shading {
+  Basic
+  Lambert
+}
+
+///|
 pub fn CoordinateSystem::to_int(self : CoordinateSystem) -> Int {
   match self {
     WebGL => WEBGL_COORDINATE_SYSTEM

@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -35,6 +35,14 @@ sh scripts/build-cube.sh
 ```
 
 Copy `target/cube.component.wasm` to `examples/apps/cube/cube.component.wasm` in wasi-gfx-runtime, then `cargo xtask run-demo --name cube`. `moon run src/examples/cube/app` only builds the scene and does not open a window.
+
+The Lambert sample is the same kind of component:
+
+```sh
+sh scripts/build-lit.sh
+```
+
+Copy `target/lit.component.wasm` to `examples/apps/lit/lit.component.wasm`, then `cargo xtask run-demo --name lit`. `moon run src/examples/lit/app` does not open a window.
 
 ## License
 

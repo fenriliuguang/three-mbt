@@ -39,6 +39,7 @@ test "opaque list keeps a visible basic mesh" {
   assert_eq(items.length(), 1)
   assert_eq(items[0].geometry.get_attribute("position").unwrap().count, 24)
   assert_eq(items[0].color.get_hex(), 16746496)
+  assert_eq(items[0].shading is @constants.Basic, true)
 }
 
 ///|
@@ -61,14 +62,46 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(packed_indices[4], b'\x02')
   let mvp = @math.Matrix4::new()
   let color = @math.Color::new(r=0.0, g=1.0, b=0.0)
-  let uniforms = @common.pack_uniforms(mvp, color, 1.0)
+  let zero = @math.Vector3::new()
+  let up = @math.Vector3::new(y=1.0)
+  let uniforms = @common.pack_uniforms(
+    mvp,
+    @common.normal_matrix(mvp),
+    color,
+    1.0,
+    zero,
+    zero,
+    up,
+  )
   assert_eq(uniforms.length(), @common.uniform_bytes)
   assert_eq(uniforms[0], b'\x00')
   assert_eq(uniforms[1], b'\x00')
   assert_eq(uniforms[2], b'\x80')
   assert_eq(uniforms[3], b'\x3F')
-  assert_eq(uniforms[68], b'\x00')
-  assert_eq(uniforms[69], b'\x00')
-  assert_eq(uniforms[70], b'\x80')
-  assert_eq(uniforms[71], b'\x3F')
+  assert_eq(uniforms[132], b'\x00')
+  assert_eq(uniforms[133], b'\x00')
+  assert_eq(uniforms[134], b'\x80')
+  assert_eq(uniforms[135], b'\x3F')
+  assert_eq(uniforms[180], b'\x00')
+  assert_eq(uniforms[181], b'\x00')
+  assert_eq(uniforms[182], b'\x80')
+  assert_eq(uniforms[183], b'\x3F')
+}
+
+///|
+test "frame lights sum ambient and the first directional" {
+  let scene = @scenes.Scene::new()
+  let ambient = @lights.AmbientLight::new(hex=0xFFFFFF, intensity=0.25)
+  ignore(scene.add(ambient))
+  let sun = @lights.DirectionalLight::new(hex=0xFFFFFF, intensity=1.0)
+  ignore(scene.add(sun))
+  @common.update_frame(scene.node, scene.node)
+  let lights = @common.collect_lights(scene.node)
+  assert_eq(lights.ambient.x, 0.25)
+  assert_eq(lights.ambient.y, 0.25)
+  assert_eq(lights.ambient.z, 0.25)
+  assert_eq(lights.color.x, 1.0)
+  assert_eq(lights.direction.x, 0.0)
+  assert_eq(lights.direction.y, 1.0)
+  assert_eq(lights.direction.z, 0.0)
 }
