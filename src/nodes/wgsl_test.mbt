@@ -57,3 +57,22 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
     true,
   )
 }
+
+///|
+test "lines return the uniform color and points scale like r186" {
+  let line = @nodes.line_wgsl()
+  assert_eq(includes(line, "return uniforms.color;"), true)
+  assert_eq(includes(line, "@location(0) position : vec3<f32>"), true)
+  assert_eq(includes(line, "map_texture"), false)
+  let points = @nodes.points_wgsl()
+  assert_eq(
+    includes(
+      points, "select((uniforms.point).x, (uniforms.point).x * (uniforms.viewport).y * 0.5 / depth, attenuate)",
+    ),
+    true,
+  )
+  assert_eq(includes(points, "let depth = max(-view.z, 0.000001);"), true)
+  assert_eq(includes(points, "@location(0) corner : vec2<f32>"), true)
+  assert_eq(includes(points, "@location(1) position : vec3<f32>"), true)
+  assert_eq(includes(points, "uniforms.view"), true)
+}

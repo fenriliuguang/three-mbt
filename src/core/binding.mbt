@@ -14,6 +14,26 @@ pub(all) struct MeshBinding {
 }
 
 ///|
+/// 点、折线和线段。`Line` 是折线，`LineSegments` 是成对线段。
+pub(all) enum PrimitiveKind {
+  Points
+  Line
+  LineSegments
+}
+
+///|
+/// 挂在点或线上的绘制数据。线宽在 WebGPU 里固定为 1 像素。
+pub(all) struct PrimitiveBinding {
+  geometry : BufferGeometry
+  color : @math.Color
+  kind : PrimitiveKind
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
+  transparent : Bool
+}
+
+///|
 /// 挂在灯光节点上的数据。平行光的 `target` 是另一个场景节点。
 pub(all) struct LightState {
   color : @math.Color

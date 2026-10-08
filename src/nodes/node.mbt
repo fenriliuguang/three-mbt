@@ -50,6 +50,9 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("model", Mat4),
     ("camera_position", Vec4),
     ("surface", Vec4),
+    ("viewport", Vec4),
+    ("point", Vec4),
+    ("view", Mat4),
   ]
 }
 
@@ -178,5 +181,21 @@ pub fn standard_program() -> Program {
     fragment_color: StandardLit(base),
     sampled: true,
     preamble: standard_preamble(),
+  }
+}
+
+///|
+/// 折线和线段。只有位置和颜色，线宽由光栅器固定为 1 像素。
+pub fn line_program() -> Program {
+  let position = Attribute("position", 0, Vec3)
+  {
+    uniforms: frame_uniforms(),
+    attributes: [("position", 0, Vec3)],
+    varyings: [],
+    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
+    vertex_varyings: [],
+    fragment_color: Uniform("color", Vec4),
+    sampled: false,
+    preamble: "",
   }
 }

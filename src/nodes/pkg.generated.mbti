@@ -12,6 +12,12 @@ pub fn lambert_program() -> Program
 
 pub fn lambert_wgsl() -> String
 
+pub fn line_program() -> Program
+
+pub fn line_wgsl() -> String
+
+pub fn points_wgsl() -> String
+
 pub fn standard_program() -> Program
 
 pub fn standard_wgsl() -> String

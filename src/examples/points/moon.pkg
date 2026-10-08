@@ -1,0 +1,16 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：点和折线。线宽是 1 像素，点按像素大小做透视衰减。

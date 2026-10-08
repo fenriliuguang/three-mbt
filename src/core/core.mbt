@@ -9,6 +9,9 @@ pub(all) enum NodeKind {
   OrthographicCamera
   AmbientLight
   DirectionalLight
+  Points
+  Line
+  LineSegments
 }
 
 ///|

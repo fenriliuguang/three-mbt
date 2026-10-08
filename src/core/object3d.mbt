@@ -67,6 +67,7 @@ pub(all) struct Object3D {
   mut pivot : @math.Vector3?
   mut camera : CameraState?
   mut mesh : MeshBinding?
+  mut primitive : PrimitiveBinding?
   mut light : LightState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
@@ -103,6 +104,7 @@ pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
     pivot: None,
     camera: None,
     mesh: None,
+    primitive: None,
     light: None,
     listeners: Map([]),
   }

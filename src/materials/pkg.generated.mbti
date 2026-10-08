@@ -12,6 +12,13 @@ import {
 // Errors
 
 // Types and methods
+pub(all) struct LineBasicMaterial {
+  color : @math.Color
+  mut opacity : Double
+  mut transparent : Bool
+}
+pub fn LineBasicMaterial::new(hex? : Int) -> Self
+
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -48,6 +55,15 @@ pub(all) struct MeshStandardMaterial {
   material : Material
 }
 pub fn MeshStandardMaterial::new(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+
+pub(all) struct PointsMaterial {
+  color : @math.Color
+  mut size : Double
+  mut size_attenuation : Bool
+  mut opacity : Double
+  mut transparent : Bool
+}
+pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 
 // Type aliases
 

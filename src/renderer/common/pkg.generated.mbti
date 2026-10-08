@@ -13,6 +13,8 @@ pub fn collect_lights(@core.Object3D) -> LightFrame
 
 pub fn collect_opaque(@core.Object3D) -> Array[RenderItem]
 
+pub fn collect_primitives(@core.Object3D) -> Array[PrimitiveItem]
+
 pub fn copy_bytes_per_row(Int) -> Int
 
 pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
@@ -21,13 +23,19 @@ pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
 pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
 
+pub fn pack_point_positions(@core.BufferAttribute, @core.BufferAttribute?) -> FixedArray[Byte]
+
 pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @core.BufferAttribute?) -> FixedArray[Byte]
 
 pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 
-pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double) -> FixedArray[Byte]
+pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double, @math.Matrix4, Double, Double, Double, Double) -> FixedArray[Byte]
 
 pub fn pad_texture_rows(FixedArray[Byte], Int, Int) -> (FixedArray[Byte], Int)
+
+pub fn point_quad_bytes() -> FixedArray[Byte]
+
+pub let position_stride : Int
 
 pub let uniform_bytes : Int
 
@@ -42,6 +50,16 @@ pub(all) struct LightFrame {
   ambient : @math.Vector3
   color : @math.Vector3
   direction : @math.Vector3
+}
+
+pub(all) struct PrimitiveItem {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  color : @math.Color
+  kind : @core.PrimitiveKind
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
 }
 
 pub(all) struct RenderItem {

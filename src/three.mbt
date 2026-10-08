@@ -54,6 +54,7 @@ pub using @core {
   type GeometryGroup,
   type Layers,
   type NodeKind,
+  type PrimitiveKind,
   type Object3D,
   type ObjectEvent,
 }
@@ -65,7 +66,13 @@ pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 pub using @scenes {type Scene}
 
 ///|
-pub using @objects {type Group, type Mesh}
+pub using @objects {
+  type Group,
+  type Line,
+  type LineSegments,
+  type Mesh,
+  type Points,
+}
 
 ///|
 pub using @geometries {type BoxGeometry, type BoxParameters}
@@ -75,8 +82,10 @@ pub using @materials {
   type Material,
   type MaterialKind,
   type MeshBasicMaterial,
+  type LineBasicMaterial,
   type MeshLambertMaterial,
   type MeshStandardMaterial,
+  type PointsMaterial,
 }
 
 ///|

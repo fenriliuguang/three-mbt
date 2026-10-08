@@ -33,6 +33,17 @@ struct GeometryGpu {
 }
 
 ///|
+struct PositionGpu {
+  geometry : @core.BufferGeometry
+  vertices : GpuBuffer
+  indices : GpuBuffer?
+  index_count : Int
+  vertex_count : Int
+  mut points : GpuBuffer?
+  mut point_count : Int
+}
+
+///|
 struct ObjectGpu {
   node : @core.Object3D
   buffer : GpuBuffer
@@ -68,9 +79,14 @@ pub struct WebGPURenderer {
   basic : CullPipelines
   lambert : CullPipelines
   standard : CullPipelines
+  line_list : GpuRenderPipeline
+  line_strip : GpuRenderPipeline
+  points : GpuRenderPipeline
+  quad : GpuBuffer
   white : TextureGpu
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
+  positions : Array[PositionGpu]
   uniforms : Array[ObjectGpu]
   textures : Array[TextureGpu]
   mut swap_width : UInt
@@ -215,6 +231,97 @@ fn unlit_pipeline(
     }),
     layout: @gpu.Specific(pipeline_layout),
     label: Some("unlit"),
+  })
+}
+
+///|
+fn color_pipeline(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+  topology : @gpu.GpuPrimitiveTopology,
+  instanced : Bool,
+) -> GpuRenderPipeline {
+  let buffers : Array[@gpu.GpuVertexBufferLayout?] = if instanced {
+    [
+      Some({
+        array_stride: 8UL,
+        step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
+        attributes: [
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X2,
+            offset: 0UL,
+            shader_location: 0U,
+          },
+        ],
+      }),
+      Some({
+        array_stride: @common.position_stride.to_uint64(),
+        step_mode: Some(@gpu.GpuVertexStepMode::INSTANCE),
+        attributes: [
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X3,
+            offset: 0UL,
+            shader_location: 1U,
+          },
+        ],
+      }),
+    ]
+  } else {
+    [
+      Some({
+        array_stride: @common.position_stride.to_uint64(),
+        step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
+        attributes: [
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X3,
+            offset: 0UL,
+            shader_location: 0U,
+          },
+        ],
+      }),
+    ]
+  }
+  let strip = match topology {
+    @gpu.GpuPrimitiveTopology::LINE_STRIP => Some(@gpu.GpuIndexFormat::UINT32)
+    _ => None
+  }
+  device.create_render_pipeline({
+    vertex: {
+      buffers: Some(buffers),
+      module_: shader,
+      entry_point: Some("vs"),
+      constants: None,
+    },
+    primitive: Some({
+      topology: Some(topology),
+      strip_index_format: strip,
+      front_face: Some(@gpu.GpuFrontFace::CCW),
+      cull_mode: Some(GpuCullMode::NONE),
+      unclipped_depth: None,
+    }),
+    depth_stencil: Some({
+      format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+      depth_write_enabled: Some(true),
+      depth_compare: Some(@gpu.GpuCompareFunction::LESS),
+      stencil_front: None,
+      stencil_back: None,
+      stencil_read_mask: None,
+      stencil_write_mask: None,
+      depth_bias: None,
+      depth_bias_slope_scale: None,
+      depth_bias_clamp: None,
+    }),
+    multisample: None,
+    fragment: Some({
+      targets: [Some({ format, blend: None, write_mask: None, })],
+      module_: shader,
+      entry_point: Some("fs"),
+      constants: None,
+    }),
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("color"),
   })
 }
 
@@ -401,6 +508,13 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     immediate_size: None,
     label: Some("frame"),
   })
+  let color_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout)],
+    immediate_size: None,
+    label: Some("color"),
+  })
+  let line_shader = shader_module(device, @nodes.line_wgsl(), "line")
+  let points_shader = shader_module(device, @nodes.points_wgsl(), "points")
   let white = upload_texture(
     device,
     texture_layout,
@@ -424,9 +538,41 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
     standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
+    line_list: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+    ),
+    line_strip: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+    ),
+    points: color_pipeline(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+    ),
+    quad: pack_buffer(
+      device,
+      @common.point_quad_bytes(),
+      vertex=true,
+      index=false,
+      uniform=false,
+    ),
     white,
     depth: None,
     geometries: [],
+    positions: [],
     uniforms: [],
     textures: [],
     swap_width: window.width(),
@@ -585,6 +731,129 @@ fn WebGPURenderer::object_gpu(
   let cached = { node, buffer, group, }
   self.uniforms.push(cached)
   cached
+}
+
+///|
+fn WebGPURenderer::position_gpu(
+  self : WebGPURenderer,
+  geometry : @core.BufferGeometry,
+) -> PositionGpu? {
+  for cached in self.positions {
+    if physical_equal(cached.geometry, geometry) {
+      return Some(cached)
+    }
+  }
+  match geometry.get_attribute("position") {
+    None => None
+    Some(position) =>
+      if position.count == 0 {
+        None
+      } else {
+        let vertices = pack_buffer(
+          self.device,
+          @common.pack_f32(position),
+          vertex=true,
+          index=false,
+          uniform=false,
+        )
+        let (indices, index_count) = match geometry.index {
+          None => (None, 0)
+          Some(index) =>
+            (
+              Some(
+                pack_buffer(
+                  self.device,
+                  @common.pack_u32_indices(index),
+                  vertex=false,
+                  index=true,
+                  uniform=false,
+                ),
+              ),
+              index.count,
+            )
+        }
+        let cached : PositionGpu = {
+          geometry,
+          vertices,
+          indices,
+          index_count,
+          vertex_count: position.count,
+          points: None,
+          point_count: 0,
+        }
+        self.positions.push(cached)
+        Some(cached)
+      }
+  }
+}
+
+///|
+fn WebGPURenderer::point_instances(
+  self : WebGPURenderer,
+  geometry : PositionGpu,
+) -> GpuBuffer {
+  match geometry.points {
+    Some(buffer) => buffer
+    None => {
+      let bytes = match geometry.geometry.get_attribute("position") {
+        None => FixedArray::make(0, b'\x00')
+        Some(position) =>
+          @common.pack_point_positions(position, geometry.geometry.index)
+      }
+      let buffer = pack_buffer(
+        self.device,
+        bytes,
+        vertex=true,
+        index=false,
+        uniform=false,
+      )
+      geometry.point_count = if @common.position_stride == 0 {
+        0
+      } else {
+        bytes.length() / @common.position_stride
+      }
+      geometry.points = Some(buffer)
+      buffer
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::draw_lines(
+  self : WebGPURenderer,
+  pass : @gpu.GpuRenderPassEncoder,
+  pipeline : GpuRenderPipeline,
+  geometry : PositionGpu,
+) -> Unit {
+  ignore(self)
+  let indexed = match geometry.indices {
+    Some(_) => geometry.index_count >= 2
+    None => geometry.vertex_count >= 2
+  }
+  if !indexed {
+    return
+  }
+  pass.set_pipeline(pipeline)
+  pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+  match geometry.indices {
+    None =>
+      pass.draw(
+        geometry.vertex_count.reinterpret_as_uint(),
+        Some(1U),
+        None,
+        None,
+      )
+    Some(indices) => {
+      pass.set_index_buffer(indices, @gpu.GpuIndexFormat::UINT32, None, None)
+      pass.draw_indexed(
+        geometry.index_count.reinterpret_as_uint(),
+        Some(1U),
+        None,
+        None,
+        None,
+      )
+    }
+  }
 }
 
 ///|
@@ -756,6 +1025,11 @@ pub fn WebGPURenderer::render(
           @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
           item.roughness,
           item.metalness,
+          state.matrix_world_inverse,
+          width.reinterpret_as_int().to_double(),
+          height.reinterpret_as_int().to_double(),
+          1.0,
+          0.0,
         )
         ignore(
           self.device
@@ -797,6 +1071,69 @@ pub fn WebGPURenderer::render(
               None,
             )
           }
+        }
+      }
+    }
+  }
+  let strokes = @common.collect_primitives(scene.node)
+  let viewport_width = width.reinterpret_as_int().to_double()
+  let viewport_height = height.reinterpret_as_int().to_double()
+  for item in strokes {
+    match self.position_gpu(item.geometry) {
+      None => ()
+      Some(geometry) => {
+        let mvp = @common.model_view_projection(state, item.node)
+        let gpu = self.object_gpu(item.node)
+        let attenuation = if item.size_attenuation &&
+          state.kind is @core.Perspective {
+          1.0
+        } else {
+          0.0
+        }
+        let eye = camera.matrix_world.elements
+        let uniforms = @common.pack_uniforms(
+          mvp,
+          @common.normal_matrix(item.node.matrix_world),
+          item.color,
+          item.opacity,
+          lights.ambient,
+          lights.color,
+          lights.direction,
+          item.node.matrix_world,
+          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
+          1.0,
+          0.0,
+          state.matrix_world_inverse,
+          viewport_width,
+          viewport_height,
+          item.size,
+          attenuation,
+        )
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
+        )
+        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        match item.kind {
+          @core.PrimitiveKind::Points => {
+            let instances = self.point_instances(geometry)
+            if geometry.point_count > 0 {
+              pass.set_pipeline(self.points)
+              pass.set_vertex_buffer(0U, Some(self.quad), None, None)
+              pass.set_vertex_buffer(1U, Some(instances), None, None)
+              pass.draw(
+                6U,
+                Some(geometry.point_count.reinterpret_as_uint()),
+                None,
+                None,
+              )
+            }
+          }
+          @core.PrimitiveKind::Line =>
+            self.draw_lines(pass, self.line_strip, geometry)
+          @core.PrimitiveKind::LineSegments =>
+            self.draw_lines(pass, self.line_list, geometry)
         }
       }
     }

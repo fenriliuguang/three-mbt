@@ -116,3 +116,41 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
     Standard => @constants.Standard
   }
 }
+
+///|
+/// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
+pub(all) struct PointsMaterial {
+  color : @math.Color
+  mut size : Double
+  mut size_attenuation : Bool
+  mut opacity : Double
+  mut transparent : Bool
+}
+
+///|
+pub fn PointsMaterial::new(
+  hex? : Int = 0xFFFFFF,
+  size? : Double = 1.0,
+  size_attenuation? : Bool = true,
+) -> PointsMaterial {
+  {
+    color: @math.Color::new().set_hex(hex),
+    size,
+    size_attenuation,
+    opacity: 1.0,
+    transparent: false,
+  }
+}
+
+///|
+/// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
+pub(all) struct LineBasicMaterial {
+  color : @math.Color
+  mut opacity : Double
+  mut transparent : Bool
+}
+
+///|
+pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
+  { color: @math.Color::new().set_hex(hex), opacity: 1.0, transparent: false, }
+}

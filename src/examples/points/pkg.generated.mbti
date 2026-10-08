@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/points"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct PointsScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  group : @objects.Group
+  line : @objects.Line
+  points : @objects.Points
+  mut angle : Double
+}
+pub fn PointsScene::new() -> Self
+pub fn PointsScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

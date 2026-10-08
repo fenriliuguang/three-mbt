@@ -105,6 +105,11 @@ test "packed vertices and uniforms are little-endian f32" {
     eye,
     0.5,
     1.0,
+    mvp,
+    2.0,
+    4.0,
+    8.0,
+    1.0,
   )
   assert_eq(uniforms.length(), @common.uniform_bytes)
   assert_eq(uniforms[0], b'\x00')
@@ -135,6 +140,36 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(uniforms[277], b'\x00')
   assert_eq(uniforms[278], b'\x80')
   assert_eq(uniforms[279], b'\x3F')
+  assert_eq(uniforms[288], b'\x00')
+  assert_eq(uniforms[289], b'\x00')
+  assert_eq(uniforms[290], b'\x00')
+  assert_eq(uniforms[291], b'\x40')
+  assert_eq(uniforms[304], b'\x00')
+  assert_eq(uniforms[305], b'\x00')
+  assert_eq(uniforms[306], b'\x00')
+  assert_eq(uniforms[307], b'\x41')
+  assert_eq(uniforms[320], b'\x00')
+  assert_eq(uniforms[321], b'\x00')
+  assert_eq(uniforms[322], b'\x80')
+  assert_eq(uniforms[323], b'\x3F')
+}
+
+///|
+test "point quads cover six corners and indexed points expand" {
+  let quad = @common.point_quad_bytes()
+  assert_eq(quad.length(), 48)
+  assert_eq(quad[0], b'\x00')
+  assert_eq(quad[1], b'\x00')
+  assert_eq(quad[2], b'\x80')
+  assert_eq(quad[3], b'\xBF')
+  let position = @core.BufferAttribute::new([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], 3)
+  let index = @core.BufferAttribute::from_ints([1], 1)
+  let packed = @common.pack_point_positions(position, Some(index))
+  assert_eq(packed.length(), @common.position_stride)
+  assert_eq(packed[0], b'\x00')
+  assert_eq(packed[1], b'\x00')
+  assert_eq(packed[2], b'\x40')
+  assert_eq(packed[3], b'\x40')
 }
 
 ///|

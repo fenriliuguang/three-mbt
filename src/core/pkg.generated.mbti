@@ -118,6 +118,9 @@ pub(all) enum NodeKind {
   OrthographicCamera
   AmbientLight
   DirectionalLight
+  Points
+  Line
+  LineSegments
 }
 
 pub(all) struct Object3D {
@@ -147,6 +150,7 @@ pub(all) struct Object3D {
   mut pivot : @math.Vector3?
   mut camera : CameraState?
   mut mesh : MeshBinding?
+  mut primitive : PrimitiveBinding?
   mut light : LightState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
@@ -175,6 +179,22 @@ pub(all) struct ObjectEvent {
   mut child : Object3D?
 }
 pub fn ObjectEvent::new(String) -> Self
+
+pub(all) struct PrimitiveBinding {
+  geometry : BufferGeometry
+  color : @math.Color
+  kind : PrimitiveKind
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
+  transparent : Bool
+}
+
+pub(all) enum PrimitiveKind {
+  Points
+  Line
+  LineSegments
+}
 
 pub(all) enum ProjectionKind {
   Perspective

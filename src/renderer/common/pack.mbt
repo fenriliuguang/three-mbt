@@ -2,9 +2,13 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 三块 `mat4x4<f32>` 和六块 `vec4<f32>`。288 字节，三种材质共用。
-/// 末尾是模型矩阵、相机位置，以及 `surface = (roughness, metalness, 0, 0)`。
-pub let uniform_bytes : Int = 288
+/// 四块 `mat4x4<f32>` 和八块 `vec4<f32>`。384 字节。
+/// `surface` 之后是视口、点参数 `(size, attenuation, 0, 0)` 和视图矩阵。
+pub let uniform_bytes : Int = 384
+
+///|
+/// 只有位置时，每个顶点 12 字节。
+pub let position_stride : Int = 12
 
 ///|
 /// 位置、法线、uv 交错存放时每个顶点的字节数。
@@ -177,6 +181,11 @@ pub fn pack_uniforms(
   camera_position : @math.Vector3,
   roughness : Double,
   metalness : Double,
+  view : @math.Matrix4,
+  viewport_width : Double,
+  viewport_height : Double,
+  point_size : Double,
+  size_attenuation : Double,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -192,5 +201,45 @@ pub fn pack_uniforms(
   write_vec3(dst, 256, camera_position.x, camera_position.y, camera_position.z)
   write_f32(dst, 272, roughness)
   write_f32(dst, 276, metalness)
+  write_f32(dst, 288, viewport_width)
+  write_f32(dst, 292, viewport_height)
+  write_f32(dst, 304, point_size)
+  write_f32(dst, 308, size_attenuation)
+  write_matrix4(dst, 320, view)
   dst
+}
+
+///|
+/// 点精灵的两个三角形。角点在 \[-1, 1\]，顺序保持朝外。
+pub fn point_quad_bytes() -> FixedArray[Byte] {
+  let corners = [
+    -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
+  ]
+  let dst = FixedArray::make(corners.length() * 4, b'\x00')
+  for index in 0..<corners.length() {
+    write_f32(dst, index * 4, corners[index])
+  }
+  dst
+}
+
+///|
+/// 点的实例位置。有索引时按索引展开，没有索引时紧排 `xyz`。
+pub fn pack_point_positions(
+  position : BufferAttribute,
+  index : BufferAttribute?,
+) -> FixedArray[Byte] {
+  match index {
+    None => pack_f32(position)
+    Some(index) => {
+      let dst = FixedArray::make(index.count * position_stride, b'\x00')
+      for item in 0..<index.count {
+        let vertex = index.get_x(item).to_int()
+        let base = item * position_stride
+        write_f32(dst, base, position.get_x(vertex))
+        write_f32(dst, base + 4, position.get_y(vertex))
+        write_f32(dst, base + 8, position.get_z(vertex))
+      }
+      dst
+    }
+  }
 }

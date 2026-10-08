@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points and lines. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -59,6 +59,14 @@ sh scripts/build-standard.sh
 ```
 
 Copy `target/standard.component.wasm` to `examples/apps/standard/standard.component.wasm`, then `cargo xtask run-demo --name standard`. `moon run src/examples/standard/app` does not open a window.
+
+Points and lines share one sample. Point size is in pixels and shrinks with distance; lines are one pixel wide:
+
+```sh
+sh scripts/build-points.sh
+```
+
+Copy `target/points.component.wasm` to `examples/apps/points/points.component.wasm`, then `cargo xtask run-demo --name points`. `moon run src/examples/points/app` does not open a window.
 
 ## License
 

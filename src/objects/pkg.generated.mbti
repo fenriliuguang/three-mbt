@@ -21,6 +21,26 @@ pub fn Group::new() -> Self
 pub fn Group::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Group
 
+pub(all) struct Line {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  material : @materials.LineBasicMaterial
+}
+pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
+pub fn Line::refresh(Self) -> Unit
+pub fn Line::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Line
+
+pub(all) struct LineSegments {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  material : @materials.LineBasicMaterial
+}
+pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
+pub fn LineSegments::refresh(Self) -> Unit
+pub fn LineSegments::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for LineSegments
+
 pub(all) struct Mesh {
   node : @core.Object3D
   geometry : @core.BufferGeometry
@@ -32,6 +52,16 @@ pub fn Mesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn Mesh::set_side(Self, @constants.Side) -> Unit
 pub fn Mesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Mesh
+
+pub(all) struct Points {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  material : @materials.PointsMaterial
+}
+pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
+pub fn Points::refresh(Self) -> Unit
+pub fn Points::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Points
 
 // Type aliases
 

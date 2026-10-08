@@ -46,6 +46,44 @@ pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
 }
 
 ///|
+
+///|
+/// 点和线。透明的留到后面。
+pub(all) struct PrimitiveItem {
+  node : Object3D
+  geometry : BufferGeometry
+  color : @math.Color
+  kind : @core.PrimitiveKind
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
+}
+
+///|
+/// 收集当前可见的点和线。
+pub fn collect_primitives(root : Object3D) -> Array[PrimitiveItem] {
+  let items = []
+  root.traverse_visible(fn(node) {
+    match node.primitive {
+      None => ()
+      Some(binding) =>
+        if !binding.transparent {
+          items.push({
+            node,
+            geometry: binding.geometry,
+            color: binding.color,
+            kind: binding.kind,
+            size: binding.size,
+            size_attenuation: binding.size_attenuation,
+            opacity: binding.opacity,
+          })
+        }
+    }
+  })
+  items
+}
+
+///|
 /// 先更新场景，再更新相机，这样挂在场景里的相机能读到父节点的世界矩阵。
 pub fn update_frame(scene : Object3D, camera : Object3D) -> Unit {
   scene.update_matrix_world(force=true)

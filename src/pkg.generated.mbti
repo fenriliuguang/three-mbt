@@ -88,6 +88,12 @@ pub using @objects {type Group}
 
 pub using @core {type Layers}
 
+pub using @objects {type Line}
+
+pub using @materials {type LineBasicMaterial}
+
+pub using @objects {type LineSegments}
+
 pub using @materials {type Material}
 
 pub using @materials {type MaterialKind}
@@ -115,6 +121,12 @@ pub using @cameras {type OrthographicCamera}
 pub using @cameras {type PerspectiveCamera}
 
 pub using @math {type Plane}
+
+pub using @objects {type Points}
+
+pub using @materials {type PointsMaterial}
+
+pub using @core {type PrimitiveKind}
 
 pub using @math {type Quaternion}
 
