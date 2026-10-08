@@ -1,6 +1,7 @@
+warnings = "-44"
+
 import {
   "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface",
-  "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface-webgpu" @canvas,
   "fenriliuguang/three-mbt/interface/wasi/webgpu/webgpu",
 }
 

@@ -23,6 +23,7 @@ interface surface-webgpu {
 }
 
 world webgpu-imports {
-  import surface-webgpu;
   import wasi:webgpu/webgpu@0.3.0-rc.2;
+  import surface;
+  import surface-webgpu;
 }

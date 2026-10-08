@@ -1,0 +1,11 @@
+package example:example;
+
+// Guest world aligned with wasi-gfx-runtime's example host.
+// The host calls the async `start` export and provides `print`.
+world example {
+  include wasi:webgpu/imports@0.3.0-rc.2;
+  include wasi-gfx:surface/webgpu-imports@0.2.0;
+
+  import print: func(s: string);
+  export start: async func();
+}

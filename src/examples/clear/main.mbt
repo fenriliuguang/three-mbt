@@ -1,6 +1,6 @@
 ///|
 fn main {
   println(
-    "three-mbt clear: upstream \{@three-mbt.upstream_revision}, phase 1 placeholder",
+    "three-mbt clear: the swapchain sample is the wasm component, see README",
   )
 }

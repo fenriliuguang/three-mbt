@@ -117,12 +117,7 @@ src/examples/clear/          phase 1
 src/examples/cube/           phase 3
 ```
 
-Samples live under `src/examples` because only packages inside the `source` directory belong to the module. Run them with:
-
-```sh
-moon run src/examples/clear
-moon run src/examples/cube
-```
+Samples live under `src/examples` because only packages inside the `source` directory belong to the module. The clear sample is the Wasm component built from `src/gen`; `moon run src/examples/cube` stays a placeholder until phase 3.
 
 ## Correspondence with r186
 
@@ -153,7 +148,7 @@ The module, package directories, pinned WIT, and `moon check`. Binding generatio
 
 ### 1. Swapchain
 
-Call `gpu.request-adapter`, then `request-device`. Create a `surface`, call `context.configure`, and on `on-frame` clear and `present`. This phase has no three.js types yet. `examples/clear` ends as a real clear. Upstream still marks `present` on `surface-webgpu` as TODO. Confirm the current-texture and present behavior on wasi-gfx-runtime, then freeze `SurfaceTarget`.
+Call `gpu.request-adapter`, then `request-device`. Create a `surface`, call `context.configure`, and on `on-frame` clear and `present`. This phase has no three.js types yet. The clear sample is the component exported from `src/gen` (`start`). Upstream still marks `present` on `surface-webgpu` as TODO. wasi-gfx-runtime's `cargo xtask run-demo --name clear` presents the dark blue clear (`0.05, 0.1, 0.2`), so `SurfaceTarget` stays at that behavior.
 
 ### 2. World (CPU)
 
@@ -210,4 +205,4 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 
 - If phase 1 shows that the component-model bindings cannot express async `request-adapter` / `request-device`, the scene graph keeps its own call shape. `bindings` is a separate package so that layer can be replaced.
 - Schedule risk sits in the node compiler. Hard-coded WGSL pushes that risk to phase 4.
-- Phase 1 checks the host meaning of `present` on wasi-gfx-runtime before `SurfaceTarget` is written.
+- Phase 1 confirmed `present` on wasi-gfx-runtime: the clear sample's swapchain color reaches the window.

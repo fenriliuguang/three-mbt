@@ -1,0 +1,7 @@
+warnings = "-44"
+
+import {
+  "fenriliuguang/three-mbt/async-core",
+}
+
+supported_targets = "+wasm"

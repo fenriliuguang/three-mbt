@@ -4,18 +4,29 @@
 
 把 [three.js](https://github.com/mrdoob/three.js) **r186** 的 WebGPU 世界迁到 MoonBit。GPU 使用 [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu)，窗口、帧循环和输入使用 [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx)。
 
-当前是阶段 0：模块、包目录和计划已经就位。场景图与渲染器随后实现。迁移范围、阶段和目录约定写在 [docs/PLAN.md](docs/PLAN.md)。
+阶段 1 会打开 wasi-gfx 窗口，配置 WebGPU 交换链，并在每一帧清屏。范围和后续阶段写在 [docs/PLAN.md](docs/PLAN.md)。
 
 ## 检查
 
 ```sh
 moon check
+moon check --target wasm
 moon test
-moon run src/examples/clear
-moon run src/examples/cube
 ```
 
-`examples/clear` 与 `examples/cube` 现在只打印占位信息。
+清屏组件用 [wasi-gfx-runtime](https://github.com/wasi-gfx/wasi-gfx-runtime) 运行：
+
+```sh
+powershell -File scripts/build-clear.ps1
+```
+
+把 `target/clear.component.wasm` 复制到 wasi-gfx-runtime 的 `examples/apps/clear/clear.component.wasm`，然后：
+
+```sh
+cargo xtask run-demo --name clear
+```
+
+组件导出异步 `start`，并导入 `wasi:webgpu`、`wasi-gfx:surface` 和 `print`。`moon run src/examples/cube` 仍是占位程序。
 
 ## 许可
 

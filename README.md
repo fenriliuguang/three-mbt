@@ -4,18 +4,29 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-This is phase 0: the module, package layout, and plan are in place. Scene-graph and renderer work comes later. Scope, phases, and directory rules are in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Scope and later phases are in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
 ```sh
 moon check
+moon check --target wasm
 moon test
-moon run src/examples/clear
-moon run src/examples/cube
 ```
 
-`examples/clear` and `examples/cube` print placeholders.
+Build the clear component, then run it with [wasi-gfx-runtime](https://github.com/wasi-gfx/wasi-gfx-runtime):
+
+```sh
+powershell -File scripts/build-clear.ps1
+```
+
+Copy `target/clear.component.wasm` to `examples/apps/clear/clear.component.wasm` in wasi-gfx-runtime, then:
+
+```sh
+cargo xtask run-demo --name clear
+```
+
+The component exports async `start` and imports `wasi:webgpu`, `wasi-gfx:surface`, and `print`. `moon run src/examples/cube` is still a placeholder.
 
 ## License
 

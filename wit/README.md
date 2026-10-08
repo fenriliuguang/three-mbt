@@ -12,6 +12,16 @@ Interface text lives here until bindings are generated, so the implementation st
 
 Fetched on 2026-10-08.
 
+`surface/surface-webgpu.wit`'s `webgpu-imports` world also imports `surface`, matching the world used by wasi-gfx-runtime. `guest/world.wit` is this repository's component world (`example:example/example`): it includes those imports, imports `print`, and exports async `start`.
+
+Regenerate the MoonBit bindings with:
+
+```sh
+wit-bindgen moonbit wit/webgpu wit/surface wit/guest --out-dir src --project-name fenriliuguang/three-mbt --ignore-module-file --derive-show --derive-eq --derive-error --world example:example/example
+```
+
+`src/gen/world/example/start.mbt` and its `platform` import are hand-written. Keep them across regeneration.
+
 `wasi:webgpu` text is licensed by the Contributors to the WASI Specification under the W3C Community CLA. That `wasi-gfx` commit has no separate license file. When bumping a version, update this table and [docs/PLAN.md](../docs/PLAN.md) together.
 
 This tree vendors `surface` only. `wasi-gfx`'s `frame-buffer` stays in the upstream repository.

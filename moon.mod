@@ -15,7 +15,7 @@ keywords = [ "threejs", "webgpu", "wasi", "graphics" ]
 
 preferred_target = "wasm-gc"
 
-supported_targets = "+wasm-gc+native"
+supported_targets = "+wasm-gc+wasm+native"
 
 source = "src"
 
