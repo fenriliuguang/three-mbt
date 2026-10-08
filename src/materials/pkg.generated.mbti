@@ -4,6 +4,7 @@ package "fenriliuguang/three-mbt/materials"
 import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/textures",
 }
 
 // Values
@@ -17,6 +18,7 @@ pub(all) struct Material {
   mut opacity : Double
   mut transparent : Bool
   mut wireframe : Bool
+  mut map : @textures.Texture?
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

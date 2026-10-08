@@ -1,8 +1,5 @@
-// 对外门面 fenriliuguang/three-mbt。阶段 2 的场景图类型从这里重新导出。
 import {
   "fenriliuguang/three-mbt/cameras",
-  "fenriliuguang/three-mbt/constants",
-  "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/geometries",
   "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
@@ -10,4 +7,12 @@ import {
   "fenriliuguang/three-mbt/objects",
   "fenriliuguang/three-mbt/scenes",
   "fenriliuguang/three-mbt/textures",
+  "moonbitlang/core/math" @std,
 }
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 5：rgba8 棋盘格、以及留在样本里的指针轨道。

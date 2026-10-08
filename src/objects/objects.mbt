@@ -54,7 +54,7 @@ pub impl @core.AsNode for Mesh with fn to_node(self) {
 pub extend Mesh with @core.AsNode::{to_node}
 
 ///|
-/// 把材质上的侧面、透明度和线框写回节点。颜色本身是共享的，不需要复制。
+/// 把材质上的侧面、透明度、线框和贴图写回节点。颜色本身是共享的，不需要复制。
 pub fn Mesh::refresh(self : Mesh) -> Unit {
   self.node.mesh = Some(MeshBinding::{
     geometry: self.geometry,
@@ -64,7 +64,15 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     opacity: self.material.opacity,
     transparent: self.material.transparent,
     wireframe: self.material.wireframe,
+    map: self.material.map,
   })
+}
+
+///|
+/// 换贴图并写回节点。直接改 `material.map` 不会更新绑定。
+pub fn Mesh::set_map(self : Mesh, map : @textures.Texture?) -> Unit {
+  self.material.map = map
+  self.refresh()
 }
 
 ///|

@@ -5,6 +5,7 @@ import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/textures",
 }
 
 // Values
@@ -12,21 +13,27 @@ pub fn collect_lights(@core.Object3D) -> LightFrame
 
 pub fn collect_opaque(@core.Object3D) -> Array[RenderItem]
 
+pub fn copy_bytes_per_row(Int) -> Int
+
 pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
 
 pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
 pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
 
-pub fn pack_position_normal(@core.BufferAttribute, @core.BufferAttribute?) -> FixedArray[Byte]
+pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @core.BufferAttribute?) -> FixedArray[Byte]
 
 pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 
 pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3) -> FixedArray[Byte]
 
+pub fn pad_texture_rows(FixedArray[Byte], Int, Int) -> (FixedArray[Byte], Int)
+
 pub let uniform_bytes : Int
 
 pub fn update_frame(@core.Object3D, @core.Object3D) -> Unit
+
+pub let vertex_stride : Int
 
 // Errors
 
@@ -44,6 +51,7 @@ pub(all) struct RenderItem {
   shading : @constants.Shading
   side : @constants.Side
   opacity : Double
+  map : @textures.Texture?
 }
 
 // Type aliases

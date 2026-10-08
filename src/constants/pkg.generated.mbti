@@ -4,9 +4,27 @@ package "fenriliuguang/three-mbt/constants"
 // Values
 pub const BACK_SIDE : Int = 1
 
+pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
+
 pub const DOUBLE_SIDE : Int = 2
 
 pub const FRONT_SIDE : Int = 0
+
+pub const LINEAR_FILTER : Int = 1006
+
+pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
+
+pub const LINEAR_MIPMAP_NEAREST_FILTER : Int = 1007
+
+pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
+
+pub const NEAREST_FILTER : Int = 1003
+
+pub const NEAREST_MIPMAP_LINEAR_FILTER : Int = 1005
+
+pub const NEAREST_MIPMAP_NEAREST_FILTER : Int = 1004
+
+pub const REPEAT_WRAPPING : Int = 1000
 
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
@@ -32,6 +50,25 @@ pub(all) enum Side {
   Double
 }
 pub fn Side::to_int(Self) -> Int
+
+pub(all) enum TextureFilter {
+  Nearest
+  NearestMipmapNearest
+  NearestMipmapLinear
+  Linear
+  LinearMipmapNearest
+  LinearMipmapLinear
+}
+pub fn TextureFilter::is_nearest(Self) -> Bool
+pub fn TextureFilter::mip_linear(Self) -> Bool
+pub fn TextureFilter::to_int(Self) -> Int
+
+pub(all) enum Wrapping {
+  Repeat
+  ClampToEdge
+  MirroredRepeat
+}
+pub fn Wrapping::to_int(Self) -> Int
 
 // Type aliases
 

@@ -10,6 +10,7 @@ pub(all) struct RenderItem {
   shading : @constants.Shading
   side : @constants.Side
   opacity : Double
+  map : @textures.Texture?
 }
 
 ///|
@@ -30,6 +31,7 @@ pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
                 shading: binding.shading,
                 side: binding.side,
                 opacity: binding.opacity,
+                map: binding.map,
               })
             }
         }

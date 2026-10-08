@@ -27,6 +27,7 @@ pub(all) enum Node {
   Normalize(Node)
   Vec4(Node, Node)
   Swizzle(Node, String)
+  TextureSample(Node)
 }
 
 pub(all) struct Program {
@@ -36,10 +37,12 @@ pub(all) struct Program {
   vertex_clip : Node
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
+  sampled : Bool
 }
 
 pub(all) enum ValueType {
   F32
+  Vec2
   Vec3
   Vec4
   Mat4

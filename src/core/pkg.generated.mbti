@@ -4,6 +4,7 @@ package "fenriliuguang/three-mbt/core"
 import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/textures",
 }
 
 // Values
@@ -103,6 +104,7 @@ pub(all) struct MeshBinding {
   mut opacity : Double
   mut transparent : Bool
   mut wireframe : Bool
+  map : @textures.Texture?
 }
 
 pub(all) enum NodeKind {

@@ -2,6 +2,7 @@
 /// 节点值的 WGSL 类型。uniform 里的 `vec3` 也按 `vec4` 存放，对齐到 16 字节。
 pub(all) enum ValueType {
   F32
+  Vec2
   Vec3
   Vec4
   Mat4
@@ -21,6 +22,7 @@ pub(all) enum Node {
   Normalize(Node)
   Vec4(Node, Node)
   Swizzle(Node, String)
+  TextureSample(Node)
 }
 
 ///|
@@ -31,6 +33,7 @@ pub(all) struct Program {
   vertex_clip : Node
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
+  sampled : Bool
 }
 
 ///|
@@ -47,22 +50,24 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
 
 ///|
 fn position_attributes() -> Array[(String, Int, ValueType)] {
-  [("position", 0, Vec3), ("normal", 1, Vec3)]
+  [("position", 0, Vec3), ("normal", 1, Vec3), ("uv", 2, Vec2)]
 }
 
 ///|
-/// 不受光照。法线乘 0 只是为了让顶点布局和 Lambert 一致。
+/// 不受光照。法线乘 0 只是为了让顶点布局和 Lambert 一致。贴图采样乘在颜色上，没有贴图时渲染器绑一张白纹理。
 pub fn basic_program() -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = Attribute("normal", 1, Vec3)
   let shifted = Add(position, Mul(normal, Float(0.0)))
+  let sample = TextureSample(Varying("v_uv", Vec2))
   {
     uniforms: frame_uniforms(),
     attributes: position_attributes(),
-    varyings: [],
+    varyings: [("v_uv", Vec2)],
     vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(shifted, Float(1.0))),
-    vertex_varyings: [],
-    fragment_color: Uniform("color", Vec4),
+    vertex_varyings: [("v_uv", Attribute("uv", 2, Vec2))],
+    fragment_color: Mul(Uniform("color", Vec4), sample),
+    sampled: true,
   }
 }
 
@@ -84,13 +89,24 @@ pub fn lambert_program() -> Program {
     Swizzle(Uniform("ambient", Vec4), "xyz"),
     Mul(Swizzle(Uniform("light_color", Vec4), "xyz"), ndotl),
   )
-  let rgb = Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit)
+  let sample = TextureSample(Varying("v_uv", Vec2))
+  let rgb = Mul(
+    Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
+    Swizzle(sample, "xyz"),
+  )
   {
     uniforms: frame_uniforms(),
     attributes: position_attributes(),
-    varyings: [("v_normal", Vec3)],
+    varyings: [("v_normal", Vec3), ("v_uv", Vec2)],
     vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
-    vertex_varyings: [("v_normal", world_normal)],
-    fragment_color: Vec4(rgb, Swizzle(Uniform("color", Vec4), "w")),
+    vertex_varyings: [
+      ("v_normal", world_normal),
+      ("v_uv", Attribute("uv", 2, Vec2)),
+    ],
+    fragment_color: Vec4(
+      rgb,
+      Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+    ),
+    sampled: true,
   }
 }

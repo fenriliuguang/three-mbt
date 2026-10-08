@@ -3,6 +3,7 @@ import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/textures",
 }
 
 import {
@@ -12,4 +13,5 @@ import {
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/objects",
   "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
 } for "test"

@@ -8,10 +8,21 @@ pub using @constants {
   DOUBLE_SIDE,
   FRONT_SIDE,
   WEBGL_COORDINATE_SYSTEM,
+  CLAMP_TO_EDGE_WRAPPING,
+  LINEAR_FILTER,
+  LINEAR_MIPMAP_LINEAR_FILTER,
+  LINEAR_MIPMAP_NEAREST_FILTER,
+  MIRRORED_REPEAT_WRAPPING,
+  NEAREST_FILTER,
+  NEAREST_MIPMAP_LINEAR_FILTER,
+  NEAREST_MIPMAP_NEAREST_FILTER,
+  REPEAT_WRAPPING,
   WEBGPU_COORDINATE_SYSTEM,
   type CoordinateSystem,
   type Shading,
   type Side,
+  type TextureFilter,
+  type Wrapping,
 }
 
 ///|
@@ -69,3 +80,6 @@ pub using @materials {
 
 ///|
 pub using @lights {type AmbientLight, type DirectionalLight}
+
+///|
+pub using @textures {type Texture}

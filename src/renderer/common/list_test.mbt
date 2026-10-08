@@ -40,6 +40,34 @@ test "opaque list keeps a visible basic mesh" {
   assert_eq(items[0].geometry.get_attribute("position").unwrap().count, 24)
   assert_eq(items[0].color.get_hex(), 16746496)
   assert_eq(items[0].shading is @constants.Basic, true)
+  assert_eq(items[0].map is None, true)
+}
+
+///|
+test "opaque list keeps a mesh map" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let basic = @materials.MeshBasicMaterial::new()
+  let mesh = @objects.Mesh::new(box.geometry, basic.material)
+  let map = @textures.Texture::checker(
+    width=2,
+    height=2,
+    cell=1,
+    first=0xFFFFFF,
+    second=0x000000,
+  )
+  mesh.set_map(Some(map))
+  ignore(scene.add(mesh))
+  let items = @common.collect_opaque(scene.node)
+  assert_eq(items.length(), 1)
+  match items[0].map {
+    None => assert_eq(false, true)
+    Some(stored) => {
+      assert_eq(stored.width, 2)
+      assert_eq(stored.height, 2)
+      assert_eq(physical_equal(stored, map), true)
+    }
+  }
 }
 
 ///|
@@ -104,4 +132,33 @@ test "frame lights sum ambient and the first directional" {
   assert_eq(lights.direction.x, 0.0)
   assert_eq(lights.direction.y, 1.0)
   assert_eq(lights.direction.z, 0.0)
+}
+
+///|
+test "vertices pack uv and texture rows pad to 256" {
+  let position = @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)
+  let uv = @core.BufferAttribute::new([0.5, 0.25], 2)
+  let packed = @common.pack_position_normal_uv(position, None, Some(uv))
+  assert_eq(packed.length(), @common.vertex_stride)
+  assert_eq(packed[20], b'\x00')
+  assert_eq(packed[21], b'\x00')
+  assert_eq(packed[22], b'\x80')
+  assert_eq(packed[23], b'\x3F')
+  assert_eq(packed[24], b'\x00')
+  assert_eq(packed[25], b'\x00')
+  assert_eq(packed[26], b'\x00')
+  assert_eq(packed[27], b'\x3F')
+  assert_eq(packed[28], b'\x00')
+  assert_eq(packed[29], b'\x00')
+  assert_eq(packed[30], b'\x80')
+  assert_eq(packed[31], b'\x3E')
+  let pixels = FixedArray::make(8, b'\x11')
+  let (rows, stride) = @common.pad_texture_rows(pixels, 1, 2)
+  assert_eq(@common.copy_bytes_per_row(4), 256)
+  assert_eq(@common.copy_bytes_per_row(256), 256)
+  assert_eq(stride, 256)
+  assert_eq(rows.length(), 512)
+  assert_eq(rows[0], b'\x11')
+  assert_eq(rows[4], b'\x00')
+  assert_eq(rows[256], b'\x11')
 }

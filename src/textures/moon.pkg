@@ -1,2 +1,8 @@
-// 阶段 5。纹理源是宽、高和 rgba8 字节。
-// 计划依赖 fenriliuguang/three-mbt/constants。
+// 阶段 5。纹理源是宽、高和 rgba8 字节，不读 DOM 图片。
+import {
+  "fenriliuguang/three-mbt/constants",
+}
+
+import {
+  "fenriliuguang/three-mbt/constants",
+} for "test"

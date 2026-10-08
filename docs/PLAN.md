@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 4 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, and a Lambert cube with ambient and directional light. Textures are phase 5.
+Phase 0 through phase 5 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, and an `rgba8` textured cube whose camera follows pointer events. PBR is phase 6.
 
 ## Pins
 
@@ -112,9 +112,11 @@ src/lights/
 src/textures/
 src/renderer/common/
 src/renderer/webgpu/
-src/nodes/                   empty until phase 4
+src/nodes/                   WGSL subset from phase 4, texture sample from phase 5
 src/examples/clear/          phase 1
 src/examples/cube/           phase 3
+src/examples/lit/            phase 4
+src/examples/textured/       phase 5
 ```
 
 Samples live under `src/examples` because only packages inside the `source` directory belong to the module. The clear sample is the Wasm component built from `src/gen`; `moon run src/examples/cube` stays a placeholder until phase 3.
@@ -171,6 +173,8 @@ This phase has landed. `nodes` builds `MeshBasicMaterial` and `MeshLambertMateri
 ### 5. Textures and window events
 
 `rgba8` textures and samplers. `on-resize` rebuilds the swapchain. A sample uses `on-pointer-*` to move the camera. Input stays in the sample.
+
+This phase has landed. `Texture` is width, height, and `rgba8` bytes. Materials can hold one map; both shaders sample it, and a missing map binds a 1×1 white texture. `examples/textured` is a Lambert cube with a checker map. Its component reads `on-resize` and asks the renderer to reconfigure the swapchain, and reads `on-pointer-*` to orbit the camera. The window sample is `scripts/build-textured.sh`. Host playback of that component stays out of this pass.
 
 ### 6. PBR subset
 

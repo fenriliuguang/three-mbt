@@ -6,6 +6,22 @@ using @core {type BufferAttribute}
 pub let uniform_bytes : Int = 192
 
 ///|
+/// 位置、法线、uv 交错存放时每个顶点的字节数。
+pub let vertex_stride : Int = 32
+
+///|
+/// WebGPU 要求 `bytesPerRow` 是 256 的倍数。
+pub fn copy_bytes_per_row(row_bytes : Int) -> Int {
+  let alignment = 256
+  let remainder = row_bytes % alignment
+  if remainder == 0 {
+    row_bytes
+  } else {
+    row_bytes + (alignment - remainder)
+  }
+}
+
+///|
 fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
   let bytes = Float::from_double(value).to_le_bytes()
   let mut index = 0
@@ -69,14 +85,15 @@ pub fn pack_u32_indices(index : BufferAttribute) -> FixedArray[Byte] {
 }
 
 ///|
-/// 位置和法线交错存放，每个顶点 24 字节。缺少法线时写成 `(0, 0, 1)`。
-pub fn pack_position_normal(
+/// 位置、法线和 uv 交错存放，每个顶点 32 字节。缺少法线时写成 `(0, 0, 1)`，缺少 uv 时写成 `(0, 0)`。
+pub fn pack_position_normal_uv(
   position : BufferAttribute,
   normal : BufferAttribute?,
+  uv : BufferAttribute?,
 ) -> FixedArray[Byte] {
-  let dst = FixedArray::make(position.count * 24, b'\x00')
+  let dst = FixedArray::make(position.count * vertex_stride, b'\x00')
   for index in 0..<position.count {
-    let base = index * 24
+    let base = index * vertex_stride
     write_vec3(
       dst,
       base,
@@ -95,8 +112,36 @@ pub fn pack_position_normal(
         )
       _ => write_f32(dst, base + 20, 1.0)
     }
+    match uv {
+      Some(uv) if index < uv.count => {
+        write_f32(dst, base + 24, uv.get_x(index))
+        write_f32(dst, base + 28, uv.get_y(index))
+      }
+      _ => ()
+    }
   }
   dst
+}
+
+///|
+/// 把紧排的 `rgba8` 补到每行 256 字节对齐，供 `write_texture` 使用。
+pub fn pad_texture_rows(
+  pixels : FixedArray[Byte],
+  width : Int,
+  height : Int,
+) -> (FixedArray[Byte], Int) {
+  let row = width * 4
+  let stride = copy_bytes_per_row(row)
+  if stride == row {
+    return (pixels, stride)
+  }
+  let dst = FixedArray::make(stride * height, b'\x00')
+  for y in 0..<height {
+    for x in 0..<row {
+      dst[y * stride + x] = pixels[y * row + x]
+    }
+  }
+  (dst, stride)
 }
 
 ///|

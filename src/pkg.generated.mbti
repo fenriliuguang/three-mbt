@@ -11,14 +11,33 @@ import {
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
   "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
 }
 
 // Values
 pub const BACK_SIDE : Int = 1
 
+pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
+
 pub const DOUBLE_SIDE : Int = 2
 
 pub const FRONT_SIDE : Int = 0
+
+pub const LINEAR_FILTER : Int = 1006
+
+pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
+
+pub const LINEAR_MIPMAP_NEAREST_FILTER : Int = 1007
+
+pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
+
+pub const NEAREST_FILTER : Int = 1003
+
+pub const NEAREST_MIPMAP_LINEAR_FILTER : Int = 1005
+
+pub const NEAREST_MIPMAP_NEAREST_FILTER : Int = 1004
+
+pub const REPEAT_WRAPPING : Int = 1000
 
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
@@ -105,11 +124,17 @@ pub using @constants {type Side}
 
 pub using @math {type Sphere}
 
+pub using @textures {type Texture}
+
+pub using @constants {type TextureFilter}
+
 pub using @math {type Vector2}
 
 pub using @math {type Vector3}
 
 pub using @math {type Vector4}
+
+pub using @constants {type Wrapping}
 
 pub using @core {trait AsNode}
 

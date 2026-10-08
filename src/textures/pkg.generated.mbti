@@ -1,11 +1,29 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "fenriliuguang/three-mbt/textures"
 
+import {
+  "fenriliuguang/three-mbt/constants",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub(all) struct Texture {
+  width : Int
+  height : Int
+  data : FixedArray[Byte]
+  mut wrap_s : @constants.Wrapping
+  mut wrap_t : @constants.Wrapping
+  mut mag_filter : @constants.TextureFilter
+  mut min_filter : @constants.TextureFilter
+  mut flip_y : Bool
+  mut needs_update : Bool
+}
+pub fn Texture::checker(width~ : Int, height~ : Int, cell~ : Int, first~ : Int, second~ : Int) -> Self
+pub fn Texture::from_rgba8(Int, Int, FixedArray[Byte]) -> Self
+pub fn Texture::rgba8(Self) -> FixedArray[Byte]
 
 // Type aliases
 

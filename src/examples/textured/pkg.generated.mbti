@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/textured"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct TexturedScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  mesh : @objects.Mesh
+  map : @textures.Texture
+  mut angle : Double
+  mut yaw : Double
+  mut pitch : Double
+  radius : Double
+  mut dragging : Bool
+  mut last_x : Double
+  mut last_y : Double
+}
+pub fn TexturedScene::new() -> Self
+pub fn TexturedScene::pointer_down(Self, Double, Double) -> Unit
+pub fn TexturedScene::pointer_move(Self, Double, Double) -> Unit
+pub fn TexturedScene::pointer_up(Self) -> Unit
+pub fn TexturedScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

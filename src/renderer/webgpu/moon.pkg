@@ -1,4 +1,4 @@
-// 阶段 3。不光照的 WebGPU 绘制路径。
+// 阶段 3 起的 WebGPU 绘制路径。阶段 5 加上 rgba8 纹理和交换链重建。
 import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
@@ -9,6 +9,7 @@ import {
   "fenriliuguang/three-mbt/platform",
   "fenriliuguang/three-mbt/renderer/common",
   "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
 }
 
 supported_targets = "+wasm"

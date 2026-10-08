@@ -7,6 +7,7 @@ using @gpu {
   type GpuCullMode,
   type GpuDevice,
   type GpuRenderPipeline,
+  type GpuSampler,
   type GpuShaderModule,
   type GpuTexture,
   type GpuTextureFormat,
@@ -39,6 +40,15 @@ struct ObjectGpu {
 }
 
 ///|
+struct TextureGpu {
+  source : @textures.Texture?
+  texture : GpuTexture
+  view : GpuTextureView
+  sampler : GpuSampler
+  group : GpuBindGroup
+}
+
+///|
 struct CullPipelines {
   front : GpuRenderPipeline
   back : GpuRenderPipeline
@@ -47,17 +57,24 @@ struct CullPipelines {
 
 ///|
 /// 一帧里的不透明网格。深度比较是 `less`，近平面为 0。
+/// 没有贴图的材质使用一张 1×1 白纹理，因此两种着色器始终采样。
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
   context : @canvas.Context
   format : GpuTextureFormat
   layout : GpuBindGroupLayout
+  texture_layout : GpuBindGroupLayout
   basic : CullPipelines
   lambert : CullPipelines
+  white : TextureGpu
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
   uniforms : Array[ObjectGpu]
+  textures : Array[TextureGpu]
+  mut swap_width : UInt
+  mut swap_height : UInt
+  mut swapchain_dirty : Bool
 }
 
 ///|
@@ -87,6 +104,45 @@ fn flags_texture() -> GpuTextureUsage {
 }
 
 ///|
+fn flags_sampled() -> GpuTextureUsage {
+  GpuTextureUsage::default()
+  .set(@gpu.GpuTextureUsageFlag::COPY_DST)
+  .set(@gpu.GpuTextureUsageFlag::TEXTURE_BINDING)
+}
+
+///|
+fn fragment_visibility() -> @gpu.GpuShaderStage {
+  @gpu.GpuShaderStage::default().set(@gpu.GpuShaderStageFlag::FRAGMENT)
+}
+
+///|
+fn gpu_filter(nearest : Bool) -> @gpu.GpuFilterMode {
+  if nearest {
+    @gpu.GpuFilterMode::NEAREST
+  } else {
+    @gpu.GpuFilterMode::LINEAR
+  }
+}
+
+///|
+fn gpu_mip(linear : Bool) -> @gpu.GpuMipmapFilterMode {
+  if linear {
+    @gpu.GpuMipmapFilterMode::LINEAR
+  } else {
+    @gpu.GpuMipmapFilterMode::NEAREST
+  }
+}
+
+///|
+fn gpu_address(wrap : @constants.Wrapping) -> @gpu.GpuAddressMode {
+  match wrap {
+    @constants.Repeat => @gpu.GpuAddressMode::REPEAT
+    @constants.ClampToEdge => @gpu.GpuAddressMode::CLAMP_TO_EDGE
+    @constants.MirroredRepeat => @gpu.GpuAddressMode::MIRROR_REPEAT
+  }
+}
+
+///|
 fn shader_visibility() -> @gpu.GpuShaderStage {
   @gpu.GpuShaderStage::default()
   .set(@gpu.GpuShaderStageFlag::VERTEX)
@@ -105,7 +161,7 @@ fn unlit_pipeline(
     vertex: {
       buffers: Some([
         Some({
-          array_stride: 24UL,
+          array_stride: @common.vertex_stride.to_uint64(),
           step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
           attributes: [
             {
@@ -117,6 +173,11 @@ fn unlit_pipeline(
               format: @gpu.GpuVertexFormat::FLOAT32X3,
               offset: 12UL,
               shader_location: 1U,
+            },
+            {
+              format: @gpu.GpuVertexFormat::FLOAT32X2,
+              offset: 24UL,
+              shader_location: 2U,
             },
           ],
         }),
@@ -202,6 +263,86 @@ fn cull_pipelines(
 }
 
 ///|
+fn upload_texture(
+  device : GpuDevice,
+  layout : GpuBindGroupLayout,
+  width : Int,
+  height : Int,
+  pixels : FixedArray[Byte],
+  wrap_s : @constants.Wrapping,
+  wrap_t : @constants.Wrapping,
+  mag_filter : @constants.TextureFilter,
+  min_filter : @constants.TextureFilter,
+  source : @textures.Texture?,
+) -> TextureGpu {
+  let (padded, stride) = @common.pad_texture_rows(pixels, width, height)
+  let texture = device.create_texture({
+    size: {
+      width: width.reinterpret_as_uint(),
+      height: Some(height.reinterpret_as_uint()),
+      depth_or_array_layers: Some(1U),
+    },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: @gpu.GpuTextureFormat::RGBA8UNORM,
+    usage: flags_sampled(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some("rgba8"),
+  })
+  device
+  .queue()
+  .write_texture_with_copy(
+    { texture, mip_level: Some(0U), origin: None, aspect: None, },
+    padded,
+    {
+      offset: Some(0UL),
+      bytes_per_row: Some(stride.reinterpret_as_uint()),
+      rows_per_image: Some(height.reinterpret_as_uint()),
+    },
+    {
+      width: width.reinterpret_as_uint(),
+      height: Some(height.reinterpret_as_uint()),
+      depth_or_array_layers: Some(1U),
+    },
+  )
+  let view = texture.create_view(None)
+  let sampler = device.create_sampler(
+    Some({
+      address_mode_u: Some(gpu_address(wrap_s)),
+      address_mode_v: Some(gpu_address(wrap_t)),
+      address_mode_w: None,
+      mag_filter: Some(gpu_filter(mag_filter.is_nearest())),
+      min_filter: Some(gpu_filter(min_filter.is_nearest())),
+      mipmap_filter: Some(gpu_mip(min_filter.mip_linear())),
+      lod_min_clamp: None,
+      lod_max_clamp: None,
+      compare: None,
+      max_anisotropy: None,
+      label: Some("rgba8"),
+    }),
+  )
+  let group = device.create_bind_group({
+    layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
+      { binding: 1U, resource: @gpu.GpuBindingResource::GpuSampler(sampler), },
+    ],
+    label: Some("rgba8"),
+  })
+  { source, texture, view, sampler, group, }
+}
+
+///|
+fn drop_texture(gpu : TextureGpu) -> Unit {
+  gpu.group.drop()
+  gpu.view.drop()
+  gpu.sampler.drop()
+  gpu.texture.drop()
+}
+
+///|
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
@@ -222,24 +363,68 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
         storage_texture: None,
       },
     ],
-    label: Some("unlit"),
+    label: Some("frame"),
+  })
+  let texture_layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("rgba8"),
   })
   let pipeline_layout = device.create_pipeline_layout({
-    bind_group_layouts: [Some(layout)],
+    bind_group_layouts: [Some(layout), Some(texture_layout)],
     immediate_size: None,
-    label: Some("unlit"),
+    label: Some("frame"),
   })
+  let white = upload_texture(
+    device,
+    texture_layout,
+    1,
+    1,
+    FixedArray::make(4, b'\xFF'),
+    @constants.ClampToEdge,
+    @constants.ClampToEdge,
+    @constants.Linear,
+    @constants.Linear,
+    None,
+  )
+  let window = target.window()
   {
     device,
-    window: target.window(),
+    window,
     context: target.context(),
     format,
     layout,
+    texture_layout,
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
+    white,
     depth: None,
     geometries: [],
     uniforms: [],
+    textures: [],
+    swap_width: window.width(),
+    swap_height: window.height(),
+    swapchain_dirty: false,
   }
 }
 
@@ -310,9 +495,10 @@ fn WebGPURenderer::geometry_gpu(
       } else {
         let vertices = pack_buffer(
           self.device,
-          @common.pack_position_normal(
+          @common.pack_position_normal_uv(
             position,
             geometry.get_attribute("normal"),
+            geometry.get_attribute("uv"),
           ),
           vertex=true,
           index=false,
@@ -413,6 +599,82 @@ fn sync_aspect(camera : @core.Object3D, width : UInt, height : UInt) -> Unit {
 }
 
 ///|
+/// `on-resize` 里调用。下一帧绘制前会 `unconfigure` 再 `configure`。
+pub fn WebGPURenderer::invalidate_swapchain(self : WebGPURenderer) -> Unit {
+  self.swapchain_dirty = true
+}
+
+///|
+fn WebGPURenderer::sync_swapchain(self : WebGPURenderer) -> Unit {
+  let width = self.window.width()
+  let height = self.window.height()
+  if !self.swapchain_dirty &&
+    width == self.swap_width &&
+    height == self.swap_height {
+    return
+  }
+  self.context.unconfigure()
+  self.context.configure({
+    device: self.device,
+    format: self.format,
+    usage: None,
+    view_formats: None,
+    color_space: None,
+    tone_mapping: None,
+    alpha_mode: None,
+  })
+  self.swap_width = width
+  self.swap_height = height
+  self.swapchain_dirty = false
+}
+
+///|
+fn WebGPURenderer::texture_group(
+  self : WebGPURenderer,
+  map : @textures.Texture?,
+) -> GpuBindGroup {
+  match map {
+    None => self.white.group
+    Some(source) => {
+      let mut found = -1
+      let mut index = 0
+      while index < self.textures.length() {
+        match self.textures[index].source {
+          Some(cached) => if physical_equal(cached, source) { found = index }
+          None => ()
+        }
+        index = index + 1
+      }
+      if found >= 0 && !source.needs_update {
+        return self.textures[found].group
+      }
+      if found >= 0 {
+        drop_texture(self.textures[found])
+      }
+      let uploaded = upload_texture(
+        self.device,
+        self.texture_layout,
+        source.width,
+        source.height,
+        source.rgba8(),
+        source.wrap_s,
+        source.wrap_t,
+        source.mag_filter,
+        source.min_filter,
+        Some(source),
+      )
+      source.needs_update = false
+      if found >= 0 {
+        self.textures[found] = uploaded
+      } else {
+        self.textures.push(uploaded)
+      }
+      uploaded.group
+    }
+  }
+}
+
+///|
 /// 更新矩阵，清屏，画出不透明网格，然后 `present`。
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
@@ -424,6 +686,7 @@ pub fn WebGPURenderer::render(
   if width == 0U || height == 0U {
     return
   }
+  self.sync_swapchain()
   sync_aspect(camera, width, height)
   @common.update_frame(scene.node, camera)
   let state = match camera.camera {
@@ -489,6 +752,15 @@ pub fn WebGPURenderer::render(
         pass.set_pipeline(self.pipeline(item.shading, item.side))
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
         ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        ignore(
+          pass.set_bind_group(
+            1U,
+            Some(self.texture_group(item.map)),
+            None,
+            None,
+            None,
+          ),
+        )
         match geometry.indices {
           None =>
             pass.draw(

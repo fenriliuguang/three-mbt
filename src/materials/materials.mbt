@@ -13,6 +13,7 @@ pub(all) struct Material {
   mut opacity : Double
   mut transparent : Bool
   mut wireframe : Bool
+  mut map : @textures.Texture?
   kind : MaterialKind
 }
 
@@ -24,6 +25,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     opacity: 1.0,
     transparent: false,
     wireframe: false,
+    map: None,
     kind: Basic,
   }
 }
@@ -47,6 +49,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     opacity: 1.0,
     transparent: false,
     wireframe: false,
+    map: None,
     kind: Lambert,
   }
 }

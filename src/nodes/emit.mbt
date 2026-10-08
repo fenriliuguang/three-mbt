@@ -2,6 +2,7 @@
 fn wgsl_type(ty : ValueType) -> String {
   match ty {
     F32 => "f32"
+    Vec2 => "vec2<f32>"
     Vec3 => "vec3<f32>"
     Vec4 => "vec4<f32>"
     Mat4 => "mat4x4<f32>"
@@ -32,6 +33,8 @@ fn emit_expr(node : Node) -> String {
     Normalize(value) => "normalize(\{emit_expr(value)})"
     Vec4(xyz, w) => "vec4<f32>(\{emit_expr(xyz)}, \{emit_expr(w)})"
     Swizzle(value, suffix) => "(\{emit_expr(value)}).\{suffix}"
+    TextureSample(uv) =>
+      "textureSample(map_texture, map_sampler, \{emit_expr(uv)})"
   }
 }
 
@@ -52,7 +55,12 @@ pub fn emit_wgsl(program : Program) -> String {
   let lines = []
   lines.push("struct Uniforms {\n")
   emit_fields(lines, program.uniforms)
-  lines.push("}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\n")
+  lines.push("}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n")
+  if program.sampled {
+    lines.push("@group(1) @binding(0) var map_texture : texture_2d<f32>;\n")
+    lines.push("@group(1) @binding(1) var map_sampler : sampler;\n")
+  }
+  lines.push("\n")
   lines.push("struct VertexInput {\n")
   for attribute in program.attributes {
     let (name, location, ty) = attribute
