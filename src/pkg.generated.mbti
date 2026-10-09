@@ -132,6 +132,8 @@ pub using @core {type PrimitiveKind}
 
 pub using @math {type Quaternion}
 
+pub using @textures {type RenderTarget}
+
 pub using @scenes {type Scene}
 
 pub using @constants {type Shading}

@@ -1,0 +1,17 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+import {
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：先把立方体画进颜色目标，再把这张纹理贴到屏幕四边形上。

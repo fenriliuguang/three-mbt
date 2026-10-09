@@ -4,7 +4,7 @@
 
 把 [three.js](https://github.com/mrdoob/three.js) **r186** 的 WebGPU 世界迁到 MoonBit。GPU 使用 [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu)，窗口、帧循环和输入使用 [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx)。
 
-阶段 1 会打开 wasi-gfx 窗口，配置 WebGPU 交换链，并在每一帧清屏。阶段 2 是 CPU 场景图，并用 r186 的数值做对照。阶段 3 绘制一个不受光照的旋转立方体。阶段 4 加上 Lambert 着色、环境光和一盏平行光。阶段 5 加上 `rgba8` 纹理，在窗口缩放时重建交换链，并在样本里用指针事件转动相机。阶段 6 加上 `MeshStandardMaterial` 的粗糙度、金属度和平行光。阶段 7 从点、线、实例化和平行光阴影开始。范围写在 [docs/PLAN.md](docs/PLAN.md)。
+阶段 1 会打开 wasi-gfx 窗口，配置 WebGPU 交换链，并在每一帧清屏。阶段 2 是 CPU 场景图，并用 r186 的数值做对照。阶段 3 绘制一个不受光照的旋转立方体。阶段 4 加上 Lambert 着色、环境光和一盏平行光。阶段 5 加上 `rgba8` 纹理，在窗口缩放时重建交换链，并在样本里用指针事件转动相机。阶段 6 加上 `MeshStandardMaterial` 的粗糙度、金属度和平行光。阶段 7 从点、线、实例化、平行光阴影和渲染目标开始。范围写在 [docs/PLAN.md](docs/PLAN.md)。
 
 ## 检查
 
@@ -83,6 +83,14 @@ sh scripts/build-shadow.sh
 ```
 
 把 `target/shadow.component.wasm` 复制到 `examples/apps/shadow/shadow.component.wasm`，然后 `cargo xtask run-demo --name shadow`。`moon run src/examples/shadow/app` 不会打开窗口。
+
+渲染目标样本先把 Lambert 立方体画进 256×256 的颜色目标，再贴到铺满窗口的四边形上：
+
+```sh
+sh scripts/build-target.sh
+```
+
+把 `target/target.component.wasm` 复制到 `examples/apps/target/target.component.wasm`，然后 `cargo xtask run-demo --name target`。`moon run src/examples/target/app` 不会打开窗口。
 
 ## 许可
 

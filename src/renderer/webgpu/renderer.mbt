@@ -85,6 +85,20 @@ struct TextureGpu {
 }
 
 ///|
+struct ColorTarget {
+  source : @textures.Texture
+  texture : GpuTexture
+  view : GpuTextureView
+  sampler : GpuSampler
+  group : GpuBindGroup
+  depth_texture : GpuTexture
+  depth_view : GpuTextureView
+  width : UInt
+  height : UInt
+  version : Int
+}
+
+///|
 struct CullPipelines {
   front : GpuRenderPipeline
   back : GpuRenderPipeline
@@ -119,6 +133,8 @@ pub struct WebGPURenderer {
   shadow_depth_instanced : GpuRenderPipeline
   mut shadow_map : ShadowMap?
   mut depth : DepthTarget?
+  mut output : @textures.RenderTarget?
+  color_targets : Array[ColorTarget]
   geometries : Array[GeometryGpu]
   positions : Array[PositionGpu]
   instances : Array[InstanceGpu]
@@ -166,6 +182,13 @@ fn flags_shadow() -> GpuTextureUsage {
 fn flags_sampled() -> GpuTextureUsage {
   GpuTextureUsage::default()
   .set(@gpu.GpuTextureUsageFlag::COPY_DST)
+  .set(@gpu.GpuTextureUsageFlag::TEXTURE_BINDING)
+}
+
+///|
+fn flags_color() -> GpuTextureUsage {
+  GpuTextureUsage::default()
+  .set(@gpu.GpuTextureUsageFlag::RENDER_ATTACHMENT)
   .set(@gpu.GpuTextureUsageFlag::TEXTURE_BINDING)
 }
 
@@ -827,6 +850,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ),
     shadow_map: None,
     depth: None,
+    output: None,
+    color_targets: [],
     geometries: [],
     positions: [],
     instances: [],
@@ -1250,6 +1275,119 @@ fn WebGPURenderer::sync_swapchain(self : WebGPURenderer) -> Unit {
 }
 
 ///|
+fn extent(value : Int) -> UInt {
+  if value < 1 {
+    1U
+  } else {
+    value.reinterpret_as_uint()
+  }
+}
+
+///|
+fn drop_color_target(gpu : ColorTarget) -> Unit {
+  gpu.group.drop()
+  gpu.view.drop()
+  gpu.sampler.drop()
+  gpu.texture.drop()
+  gpu.depth_view.drop()
+  gpu.depth_texture.drop()
+}
+
+///|
+/// 按纹理身份缓存颜色目标和它自己的深度缓冲。尺寸或版本变了就重建。
+/// 格式跟画布相同，这样网格管线可以画进去。
+fn WebGPURenderer::color_target(
+  self : WebGPURenderer,
+  source : @textures.Texture,
+) -> ColorTarget {
+  let width = extent(source.width)
+  let height = extent(source.height)
+  let version = source.version
+  let mut found = -1
+  let mut index = 0
+  while index < self.color_targets.length() {
+    if physical_equal(self.color_targets[index].source, source) {
+      found = index
+    }
+    index = index + 1
+  }
+  if found >= 0 {
+    let cached = self.color_targets[found]
+    if cached.width == width &&
+      cached.height == height &&
+      cached.version == version {
+      return cached
+    }
+    drop_color_target(cached)
+  }
+  let texture = self.device.create_texture({
+    size: { width, height: Some(height), depth_or_array_layers: Some(1U), },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: self.format,
+    usage: flags_color(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some("color-target"),
+  })
+  let view = texture.create_view(None)
+  let sampler = self.device.create_sampler(
+    Some({
+      address_mode_u: Some(gpu_address(source.wrap_s)),
+      address_mode_v: Some(gpu_address(source.wrap_t)),
+      address_mode_w: None,
+      mag_filter: Some(gpu_filter(source.mag_filter.is_nearest())),
+      min_filter: Some(gpu_filter(source.min_filter.is_nearest())),
+      mipmap_filter: Some(gpu_mip(source.min_filter.mip_linear())),
+      lod_min_clamp: None,
+      lod_max_clamp: None,
+      compare: None,
+      max_anisotropy: None,
+      label: Some("color-target"),
+    }),
+  )
+  let group = self.device.create_bind_group({
+    layout: self.texture_layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
+      { binding: 1U, resource: @gpu.GpuBindingResource::GpuSampler(sampler), },
+    ],
+    label: Some("color-target"),
+  })
+  let depth_texture = self.device.create_texture({
+    size: { width, height: Some(height), depth_or_array_layers: Some(1U), },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+    usage: flags_texture(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some("color-target-depth"),
+  })
+  let depth_view = depth_texture.create_view(None)
+  let cached : ColorTarget = {
+    source,
+    texture,
+    view,
+    sampler,
+    group,
+    depth_texture,
+    depth_view,
+    width,
+    height,
+    version,
+  }
+  if found >= 0 {
+    self.color_targets[found] = cached
+  } else {
+    self.color_targets.push(cached)
+  }
+  cached
+}
+
+///|
 fn WebGPURenderer::texture_group(
   self : WebGPURenderer,
   map : @textures.Texture?,
@@ -1257,6 +1395,16 @@ fn WebGPURenderer::texture_group(
   match map {
     None => self.white.group
     Some(source) => {
+      if source.attachment {
+        match self.output {
+          Some(current) =>
+            if physical_equal(current.texture, source) {
+              return self.white.group
+            }
+          None => ()
+        }
+        return self.color_target(source).group
+      }
       let mut found = -1
       let mut index = 0
       while index < self.textures.length() {
@@ -1512,26 +1660,52 @@ fn WebGPURenderer::draw_shadow(
 }
 
 ///|
-/// 更新矩阵，清屏，画出不透明网格，然后 `present`。
+/// 下一帧画到 `target`。`None` 回到窗口，并在帧末 `present`。
+pub fn WebGPURenderer::set_render_target(
+  self : WebGPURenderer,
+  target : @textures.RenderTarget?,
+) -> Unit {
+  self.output = target
+}
+
+///|
+/// 更新矩阵，清屏，画出不透明网格。窗口目标会 `present`，颜色目标不会。
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
   scene : @scenes.Scene,
   camera : @core.Object3D,
 ) -> Unit {
-  let width = self.window.width()
-  let height = self.window.height()
-  if width == 0U || height == 0U {
-    return
+  let offscreen = self.output
+  let (width, height, to_screen) = match offscreen {
+    None => {
+      let width = self.window.width()
+      let height = self.window.height()
+      if width == 0U || height == 0U {
+        return
+      }
+      self.sync_swapchain()
+      (width, height, true)
+    }
+    Some(target) =>
+      (extent(target.texture.width), extent(target.texture.height), false)
   }
-  self.sync_swapchain()
   sync_aspect(camera, width, height)
   @common.update_frame(scene.node, camera)
   let state = match camera.camera {
     None => return
     Some(state) => state
   }
-  let depth = self.ensure_depth(width, height)
-  let color = self.context.get_current_texture().create_view(None)
+  let (color, depth) = match offscreen {
+    None =>
+      (
+        self.context.get_current_texture().create_view(None),
+        self.ensure_depth(width, height),
+      )
+    Some(target) => {
+      let frame = self.color_target(target.texture)
+      (frame.view, frame.depth_view)
+    }
+  }
   let (r, g, b) = match scene.background {
     None => (0.0, 0.0, 0.0)
     Some(background) => (background.r, background.g, background.b)
@@ -1755,5 +1929,7 @@ pub fn WebGPURenderer::render(
   }
   pass.end()
   self.device.queue().submit([encoder.finish(None)])
-  self.context.present()
+  if to_screen {
+    self.context.present()
+  }
 }

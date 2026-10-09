@@ -1,0 +1,31 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/target"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct TargetScene {
+  offscreen : @scenes.Scene
+  screen : @scenes.Scene
+  off_camera : @cameras.PerspectiveCamera
+  screen_camera : @cameras.OrthographicCamera
+  cube : @objects.Mesh
+  quad : @objects.Mesh
+  target : @textures.RenderTarget
+  mut angle : Double
+}
+pub fn TargetScene::new() -> Self
+pub fn TargetScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

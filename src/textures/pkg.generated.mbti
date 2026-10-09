@@ -10,9 +10,15 @@ import {
 // Errors
 
 // Types and methods
+pub(all) struct RenderTarget {
+  texture : Texture
+}
+pub fn RenderTarget::new(Int, Int) -> Self
+pub fn RenderTarget::set_size(Self, Int, Int) -> Unit
+
 pub(all) struct Texture {
-  width : Int
-  height : Int
+  mut width : Int
+  mut height : Int
   data : FixedArray[Byte]
   mut wrap_s : @constants.Wrapping
   mut wrap_t : @constants.Wrapping
@@ -20,7 +26,10 @@ pub(all) struct Texture {
   mut min_filter : @constants.TextureFilter
   mut flip_y : Bool
   mut needs_update : Bool
+  attachment : Bool
+  mut version : Int
 }
+pub fn Texture::attachment(Int, Int) -> Self
 pub fn Texture::checker(width~ : Int, height~ : Int, cell~ : Int, first~ : Int, second~ : Int) -> Self
 pub fn Texture::from_rgba8(Int, Int, FixedArray[Byte]) -> Self
 pub fn Texture::rgba8(Self) -> FixedArray[Byte]

@@ -3,9 +3,12 @@
 ///
 /// `flip_y` 默认 true，与 r186 一致：上传前把行序颠倒，使图像顶部落到较高的 v。
 /// 本阶段不生成 mipmap。
+///
+/// `attachment` 为 true 时，像素在 GPU 颜色目标上，`data` 只是 1×1 占位。
+/// 这种纹理 `flip_y` 为 false：画面顶在纹理的 v = 0。
 pub(all) struct Texture {
-  width : Int
-  height : Int
+  mut width : Int
+  mut height : Int
   data : FixedArray[Byte]
   mut wrap_s : @constants.Wrapping
   mut wrap_t : @constants.Wrapping
@@ -13,6 +16,8 @@ pub(all) struct Texture {
   mut min_filter : @constants.TextureFilter
   mut flip_y : Bool
   mut needs_update : Bool
+  attachment : Bool
+  mut version : Int
 }
 
 ///|
@@ -43,6 +48,34 @@ pub fn Texture::from_rgba8(
     min_filter: @constants.LinearMipmapLinear,
     flip_y: true,
     needs_update: true,
+    attachment: false,
+    version: 0,
+  }
+}
+
+///|
+/// 颜色目标用的空纹理。尺寸至少是 1×1，CPU 侧不保存整张图。
+pub fn Texture::attachment(width : Int, height : Int) -> Texture {
+  {
+    width: if width < 1 {
+      1
+    } else {
+      width
+    },
+    height: if height < 1 {
+      1
+    } else {
+      height
+    },
+    data: FixedArray::make(4, b'\x00'),
+    wrap_s: @constants.ClampToEdge,
+    wrap_t: @constants.ClampToEdge,
+    mag_filter: @constants.Linear,
+    min_filter: @constants.Linear,
+    flip_y: false,
+    needs_update: false,
+    attachment: true,
+    version: 0,
   }
 }
 
@@ -73,7 +106,11 @@ pub fn Texture::checker(
 
 ///|
 /// 上传用的紧排 `rgba8`。`flip_y` 为 true 时第 0 行变成源数据的最后一行。
+/// 颜色目标没有 CPU 像素，这里只返回 1×1 占位。
 pub fn Texture::rgba8(self : Texture) -> FixedArray[Byte] {
+  if self.attachment {
+    return FixedArray::make(4, b'\x00')
+  }
   let row = self.width * 4
   let dst = FixedArray::make(self.data.length(), b'\x00')
   if !self.flip_y {
@@ -90,4 +127,33 @@ pub fn Texture::rgba8(self : Texture) -> FixedArray[Byte] {
     }
   }
   dst
+}
+
+///|
+/// 离屏颜色目标。`texture` 交给 `Mesh::set_map` 后即可采样。
+/// 没有多重采样、模板缓冲和深度贴图。改尺寸会增加 `texture.version`。
+pub(all) struct RenderTarget {
+  texture : Texture
+}
+
+///|
+pub fn RenderTarget::new(width : Int, height : Int) -> RenderTarget {
+  { texture: Texture::attachment(width, height), }
+}
+
+///|
+/// 改颜色目标的宽高。相同尺寸不增加版本。小于 1 的边记为 1。
+pub fn RenderTarget::set_size(
+  self : RenderTarget,
+  width : Int,
+  height : Int,
+) -> Unit {
+  let next_width = if width < 1 { 1 } else { width }
+  let next_height = if height < 1 { 1 } else { height }
+  if self.texture.width == next_width && self.texture.height == next_height {
+    return
+  }
+  self.texture.width = next_width
+  self.texture.height = next_height
+  self.texture.version = self.texture.version + 1
 }

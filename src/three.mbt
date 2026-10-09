@@ -93,4 +93,4 @@ pub using @materials {
 pub using @lights {type AmbientLight, type DirectionalLight}
 
 ///|
-pub using @textures {type Texture}
+pub using @textures {type RenderTarget, type Texture}

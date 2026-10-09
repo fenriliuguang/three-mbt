@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, and directional shadows. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, and render targets. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -83,6 +83,14 @@ sh scripts/build-shadow.sh
 ```
 
 Copy `target/shadow.component.wasm` to `examples/apps/shadow/shadow.component.wasm`, then `cargo xtask run-demo --name shadow`. `moon run src/examples/shadow/app` does not open a window.
+
+The render-target sample draws a Lambert cube into a 256×256 color target, then samples it on a screen quad:
+
+```sh
+sh scripts/build-target.sh
+```
+
+Copy `target/target.component.wasm` to `examples/apps/target/target.component.wasm`, then `cargo xtask run-demo --name target`. `moon run src/examples/target/app` does not open a window.
 
 ## License
 
