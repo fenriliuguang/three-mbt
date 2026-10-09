@@ -1,0 +1,16 @@
+// 阶段 7。glTF 2.0 的几何和 PBR 因子。不读贴图、蒙皮、形变和动画。
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "moonbitlang/core/encoding/base64",
+  "moonbitlang/core/json",
+}
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+  "moonbitlang/core/encoding/base64",
+} for "test"

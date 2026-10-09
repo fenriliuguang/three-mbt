@@ -7,6 +7,7 @@ import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/gltf",
   "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/math",
@@ -60,6 +61,8 @@ pub fn deg_to_rad(Double) -> Double
 
 pub fn linear_to_srgb(Double) -> Double
 
+pub fn parse(String, bin? : Bytes) -> @objects.Group raise @gltf.GltfError
+
 pub fn rad_to_deg(Double) -> Double
 
 pub fn srgb_to_linear(Double) -> Double
@@ -106,6 +109,8 @@ pub using @scenes {type FogKind}
 pub using @math {type Frustum}
 
 pub using @core {type GeometryGroup}
+
+pub using @gltf {type GltfError}
 
 pub using @objects {type Group}
 

@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/gltf"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct GltfScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  root : @objects.Group
+  mut angle : Double
+}
+pub fn GltfScene::new() -> Self
+pub fn GltfScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

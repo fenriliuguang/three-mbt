@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, and the animation mixer. A glTF subset is next.
+Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, the animation mixer, and a glTF geometry and PBR subset. Compute is next.
 
 ## Pins
 
@@ -125,6 +125,8 @@ src/examples/target/         phase 7
 src/examples/fog/            phase 7
 src/examples/animate/        phase 7
 src/animation/               phase 7
+src/examples/gltf/           phase 7
+src/gltf/                    phase 7
 ```
 
 Samples live under `src/examples` because only packages inside the `source` directory belong to the module. The clear sample is the Wasm component built from `src/gen`; `moon run src/examples/cube` stays a placeholder until phase 3.
@@ -204,7 +206,9 @@ Render targets have landed. `RenderTarget` is a color texture plus a private `de
 
 Fog has landed. `Fog` is linear, with `near` and `far` in view-space depth, and `FogExp2` is `1 - exp(-density² depth²)`. The factor is the same smoothstep r186 uses for linear fog. A material with `fog` set to false keeps its own color. `examples/fog` is three Lambert cubes fading into the background. The window sample is `scripts/build-fog.sh`. Host playback stays out of this pass.
 
-The animation mixer has landed. `AnimationClip` holds vector and quaternion tracks. Sampling is linear, or discrete; quaternion tracks use slerp. `LoopRepeat`, `LoopOnce`, and `LoopPingPong` match the r186 numbers. A weight below 1 blends with the pose captured on the first update. `InterpolateSmooth` stays later. `examples/animate` bobs and turns a Lambert cube. The window sample is `scripts/build-animate.sh`. Host playback stays out of this pass. glTF stays later.
+The animation mixer has landed. `AnimationClip` holds vector and quaternion tracks. Sampling is linear, or discrete; quaternion tracks use slerp. `LoopRepeat`, `LoopOnce`, and `LoopPingPong` match the r186 numbers. A weight below 1 blends with the pose captured on the first update. `InterpolateSmooth` stays later. `examples/animate` bobs and turns a Lambert cube. The window sample is `scripts/build-animate.sh`. Host playback stays out of this pass.
+
+A glTF 2.0 subset has landed. `parse` reads one JSON document. Buffer bytes come from a base64 `data:` URI, or from the caller when buffer 0 has no URI. Triangle primitives become meshes with `POSITION`, `NORMAL`, `TEXCOORD_0`, and indices. `baseColorFactor` is written as linear RGB, with `roughnessFactor`, `metallicFactor`, and `doubleSided`. A node `matrix` replaces translation, rotation, and scale. Images, skins, morph targets, animations, cameras, and punctual lights stay later. `examples/gltf` draws that unit box under a directional light. The window sample is `scripts/build-gltf.sh`. Host playback stays out of this pass. Compute stays later.
 
 Phase 4 adds the two-material compiler. The rest of TSL and `WGSLNodeBuilder.js` stay upstream.
 
@@ -235,7 +239,8 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | RenderTarget | `textures`, `renderer` |
 | planned | 7 | Fog, FogExp2 | `scenes`, `materials`, `renderer` |
 | planned | 7 | AnimationClip, AnimationMixer | `animation` |
-| later | 7 | a glTF loader subset, compute, PostProcessing | A new package, or an extension of an existing one |
+| planned | 7 | a glTF loader subset | `gltf` |
+| later | 7 | compute, PostProcessing | A new package, or an extension of an existing one |
 | later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
 | excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
 

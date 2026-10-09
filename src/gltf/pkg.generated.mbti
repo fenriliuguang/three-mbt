@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/gltf"
+
+import {
+  "fenriliuguang/three-mbt/objects",
+}
+
+// Values
+pub fn parse(String, bin? : Bytes) -> @objects.Group raise GltfError
+
+// Errors
+pub(all) suberror GltfError {
+  Invalid(String)
+}
+
+// Types and methods
+
+// Type aliases
+
+// Traits

@@ -1,0 +1,15 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/gltf" @loader,
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：从内嵌 glTF 读出一个 Standard 立方体。

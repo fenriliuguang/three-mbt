@@ -82,6 +82,9 @@ pub using @animation {
 }
 
 ///|
+pub using @gltf {parse, type GltfError}
+
+///|
 pub using @objects {
   type Group,
   type InstancedMesh,
