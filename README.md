@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, and fog. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, and an animation mixer. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -99,6 +99,14 @@ sh scripts/build-fog.sh
 ```
 
 Copy `target/fog.component.wasm` to `examples/apps/fog/fog.component.wasm`, then `cargo xtask run-demo --name fog`. `moon run src/examples/fog/app` does not open a window.
+
+The animation sample plays a two-second clip that bobs and turns a Lambert cube:
+
+```sh
+sh scripts/build-animate.sh
+```
+
+Copy `target/animate.component.wasm` to `examples/apps/animate/animate.component.wasm`, then `cargo xtask run-demo --name animate`. `moon run src/examples/animate/app` does not open a window.
 
 ## License
 

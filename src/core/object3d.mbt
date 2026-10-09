@@ -395,6 +395,21 @@ pub fn Object3D::clear(self : Object3D) -> Object3D {
 }
 
 ///|
+/// 深度优先，先看自己再看子节点。名字相同的话返回最先遇到的那个。
+pub fn Object3D::get_object_by_name(
+  self : Object3D,
+  name : String,
+) -> Object3D? {
+  let found : Ref[Object3D?] = Ref::Ref(None)
+  self.traverse(fn(node) {
+    if found.val is None && node.name == name {
+      found.val = Some(node)
+    }
+  })
+  found.val
+}
+
+///|
 pub fn Object3D::traverse(self : Object3D, visit : (Object3D) -> Unit) -> Unit {
   visit(self)
   let count = self.children.length()

@@ -10,11 +10,23 @@ pub const DOUBLE_SIDE : Int = 2
 
 pub const FRONT_SIDE : Int = 0
 
+pub const INTERPOLATE_DISCRETE : Int = 2300
+
+pub const INTERPOLATE_LINEAR : Int = 2301
+
+pub const INTERPOLATE_SMOOTH : Int = 2302
+
 pub const LINEAR_FILTER : Int = 1006
 
 pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
 
 pub const LINEAR_MIPMAP_NEAREST_FILTER : Int = 1007
+
+pub const LOOP_ONCE : Int = 2200
+
+pub const LOOP_PING_PONG : Int = 2202
+
+pub const LOOP_REPEAT : Int = 2201
 
 pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
 
@@ -38,6 +50,19 @@ pub(all) enum CoordinateSystem {
   WebGPU
 }
 pub fn CoordinateSystem::to_int(Self) -> Int
+
+pub(all) enum Interpolation {
+  Discrete
+  Linear
+}
+pub fn Interpolation::to_int(Self) -> Int
+
+pub(all) enum LoopMode {
+  Once
+  Repeat
+  PingPong
+}
+pub fn LoopMode::to_int(Self) -> Int
 
 pub(all) enum Shading {
   Basic

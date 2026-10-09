@@ -2,6 +2,7 @@
 package "fenriliuguang/three-mbt"
 
 import {
+  "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
@@ -23,11 +24,23 @@ pub const DOUBLE_SIDE : Int = 2
 
 pub const FRONT_SIDE : Int = 0
 
+pub const INTERPOLATE_DISCRETE : Int = 2300
+
+pub const INTERPOLATE_LINEAR : Int = 2301
+
+pub const INTERPOLATE_SMOOTH : Int = 2302
+
 pub const LINEAR_FILTER : Int = 1006
 
 pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
 
 pub const LINEAR_MIPMAP_NEAREST_FILTER : Int = 1007
+
+pub const LOOP_ONCE : Int = 2200
+
+pub const LOOP_PING_PONG : Int = 2202
+
+pub const LOOP_REPEAT : Int = 2201
 
 pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
 
@@ -59,6 +72,12 @@ pub let upstream_revision : String
 
 // Type aliases
 pub using @lights {type AmbientLight}
+
+pub using @animation {type AnimationAction}
+
+pub using @animation {type AnimationClip}
+
+pub using @animation {type AnimationMixer}
 
 pub using @math {type Box3}
 
@@ -92,6 +111,10 @@ pub using @objects {type Group}
 
 pub using @objects {type InstancedMesh}
 
+pub using @constants {type Interpolation}
+
+pub using @animation {type KeyframeTrack}
+
 pub using @core {type Layers}
 
 pub using @objects {type Line}
@@ -99,6 +122,8 @@ pub using @objects {type Line}
 pub using @materials {type LineBasicMaterial}
 
 pub using @objects {type LineSegments}
+
+pub using @constants {type LoopMode}
 
 pub using @materials {type Material}
 

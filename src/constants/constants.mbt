@@ -154,3 +154,59 @@ pub fn TextureFilter::mip_linear(self : TextureFilter) -> Bool {
     _ => false
   }
 }
+
+///|
+/// 播完一次就停。对齐 `LoopOnce`（2200）。
+pub const LOOP_ONCE : Int = 2200
+
+///|
+/// 循环。对齐 `LoopRepeat`（2201）。
+pub const LOOP_REPEAT : Int = 2201
+
+///|
+/// 往返。对齐 `LoopPingPong`（2202）。
+pub const LOOP_PING_PONG : Int = 2202
+
+///|
+/// 关键帧直接取左边那一帧。对齐 `InterpolateDiscrete`（2300）。
+pub const INTERPOLATE_DISCRETE : Int = 2300
+
+///|
+/// 关键帧线性插值。对齐 `InterpolateLinear`（2301）。
+pub const INTERPOLATE_LINEAR : Int = 2301
+
+///|
+/// 三次样条。对齐 `InterpolateSmooth`（2302）。这一阶段还不采样它。
+pub const INTERPOLATE_SMOOTH : Int = 2302
+
+///|
+/// 动画循环方式。
+pub(all) enum LoopMode {
+  Once
+  Repeat
+  PingPong
+}
+
+///|
+/// 关键帧插值。`Smooth` 的数值留在常量里，采样只用离散和线性。
+pub(all) enum Interpolation {
+  Discrete
+  Linear
+}
+
+///|
+pub fn LoopMode::to_int(self : LoopMode) -> Int {
+  match self {
+    Once => LOOP_ONCE
+    Repeat => LOOP_REPEAT
+    PingPong => LOOP_PING_PONG
+  }
+}
+
+///|
+pub fn Interpolation::to_int(self : Interpolation) -> Int {
+  match self {
+    Discrete => INTERPOLATE_DISCRETE
+    Linear => INTERPOLATE_LINEAR
+  }
+}

@@ -1,0 +1,65 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/animation"
+
+import {
+  "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct AnimationAction {
+  clip : AnimationClip
+  mut time : Double
+  mut time_scale : Double
+  mut weight : Double
+  mut loop_mode : @constants.LoopMode
+  mut repetitions : Int
+  mut clamp_when_finished : Bool
+  mut enabled : Bool
+  mut paused : Bool
+  mut playing : Bool
+}
+pub fn AnimationAction::play(Self) -> Unit
+pub fn AnimationAction::set_clamp(Self, Bool) -> Unit
+pub fn AnimationAction::set_loop(Self, @constants.LoopMode, repetitions? : Int) -> Unit
+pub fn AnimationAction::set_time_scale(Self, Double) -> Unit
+pub fn AnimationAction::stop(Self) -> Unit
+
+pub(all) struct AnimationClip {
+  name : String
+  tracks : Array[KeyframeTrack]
+  mut duration : Double
+}
+pub fn AnimationClip::new(String, Array[KeyframeTrack], duration? : Double) -> Self
+
+pub struct AnimationMixer {
+  root : @core.Object3D
+  mut time : Double
+  mut time_scale : Double
+  actions : Array[AnimationAction]
+  bindings : Array[PoseBinding]
+}
+pub fn AnimationMixer::clip_action(Self, AnimationClip) -> AnimationAction
+pub fn AnimationMixer::new(@core.Object3D) -> Self
+pub fn AnimationMixer::set_time_scale(Self, Double) -> Unit
+pub fn AnimationMixer::update(Self, Double) -> Unit
+
+pub(all) struct KeyframeTrack {
+  name : String
+  times : Array[Double]
+  values : Array[Double]
+  value_size : Int
+  mut interpolation : @constants.Interpolation
+}
+pub fn KeyframeTrack::quaternion(String, Array[Double], Array[Double]) -> Self
+pub fn KeyframeTrack::vector(String, Array[Double], Array[Double]) -> Self
+
+type PoseBinding
+
+// Type aliases
+
+// Traits

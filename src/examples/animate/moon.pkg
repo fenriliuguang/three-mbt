@@ -1,14 +1,12 @@
-// 对外门面 fenriliuguang/three-mbt。阶段 2 的场景图类型从这里重新导出。
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
-  "fenriliuguang/three-mbt/constants",
-  "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/geometries",
   "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
   "fenriliuguang/three-mbt/scenes",
-  "fenriliuguang/three-mbt/textures",
 }
+
+// 阶段 7：混合器驱动立方体的位置和旋转，不再手写每帧角度。

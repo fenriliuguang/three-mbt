@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/animate"
+
+import {
+  "fenriliuguang/three-mbt/animation",
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct AnimateScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  mesh : @objects.Mesh
+  mixer : @animation.AnimationMixer
+}
+pub fn AnimateScene::new() -> Self
+pub fn AnimateScene::step(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

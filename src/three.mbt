@@ -9,9 +9,15 @@ pub using @constants {
   FRONT_SIDE,
   WEBGL_COORDINATE_SYSTEM,
   CLAMP_TO_EDGE_WRAPPING,
+  INTERPOLATE_DISCRETE,
+  INTERPOLATE_LINEAR,
+  INTERPOLATE_SMOOTH,
   LINEAR_FILTER,
   LINEAR_MIPMAP_LINEAR_FILTER,
   LINEAR_MIPMAP_NEAREST_FILTER,
+  LOOP_ONCE,
+  LOOP_PING_PONG,
+  LOOP_REPEAT,
   MIRRORED_REPEAT_WRAPPING,
   NEAREST_FILTER,
   NEAREST_MIPMAP_LINEAR_FILTER,
@@ -19,6 +25,8 @@ pub using @constants {
   REPEAT_WRAPPING,
   WEBGPU_COORDINATE_SYSTEM,
   type CoordinateSystem,
+  type Interpolation,
+  type LoopMode,
   type Shading,
   type Side,
   type TextureFilter,
@@ -64,6 +72,14 @@ pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 
 ///|
 pub using @scenes {type Fog, type FogKind, type Scene}
+
+///|
+pub using @animation {
+  type AnimationAction,
+  type AnimationClip,
+  type AnimationMixer,
+  type KeyframeTrack,
+}
 
 ///|
 pub using @objects {
