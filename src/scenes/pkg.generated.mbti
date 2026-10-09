@@ -11,15 +11,33 @@ import {
 // Errors
 
 // Types and methods
+pub(all) struct Fog {
+  color : @math.Color
+  mut near : Double
+  mut far : Double
+  mut density : Double
+  kind : FogKind
+}
+pub fn Fog::exp2(hex? : Int, density? : Double) -> Self
+pub fn Fog::factor(Self, Double) -> Double
+pub fn Fog::linear(hex? : Int, near? : Double, far? : Double) -> Self
+
+pub(all) enum FogKind {
+  Linear
+  Exp2
+}
+
 pub(all) struct Scene {
   node : @core.Object3D
   mut background : @math.Color?
   mut background_blurriness : Double
   mut background_intensity : Double
+  mut fog : Fog?
 }
 pub fn[T : @core.AsNode] Scene::add(Self, T) -> Self
 pub fn Scene::new() -> Self
 pub fn Scene::set_background(Self, @math.Color) -> Unit
+pub fn Scene::set_fog(Self, Fog?) -> Unit
 pub fn Scene::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Scene
 

@@ -76,6 +76,18 @@ priv struct ShadowPack {
 }
 
 ///|
+priv struct FogPack {
+  r : Double
+  g : Double
+  b : Double
+  enabled : Double
+  near : Double
+  far : Double
+  density : Double
+  mode : Double
+}
+
+///|
 struct TextureGpu {
   source : @textures.Texture?
   texture : GpuTexture
@@ -1444,6 +1456,41 @@ fn WebGPURenderer::texture_group(
 }
 
 ///|
+fn fog_pack(fog : @scenes.Fog?, receive : Bool) -> FogPack {
+  match fog {
+    None =>
+      {
+        r: 0.0,
+        g: 0.0,
+        b: 0.0,
+        enabled: 0.0,
+        near: 0.0,
+        far: 1.0,
+        density: 0.0,
+        mode: 0.0,
+      }
+    Some(fog) =>
+      {
+        r: fog.color.r,
+        g: fog.color.g,
+        b: fog.color.b,
+        enabled: if receive {
+          1.0
+        } else {
+          0.0
+        },
+        near: fog.near,
+        far: fog.far,
+        density: fog.density,
+        mode: match fog.kind {
+          @scenes.Linear => 0.0
+          @scenes.Exp2 => 1.0
+        },
+      }
+  }
+}
+
+///|
 fn shadow_pack(lights : @common.LightFrame, receive : Bool) -> ShadowPack {
   match lights.shadow {
     None =>
@@ -1594,6 +1641,14 @@ fn WebGPURenderer::draw_shadow(
           blank.normal_bias,
           blank.enabled,
           blank.texel,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
         )
         ignore(
           self.device
@@ -1763,6 +1818,7 @@ pub fn WebGPURenderer::render(
         let gpu = self.object_gpu(item.node)
         let eye = camera.matrix_world.elements
         let shade = shadow_pack(lights, item.node.receive_shadow)
+        let haze = fog_pack(scene.fog, item.fog)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -1785,6 +1841,14 @@ pub fn WebGPURenderer::render(
           shade.normal_bias,
           shade.enabled,
           shade.texel,
+          haze.r,
+          haze.g,
+          haze.b,
+          haze.enabled,
+          haze.near,
+          haze.far,
+          haze.density,
+          haze.mode,
         )
         ignore(
           self.device
@@ -1875,6 +1939,7 @@ pub fn WebGPURenderer::render(
         }
         let eye = camera.matrix_world.elements
         let shade = shadow_pack(lights, false)
+        let haze = fog_pack(scene.fog, item.fog)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -1897,6 +1962,14 @@ pub fn WebGPURenderer::render(
           shade.normal_bias,
           shade.enabled,
           shade.texel,
+          haze.r,
+          haze.g,
+          haze.b,
+          haze.enabled,
+          haze.near,
+          haze.far,
+          haze.density,
+          haze.mode,
         )
         ignore(
           self.device

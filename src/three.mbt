@@ -63,7 +63,7 @@ pub using @core {
 pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 
 ///|
-pub using @scenes {type Scene}
+pub using @scenes {type Fog, type FogKind, type Scene}
 
 ///|
 pub using @objects {

@@ -1,5 +1,6 @@
-// 阶段 2。Scene。
+// 阶段 2 起。Scene，以及线性雾和指数平方雾。
 import {
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/math",
+  "moonbitlang/core/math" @std,
 }

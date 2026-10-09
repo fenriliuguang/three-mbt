@@ -80,6 +80,10 @@ pub using @math {type Euler}
 
 pub using @math {type EulerOrder}
 
+pub using @scenes {type Fog}
+
+pub using @scenes {type FogKind}
+
 pub using @math {type Frustum}
 
 pub using @core {type GeometryGroup}

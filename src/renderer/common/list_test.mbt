@@ -115,6 +115,14 @@ test "packed vertices and uniforms are little-endian f32" {
     0.0,
     0.0,
     0.0,
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    2.0,
+    4.0,
+    0.5,
+    1.0,
   )
   assert_eq(uniforms.length(), @common.uniform_bytes)
   assert_eq(uniforms[0], b'\x00')
@@ -163,6 +171,22 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(uniforms[387], b'\x3F')
   assert_eq(uniforms[448], b'\x00')
   assert_eq(uniforms[460], b'\x00')
+  assert_eq(uniforms[464], b'\x00')
+  assert_eq(uniforms[465], b'\x00')
+  assert_eq(uniforms[466], b'\x80')
+  assert_eq(uniforms[467], b'\x3F')
+  assert_eq(uniforms[476], b'\x00')
+  assert_eq(uniforms[477], b'\x00')
+  assert_eq(uniforms[478], b'\x80')
+  assert_eq(uniforms[479], b'\x3F')
+  assert_eq(uniforms[480], b'\x00')
+  assert_eq(uniforms[481], b'\x00')
+  assert_eq(uniforms[482], b'\x00')
+  assert_eq(uniforms[483], b'\x40')
+  assert_eq(uniforms[492], b'\x00')
+  assert_eq(uniforms[493], b'\x00')
+  assert_eq(uniforms[494], b'\x80')
+  assert_eq(uniforms[495], b'\x3F')
 }
 
 ///|

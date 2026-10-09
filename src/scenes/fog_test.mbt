@@ -1,0 +1,31 @@
+///|
+test "linear fog smoothsteps and exp2 fades with density" {
+  let linear = @scenes.Fog::linear(hex=0xFFFFFF, near=2.0, far=12.0)
+  assert_eq(linear.near, 2.0)
+  assert_eq(linear.far, 12.0)
+  assert_eq(linear.kind is @scenes.FogKind::Linear, true)
+  assert_eq(linear.factor(0.0), 0.0)
+  assert_eq(linear.factor(2.0), 0.0)
+  assert_eq(linear.factor(7.0), 0.5)
+  assert_eq(linear.factor(12.0), 1.0)
+  assert_eq(linear.factor(20.0), 1.0)
+  let defaults = @scenes.Fog::linear()
+  assert_eq(defaults.near, 1.0)
+  assert_eq(defaults.far, 1000.0)
+  let clear = @scenes.Fog::exp2(density=0.0)
+  assert_eq(clear.kind is @scenes.FogKind::Exp2, true)
+  assert_eq(clear.factor(4.0), 0.0)
+  let thick = @scenes.Fog::exp2(density=1.0)
+  assert_eq(thick.factor(0.0), 0.0)
+  let faded = thick.factor(1.0)
+  assert_eq(faded > 0.63 && faded < 0.64, true)
+  let scene = @scenes.Scene::new()
+  assert_eq(scene.fog is None, true)
+  scene.set_fog(Some(linear))
+  match scene.fog {
+    None => panic()
+    Some(fog) => assert_eq(physical_equal(fog, linear), true)
+  }
+  scene.set_fog(None)
+  assert_eq(scene.fog is None, true)
+}

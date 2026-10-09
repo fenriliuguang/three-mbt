@@ -36,6 +36,7 @@ pub fn InstancedMesh::new(@core.BufferGeometry, @materials.Material, Int) -> Sel
 pub fn InstancedMesh::refresh(Self) -> Unit
 pub fn InstancedMesh::set_color_at(Self, Int, @math.Color) -> Unit
 pub fn InstancedMesh::set_count(Self, Int) -> Unit
+pub fn InstancedMesh::set_fog(Self, Bool) -> Unit
 pub fn InstancedMesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn InstancedMesh::set_matrix_at(Self, Int, @math.Matrix4) -> Unit
 pub fn InstancedMesh::set_side(Self, @constants.Side) -> Unit
@@ -49,6 +50,7 @@ pub(all) struct Line {
 }
 pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn Line::refresh(Self) -> Unit
+pub fn Line::set_fog(Self, Bool) -> Unit
 pub fn Line::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Line
 
@@ -59,6 +61,7 @@ pub(all) struct LineSegments {
 }
 pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineSegments::refresh(Self) -> Unit
+pub fn LineSegments::set_fog(Self, Bool) -> Unit
 pub fn LineSegments::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for LineSegments
 
@@ -69,6 +72,7 @@ pub(all) struct Mesh {
 }
 pub fn Mesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn Mesh::refresh(Self) -> Unit
+pub fn Mesh::set_fog(Self, Bool) -> Unit
 pub fn Mesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn Mesh::set_side(Self, @constants.Side) -> Unit
 pub fn Mesh::to_node(Self) -> @core.Object3D
@@ -81,6 +85,7 @@ pub(all) struct Points {
 }
 pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
 pub fn Points::refresh(Self) -> Unit
+pub fn Points::set_fog(Self, Bool) -> Unit
 pub fn Points::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Points
 

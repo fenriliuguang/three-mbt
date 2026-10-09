@@ -80,6 +80,7 @@ pub fn emit_wgsl(program : Program) -> String {
   if program.preamble != "" {
     lines.push(program.preamble)
   }
+  lines.push(fog_preamble())
   lines.push("struct VertexInput {\n")
   for attribute in program.attributes {
     let (name, location, ty) = attribute
@@ -112,7 +113,9 @@ pub fn emit_wgsl(program : Program) -> String {
   lines.push(
     "  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput) -> @location(0) vec4<f32> {\n",
   )
-  lines.push("  return \{emit_expr(program.fragment_color)};\n}\n")
+  lines.push(
+    "  return apply_fog(\{emit_expr(program.fragment_color)}, input.v_fog_depth);\n}\n",
+  )
   let mut wgsl = ""
   for line in lines {
     wgsl = wgsl + line
@@ -184,5 +187,6 @@ fn uniform_header() -> String {
 /// `size` 是像素。衰减打开时乘 `viewportHeight * 0.5 / -viewZ`，和 r186 的 `PointsMaterial` 一样。
 pub fn points_wgsl() -> String {
   uniform_header() +
-  "struct VertexInput {\n  @location(0) corner : vec2<f32>,\n  @location(1) position : vec3<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  let world = uniforms.model * vec4<f32>(input.position, 1.0);\n  let view = uniforms.view * world;\n  let clip = uniforms.mvp * vec4<f32>(input.position, 1.0);\n  let attenuate = (uniforms.point).y > 0.5;\n  let depth = max(-view.z, 0.000001);\n  let pixels = select((uniforms.point).x, (uniforms.point).x * (uniforms.viewport).y * 0.5 / depth, attenuate);\n  let ndc = vec2<f32>(pixels / (uniforms.viewport).x, pixels / (uniforms.viewport).y);\n  let offset = input.corner * ndc * clip.w;\n  output.clip = vec4<f32>(clip.x + offset.x, clip.y + offset.y, clip.z, clip.w);\n  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput) -> @location(0) vec4<f32> {\n  return uniforms.color + vec4<f32>(input.clip.x * 0.0, 0.0, 0.0, 0.0);\n}\n"
+  fog_preamble() +
+  "struct VertexInput {\n  @location(0) corner : vec2<f32>,\n  @location(1) position : vec3<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n  @location(0) v_fog_depth : f32,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  let world = uniforms.model * vec4<f32>(input.position, 1.0);\n  let view = uniforms.view * world;\n  let clip = uniforms.mvp * vec4<f32>(input.position, 1.0);\n  let attenuate = (uniforms.point).y > 0.5;\n  let depth = max(-view.z, 0.000001);\n  let pixels = select((uniforms.point).x, (uniforms.point).x * (uniforms.viewport).y * 0.5 / depth, attenuate);\n  let ndc = vec2<f32>(pixels / (uniforms.viewport).x, pixels / (uniforms.viewport).y);\n  let offset = input.corner * ndc * clip.w;\n  output.clip = vec4<f32>(clip.x + offset.x, clip.y + offset.y, clip.z, clip.w);\n  output.v_fog_depth = -view.z;\n  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput) -> @location(0) vec4<f32> {\n  let color = uniforms.color + vec4<f32>(input.clip.x * 0.0, 0.0, 0.0, 0.0);\n  return apply_fog(color, input.v_fog_depth);\n}\n"
 }

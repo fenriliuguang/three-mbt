@@ -58,7 +58,37 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("view", Mat4),
     ("shadow_matrix", Mat4),
     ("shadow", Vec4),
+    ("fog", Vec4),
+    ("fog_params", Vec4),
   ]
+}
+
+///|
+/// 雾因子乘在片元颜色上。`fog.w` 小于 0.5 时这个材质不吃雾。
+/// 线性雾是 smoothstep，`fog_params.w` 大于 0.5 时改成指数平方。
+fn fog_preamble() -> String {
+  "fn apply_fog(color : vec4<f32>, depth : f32) -> vec4<f32> {\n  if ((uniforms.fog).w < 0.5) {\n    return color;\n  }\n  var factor = 0.0;\n  let near = (uniforms.fog_params).x;\n  let far = (uniforms.fog_params).y;\n  let density = (uniforms.fog_params).z;\n  if ((uniforms.fog_params).w < 0.5) {\n    let span = max(far - near, 0.000001);\n    let t = clamp((depth - near) / span, 0.0, 1.0);\n    factor = t * t * (3.0 - 2.0 * t);\n  } else {\n    let amount = density * depth;\n    factor = 1.0 - exp(-amount * amount);\n  }\n  return vec4<f32>(mix(color.xyz, (uniforms.fog).xyz, factor), color.w);\n}\n\n"
+}
+
+///|
+/// 视图空间深度，和 r186 的 `-mvPosition.z` 一样。相机前方为正。
+fn fog_depth(point : Node) -> Node {
+  let view_z = Swizzle(
+    Mul(Uniform("view", Mat4), Mul(Uniform("model", Mat4), point)),
+    "z",
+  )
+  Mul(view_z, Float(-1.0))
+}
+
+///|
+fn with_fog(
+  varyings : Array[(String, ValueType)],
+  assignments : Array[(String, Node)],
+  depth : Node,
+) -> (Array[(String, ValueType)], Array[(String, Node)]) {
+  varyings.push(("v_fog_depth", F32))
+  assignments.push(("v_fog_depth", depth))
+  (varyings, assignments)
 }
 
 ///|
@@ -169,10 +199,15 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
   let normal = Attribute("normal", 1, Vec3)
   let shifted = Add(position, Mul(normal, Float(0.0)))
   let sample = TextureSample(Varying("v_uv", Vec2))
-  let (varyings, assignments) = with_instance_color(
+  let (colored_varyings, colored_assignments) = with_instance_color(
     [("v_uv", Vec2)],
     [("v_uv", Attribute("uv", 2, Vec2))],
     instanced,
+  )
+  let (varyings, assignments) = with_fog(
+    colored_varyings,
+    colored_assignments,
+    fog_depth(mesh_local(position, instanced)),
   )
   {
     uniforms: frame_uniforms(),
@@ -218,7 +253,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
     Swizzle(sample, "xyz"),
   )
-  let (varyings, assignments) = with_instance_color(
+  let (colored_varyings, colored_assignments) = with_instance_color(
     [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
     [
       ("v_normal", world_normal),
@@ -226,6 +261,11 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
       ("v_world", world),
     ],
     instanced,
+  )
+  let (varyings, assignments) = with_fog(
+    colored_varyings,
+    colored_assignments,
+    fog_depth(mesh_local(position, instanced)),
   )
   {
     uniforms: frame_uniforms(),
@@ -263,7 +303,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), Swizzle(sample, "xyz")),
     Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
   )
-  let (varyings, assignments) = with_instance_color(
+  let (colored_varyings, colored_assignments) = with_instance_color(
     [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
     [
       ("v_normal", world_normal),
@@ -271,6 +311,11 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
       ("v_world", world),
     ],
     instanced,
+  )
+  let (varyings, assignments) = with_fog(
+    colored_varyings,
+    colored_assignments,
+    fog_depth(placed),
   )
   {
     uniforms: frame_uniforms(),
@@ -293,12 +338,13 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
 /// 折线和线段。只有位置和颜色，线宽由光栅器固定为 1 像素。
 pub fn line_program() -> Program {
   let position = Attribute("position", 0, Vec3)
+  let placed = Node::Vec4(position, Float(1.0))
   {
     uniforms: frame_uniforms(),
     attributes: [("position", 0, Vec3)],
-    varyings: [],
-    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
-    vertex_varyings: [],
+    varyings: [("v_fog_depth", F32)],
+    vertex_clip: Mul(Uniform("mvp", Mat4), placed),
+    vertex_varyings: [("v_fog_depth", fog_depth(placed))],
     fragment_color: Uniform("color", Vec4),
     sampled: false,
     shadowed: false,

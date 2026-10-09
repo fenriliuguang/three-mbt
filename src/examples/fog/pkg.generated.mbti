@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/fog"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct FogScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  near_cube : @objects.Mesh
+  mid_cube : @objects.Mesh
+  far_cube : @objects.Mesh
+  mut angle : Double
+}
+pub fn FogScene::new() -> Self
+pub fn FogScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

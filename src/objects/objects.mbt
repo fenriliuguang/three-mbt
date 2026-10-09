@@ -72,6 +72,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     map: self.material.map,
     roughness: self.material.roughness,
     metalness: self.material.metalness,
+    fog: self.material.fog,
     instances: None,
   })
 }
@@ -90,6 +91,13 @@ pub fn Mesh::set_side(self : Mesh, side : @constants.Side) -> Unit {
 }
 
 ///|
+/// 关掉之后，这个网格不再混入场景雾。直接改 `material.fog` 不会更新绑定。
+pub fn Mesh::set_fog(self : Mesh, enabled : Bool) -> Unit {
+  self.material.fog = enabled
+  self.refresh()
+}
+
+///|
 fn primitive_binding(
   geometry : BufferGeometry,
   color : @math.Color,
@@ -98,8 +106,9 @@ fn primitive_binding(
   size_attenuation : Bool,
   opacity : Double,
   transparent : Bool,
+  fog : Bool,
 ) -> @core.PrimitiveBinding {
-  { geometry, color, kind, size, size_attenuation, opacity, transparent, }
+  { geometry, color, kind, size, size_attenuation, opacity, transparent, fog, }
 }
 
 ///|
@@ -140,8 +149,15 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.size_attenuation,
       self.material.opacity,
       self.material.transparent,
+      self.material.fog,
     ),
   )
+}
+
+///|
+pub fn Points::set_fog(self : Points, enabled : Bool) -> Unit {
+  self.material.fog = enabled
+  self.refresh()
 }
 
 ///|
@@ -182,8 +198,15 @@ pub fn Line::refresh(self : Line) -> Unit {
       false,
       self.material.opacity,
       self.material.transparent,
+      self.material.fog,
     ),
   )
+}
+
+///|
+pub fn Line::set_fog(self : Line, enabled : Bool) -> Unit {
+  self.material.fog = enabled
+  self.refresh()
 }
 
 ///|
@@ -224,8 +247,15 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       false,
       self.material.opacity,
       self.material.transparent,
+      self.material.fog,
     ),
   )
+}
+
+///|
+pub fn LineSegments::set_fog(self : LineSegments, enabled : Bool) -> Unit {
+  self.material.fog = enabled
+  self.refresh()
 }
 
 ///|
@@ -339,6 +369,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     map: self.material.map,
     roughness: self.material.roughness,
     metalness: self.material.metalness,
+    fog: self.material.fog,
     instances: Some(self.instances),
   })
 }
@@ -349,6 +380,12 @@ pub fn InstancedMesh::set_side(
   side : @constants.Side,
 ) -> Unit {
   self.material.side = side
+  self.refresh()
+}
+
+///|
+pub fn InstancedMesh::set_fog(self : InstancedMesh, enabled : Bool) -> Unit {
+  self.material.fog = enabled
   self.refresh()
 }
 

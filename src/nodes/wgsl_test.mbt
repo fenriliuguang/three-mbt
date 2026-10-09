@@ -107,9 +107,14 @@ test "lit materials sample a directional shadow map" {
 ///|
 test "lines return the uniform color and points scale like r186" {
   let line = @nodes.line_wgsl()
-  assert_eq(includes(line, "return uniforms.color;"), true)
+  assert_eq(
+    includes(line, "apply_fog(uniforms.color, input.v_fog_depth)"),
+    true,
+  )
   assert_eq(includes(line, "@location(0) position : vec3<f32>"), true)
   assert_eq(includes(line, "map_texture"), false)
+  assert_eq(includes(@nodes.basic_wgsl(), "fn apply_fog("), true)
+  assert_eq(includes(@nodes.lambert_wgsl(), "v_fog_depth"), true)
   let points = @nodes.points_wgsl()
   assert_eq(
     includes(
@@ -121,4 +126,5 @@ test "lines return the uniform color and points scale like r186" {
   assert_eq(includes(points, "@location(0) corner : vec2<f32>"), true)
   assert_eq(includes(points, "@location(1) position : vec3<f32>"), true)
   assert_eq(includes(points, "uniforms.view"), true)
+  assert_eq(includes(points, "apply_fog(color, input.v_fog_depth)"), true)
 }

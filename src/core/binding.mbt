@@ -11,6 +11,7 @@ pub(all) struct MeshBinding {
   map : @textures.Texture?
   roughness : Double
   metalness : Double
+  fog : Bool
   instances : InstanceData?
 }
 
@@ -42,6 +43,7 @@ pub(all) struct PrimitiveBinding {
   size_attenuation : Bool
   opacity : Double
   transparent : Bool
+  fog : Bool
 }
 
 ///|

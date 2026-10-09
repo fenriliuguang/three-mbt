@@ -2,9 +2,9 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 五块 `mat4x4<f32>` 和九块 `vec4<f32>`。464 字节。
-/// 视图矩阵之后是阴影矩阵，以及 `(bias, normalBias, enabled, texel)`。
-pub let uniform_bytes : Int = 464
+/// 五块 `mat4x4<f32>` 和十一块 `vec4<f32>`。496 字节。
+/// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
+pub let uniform_bytes : Int = 496
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
@@ -199,6 +199,14 @@ pub fn pack_uniforms(
   shadow_normal_bias : Double,
   shadow_enabled : Double,
   shadow_texel : Double,
+  fog_r : Double,
+  fog_g : Double,
+  fog_b : Double,
+  fog_enabled : Double,
+  fog_near : Double,
+  fog_far : Double,
+  fog_density : Double,
+  fog_mode : Double,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -224,6 +232,14 @@ pub fn pack_uniforms(
   write_f32(dst, 452, shadow_normal_bias)
   write_f32(dst, 456, shadow_enabled)
   write_f32(dst, 460, shadow_texel)
+  write_f32(dst, 464, fog_r)
+  write_f32(dst, 468, fog_g)
+  write_f32(dst, 472, fog_b)
+  write_f32(dst, 476, fog_enabled)
+  write_f32(dst, 480, fog_near)
+  write_f32(dst, 484, fog_far)
+  write_f32(dst, 488, fog_density)
+  write_f32(dst, 492, fog_mode)
   dst
 }
 

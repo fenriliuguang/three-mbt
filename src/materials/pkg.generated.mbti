@@ -16,6 +16,7 @@ pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut opacity : Double
   mut transparent : Bool
+  mut fog : Bool
 }
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
 
@@ -28,6 +29,7 @@ pub(all) struct Material {
   mut map : @textures.Texture?
   mut roughness : Double
   mut metalness : Double
+  mut fog : Bool
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
@@ -62,6 +64,7 @@ pub(all) struct PointsMaterial {
   mut size_attenuation : Bool
   mut opacity : Double
   mut transparent : Bool
+  mut fog : Bool
 }
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 

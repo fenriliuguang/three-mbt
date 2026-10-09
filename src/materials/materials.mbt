@@ -17,6 +17,7 @@ pub(all) struct Material {
   mut map : @textures.Texture?
   mut roughness : Double
   mut metalness : Double
+  mut fog : Bool
   kind : MaterialKind
 }
 
@@ -31,6 +32,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     map: None,
     roughness: 1.0,
     metalness: 0.0,
+    fog: true,
     kind: Basic,
   }
 }
@@ -57,6 +59,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     map: None,
     roughness: 1.0,
     metalness: 0.0,
+    fog: true,
     kind: Lambert,
   }
 }
@@ -89,6 +92,7 @@ pub fn Material::standard(
     map: None,
     roughness,
     metalness,
+    fog: true,
     kind: Standard,
   }
 }
@@ -125,6 +129,7 @@ pub(all) struct PointsMaterial {
   mut size_attenuation : Bool
   mut opacity : Double
   mut transparent : Bool
+  mut fog : Bool
 }
 
 ///|
@@ -139,6 +144,7 @@ pub fn PointsMaterial::new(
     size_attenuation,
     opacity: 1.0,
     transparent: false,
+    fog: true,
   }
 }
 
@@ -148,9 +154,15 @@ pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut opacity : Double
   mut transparent : Bool
+  mut fog : Bool
 }
 
 ///|
 pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
-  { color: @math.Color::new().set_hex(hex), opacity: 1.0, transparent: false, }
+  {
+    color: @math.Color::new().set_hex(hex),
+    opacity: 1.0,
+    transparent: false,
+    fog: true,
+  }
 }
