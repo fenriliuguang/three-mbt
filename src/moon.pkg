@@ -2,6 +2,7 @@
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/compute",
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/geometries",

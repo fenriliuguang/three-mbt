@@ -1,0 +1,6 @@
+// 阶段 7。计算着色器写入的位置。不接触 WebGPU 绑定。
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
+  "moonbitlang/core/math" @std,
+}

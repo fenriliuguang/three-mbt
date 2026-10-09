@@ -71,6 +71,9 @@ pub using @core {
 pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 
 ///|
+pub using @compute {type StoragePositions, wave_position, workgroup_count}
+
+///|
 pub using @scenes {type Fog, type FogKind, type Scene}
 
 ///|

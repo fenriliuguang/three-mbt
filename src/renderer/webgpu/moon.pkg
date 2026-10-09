@@ -1,5 +1,6 @@
 // 阶段 3 起的 WebGPU 绘制路径。阶段 5 加上 rgba8 纹理和交换链重建。
 import {
+  "fenriliuguang/three-mbt/compute",
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/interface/wasi-gfx/surface/surface",

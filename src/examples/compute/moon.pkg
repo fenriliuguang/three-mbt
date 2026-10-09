@@ -1,0 +1,15 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/compute" @kernel,
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：65 个点的位置由计算着色器写成一条正弦波。

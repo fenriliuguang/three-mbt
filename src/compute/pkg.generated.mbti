@@ -1,0 +1,33 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/compute"
+
+import {
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
+}
+
+// Values
+pub const WORKGROUP_SIZE : Int = 64
+
+pub fn pack_wave_params(Double, Int) -> FixedArray[Byte]
+
+pub fn wave_position(Int, Int, Double) -> @math.Vector3
+
+pub fn wave_wgsl() -> String
+
+pub fn workgroup_count(Int) -> Int
+
+// Errors
+
+// Types and methods
+pub(all) struct StoragePositions {
+  geometry : @core.BufferGeometry
+  count : Int
+  mut time : Double
+}
+pub fn StoragePositions::new(Int) -> Self
+pub fn StoragePositions::set_time(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

@@ -4,6 +4,7 @@ package "fenriliuguang/three-mbt"
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/compute",
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/geometries",
@@ -68,6 +69,10 @@ pub fn rad_to_deg(Double) -> Double
 pub fn srgb_to_linear(Double) -> Double
 
 pub let upstream_revision : String
+
+pub fn wave_position(Int, Int, Double) -> @math.Vector3
+
+pub fn workgroup_count(Int) -> Int
 
 // Errors
 
@@ -175,6 +180,8 @@ pub using @constants {type Shading}
 pub using @constants {type Side}
 
 pub using @math {type Sphere}
+
+pub using @compute {type StoragePositions}
 
 pub using @textures {type Texture}
 

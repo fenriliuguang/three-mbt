@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt/examples/compute",
+}
+
+pkgtype(kind: "executable")
+
+// `moon run src/examples/compute/app` 只确认场景能建出来。上屏用 compute 组件。

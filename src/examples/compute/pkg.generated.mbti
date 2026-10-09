@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/compute"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ComputeScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  points : @objects.Points
+  positions : @fenriliuguang/three-mbt/compute.StoragePositions
+}
+pub fn ComputeScene::new() -> Self
+pub fn ComputeScene::step(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

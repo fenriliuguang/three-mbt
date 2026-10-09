@@ -4,6 +4,7 @@ using @gpu {
   type GpuBindGroupLayout,
   type GpuBuffer,
   type GpuBufferUsage,
+  type GpuComputePipeline,
   type GpuCullMode,
   type GpuDevice,
   type GpuRenderPipeline,
@@ -56,6 +57,15 @@ struct InstanceGpu {
   matrices : GpuBuffer
   colors : GpuBuffer
   mut version : Int
+}
+
+///|
+struct StorageGpu {
+  source : @compute.StoragePositions
+  buffer : GpuBuffer
+  uniform : GpuBuffer
+  group : GpuBindGroup
+  count : Int
 }
 
 ///|
@@ -136,6 +146,8 @@ pub struct WebGPURenderer {
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
+  wave : GpuComputePipeline
+  wave_layout : GpuBindGroupLayout
   quad : GpuBuffer
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
@@ -150,6 +162,7 @@ pub struct WebGPURenderer {
   geometries : Array[GeometryGpu]
   positions : Array[PositionGpu]
   instances : Array[InstanceGpu]
+  storages : Array[StorageGpu]
   uniforms : Array[ObjectGpu]
   textures : Array[TextureGpu]
   mut swap_width : UInt
@@ -207,6 +220,19 @@ fn flags_color() -> GpuTextureUsage {
 ///|
 fn fragment_visibility() -> @gpu.GpuShaderStage {
   @gpu.GpuShaderStage::default().set(@gpu.GpuShaderStageFlag::FRAGMENT)
+}
+
+///|
+fn compute_visibility() -> @gpu.GpuShaderStage {
+  @gpu.GpuShaderStage::default().set(@gpu.GpuShaderStageFlag::COMPUTE)
+}
+
+///|
+fn flags_storage_vertex() -> GpuBufferUsage {
+  GpuBufferUsage::default()
+  .set(@gpu.GpuBufferUsageFlag::COPY_DST)
+  .set(@gpu.GpuBufferUsageFlag::VERTEX)
+  .set(@gpu.GpuBufferUsageFlag::STORAGE)
 }
 
 ///|
@@ -621,6 +647,53 @@ fn drop_texture(gpu : TextureGpu) -> Unit {
 }
 
 ///|
+fn wave_pipeline(
+  device : GpuDevice,
+) -> (GpuBindGroupLayout, GpuComputePipeline) {
+  let layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: compute_visibility(),
+        buffer: Some({
+          type_: Some(@gpu.GpuBufferBindingType::STORAGE),
+          has_dynamic_offset: None,
+          min_binding_size: None,
+        }),
+        sampler: None,
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: compute_visibility(),
+        buffer: Some({
+          type_: Some(@gpu.GpuBufferBindingType::UNIFORM),
+          has_dynamic_offset: None,
+          min_binding_size: None,
+        }),
+        sampler: None,
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("wave"),
+  })
+  let pipeline_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout)],
+    immediate_size: None,
+    label: Some("wave"),
+  })
+  let shader = shader_module(device, @compute.wave_wgsl(), "wave")
+  let pipeline = device.create_compute_pipeline({
+    compute: { module_: shader, entry_point: Some("main"), constants: None, },
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("wave"),
+  })
+  (layout, pipeline)
+}
+
+///|
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
@@ -777,6 +850,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("shadow-dummy"),
   })
+  let wave = wave_pipeline(device)
   let white = upload_texture(
     device,
     texture_layout,
@@ -845,6 +919,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
     ),
+    wave: wave.1,
+    wave_layout: wave.0,
     quad: pack_buffer(
       device,
       @common.point_quad_bytes(),
@@ -867,6 +943,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     geometries: [],
     positions: [],
     instances: [],
+    storages: [],
     uniforms: [],
     textures: [],
     swap_width: window.width(),
@@ -1169,10 +1246,126 @@ fn WebGPURenderer::position_gpu(
 }
 
 ///|
+fn WebGPURenderer::storage_for(
+  self : WebGPURenderer,
+  geometry : @core.BufferGeometry,
+) -> StorageGpu? {
+  for cached in self.storages {
+    if physical_equal(cached.source.geometry, geometry) {
+      return Some(cached)
+    }
+  }
+  None
+}
+
+///|
+fn WebGPURenderer::ensure_storage(
+  self : WebGPURenderer,
+  positions : @compute.StoragePositions,
+) -> StorageGpu {
+  match self.storage_for(positions.geometry) {
+    Some(cached) => cached
+    None => {
+      let stride = @common.position_stride
+      let bytes = if positions.count < 1 {
+        stride
+      } else {
+        positions.count * stride
+      }
+      let storage = self.device.create_buffer({
+        size: bytes.to_uint64(),
+        usage: flags_storage_vertex(),
+        mapped_at_creation: None,
+        label: Some("wave-positions"),
+      })
+      ignore(
+        self.device
+        .queue()
+        .write_buffer_with_copy(
+          storage,
+          0UL,
+          FixedArray::make(bytes, b'\x00'),
+          None,
+          None,
+        ),
+      )
+      let uniform = pack_buffer(
+        self.device,
+        @compute.pack_wave_params(positions.time, positions.count),
+        vertex=false,
+        index=false,
+        uniform=true,
+      )
+      let group = self.device.create_bind_group({
+        layout: self.wave_layout,
+        entries: [
+          {
+            binding: 0U,
+            resource: @gpu.GpuBindingResource::GpuBuffer(storage),
+          },
+          {
+            binding: 1U,
+            resource: @gpu.GpuBindingResource::GpuBuffer(uniform),
+          },
+        ],
+        label: Some("wave"),
+      })
+      let cached = {
+        source: positions,
+        buffer: storage,
+        uniform,
+        group,
+        count: positions.count,
+      }
+      self.storages.push(cached)
+      cached
+    }
+  }
+}
+
+///|
+/// 把 `positions` 的波形写入存储缓冲。随后的 `render` 里，挂着同一几何体的点会读这块缓冲。
+pub fn WebGPURenderer::compute(
+  self : WebGPURenderer,
+  positions : @compute.StoragePositions,
+) -> Unit {
+  let groups = @compute.workgroup_count(positions.count)
+  if groups < 1 {
+    return
+  }
+  let gpu = self.ensure_storage(positions)
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(
+      gpu.uniform,
+      0UL,
+      @compute.pack_wave_params(positions.time, positions.count),
+      None,
+      None,
+    ),
+  )
+  let encoder = self.device.create_command_encoder(None)
+  let pass = encoder.begin_compute_pass(None)
+  pass.set_pipeline(self.wave)
+  ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+  pass.dispatch_workgroups(groups.reinterpret_as_uint(), None, None)
+  pass.end()
+  self.device.queue().submit([encoder.finish(None)])
+}
+
+///|
 fn WebGPURenderer::point_instances(
   self : WebGPURenderer,
   geometry : PositionGpu,
 ) -> GpuBuffer {
+  match self.storage_for(geometry.geometry) {
+    Some(storage) => {
+      geometry.point_count = storage.count
+      return storage.buffer
+    }
+    None => ()
+  }
   match geometry.points {
     Some(buffer) => buffer
     None => {
