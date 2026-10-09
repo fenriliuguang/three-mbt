@@ -59,6 +59,25 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
 }
 
 ///|
+test "instanced meshes multiply instance matrix and color" {
+  let matrix = "mat4x4<f32>(input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2, input.instance_matrix_3)"
+  let basic = @nodes.basic_instanced_wgsl()
+  let lambert = @nodes.lambert_instanced_wgsl()
+  let standard = @nodes.standard_instanced_wgsl()
+  assert_eq(includes(basic, "@location(3) instance_matrix_0 : vec4<f32>"), true)
+  assert_eq(includes(basic, "@location(6) instance_matrix_3 : vec4<f32>"), true)
+  assert_eq(includes(basic, "@location(7) instance_color : vec3<f32>"), true)
+  assert_eq(includes(basic, matrix), true)
+  assert_eq(includes(basic, "input.v_instance_color"), true)
+  assert_eq(includes(@nodes.basic_wgsl(), "instance_matrix"), false)
+  assert_eq(includes(lambert, "instance_normal("), true)
+  assert_eq(includes(lambert, matrix), true)
+  assert_eq(includes(standard, matrix), true)
+  assert_eq(includes(standard, "fn D_GGX("), true)
+  assert_eq(includes(standard, "input.v_instance_color"), true)
+}
+
+///|
 test "lines return the uniform color and points scale like r186" {
   let line = @nodes.line_wgsl()
   assert_eq(includes(line, "return uniforms.color;"), true)

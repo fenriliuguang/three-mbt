@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points and lines. Instancing is next.
+Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, and instancing. Shadows are next.
 
 ## Pins
 
@@ -119,6 +119,7 @@ src/examples/lit/            phase 4
 src/examples/textured/       phase 5
 src/examples/standard/       phase 6
 src/examples/points/         phase 7
+src/examples/instanced/      phase 7
 ```
 
 Samples live under `src/examples` because only packages inside the `source` directory belong to the module. The clear sample is the Wasm component built from `src/gen`; `moon run src/examples/cube` stays a placeholder until phase 3.
@@ -188,7 +189,9 @@ This phase has landed. `MeshStandardMaterial` defaults to roughness 1 and metaln
 
 Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute. Each addition changes the matching row below from "later" to "ported".
 
-Points and lines have landed. `PointsMaterial.size` is in pixels. When `sizeAttenuation` is set and the camera is perspective, the quad scales by `viewportHeight * 0.5 / -viewZ`, matching r186. WebGPU lines stay one pixel wide, as `Line` (strip) and `LineSegments` (list). `examples/points` draws both. The window sample is `scripts/build-points.sh`. Host playback stays out of this pass. Instancing, shadows, render targets, fog, animation, and glTF stay later.
+Points and lines have landed. `PointsMaterial.size` is in pixels. When `sizeAttenuation` is set and the camera is perspective, the quad scales by `viewportHeight * 0.5 / -viewZ`, matching r186. WebGPU lines stay one pixel wide, as `Line` (strip) and `LineSegments` (list). `examples/points` draws both. The window sample is `scripts/build-points.sh`. Host playback stays out of this pass.
+
+Instancing has landed. `InstancedMesh` stores column-major instance matrices and an optional per-instance color. The instance matrix is applied before the object matrix. A missing color is white. `count` can be lowered without reallocating. `compute_bounding_box` unions each transformed geometry box in local space. `examples/instanced` draws three Lambert cubes from one mesh. The window sample is `scripts/build-instanced.sh`. Host playback stays out of this pass. Shadows, render targets, fog, animation, and glTF stay later.
 
 Phase 4 adds the two-material compiler. The rest of TSL and `WGSLNodeBuilder.js` stay upstream.
 
@@ -214,7 +217,8 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 1 | `src/renderers/common/CanvasTarget.js` | `platform` |
 | planned | 4, 6 | The nodes in `src/nodes` that Lambert and Standard reach | `nodes` |
 | planned | 7 | Points, Line, LineSegments, PointsMaterial, LineBasicMaterial | `objects`, `materials`, `renderer` |
-| later | 7 | InstancedMesh, shadows, RenderTarget, fog, `src/animation`, a glTF loader subset, compute, PostProcessing | A new package, or an extension of an existing one |
+| planned | 7 | InstancedMesh | `objects`, `renderer` |
+| later | 7 | shadows, RenderTarget, fog, `src/animation`, a glTF loader subset, compute, PostProcessing | A new package, or an extension of an existing one |
 | later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
 | excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
 

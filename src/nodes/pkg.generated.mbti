@@ -2,13 +2,17 @@
 package "fenriliuguang/three-mbt/nodes"
 
 // Values
-pub fn basic_program() -> Program
+pub fn basic_instanced_wgsl() -> String
+
+pub fn basic_program(instanced? : Bool) -> Program
 
 pub fn basic_wgsl() -> String
 
 pub fn emit_wgsl(Program) -> String
 
-pub fn lambert_program() -> Program
+pub fn lambert_instanced_wgsl() -> String
+
+pub fn lambert_program(instanced? : Bool) -> Program
 
 pub fn lambert_wgsl() -> String
 
@@ -18,7 +22,9 @@ pub fn line_wgsl() -> String
 
 pub fn points_wgsl() -> String
 
-pub fn standard_program() -> Program
+pub fn standard_instanced_wgsl() -> String
+
+pub fn standard_program(instanced? : Bool) -> Program
 
 pub fn standard_wgsl() -> String
 
@@ -39,6 +45,7 @@ pub(all) enum Node {
   Swizzle(Node, String)
   TextureSample(Node)
   StandardLit(Node)
+  InstanceNormal(Node)
 }
 
 pub(all) struct Program {

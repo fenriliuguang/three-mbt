@@ -11,6 +11,14 @@ pub let uniform_bytes : Int = 384
 pub let position_stride : Int = 12
 
 ///|
+/// 一个实例矩阵 16 个 `f32`，64 字节。
+pub let instance_matrix_stride : Int = 64
+
+///|
+/// 一个实例颜色 `rgb`，12 字节。
+pub let instance_color_stride : Int = 12
+
+///|
 /// 位置、法线、uv 交错存放时每个顶点的字节数。
 pub let vertex_stride : Int = 32
 
@@ -218,6 +226,29 @@ pub fn point_quad_bytes() -> FixedArray[Byte] {
   let dst = FixedArray::make(corners.length() * 4, b'\x00')
   for index in 0..<corners.length() {
     write_f32(dst, index * 4, corners[index])
+  }
+  dst
+}
+
+///|
+/// 实例颜色。没有颜色时写成白色。个数按矩阵容量，而不是当前 `count`。
+pub fn pack_instance_colors(
+  colors : BufferAttribute?,
+  count : Int,
+) -> FixedArray[Byte] {
+  let dst = FixedArray::make(count * instance_color_stride, b'\x00')
+  let mut index = 0
+  while index < count {
+    let (r, g, b) = match colors {
+      Some(colors) if index < colors.count =>
+        (colors.get_x(index), colors.get_y(index), colors.get_z(index))
+      _ => (1.0, 1.0, 1.0)
+    }
+    let base = index * instance_color_stride
+    write_f32(dst, base, r)
+    write_f32(dst, base + 4, g)
+    write_f32(dst, base + 8, b)
+    index = index + 1
   }
   dst
 }

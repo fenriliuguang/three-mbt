@@ -13,6 +13,7 @@ pub(all) struct RenderItem {
   map : @textures.Texture?
   roughness : Double
   metalness : Double
+  instances : @core.InstanceData?
 }
 
 ///|
@@ -36,6 +37,7 @@ pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
                 map: binding.map,
                 roughness: binding.roughness,
                 metalness: binding.metalness,
+                instances: binding.instances,
               })
             }
         }

@@ -23,7 +23,12 @@ fn emit_f32(value : Double) -> String {
 fn emit_expr(node : Node) -> String {
   match node {
     Uniform(name, _) => "uniforms.\{name}"
-    Attribute(name, _, _) => "input.\{name}"
+    Attribute(name, _, ty) =>
+      match ty {
+        Mat4 =>
+          "mat4x4<f32>(input.\{name}_0, input.\{name}_1, input.\{name}_2, input.\{name}_3)"
+        _ => "input.\{name}"
+      }
     Varying(name, _) => "input.\{name}"
     Float(value) => emit_f32(value)
     Add(left, right) => "(\{emit_expr(left)} + \{emit_expr(right)})"
@@ -37,6 +42,8 @@ fn emit_expr(node : Node) -> String {
       "textureSample(map_texture, map_sampler, \{emit_expr(uv)})"
     StandardLit(base) =>
       "standard_lit(\{emit_expr(base)}, input.v_normal, input.v_world)"
+    InstanceNormal(normal) =>
+      "instance_normal(\{emit_expr(normal)}, input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2)"
   }
 }
 
@@ -69,7 +76,15 @@ pub fn emit_wgsl(program : Program) -> String {
   lines.push("struct VertexInput {\n")
   for attribute in program.attributes {
     let (name, location, ty) = attribute
-    lines.push("  @location(\{location}) \{name} : \{wgsl_type(ty)},\n")
+    match ty {
+      Mat4 => {
+        lines.push("  @location(\{location}) \{name}_0 : vec4<f32>,\n")
+        lines.push("  @location(\{location + 1}) \{name}_1 : vec4<f32>,\n")
+        lines.push("  @location(\{location + 2}) \{name}_2 : vec4<f32>,\n")
+        lines.push("  @location(\{location + 3}) \{name}_3 : vec4<f32>,\n")
+      }
+      _ => lines.push("  @location(\{location}) \{name} : \{wgsl_type(ty)},\n")
+    }
   }
   lines.push(
     "}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n",
@@ -104,13 +119,28 @@ pub fn basic_wgsl() -> String {
 }
 
 ///|
+pub fn basic_instanced_wgsl() -> String {
+  emit_wgsl(basic_program(instanced=true))
+}
+
+///|
 pub fn lambert_wgsl() -> String {
   emit_wgsl(lambert_program())
 }
 
 ///|
+pub fn lambert_instanced_wgsl() -> String {
+  emit_wgsl(lambert_program(instanced=true))
+}
+
+///|
 pub fn standard_wgsl() -> String {
   emit_wgsl(standard_program())
+}
+
+///|
+pub fn standard_instanced_wgsl() -> String {
+  emit_wgsl(standard_program(instanced=true))
 }
 
 ///|

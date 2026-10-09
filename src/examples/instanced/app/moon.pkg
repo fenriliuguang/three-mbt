@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt/examples/instanced",
+}
+
+pkgtype(kind: "executable")
+
+// `moon run src/examples/instanced/app` 只确认场景能建出来。上屏用 instanced 组件。

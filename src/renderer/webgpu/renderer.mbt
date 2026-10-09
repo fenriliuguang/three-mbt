@@ -51,6 +51,14 @@ struct ObjectGpu {
 }
 
 ///|
+struct InstanceGpu {
+  data : @core.InstanceData
+  matrices : GpuBuffer
+  colors : GpuBuffer
+  mut version : Int
+}
+
+///|
 struct TextureGpu {
   source : @textures.Texture?
   texture : GpuTexture
@@ -79,6 +87,9 @@ pub struct WebGPURenderer {
   basic : CullPipelines
   lambert : CullPipelines
   standard : CullPipelines
+  basic_instanced : CullPipelines
+  lambert_instanced : CullPipelines
+  standard_instanced : CullPipelines
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
@@ -87,6 +98,7 @@ pub struct WebGPURenderer {
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
   positions : Array[PositionGpu]
+  instances : Array[InstanceGpu]
   uniforms : Array[ObjectGpu]
   textures : Array[TextureGpu]
   mut swap_width : UInt
@@ -167,38 +179,86 @@ fn shader_visibility() -> @gpu.GpuShaderStage {
 }
 
 ///|
+fn mesh_vertex_buffers(instanced : Bool) -> Array[@gpu.GpuVertexBufferLayout?] {
+  let geometry : @gpu.GpuVertexBufferLayout? = Some({
+    array_stride: @common.vertex_stride.to_uint64(),
+    step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
+    attributes: [
+      {
+        format: @gpu.GpuVertexFormat::FLOAT32X3,
+        offset: 0UL,
+        shader_location: 0U,
+      },
+      {
+        format: @gpu.GpuVertexFormat::FLOAT32X3,
+        offset: 12UL,
+        shader_location: 1U,
+      },
+      {
+        format: @gpu.GpuVertexFormat::FLOAT32X2,
+        offset: 24UL,
+        shader_location: 2U,
+      },
+    ],
+  })
+  if !instanced {
+    [geometry]
+  } else {
+    [
+      geometry,
+      Some({
+        array_stride: @common.instance_matrix_stride.to_uint64(),
+        step_mode: Some(@gpu.GpuVertexStepMode::INSTANCE),
+        attributes: [
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X4,
+            offset: 0UL,
+            shader_location: 3U,
+          },
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X4,
+            offset: 16UL,
+            shader_location: 4U,
+          },
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X4,
+            offset: 32UL,
+            shader_location: 5U,
+          },
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X4,
+            offset: 48UL,
+            shader_location: 6U,
+          },
+        ],
+      }),
+      Some({
+        array_stride: @common.instance_color_stride.to_uint64(),
+        step_mode: Some(@gpu.GpuVertexStepMode::INSTANCE),
+        attributes: [
+          {
+            format: @gpu.GpuVertexFormat::FLOAT32X3,
+            offset: 0UL,
+            shader_location: 7U,
+          },
+        ],
+      }),
+    ]
+  }
+}
+
+///|
 fn unlit_pipeline(
   device : GpuDevice,
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
   cull : GpuCullMode,
+  instanced? : Bool = false,
 ) -> GpuRenderPipeline {
   device.create_render_pipeline({
     vertex: {
-      buffers: Some([
-        Some({
-          array_stride: @common.vertex_stride.to_uint64(),
-          step_mode: Some(@gpu.GpuVertexStepMode::VERTEX),
-          attributes: [
-            {
-              format: @gpu.GpuVertexFormat::FLOAT32X3,
-              offset: 0UL,
-              shader_location: 0U,
-            },
-            {
-              format: @gpu.GpuVertexFormat::FLOAT32X3,
-              offset: 12UL,
-              shader_location: 1U,
-            },
-            {
-              format: @gpu.GpuVertexFormat::FLOAT32X2,
-              offset: 24UL,
-              shader_location: 2U,
-            },
-          ],
-        }),
-      ]),
+      buffers: Some(mesh_vertex_buffers(instanced)),
       module_: shader,
       entry_point: Some("vs"),
       constants: None,
@@ -344,6 +404,7 @@ fn cull_pipelines(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
+  instanced? : Bool = false,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -352,6 +413,7 @@ fn cull_pipelines(
       pipeline_layout,
       format,
       GpuCullMode::BACK,
+      instanced~,
     ),
     back: unlit_pipeline(
       device,
@@ -359,6 +421,7 @@ fn cull_pipelines(
       pipeline_layout,
       format,
       GpuCullMode::FRONT,
+      instanced~,
     ),
     double: unlit_pipeline(
       device,
@@ -366,6 +429,7 @@ fn cull_pipelines(
       pipeline_layout,
       format,
       GpuCullMode::NONE,
+      instanced~,
     ),
   }
 }
@@ -461,6 +525,21 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     @nodes.standard_wgsl(),
     "standard",
   )
+  let basic_instanced_shader = shader_module(
+    device,
+    @nodes.basic_instanced_wgsl(),
+    "basic-instanced",
+  )
+  let lambert_instanced_shader = shader_module(
+    device,
+    @nodes.lambert_instanced_wgsl(),
+    "lambert-instanced",
+  )
+  let standard_instanced_shader = shader_module(
+    device,
+    @nodes.standard_instanced_wgsl(),
+    "standard-instanced",
+  )
   let layout = device.create_bind_group_layout({
     entries: [
       {
@@ -538,6 +617,27 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
     standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
+    basic_instanced: cull_pipelines(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    lambert_instanced: cull_pipelines(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    standard_instanced: cull_pipelines(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
     line_list: color_pipeline(
       device,
       line_shader,
@@ -573,6 +673,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     depth: None,
     geometries: [],
     positions: [],
+    instances: [],
     uniforms: [],
     textures: [],
     swap_width: window.width(),
@@ -587,10 +688,32 @@ fn WebGPURenderer::pipeline(
   shading : @constants.Shading,
   side : @constants.Side,
 ) -> GpuRenderPipeline {
-  let group = match shading {
-    @constants.Basic => self.basic
-    @constants.Lambert => self.lambert
-    @constants.Standard => self.standard
+  self.cull_group(shading, side, false)
+}
+
+///|
+fn WebGPURenderer::instanced_pipeline(
+  self : WebGPURenderer,
+  shading : @constants.Shading,
+  side : @constants.Side,
+) -> GpuRenderPipeline {
+  self.cull_group(shading, side, true)
+}
+
+///|
+fn WebGPURenderer::cull_group(
+  self : WebGPURenderer,
+  shading : @constants.Shading,
+  side : @constants.Side,
+  instanced : Bool,
+) -> GpuRenderPipeline {
+  let group = match (shading, instanced) {
+    (@constants.Basic, false) => self.basic
+    (@constants.Lambert, false) => self.lambert
+    (@constants.Standard, false) => self.standard
+    (@constants.Basic, true) => self.basic_instanced
+    (@constants.Lambert, true) => self.lambert_instanced
+    (@constants.Standard, true) => self.standard_instanced
   }
   match side {
     @constants.Front => group.front
@@ -730,6 +853,71 @@ fn WebGPURenderer::object_gpu(
   })
   let cached = { node, buffer, group, }
   self.uniforms.push(cached)
+  cached
+}
+
+///|
+fn upload_instances(
+  device : GpuDevice,
+  data : @core.InstanceData,
+) -> (GpuBuffer, GpuBuffer) {
+  let capacity = data.matrices.count
+  let matrices = pack_buffer(
+    device,
+    @common.pack_f32(data.matrices),
+    vertex=true,
+    index=false,
+    uniform=false,
+  )
+  let colors = pack_buffer(
+    device,
+    @common.pack_instance_colors(data.colors, capacity),
+    vertex=true,
+    index=false,
+    uniform=false,
+  )
+  (matrices, colors)
+}
+
+///|
+fn WebGPURenderer::instance_gpu(
+  self : WebGPURenderer,
+  data : @core.InstanceData,
+) -> InstanceGpu {
+  for cached in self.instances {
+    if physical_equal(cached.data, data) {
+      if cached.version != data.version {
+        let capacity = data.matrices.count
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(
+            cached.matrices,
+            0UL,
+            @common.pack_f32(data.matrices),
+            None,
+            None,
+          ),
+        )
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(
+            cached.colors,
+            0UL,
+            @common.pack_instance_colors(data.colors, capacity),
+            None,
+            None,
+          ),
+        )
+        cached.version = data.version
+      }
+      return cached
+    }
+  }
+  let (matrices, colors) = upload_instances(self.device, data)
+  let cached = { data, matrices, colors, version: data.version, }
+  self.instances.push(cached)
   cached
 }
 
@@ -1007,6 +1195,13 @@ pub fn WebGPURenderer::render(
   let lights = @common.collect_lights(scene.node)
   let items = @common.collect_opaque(scene.node)
   for item in items {
+    let draw_mesh = match item.instances {
+      Some(data) => data.count > 0
+      None => true
+    }
+    if !draw_mesh {
+      continue
+    }
     match self.geometry_gpu(item.geometry) {
       None => ()
       Some(geometry) => {
@@ -1036,8 +1231,35 @@ pub fn WebGPURenderer::render(
           .queue()
           .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
         )
-        pass.set_pipeline(self.pipeline(item.shading, item.side))
+        let batch = match item.instances {
+          Some(data) => Some(self.instance_gpu(data))
+          None => None
+        }
+        pass.set_pipeline(
+          match batch {
+            Some(_) => self.instanced_pipeline(item.shading, item.side)
+            None => self.pipeline(item.shading, item.side)
+          },
+        )
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+        let instance_count = match item.instances {
+          Some(data) => {
+            let capacity = data.matrices.count
+            if data.count < capacity {
+              data.count
+            } else {
+              capacity
+            }
+          }
+          None => 1
+        }
+        match batch {
+          None => ()
+          Some(batch) => {
+            pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
+            pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
+          }
+        }
         ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
         ignore(
           pass.set_bind_group(
@@ -1052,7 +1274,7 @@ pub fn WebGPURenderer::render(
           None =>
             pass.draw(
               geometry.vertex_count.reinterpret_as_uint(),
-              Some(1U),
+              Some(instance_count.reinterpret_as_uint()),
               None,
               None,
             )
@@ -1065,7 +1287,7 @@ pub fn WebGPURenderer::render(
             )
             pass.draw_indexed(
               geometry.index_count.reinterpret_as_uint(),
-              Some(1U),
+              Some(instance_count.reinterpret_as_uint()),
               None,
               None,
               None,

@@ -86,6 +86,8 @@ pub using @core {type GeometryGroup}
 
 pub using @objects {type Group}
 
+pub using @objects {type InstancedMesh}
+
 pub using @core {type Layers}
 
 pub using @objects {type Line}

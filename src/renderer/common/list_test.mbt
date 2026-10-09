@@ -155,6 +155,21 @@ test "packed vertices and uniforms are little-endian f32" {
 }
 
 ///|
+test "missing instance colors pack as white" {
+  let packed = @common.pack_instance_colors(None, 1)
+  assert_eq(packed.length(), @common.instance_color_stride)
+  assert_eq(packed[0], b'\x00')
+  assert_eq(packed[1], b'\x00')
+  assert_eq(packed[2], b'\x80')
+  assert_eq(packed[3], b'\x3F')
+  let red = @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)
+  let tinted = @common.pack_instance_colors(Some(red), 1)
+  assert_eq(tinted[4], b'\x00')
+  assert_eq(tinted[8], b'\x00')
+  assert_eq(@common.instance_matrix_stride, 64)
+}
+
+///|
 test "point quads cover six corners and indexed points expand" {
   let quad = @common.point_quad_bytes()
   assert_eq(quad.length(), 48)

@@ -24,6 +24,7 @@ pub(all) enum Node {
   Swizzle(Node, String)
   TextureSample(Node)
   StandardLit(Node)
+  InstanceNormal(Node)
 }
 
 ///|
@@ -91,19 +92,89 @@ fn position_attributes() -> Array[(String, Int, ValueType)] {
 }
 
 ///|
+fn mesh_attributes(instanced : Bool) -> Array[(String, Int, ValueType)] {
+  let attributes = position_attributes()
+  if instanced {
+    attributes.push(("instance_matrix", 3, Mat4))
+    attributes.push(("instance_color", 7, Vec3))
+  }
+  attributes
+}
+
+///|
+/// 实例矩阵在物体矩阵之前。非实例路径保持 `vec4(position, 1)`。
+fn mesh_local(position : Node, instanced : Bool) -> Node {
+  let point = Node::Vec4(position, Float(1.0))
+  if instanced {
+    Mul(Attribute("instance_matrix", 3, Mat4), point)
+  } else {
+    point
+  }
+}
+
+///|
+fn mesh_normal(instanced : Bool) -> Node {
+  let normal = Attribute("normal", 1, Vec3)
+  if instanced {
+    InstanceNormal(normal)
+  } else {
+    normal
+  }
+}
+
+///|
+fn instance_preamble() -> String {
+  "fn instance_normal(n : vec3<f32>, i0 : vec4<f32>, i1 : vec4<f32>, i2 : vec4<f32>) -> vec3<f32> {\n  let m = mat3x3<f32>(i0.xyz, i1.xyz, i2.xyz);\n  let s = vec3<f32>(dot(m[0], m[0]), dot(m[1], m[1]), dot(m[2], m[2]));\n  return m * (n / max(s, vec3<f32>(0.000001)));\n}\n\n"
+}
+
+///|
+fn tint_instance(color : Node, instanced : Bool) -> Node {
+  if instanced {
+    Node::Vec4(
+      Mul(Swizzle(color, "xyz"), Varying("v_instance_color", Vec3)),
+      Swizzle(color, "w"),
+    )
+  } else {
+    color
+  }
+}
+
+///|
+fn with_instance_color(
+  varyings : Array[(String, ValueType)],
+  assignments : Array[(String, Node)],
+  instanced : Bool,
+) -> (Array[(String, ValueType)], Array[(String, Node)]) {
+  if instanced {
+    varyings.push(("v_instance_color", Vec3))
+    assignments.push(("v_instance_color", Attribute("instance_color", 7, Vec3)))
+  }
+  (varyings, assignments)
+}
+
+///|
 /// 不受光照。法线乘 0 只是为了让顶点布局和 Lambert 一致。贴图采样乘在颜色上，没有贴图时渲染器绑一张白纹理。
-pub fn basic_program() -> Program {
+/// `instanced` 为真时再乘实例矩阵和实例颜色。
+pub fn basic_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = Attribute("normal", 1, Vec3)
   let shifted = Add(position, Mul(normal, Float(0.0)))
   let sample = TextureSample(Varying("v_uv", Vec2))
+  let (varyings, assignments) = with_instance_color(
+    [("v_uv", Vec2)],
+    [("v_uv", Attribute("uv", 2, Vec2))],
+    instanced,
+  )
   {
     uniforms: frame_uniforms(),
-    attributes: position_attributes(),
-    varyings: [("v_uv", Vec2)],
-    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(shifted, Float(1.0))),
-    vertex_varyings: [("v_uv", Attribute("uv", 2, Vec2))],
-    fragment_color: Mul(Uniform("color", Vec4), sample),
+    attributes: mesh_attributes(instanced),
+    varyings,
+    vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(shifted, instanced)),
+    vertex_varyings: assignments,
+    fragment_color: tint_instance(
+      Mul(Uniform("color", Vec4), sample),
+      instanced,
+    ),
     sampled: true,
     preamble: "",
   }
@@ -111,9 +182,9 @@ pub fn basic_program() -> Program {
 
 ///|
 /// Lambert：`color * (ambient + lightColor * max(dot(N, L), 0))`。
-pub fn lambert_program() -> Program {
+pub fn lambert_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
-  let normal = Attribute("normal", 1, Vec3)
+  let normal = mesh_normal(instanced)
   let world_normal = Swizzle(
     Mul(Uniform("normal_matrix", Mat4), Vec4(normal, Float(0.0))),
     "xyz",
@@ -132,55 +203,68 @@ pub fn lambert_program() -> Program {
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
     Swizzle(sample, "xyz"),
   )
+  let (varyings, assignments) = with_instance_color(
+    [("v_normal", Vec3), ("v_uv", Vec2)],
+    [("v_normal", world_normal), ("v_uv", Attribute("uv", 2, Vec2))],
+    instanced,
+  )
   {
     uniforms: frame_uniforms(),
-    attributes: position_attributes(),
-    varyings: [("v_normal", Vec3), ("v_uv", Vec2)],
-    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
-    vertex_varyings: [
-      ("v_normal", world_normal),
-      ("v_uv", Attribute("uv", 2, Vec2)),
-    ],
-    fragment_color: Vec4(
-      rgb,
-      Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+    attributes: mesh_attributes(instanced),
+    varyings,
+    vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(position, instanced)),
+    vertex_varyings: assignments,
+    fragment_color: tint_instance(
+      Vec4(rgb, Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w"))),
+      instanced,
     ),
     sampled: true,
-    preamble: "",
+    preamble: if instanced {
+      instance_preamble()
+    } else {
+      ""
+    },
   }
 }
 
 ///|
 /// Standard：`baseColor * (1 - metalness)` 的 Lambert 漫反射，加上 GGX 高光。`baseColor` 已乘贴图。
-pub fn standard_program() -> Program {
+pub fn standard_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
-  let normal = Attribute("normal", 1, Vec3)
+  let placed = mesh_local(position, instanced)
+  let normal = mesh_normal(instanced)
   let world_normal = Swizzle(
     Mul(Uniform("normal_matrix", Mat4), Vec4(normal, Float(0.0))),
     "xyz",
   )
-  let world = Swizzle(
-    Mul(Uniform("model", Mat4), Vec4(position, Float(1.0))),
-    "xyz",
-  )
+  let world = Swizzle(Mul(Uniform("model", Mat4), placed), "xyz")
   let sample = TextureSample(Varying("v_uv", Vec2))
   let base = Node::Vec4(
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), Swizzle(sample, "xyz")),
     Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
   )
-  {
-    uniforms: frame_uniforms(),
-    attributes: position_attributes(),
-    varyings: [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
-    vertex_clip: Mul(Uniform("mvp", Mat4), Vec4(position, Float(1.0))),
-    vertex_varyings: [
+  let (varyings, assignments) = with_instance_color(
+    [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
+    [
       ("v_normal", world_normal),
       ("v_uv", Attribute("uv", 2, Vec2)),
       ("v_world", world),
     ],
-    fragment_color: StandardLit(base),
+    instanced,
+  )
+  {
+    uniforms: frame_uniforms(),
+    attributes: mesh_attributes(instanced),
+    varyings,
+    vertex_clip: Mul(Uniform("mvp", Mat4), placed),
+    vertex_varyings: assignments,
+    fragment_color: StandardLit(tint_instance(base, instanced)),
     sampled: true,
-    preamble: standard_preamble(),
+    preamble: if instanced {
+      instance_preamble() + standard_preamble()
+    } else {
+      standard_preamble()
+    },
   }
 }
 

@@ -68,6 +68,7 @@ pub using @scenes {type Scene}
 ///|
 pub using @objects {
   type Group,
+  type InstancedMesh,
   type Line,
   type LineSegments,
   type Mesh,

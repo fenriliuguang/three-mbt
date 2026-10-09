@@ -17,11 +17,17 @@ pub fn collect_primitives(@core.Object3D) -> Array[PrimitiveItem]
 
 pub fn copy_bytes_per_row(Int) -> Int
 
+pub let instance_color_stride : Int
+
+pub let instance_matrix_stride : Int
+
 pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
 
 pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
 pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
+
+pub fn pack_instance_colors(@core.BufferAttribute?, Int) -> FixedArray[Byte]
 
 pub fn pack_point_positions(@core.BufferAttribute, @core.BufferAttribute?) -> FixedArray[Byte]
 
@@ -72,6 +78,7 @@ pub(all) struct RenderItem {
   map : @textures.Texture?
   roughness : Double
   metalness : Double
+  instances : @core.InstanceData?
 }
 
 // Type aliases

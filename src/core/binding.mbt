@@ -11,6 +11,17 @@ pub(all) struct MeshBinding {
   map : @textures.Texture?
   roughness : Double
   metalness : Double
+  instances : InstanceData?
+}
+
+///|
+/// `InstancedMesh` 的实例数据。矩阵是列主序 16 个数，颜色是可选的 `rgb`。
+/// `count` 可以小于矩阵容量。`version` 在矩阵或颜色改动后加一，供渲染器决定是否重传。
+pub(all) struct InstanceData {
+  matrices : BufferAttribute
+  mut colors : BufferAttribute?
+  mut count : Int
+  mut version : Int
 }
 
 ///|

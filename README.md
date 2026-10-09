@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points and lines. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, and instancing. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -67,6 +67,14 @@ sh scripts/build-points.sh
 ```
 
 Copy `target/points.component.wasm` to `examples/apps/points/points.component.wasm`, then `cargo xtask run-demo --name points`. `moon run src/examples/points/app` does not open a window.
+
+The instanced sample draws three Lambert cubes from one mesh:
+
+```sh
+sh scripts/build-instanced.sh
+```
+
+Copy `target/instanced.component.wasm` to `examples/apps/instanced/instanced.component.wasm`, then `cargo xtask run-demo --name instanced`. `moon run src/examples/instanced/app` does not open a window.
 
 ## License
 

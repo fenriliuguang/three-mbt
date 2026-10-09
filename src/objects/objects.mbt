@@ -1,5 +1,10 @@
 ///|
-using @core {type Object3D, type BufferGeometry, type MeshBinding}
+using @core {
+  type Object3D,
+  type BufferAttribute,
+  type BufferGeometry,
+  type MeshBinding,
+}
 
 ///|
 /// 用来把若干节点当作一个整体变换。
@@ -67,6 +72,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     map: self.material.map,
     roughness: self.material.roughness,
     metalness: self.material.metalness,
+    instances: None,
   })
 }
 
@@ -220,4 +226,244 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.transparent,
     ),
   )
+}
+
+///|
+fn identity_matrices(count : Int) -> BufferAttribute {
+  let array = []
+  let mut index = 0
+  while index < count {
+    array.push(1.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(1.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(1.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(0.0)
+    array.push(1.0)
+    index = index + 1
+  }
+  BufferAttribute::new(array, 16)
+}
+
+///|
+fn write_matrix(
+  attribute : BufferAttribute,
+  index : Int,
+  matrix : @math.Matrix4,
+) -> Unit {
+  let offset = index * attribute.item_size
+  let mut component = 0
+  while component < 16 {
+    attribute.array[offset + component] = matrix.elements[component]
+    component = component + 1
+  }
+}
+
+///|
+fn read_matrix(
+  attribute : BufferAttribute,
+  index : Int,
+  target : @math.Matrix4,
+) -> Unit {
+  let offset = index * attribute.item_size
+  let mut component = 0
+  while component < 16 {
+    target.elements[component] = attribute.array[offset + component]
+    component = component + 1
+  }
+}
+
+///|
+/// 同一几何体画多次。实例矩阵在物体矩阵之前相乘，和 r186 `InstancedMesh` 一样。
+/// 没有 `instanceColor` 时渲染器使用白色。默认不做视锥裁剪。
+pub(all) struct InstancedMesh {
+  node : Object3D
+  geometry : BufferGeometry
+  material : @materials.Material
+  instances : @core.InstanceData
+  mut bounding_box : @math.Box3?
+}
+
+///|
+pub fn InstancedMesh::new(
+  geometry : BufferGeometry,
+  material : @materials.Material,
+  count : Int,
+) -> InstancedMesh {
+  let node = Object3D::new(kind=@core.Mesh)
+  node.frustum_culled = false
+  let instances : @core.InstanceData = {
+    matrices: identity_matrices(count),
+    colors: None,
+    count,
+    version: 0,
+  }
+  let mesh : InstancedMesh = {
+    node,
+    geometry,
+    material,
+    instances,
+    bounding_box: None,
+  }
+  mesh.refresh()
+  mesh
+}
+
+///|
+pub impl @core.AsNode for InstancedMesh with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend InstancedMesh with @core.AsNode::{to_node}
+
+///|
+pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
+  self.node.mesh = Some(MeshBinding::{
+    geometry: self.geometry,
+    color: self.material.color,
+    shading: self.material.shading(),
+    side: self.material.side,
+    opacity: self.material.opacity,
+    transparent: self.material.transparent,
+    wireframe: self.material.wireframe,
+    map: self.material.map,
+    roughness: self.material.roughness,
+    metalness: self.material.metalness,
+    instances: Some(self.instances),
+  })
+}
+
+///|
+pub fn InstancedMesh::set_side(
+  self : InstancedMesh,
+  side : @constants.Side,
+) -> Unit {
+  self.material.side = side
+  self.refresh()
+}
+
+///|
+pub fn InstancedMesh::set_map(
+  self : InstancedMesh,
+  map : @textures.Texture?,
+) -> Unit {
+  self.material.map = map
+  self.refresh()
+}
+
+///|
+/// 把绘制个数限制在矩阵容量以内。
+pub fn InstancedMesh::set_count(self : InstancedMesh, count : Int) -> Unit {
+  let capacity = self.instances.matrices.count
+  self.instances.count = if count < 0 {
+    0
+  } else if count > capacity {
+    capacity
+  } else {
+    count
+  }
+}
+
+///|
+pub fn InstancedMesh::set_matrix_at(
+  self : InstancedMesh,
+  index : Int,
+  matrix : @math.Matrix4,
+) -> Unit {
+  write_matrix(self.instances.matrices, index, matrix)
+  self.instances.version = self.instances.version + 1
+}
+
+///|
+pub fn InstancedMesh::get_matrix_at(
+  self : InstancedMesh,
+  index : Int,
+  target : @math.Matrix4,
+) -> @math.Matrix4 {
+  read_matrix(self.instances.matrices, index, target)
+  target
+}
+
+///|
+/// 第一次调用时分配白色 `rgb`。写入的是颜色里已经存好的线性分量。
+pub fn InstancedMesh::set_color_at(
+  self : InstancedMesh,
+  index : Int,
+  color : @math.Color,
+) -> Unit {
+  let colors = match self.instances.colors {
+    Some(colors) => colors
+    None => {
+      let array = []
+      let mut item = 0
+      while item < self.instances.matrices.count {
+        array.push(1.0)
+        array.push(1.0)
+        array.push(1.0)
+        item = item + 1
+      }
+      let colors = BufferAttribute::new(array, 3)
+      self.instances.colors = Some(colors)
+      colors
+    }
+  }
+  colors.set_xyz(index, color.r, color.g, color.b)
+  self.instances.version = self.instances.version + 1
+}
+
+///|
+pub fn InstancedMesh::get_color_at(
+  self : InstancedMesh,
+  index : Int,
+  target : @math.Color,
+) -> @math.Color {
+  match self.instances.colors {
+    None => target.set_rgb(1.0, 1.0, 1.0)
+    Some(colors) =>
+      target.set_rgb(
+        colors.get_x(index),
+        colors.get_y(index),
+        colors.get_z(index),
+      )
+  }
+}
+
+///|
+/// 局部包围盒：几何体包围盒按每个实例矩阵变换后再求并。
+pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {
+  self.geometry.compute_bounding_box()
+  let box = match self.bounding_box {
+    Some(box) => box
+    None => {
+      let box = @math.Box3::empty()
+      self.bounding_box = Some(box)
+      box
+    }
+  }
+  ignore(box.make_empty())
+  match self.geometry.bounding_box {
+    None => ()
+    Some(geometry_box) => {
+      let matrix = @math.Matrix4::new()
+      let mut index = 0
+      while index < self.instances.count {
+        ignore(self.get_matrix_at(index, matrix))
+        let transformed = @math.Box3::new(geometry_box.min, geometry_box.max)
+        ignore(transformed.apply_matrix4(matrix))
+        ignore(box.union(transformed))
+        index = index + 1
+      }
+    }
+  }
+  box
 }

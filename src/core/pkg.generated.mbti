@@ -71,6 +71,13 @@ pub(all) struct GeometryGroup {
   material_index : Int
 }
 
+pub(all) struct InstanceData {
+  matrices : BufferAttribute
+  mut colors : BufferAttribute?
+  mut count : Int
+  mut version : Int
+}
+
 pub(all) struct Layers {
   mut mask : Int
 }
@@ -107,6 +114,7 @@ pub(all) struct MeshBinding {
   map : @textures.Texture?
   roughness : Double
   metalness : Double
+  instances : InstanceData?
 }
 
 pub(all) enum NodeKind {

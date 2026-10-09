@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/instanced"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct InstancedScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  mesh : @objects.InstancedMesh
+  mut angle : Double
+}
+pub fn InstancedScene::new() -> Self
+pub fn InstancedScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits
