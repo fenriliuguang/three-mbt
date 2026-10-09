@@ -59,6 +59,23 @@ struct InstanceGpu {
 }
 
 ///|
+struct ShadowMap {
+  texture : GpuTexture
+  view : GpuTextureView
+  group : GpuBindGroup
+  size : UInt
+}
+
+///|
+priv struct ShadowPack {
+  matrix : @math.Matrix4
+  bias : Double
+  normal_bias : Double
+  enabled : Double
+  texel : Double
+}
+
+///|
 struct TextureGpu {
   source : @textures.Texture?
   texture : GpuTexture
@@ -95,6 +112,12 @@ pub struct WebGPURenderer {
   points : GpuRenderPipeline
   quad : GpuBuffer
   white : TextureGpu
+  shadow_layout : GpuBindGroupLayout
+  shadow_sampler : GpuSampler
+  shadow_dummy : GpuBindGroup
+  shadow_depth : GpuRenderPipeline
+  shadow_depth_instanced : GpuRenderPipeline
+  mut shadow_map : ShadowMap?
   mut depth : DepthTarget?
   geometries : Array[GeometryGpu]
   positions : Array[PositionGpu]
@@ -130,6 +153,13 @@ fn flags_buffer(
 ///|
 fn flags_texture() -> GpuTextureUsage {
   GpuTextureUsage::default().set(@gpu.GpuTextureUsageFlag::RENDER_ATTACHMENT)
+}
+
+///|
+fn flags_shadow() -> GpuTextureUsage {
+  GpuTextureUsage::default()
+  .set(@gpu.GpuTextureUsageFlag::RENDER_ATTACHMENT)
+  .set(@gpu.GpuTextureUsageFlag::TEXTURE_BINDING)
 }
 
 ///|
@@ -291,6 +321,47 @@ fn unlit_pipeline(
     }),
     layout: @gpu.Specific(pipeline_layout),
     label: Some("unlit"),
+  })
+}
+
+///|
+/// 只写深度。剔除正面，让背面写入阴影贴图，减轻自阴影 acne。
+fn depth_pipeline(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  instanced : Bool,
+) -> GpuRenderPipeline {
+  device.create_render_pipeline({
+    vertex: {
+      buffers: Some(mesh_vertex_buffers(instanced)),
+      module_: shader,
+      entry_point: Some("vs"),
+      constants: None,
+    },
+    primitive: Some({
+      topology: Some(@gpu.GpuPrimitiveTopology::TRIANGLE_LIST),
+      strip_index_format: None,
+      front_face: Some(@gpu.GpuFrontFace::CCW),
+      cull_mode: Some(GpuCullMode::FRONT),
+      unclipped_depth: None,
+    }),
+    depth_stencil: Some({
+      format: @gpu.GpuTextureFormat::DEPTH32FLOAT,
+      depth_write_enabled: Some(true),
+      depth_compare: Some(@gpu.GpuCompareFunction::LESS),
+      stencil_front: None,
+      stencil_back: None,
+      stencil_read_mask: None,
+      stencil_write_mask: None,
+      depth_bias: None,
+      depth_bias_slope_scale: None,
+      depth_bias_clamp: None,
+    }),
+    multisample: None,
+    fragment: None,
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("shadow"),
   })
 }
 
@@ -582,8 +653,37 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("rgba8"),
   })
+  let shadow_layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::DEPTH),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::COMPARISON), }),
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("shadow"),
+  })
   let pipeline_layout = device.create_pipeline_layout({
-    bind_group_layouts: [Some(layout), Some(texture_layout)],
+    bind_group_layouts: [
+      Some(layout),
+      Some(texture_layout),
+      Some(shadow_layout),
+    ],
     immediate_size: None,
     label: Some("frame"),
   })
@@ -594,6 +694,54 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   })
   let line_shader = shader_module(device, @nodes.line_wgsl(), "line")
   let points_shader = shader_module(device, @nodes.points_wgsl(), "points")
+  let shadow_shader = shader_module(device, @nodes.shadow_wgsl(), "shadow")
+  let shadow_instanced_shader = shader_module(
+    device,
+    @nodes.shadow_instanced_wgsl(),
+    "shadow-instanced",
+  )
+  let shadow_sampler = device.create_sampler(
+    Some({
+      address_mode_u: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_v: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_w: None,
+      mag_filter: Some(@gpu.GpuFilterMode::NEAREST),
+      min_filter: Some(@gpu.GpuFilterMode::NEAREST),
+      mipmap_filter: Some(@gpu.GpuMipmapFilterMode::NEAREST),
+      lod_min_clamp: None,
+      lod_max_clamp: None,
+      compare: Some(@gpu.GpuCompareFunction::LESS),
+      max_anisotropy: None,
+      label: Some("shadow"),
+    }),
+  )
+  let shadow_dummy_texture = device.create_texture({
+    size: { width: 1U, height: Some(1U), depth_or_array_layers: Some(1U), },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: @gpu.GpuTextureFormat::DEPTH32FLOAT,
+    usage: flags_shadow(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some("shadow-dummy"),
+  })
+  let shadow_dummy = device.create_bind_group({
+    layout: shadow_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(
+          shadow_dummy_texture.create_view(None),
+        ),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(shadow_sampler),
+      },
+    ],
+    label: Some("shadow-dummy"),
+  })
   let white = upload_texture(
     device,
     texture_layout,
@@ -670,6 +818,14 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       uniform=false,
     ),
     white,
+    shadow_layout,
+    shadow_sampler,
+    shadow_dummy,
+    shadow_depth: depth_pipeline(device, shadow_shader, color_layout, false),
+    shadow_depth_instanced: depth_pipeline(
+      device, shadow_instanced_shader, color_layout, true,
+    ),
+    shadow_map: None,
     depth: None,
     geometries: [],
     positions: [],
@@ -1140,6 +1296,222 @@ fn WebGPURenderer::texture_group(
 }
 
 ///|
+fn shadow_pack(lights : @common.LightFrame, receive : Bool) -> ShadowPack {
+  match lights.shadow {
+    None =>
+      {
+        matrix: @math.Matrix4::new(),
+        bias: 0.0,
+        normal_bias: 0.0,
+        enabled: 0.0,
+        texel: 0.0,
+      }
+    Some(shadow) =>
+      {
+        matrix: shadow.matrix,
+        bias: shadow.bias,
+        normal_bias: shadow.normal_bias,
+        enabled: if receive {
+          1.0
+        } else {
+          0.0
+        },
+        texel: shadow.radius / shadow.map_size.to_double(),
+      }
+  }
+}
+
+///|
+fn WebGPURenderer::ensure_shadow(
+  self : WebGPURenderer,
+  size : Int,
+) -> ShadowMap {
+  let extent = if size < 1 { 1U } else { size.reinterpret_as_uint() }
+  match self.shadow_map {
+    Some(map) =>
+      if map.size == extent {
+        return map
+      } else {
+        map.group.drop()
+        map.view.drop()
+        map.texture.drop()
+      }
+    None => ()
+  }
+  let texture = self.device.create_texture({
+    size: {
+      width: extent,
+      height: Some(extent),
+      depth_or_array_layers: Some(1U),
+    },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: @gpu.GpuTextureFormat::DEPTH32FLOAT,
+    usage: flags_shadow(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some("shadow"),
+  })
+  let view = texture.create_view(None)
+  let group = self.device.create_bind_group({
+    layout: self.shadow_layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(self.shadow_sampler),
+      },
+    ],
+    label: Some("shadow"),
+  })
+  let map = { texture, view, group, size: extent, }
+  self.shadow_map = Some(map)
+  map
+}
+
+///|
+fn WebGPURenderer::draw_shadow(
+  self : WebGPURenderer,
+  scene : @scenes.Scene,
+  shadow : @common.ShadowFrame,
+) -> Unit {
+  let map = self.ensure_shadow(shadow.map_size)
+  let state = match shadow.camera.camera {
+    None => return
+    Some(state) => state
+  }
+  let encoder = self.device.create_command_encoder(None)
+  let pass = encoder.begin_render_pass({
+    color_attachments: [],
+    depth_stencil_attachment: Some({
+      view: map.view,
+      depth_clear_value: Some(Float::from_int(1)),
+      depth_load_op: Some(@gpu.CLEAR),
+      depth_store_op: Some(@gpu.STORE),
+      depth_read_only: Some(false),
+      stencil_clear_value: None,
+      stencil_load_op: None,
+      stencil_store_op: None,
+      stencil_read_only: None,
+    }),
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some("shadow"),
+  })
+  let blank = ShadowPack::{
+    matrix: @math.Matrix4::new(),
+    bias: 0.0,
+    normal_bias: 0.0,
+    enabled: 0.0,
+    texel: 0.0,
+  }
+  let items = @common.collect_opaque(scene.node)
+  for item in items {
+    if !item.node.cast_shadow {
+      continue
+    }
+    let draw_mesh = match item.instances {
+      Some(data) => data.count > 0
+      None => true
+    }
+    if !draw_mesh {
+      continue
+    }
+    match self.geometry_gpu(item.geometry) {
+      None => ()
+      Some(geometry) => {
+        let mvp = @common.model_view_projection(state, item.node)
+        let gpu = self.object_gpu(item.node)
+        let uniforms = @common.pack_uniforms(
+          mvp,
+          @common.normal_matrix(item.node.matrix_world),
+          item.color,
+          item.opacity,
+          @math.Vector3::new(),
+          @math.Vector3::new(),
+          @math.Vector3::new(y=1.0),
+          item.node.matrix_world,
+          @math.Vector3::new(),
+          item.roughness,
+          item.metalness,
+          @math.Matrix4::new(),
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          blank.matrix,
+          blank.bias,
+          blank.normal_bias,
+          blank.enabled,
+          blank.texel,
+        )
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
+        )
+        let batch = match item.instances {
+          Some(data) => Some(self.instance_gpu(data))
+          None => None
+        }
+        pass.set_pipeline(
+          match batch {
+            Some(_) => self.shadow_depth_instanced
+            None => self.shadow_depth
+          },
+        )
+        pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+        let instance_count = match item.instances {
+          Some(data) =>
+            if data.count < data.matrices.count {
+              data.count
+            } else {
+              data.matrices.count
+            }
+          None => 1
+        }
+        match batch {
+          None => ()
+          Some(batch) => {
+            pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
+            pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
+          }
+        }
+        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        match geometry.indices {
+          None =>
+            pass.draw(
+              geometry.vertex_count.reinterpret_as_uint(),
+              Some(instance_count.reinterpret_as_uint()),
+              None,
+              None,
+            )
+          Some(indices) => {
+            pass.set_index_buffer(
+              indices,
+              @gpu.GpuIndexFormat::UINT32,
+              None,
+              None,
+            )
+            pass.draw_indexed(
+              geometry.index_count.reinterpret_as_uint(),
+              Some(instance_count.reinterpret_as_uint()),
+              None,
+              None,
+              None,
+            )
+          }
+        }
+      }
+    }
+  }
+  pass.end()
+  self.device.queue().submit([encoder.finish(None)])
+}
+
+///|
 /// 更新矩阵，清屏，画出不透明网格，然后 `present`。
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
@@ -1163,6 +1535,11 @@ pub fn WebGPURenderer::render(
   let (r, g, b) = match scene.background {
     None => (0.0, 0.0, 0.0)
     Some(background) => (background.r, background.g, background.b)
+  }
+  let lights = @common.collect_lights(scene.node)
+  match lights.shadow {
+    None => ()
+    Some(shadow) => self.draw_shadow(scene, shadow)
   }
   let encoder = self.device.create_command_encoder(None)
   let pass = encoder.begin_render_pass({
@@ -1192,7 +1569,10 @@ pub fn WebGPURenderer::render(
     max_draw_count: None,
     label: Some("frame"),
   })
-  let lights = @common.collect_lights(scene.node)
+  let shadow_group = match lights.shadow {
+    None => self.shadow_dummy
+    Some(shadow) => self.ensure_shadow(shadow.map_size).group
+  }
   let items = @common.collect_opaque(scene.node)
   for item in items {
     let draw_mesh = match item.instances {
@@ -1208,6 +1588,7 @@ pub fn WebGPURenderer::render(
         let mvp = @common.model_view_projection(state, item.node)
         let gpu = self.object_gpu(item.node)
         let eye = camera.matrix_world.elements
+        let shade = shadow_pack(lights, item.node.receive_shadow)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -1225,6 +1606,11 @@ pub fn WebGPURenderer::render(
           height.reinterpret_as_int().to_double(),
           1.0,
           0.0,
+          shade.matrix,
+          shade.bias,
+          shade.normal_bias,
+          shade.enabled,
+          shade.texel,
         )
         ignore(
           self.device
@@ -1270,6 +1656,7 @@ pub fn WebGPURenderer::render(
             None,
           ),
         )
+        ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
         match geometry.indices {
           None =>
             pass.draw(
@@ -1313,6 +1700,7 @@ pub fn WebGPURenderer::render(
           0.0
         }
         let eye = camera.matrix_world.elements
+        let shade = shadow_pack(lights, false)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -1330,6 +1718,11 @@ pub fn WebGPURenderer::render(
           viewport_height,
           item.size,
           attenuation,
+          shade.matrix,
+          shade.bias,
+          shade.normal_bias,
+          shade.enabled,
+          shade.texel,
         )
         ignore(
           self.device

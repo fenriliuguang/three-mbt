@@ -2,6 +2,7 @@
 package "fenriliuguang/three-mbt/lights"
 
 import {
+  "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/core",
 }
 
@@ -20,8 +21,12 @@ pub impl @core.AsNode for AmbientLight
 pub(all) struct DirectionalLight {
   node : @core.Object3D
   target : @core.Object3D
+  shadow : @core.ShadowState
+  camera : @cameras.OrthographicCamera
 }
+pub fn DirectionalLight::cast_shadow(Self, Bool) -> Unit
 pub fn DirectionalLight::new(hex? : Int, intensity? : Double) -> Self
+pub fn DirectionalLight::set_shadow_bounds(Self, Double, Double, Double, Double, Double, Double) -> Unit
 pub fn DirectionalLight::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for DirectionalLight
 

@@ -25,6 +25,7 @@ pub(all) enum Node {
   TextureSample(Node)
   StandardLit(Node)
   InstanceNormal(Node)
+  DirectShadow
 }
 
 ///|
@@ -36,6 +37,7 @@ pub(all) struct Program {
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
   sampled : Bool
+  shadowed : Bool
   preamble : String
 }
 
@@ -54,7 +56,14 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("viewport", Vec4),
     ("point", Vec4),
     ("view", Mat4),
+    ("shadow_matrix", Mat4),
+    ("shadow", Vec4),
   ]
+}
+
+///|
+fn shadow_preamble() -> String {
+  "fn direct_shadow(world : vec3<f32>, normal : vec3<f32>) -> f32 {\n  if ((uniforms.shadow).z < 0.5) {\n    return 1.0;\n  }\n  let shifted = world + normalize(normal) * (uniforms.shadow).y;\n  let clip = uniforms.shadow_matrix * vec4<f32>(shifted, 1.0);\n  let uv = clip.xy / clip.w;\n  let depth = clip.z / clip.w + (uniforms.shadow).x;\n  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0 || depth < 0.0 || depth > 1.0) {\n    return 1.0;\n  }\n  let texel = (uniforms.shadow).w;\n  var sum = 0.0;\n  for (var y = -1; y <= 1; y = y + 1) {\n    for (var x = -1; x <= 1; x = x + 1) {\n      let offset = vec2<f32>(f32(x), f32(y)) * texel;\n      sum = sum + textureSampleCompare(shadow_map, shadow_sampler, uv + offset, depth);\n    }\n  }\n  return sum / 9.0;\n}\n\n"
 }
 
 ///|
@@ -75,7 +84,7 @@ fn standard_preamble() -> String {
     "  let V = normalize((uniforms.camera_position).xyz - world);\n", "  let L = normalize((uniforms.light_direction).xyz);\n",
     "  let H = normalize(V + L);\n", "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n",
     "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
-    "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  let direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL;\n",
+    "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  let direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
     "  let indirect = (uniforms.ambient).xyz * diffuse;\n", "  return vec4<f32>(direct + indirect, base.w);\n",
     "}\n\n",
   ]
@@ -176,6 +185,7 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
       instanced,
     ),
     sampled: true,
+    shadowed: false,
     preamble: "",
   }
 }
@@ -194,18 +204,27 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     Dot(n, Swizzle(Uniform("light_direction", Vec4), "xyz")),
     Float(0.0),
   )
-  let lit = Add(
-    Swizzle(Uniform("ambient", Vec4), "xyz"),
-    Mul(Swizzle(Uniform("light_color", Vec4), "xyz"), ndotl),
+  let world = Swizzle(
+    Mul(Uniform("model", Mat4), mesh_local(position, instanced)),
+    "xyz",
   )
+  let direct = Mul(
+    Mul(Swizzle(Uniform("light_color", Vec4), "xyz"), ndotl),
+    DirectShadow,
+  )
+  let lit = Add(Swizzle(Uniform("ambient", Vec4), "xyz"), direct)
   let sample = TextureSample(Varying("v_uv", Vec2))
   let rgb = Mul(
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
     Swizzle(sample, "xyz"),
   )
   let (varyings, assignments) = with_instance_color(
-    [("v_normal", Vec3), ("v_uv", Vec2)],
-    [("v_normal", world_normal), ("v_uv", Attribute("uv", 2, Vec2))],
+    [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
+    [
+      ("v_normal", world_normal),
+      ("v_uv", Attribute("uv", 2, Vec2)),
+      ("v_world", world),
+    ],
     instanced,
   )
   {
@@ -219,10 +238,11 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
       instanced,
     ),
     sampled: true,
+    shadowed: true,
     preamble: if instanced {
-      instance_preamble()
+      instance_preamble() + shadow_preamble()
     } else {
-      ""
+      shadow_preamble()
     },
   }
 }
@@ -260,10 +280,11 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     vertex_varyings: assignments,
     fragment_color: StandardLit(tint_instance(base, instanced)),
     sampled: true,
+    shadowed: true,
     preamble: if instanced {
-      instance_preamble() + standard_preamble()
+      instance_preamble() + shadow_preamble() + standard_preamble()
     } else {
-      standard_preamble()
+      shadow_preamble() + standard_preamble()
     },
   }
 }
@@ -280,6 +301,7 @@ pub fn line_program() -> Program {
     vertex_varyings: [],
     fragment_color: Uniform("color", Vec4),
     sampled: false,
+    shadowed: false,
     preamble: "",
   }
 }

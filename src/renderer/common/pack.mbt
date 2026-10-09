@@ -2,9 +2,9 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 四块 `mat4x4<f32>` 和八块 `vec4<f32>`。384 字节。
-/// `surface` 之后是视口、点参数 `(size, attenuation, 0, 0)` 和视图矩阵。
-pub let uniform_bytes : Int = 384
+/// 五块 `mat4x4<f32>` 和九块 `vec4<f32>`。464 字节。
+/// 视图矩阵之后是阴影矩阵，以及 `(bias, normalBias, enabled, texel)`。
+pub let uniform_bytes : Int = 464
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
@@ -194,6 +194,11 @@ pub fn pack_uniforms(
   viewport_height : Double,
   point_size : Double,
   size_attenuation : Double,
+  shadow : @math.Matrix4,
+  shadow_bias : Double,
+  shadow_normal_bias : Double,
+  shadow_enabled : Double,
+  shadow_texel : Double,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -214,7 +219,30 @@ pub fn pack_uniforms(
   write_f32(dst, 304, point_size)
   write_f32(dst, 308, size_attenuation)
   write_matrix4(dst, 320, view)
+  write_matrix4(dst, 384, shadow)
+  write_f32(dst, 448, shadow_bias)
+  write_f32(dst, 452, shadow_normal_bias)
+  write_f32(dst, 456, shadow_enabled)
+  write_f32(dst, 460, shadow_texel)
   dst
+}
+
+///|
+/// 把正交阴影相机的裁剪空间变到贴图坐标。WebGPU 的 `y` 向上，所以这里把 `y` 翻转到贴图。
+/// 深度已经在 `0..1`，不再做一次 `0.5` 缩放。
+pub fn shadow_matrix(
+  projection : @math.Matrix4,
+  view : @math.Matrix4,
+) -> @math.Matrix4 {
+  let clip = @math.Matrix4::new().multiply_matrices(projection, view)
+  let bias = @math.Matrix4::new()
+  ignore(
+    bias.set(
+      0.5, 0.0, 0.0, 0.5, 0.0, -0.5, 0.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
+    ),
+  )
+  @math.Matrix4::new().multiply_matrices(bias, clip)
 }
 
 ///|

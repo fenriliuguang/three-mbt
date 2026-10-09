@@ -101,6 +101,7 @@ pub(all) struct LightState {
   mut intensity : Double
   mut target : Object3D?
   kind : LightKind
+  mut shadow : ShadowState?
 }
 
 pub(all) struct MeshBinding {
@@ -207,6 +208,14 @@ pub(all) enum PrimitiveKind {
 pub(all) enum ProjectionKind {
   Perspective
   Orthographic
+}
+
+pub(all) struct ShadowState {
+  camera : Object3D
+  mut map_size : Int
+  mut bias : Double
+  mut normal_bias : Double
+  mut radius : Double
 }
 
 // Type aliases

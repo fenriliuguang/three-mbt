@@ -110,6 +110,11 @@ test "packed vertices and uniforms are little-endian f32" {
     4.0,
     8.0,
     1.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
   )
   assert_eq(uniforms.length(), @common.uniform_bytes)
   assert_eq(uniforms[0], b'\x00')
@@ -152,6 +157,12 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(uniforms[321], b'\x00')
   assert_eq(uniforms[322], b'\x80')
   assert_eq(uniforms[323], b'\x3F')
+  assert_eq(uniforms[384], b'\x00')
+  assert_eq(uniforms[385], b'\x00')
+  assert_eq(uniforms[386], b'\x80')
+  assert_eq(uniforms[387], b'\x3F')
+  assert_eq(uniforms[448], b'\x00')
+  assert_eq(uniforms[460], b'\x00')
 }
 
 ///|
@@ -225,6 +236,40 @@ test "frame lights sum ambient and the first directional" {
   assert_eq(lights.direction.x, 0.0)
   assert_eq(lights.direction.y, 1.0)
   assert_eq(lights.direction.z, 0.0)
+  assert_eq(lights.shadow is None, true)
+}
+
+///|
+test "a casting directional light builds a shadow matrix" {
+  let bias = @common.shadow_matrix(@math.Matrix4::new(), @math.Matrix4::new())
+  assert_eq(bias.elements[0], 0.5)
+  assert_eq(bias.elements[5], -0.5)
+  assert_eq(bias.elements[10], 1.0)
+  assert_eq(bias.elements[12], 0.5)
+  assert_eq(bias.elements[13], 0.5)
+  assert_eq(bias.elements[15], 1.0)
+  let scene = @scenes.Scene::new()
+  let sun = @lights.DirectionalLight::new()
+  ignore(sun.node.position.set(0.0, 5.0, 10.0))
+  sun.cast_shadow(true)
+  sun.set_shadow_bounds(-2.0, 2.0, 2.0, -2.0, 1.0, 21.0)
+  assert_eq(sun.shadow.map_size, 512)
+  assert_eq(sun.shadow.bias, 0.0)
+  ignore(scene.add(sun))
+  @common.update_frame(scene.node, scene.node)
+  let lights = @common.collect_lights(scene.node)
+  match lights.shadow {
+    None => panic()
+    Some(shadow) => {
+      assert_eq(shadow.map_size, 512)
+      assert_eq(shadow.matrix.elements[12] > 0.49, true)
+      assert_eq(shadow.matrix.elements[12] < 0.51, true)
+      assert_eq(shadow.matrix.elements[13] > 0.49, true)
+      assert_eq(shadow.matrix.elements[13] < 0.51, true)
+      assert_eq(shadow.matrix.elements[14] > 0.0, true)
+      assert_eq(shadow.matrix.elements[14] < 1.0, true)
+    }
+  }
 }
 
 ///|

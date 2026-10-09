@@ -45,10 +45,22 @@ pub(all) struct PrimitiveBinding {
 }
 
 ///|
+/// 平行光的阴影相机和参数。`camera` 是正交相机节点。
+pub(all) struct ShadowState {
+  camera : Object3D
+  mut map_size : Int
+  mut bias : Double
+  mut normal_bias : Double
+  mut radius : Double
+}
+
+///|
 /// 挂在灯光节点上的数据。平行光的 `target` 是另一个场景节点。
+/// `shadow` 只在平行光上有值。是否绘制由节点的 `cast_shadow` 决定。
 pub(all) struct LightState {
   color : @math.Color
   mut intensity : Double
   mut target : Object3D?
   kind : LightKind
+  mut shadow : ShadowState?
 }

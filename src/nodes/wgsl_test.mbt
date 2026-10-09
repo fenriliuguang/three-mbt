@@ -78,6 +78,33 @@ test "instanced meshes multiply instance matrix and color" {
 }
 
 ///|
+test "lit materials sample a directional shadow map" {
+  let lambert = @nodes.lambert_wgsl()
+  let standard = @nodes.standard_wgsl()
+  assert_eq(
+    includes(lambert, "textureSampleCompare(shadow_map, shadow_sampler,"),
+    true,
+  )
+  assert_eq(includes(lambert, "texture_depth_2d"), true)
+  assert_eq(includes(lambert, "(uniforms.ambient).xyz"), true)
+  assert_eq(
+    includes(lambert, "direct_shadow(input.v_world, input.v_normal)"),
+    true,
+  )
+  assert_eq(includes(@nodes.basic_wgsl(), "shadow_map"), false)
+  assert_eq(includes(standard, "direct_shadow(world, N)"), true)
+  assert_eq(includes(standard, "(uniforms.ambient).xyz * diffuse"), true)
+  assert_eq(
+    includes(
+      @nodes.shadow_wgsl(),
+      "uniforms.mvp * vec4<f32>(input.position, 1.0)",
+    ),
+    true,
+  )
+  assert_eq(includes(@nodes.shadow_instanced_wgsl(), "instance_matrix_0"), true)
+}
+
+///|
 test "lines return the uniform color and points scale like r186" {
   let line = @nodes.line_wgsl()
   assert_eq(includes(line, "return uniforms.color;"), true)

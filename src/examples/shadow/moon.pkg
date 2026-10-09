@@ -1,0 +1,16 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：一盏平行光把立方体的影子投到地面上。

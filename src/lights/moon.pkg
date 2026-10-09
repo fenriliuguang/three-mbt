@@ -1,5 +1,6 @@
 // 阶段 2 放灯光对象，阶段 4 起参与着色。
 import {
+  "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/math",
 }

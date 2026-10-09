@@ -22,6 +22,10 @@ pub fn line_wgsl() -> String
 
 pub fn points_wgsl() -> String
 
+pub fn shadow_instanced_wgsl() -> String
+
+pub fn shadow_wgsl() -> String
+
 pub fn standard_instanced_wgsl() -> String
 
 pub fn standard_program(instanced? : Bool) -> Program
@@ -46,6 +50,7 @@ pub(all) enum Node {
   TextureSample(Node)
   StandardLit(Node)
   InstanceNormal(Node)
+  DirectShadow
 }
 
 pub(all) struct Program {
@@ -56,6 +61,7 @@ pub(all) struct Program {
   vertex_varyings : Array[(String, Node)]
   fragment_color : Node
   sampled : Bool
+  shadowed : Bool
   preamble : String
 }
 

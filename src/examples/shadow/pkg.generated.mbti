@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/shadow"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ShadowScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  cube : @objects.Mesh
+  ground : @objects.Mesh
+  mut angle : Double
+}
+pub fn ShadowScene::new() -> Self
+pub fn ShadowScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

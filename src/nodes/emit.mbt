@@ -44,6 +44,7 @@ fn emit_expr(node : Node) -> String {
       "standard_lit(\{emit_expr(base)}, input.v_normal, input.v_world)"
     InstanceNormal(normal) =>
       "instance_normal(\{emit_expr(normal)}, input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2)"
+    DirectShadow => "direct_shadow(input.v_world, input.v_normal)"
   }
 }
 
@@ -68,6 +69,12 @@ pub fn emit_wgsl(program : Program) -> String {
   if program.sampled {
     lines.push("@group(1) @binding(0) var map_texture : texture_2d<f32>;\n")
     lines.push("@group(1) @binding(1) var map_sampler : sampler;\n")
+  }
+  if program.shadowed {
+    lines.push("@group(2) @binding(0) var shadow_map : texture_depth_2d;\n")
+    lines.push(
+      "@group(2) @binding(1) var shadow_sampler : sampler_comparison;\n",
+    )
   }
   lines.push("\n")
   if program.preamble != "" {
@@ -146,6 +153,17 @@ pub fn standard_instanced_wgsl() -> String {
 ///|
 pub fn line_wgsl() -> String {
   emit_wgsl(line_program())
+}
+
+///|
+/// 阴影贴图只写深度。uniform 只声明开头的 `mvp`，和完整 uniform 块的前 64 字节对齐。
+pub fn shadow_wgsl() -> String {
+  "struct Uniforms {\n  mvp : mat4x4<f32>,\n}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n  @location(0) position : vec3<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.clip = uniforms.mvp * vec4<f32>(input.position, 1.0);\n  return output;\n}\n"
+}
+
+///|
+pub fn shadow_instanced_wgsl() -> String {
+  "struct Uniforms {\n  mvp : mat4x4<f32>,\n}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n  @location(0) position : vec3<f32>,\n  @location(3) instance_matrix_0 : vec4<f32>,\n  @location(4) instance_matrix_1 : vec4<f32>,\n  @location(5) instance_matrix_2 : vec4<f32>,\n  @location(6) instance_matrix_3 : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  let instance = mat4x4<f32>(input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2, input.instance_matrix_3);\n  output.clip = uniforms.mvp * instance * vec4<f32>(input.position, 1.0);\n  return output;\n}\n"
 }
 
 ///|

@@ -35,13 +35,15 @@ pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @c
 
 pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 
-pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double, @math.Matrix4, Double, Double, Double, Double) -> FixedArray[Byte]
+pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double, @math.Matrix4, Double, Double, Double, Double, @math.Matrix4, Double, Double, Double, Double) -> FixedArray[Byte]
 
 pub fn pad_texture_rows(FixedArray[Byte], Int, Int) -> (FixedArray[Byte], Int)
 
 pub fn point_quad_bytes() -> FixedArray[Byte]
 
 pub let position_stride : Int
+
+pub fn shadow_matrix(@math.Matrix4, @math.Matrix4) -> @math.Matrix4
 
 pub let uniform_bytes : Int
 
@@ -56,6 +58,7 @@ pub(all) struct LightFrame {
   ambient : @math.Vector3
   color : @math.Vector3
   direction : @math.Vector3
+  shadow : ShadowFrame?
 }
 
 pub(all) struct PrimitiveItem {
@@ -79,6 +82,15 @@ pub(all) struct RenderItem {
   roughness : Double
   metalness : Double
   instances : @core.InstanceData?
+}
+
+pub(all) struct ShadowFrame {
+  camera : @core.Object3D
+  matrix : @math.Matrix4
+  bias : Double
+  normal_bias : Double
+  radius : Double
+  map_size : Int
 }
 
 // Type aliases
