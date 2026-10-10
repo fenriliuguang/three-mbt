@@ -9,6 +9,7 @@ import {
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/nodes",
   "fenriliuguang/three-mbt/platform",
+  "fenriliuguang/three-mbt/post",
   "fenriliuguang/three-mbt/renderer/common",
   "fenriliuguang/three-mbt/scenes",
   "fenriliuguang/three-mbt/textures",

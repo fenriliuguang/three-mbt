@@ -11,6 +11,7 @@ import {
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/post",
   "fenriliuguang/three-mbt/scenes",
   "fenriliuguang/three-mbt/textures",
 }

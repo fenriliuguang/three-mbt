@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/post"
+
+import {
+  "fenriliuguang/three-mbt/math",
+}
+
+// Values
+pub fn grayscale(Double, Double, Double, Double) -> @math.Color
+
+pub fn grayscale_wgsl() -> String
+
+pub fn pack_amount(Double) -> FixedArray[Byte]
+
+// Errors
+
+// Types and methods
+pub(all) struct GrayscalePass {
+  mut amount : Double
+}
+pub fn GrayscalePass::new(amount? : Double) -> Self
+pub fn GrayscalePass::set_amount(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

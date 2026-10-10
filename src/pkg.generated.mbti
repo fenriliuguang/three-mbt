@@ -13,6 +13,7 @@ import {
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/post",
   "fenriliuguang/three-mbt/scenes",
   "fenriliuguang/three-mbt/textures",
 }
@@ -59,6 +60,8 @@ pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
 
 pub fn deg_to_rad(Double) -> Double
+
+pub fn grayscale(Double, Double, Double, Double) -> @math.Color
 
 pub fn linear_to_srgb(Double) -> Double
 
@@ -116,6 +119,8 @@ pub using @math {type Frustum}
 pub using @core {type GeometryGroup}
 
 pub using @gltf {type GltfError}
+
+pub using @post {type GrayscalePass}
 
 pub using @objects {type Group}
 

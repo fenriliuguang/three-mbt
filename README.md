@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, an animation mixer, a glTF geometry and PBR subset, and a compute shader that writes point positions. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, an animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, and a grayscale fullscreen pass. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -123,6 +123,14 @@ sh scripts/build-compute.sh
 ```
 
 Copy `target/compute.component.wasm` to `examples/apps/compute/compute.component.wasm`, then `cargo xtask run-demo --name compute`. `moon run src/examples/compute/app` does not open a window.
+
+The post sample draws a Lambert cube into a color target, then mixes it halfway to grayscale:
+
+```sh
+sh scripts/build-post.sh
+```
+
+Copy `target/post.component.wasm` to `examples/apps/post/post.component.wasm`, then `cargo xtask run-demo --name post`. `moon run src/examples/post/app` does not open a window.
 
 ## License
 

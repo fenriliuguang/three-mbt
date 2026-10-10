@@ -1,0 +1,11 @@
+warnings = "-44"
+
+import {
+  "fenriliuguang/three-mbt/async-core",
+  "fenriliuguang/three-mbt/examples/post",
+  "fenriliuguang/three-mbt/platform",
+  "fenriliuguang/three-mbt/renderer/webgpu" @renderer,
+  "fenriliuguang/three-mbt/world/example" @host,
+}
+
+supported_targets = "+wasm"

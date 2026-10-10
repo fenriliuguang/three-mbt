@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt/examples/post",
+}
+
+pkgtype(kind: "executable")
+
+// `moon run src/examples/post/app` 只确认场景能建出来。上屏用 post 组件。

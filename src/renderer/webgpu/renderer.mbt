@@ -69,6 +69,15 @@ struct StorageGpu {
 }
 
 ///|
+struct PostGroup {
+  source : @textures.Texture
+  version : Int
+  width : UInt
+  height : UInt
+  group : GpuBindGroup
+}
+
+///|
 struct ShadowMap {
   texture : GpuTexture
   view : GpuTextureView
@@ -148,6 +157,10 @@ pub struct WebGPURenderer {
   points : GpuRenderPipeline
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
+  post : GpuRenderPipeline
+  post_layout : GpuBindGroupLayout
+  post_uniform : GpuBuffer
+  mut post_group : PostGroup?
   quad : GpuBuffer
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
@@ -694,6 +707,89 @@ fn wave_pipeline(
 }
 
 ///|
+fn post_pipeline(
+  device : GpuDevice,
+  format : GpuTextureFormat,
+) -> (GpuBindGroupLayout, GpuRenderPipeline, GpuBuffer) {
+  let layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 2U,
+        visibility: fragment_visibility(),
+        buffer: Some({
+          type_: Some(@gpu.GpuBufferBindingType::UNIFORM),
+          has_dynamic_offset: None,
+          min_binding_size: None,
+        }),
+        sampler: None,
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("post"),
+  })
+  let pipeline_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout)],
+    immediate_size: None,
+    label: Some("post"),
+  })
+  let shader = shader_module(device, @post.grayscale_wgsl(), "post")
+  let pipeline = device.create_render_pipeline({
+    vertex: {
+      buffers: None,
+      module_: shader,
+      entry_point: Some("vs"),
+      constants: None,
+    },
+    primitive: Some({
+      topology: Some(@gpu.GpuPrimitiveTopology::TRIANGLE_LIST),
+      strip_index_format: None,
+      front_face: Some(@gpu.GpuFrontFace::CCW),
+      cull_mode: Some(GpuCullMode::NONE),
+      unclipped_depth: None,
+    }),
+    depth_stencil: None,
+    multisample: None,
+    fragment: Some({
+      targets: [Some({ format, blend: None, write_mask: None, })],
+      module_: shader,
+      entry_point: Some("fs"),
+      constants: None,
+    }),
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("post"),
+  })
+  let uniform = pack_buffer(
+    device,
+    @post.pack_amount(1.0),
+    vertex=false,
+    index=false,
+    uniform=true,
+  )
+  (layout, pipeline, uniform)
+}
+
+///|
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
@@ -851,6 +947,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     label: Some("shadow-dummy"),
   })
   let wave = wave_pipeline(device)
+  let post = post_pipeline(device, format)
   let white = upload_texture(
     device,
     texture_layout,
@@ -921,6 +1018,10 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ),
     wave: wave.1,
     wave_layout: wave.0,
+    post: post.1,
+    post_layout: post.0,
+    post_uniform: post.2,
+    post_group: None,
     quad: pack_buffer(
       device,
       @common.point_quad_bytes(),
@@ -1914,6 +2015,105 @@ pub fn WebGPURenderer::set_render_target(
   target : @textures.RenderTarget?,
 ) -> Unit {
   self.output = target
+}
+
+///|
+fn WebGPURenderer::post_bind(
+  self : WebGPURenderer,
+  source : @textures.Texture,
+) -> GpuBindGroup {
+  let frame = self.color_target(source)
+  match self.post_group {
+    Some(cached) =>
+      if physical_equal(cached.source, source) &&
+        cached.version == source.version &&
+        cached.width == frame.width &&
+        cached.height == frame.height {
+        return cached.group
+      } else {
+        cached.group.drop()
+      }
+    None => ()
+  }
+  let group = self.device.create_bind_group({
+    layout: self.post_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(frame.view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(frame.sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuBuffer(self.post_uniform),
+      },
+    ],
+    label: Some("post"),
+  })
+  self.post_group = Some({
+    source,
+    version: source.version,
+    width: frame.width,
+    height: frame.height,
+    group,
+  })
+  group
+}
+
+///|
+/// 把 `source` 铺满窗口，并按 `pass.amount` 混进灰度，然后 `present`。
+/// 场景应先画进这个颜色目标。窗口尺寸为 0 时什么也不做。
+pub fn WebGPURenderer::post(
+  self : WebGPURenderer,
+  source : @textures.RenderTarget,
+  pass : @post.GrayscalePass,
+) -> Unit {
+  let width = self.window.width()
+  let height = self.window.height()
+  if width == 0U || height == 0U {
+    return
+  }
+  self.sync_swapchain()
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(
+      self.post_uniform,
+      0UL,
+      @post.pack_amount(pass.amount),
+      None,
+      None,
+    ),
+  )
+  let group = self.post_bind(source.texture)
+  let color = self.context.get_current_texture().create_view(None)
+  let encoder = self.device.create_command_encoder(None)
+  let draw = encoder.begin_render_pass({
+    color_attachments: [
+      Some({
+        view: color,
+        depth_slice: None,
+        resolve_target: None,
+        clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
+        load_op: @gpu.CLEAR,
+        store_op: @gpu.STORE,
+      }),
+    ],
+    depth_stencil_attachment: None,
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some("post"),
+  })
+  draw.set_pipeline(self.post)
+  ignore(draw.set_bind_group(0U, Some(group), None, None, None))
+  draw.draw(3U, Some(1U), None, None)
+  draw.end()
+  self.device.queue().submit([encoder.finish(None)])
+  self.context.present()
 }
 
 ///|
