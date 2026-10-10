@@ -75,11 +75,17 @@ pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
 pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
 
+pub fn bloom_mix(Double, Double, Double, Double, Double, Double, Double, Double) -> @math.Color
+
 pub fn deg_to_rad(Double) -> Double
 
 pub fn grayscale(Double, Double, Double, Double) -> @math.Color
 
+pub fn high_pass(Double, Double, Double, Double, Double) -> @math.Color
+
 pub fn linear_to_srgb(Double) -> Double
+
+pub fn luminance(Double, Double, Double) -> Double
 
 pub fn parse(String, bin? : Bytes) -> @objects.Group raise @gltf.GltfError
 
@@ -107,6 +113,8 @@ pub using @animation {type AnimationAction}
 pub using @animation {type AnimationClip}
 
 pub using @animation {type AnimationMixer}
+
+pub using @post {type BloomPass}
 
 pub using @math {type Box3}
 

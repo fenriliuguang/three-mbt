@@ -4,7 +4,7 @@
 
 A MoonBit migration of the [three.js](https://github.com/mrdoob/three.js) **r186** WebGPU world. GPU access goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu). Windows, the frame loop, and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx).
 
-Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, an animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, and tone mapping through Neutral. Scope is in [docs/PLAN.md](docs/PLAN.md).
+Phase 1 opens a wasi-gfx surface, configures a WebGPU swapchain, and clears it on each frame. Phase 2 is the CPU scene graph, checked against r186 fixtures. Phase 3 draws an unlit rotating cube. Phase 4 adds Lambert shading with ambient light and one directional light. Phase 5 adds `rgba8` textures, rebuilds the swapchain on resize, and orbits the camera from pointer events in the sample. Phase 6 adds `MeshStandardMaterial` with roughness, metalness, and the directional light. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, an animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, tone mapping through Neutral, and a single-resolution bloom pass. Scope is in [docs/PLAN.md](docs/PLAN.md).
 
 ## Check
 
@@ -147,6 +147,14 @@ sh scripts/build-tone.sh
 ```
 
 Copy `target/tone.component.wasm` to `examples/apps/tone/tone.component.wasm`, then `cargo xtask run-demo --name tone`. `moon run src/examples/tone/app` does not open a window.
+
+The bloom sample draws a Lambert cube into a color target, then adds one full-resolution glow at threshold 0.2:
+
+```sh
+sh scripts/build-bloom.sh
+```
+
+Copy `target/bloom.component.wasm` to `examples/apps/bloom/bloom.component.wasm`, then `cargo xtask run-demo --name bloom`. `moon run src/examples/bloom/app` does not open a window.
 
 ## License
 

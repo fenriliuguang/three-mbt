@@ -1,4 +1,4 @@
-// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
 
 ///|
 using @gpu {
@@ -77,6 +77,16 @@ struct PostGroup {
   width : UInt
   height : UInt
   group : GpuBindGroup
+}
+
+///|
+struct BloomBuffers {
+  width : UInt
+  height : UInt
+  a_texture : GpuTexture
+  a_view : GpuTextureView
+  b_texture : GpuTexture
+  b_view : GpuTextureView
 }
 
 ///|
@@ -174,6 +184,12 @@ pub struct WebGPURenderer {
   tone_layout : GpuBindGroupLayout
   tone_uniform : GpuBuffer
   mut tone_group : PostGroup?
+  bloom : GpuRenderPipeline
+  bloom_layout : GpuBindGroupLayout
+  bloom_uniform : GpuBuffer
+  bloom_sampler : GpuSampler
+  mut bloom_buffers : BloomBuffers?
+  mut bloom_held : Array[GpuBindGroup]
   quad : GpuBuffer
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
@@ -827,6 +843,124 @@ fn fullscreen_pipeline(
 }
 
 ///|
+fn bloom_pipeline(
+  device : GpuDevice,
+  format : GpuTextureFormat,
+) -> (GpuBindGroupLayout, GpuRenderPipeline, GpuBuffer, GpuSampler) {
+  let layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 2U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 3U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 4U,
+        visibility: fragment_visibility(),
+        buffer: Some({
+          type_: Some(@gpu.GpuBufferBindingType::UNIFORM),
+          has_dynamic_offset: None,
+          min_binding_size: None,
+        }),
+        sampler: None,
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("bloom"),
+  })
+  let pipeline_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout)],
+    immediate_size: None,
+    label: Some("bloom"),
+  })
+  let shader = shader_module(device, @post.bloom_wgsl(), "bloom")
+  let pipeline = device.create_render_pipeline({
+    vertex: {
+      buffers: None,
+      module_: shader,
+      entry_point: Some("vs"),
+      constants: None,
+    },
+    primitive: Some({
+      topology: Some(@gpu.GpuPrimitiveTopology::TRIANGLE_LIST),
+      strip_index_format: None,
+      front_face: Some(@gpu.GpuFrontFace::CCW),
+      cull_mode: Some(GpuCullMode::NONE),
+      unclipped_depth: None,
+    }),
+    depth_stencil: None,
+    multisample: None,
+    fragment: Some({
+      targets: [Some({ format, blend: None, write_mask: None, })],
+      module_: shader,
+      entry_point: Some("fs"),
+      constants: None,
+    }),
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("bloom"),
+  })
+  let uniform = pack_buffer(
+    device,
+    @post.pack_bloom(@post.BloomPass::new(), 0.0, 0.0, 0.0, 0.0, 0.0),
+    vertex=false,
+    index=false,
+    uniform=true,
+  )
+  let sampler = device.create_sampler(
+    Some({
+      address_mode_u: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_v: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_w: None,
+      mag_filter: Some(@gpu.GpuFilterMode::LINEAR),
+      min_filter: Some(@gpu.GpuFilterMode::LINEAR),
+      mipmap_filter: Some(@gpu.GpuMipmapFilterMode::NEAREST),
+      lod_min_clamp: None,
+      lod_max_clamp: None,
+      compare: None,
+      max_anisotropy: None,
+      label: Some("bloom"),
+    }),
+  )
+  (layout, pipeline, uniform, sampler)
+}
+
+///|
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
@@ -998,6 +1132,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     "tone",
     @post.pack_tone(@constants.ToneMapping::No, 1.0),
   )
+  let bloom = bloom_pipeline(device, format)
   let white = upload_texture(
     device,
     texture_layout,
@@ -1121,6 +1256,12 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     tone_layout: tone.0,
     tone_uniform: tone.2,
     tone_group: None,
+    bloom: bloom.1,
+    bloom_layout: bloom.0,
+    bloom_uniform: bloom.2,
+    bloom_sampler: bloom.3,
+    bloom_buffers: None,
+    bloom_held: [],
     quad: pack_buffer(
       device,
       @common.point_quad_bytes(),
@@ -2330,6 +2471,223 @@ pub fn WebGPURenderer::tone_map(
   draw.draw(3U, Some(1U), None, None)
   draw.end()
   self.device.queue().submit([encoder.finish(None)])
+  self.context.present()
+}
+
+///|
+fn drop_bloom(buffers : BloomBuffers) -> Unit {
+  buffers.a_view.drop()
+  buffers.b_view.drop()
+  buffers.a_texture.drop()
+  buffers.b_texture.drop()
+}
+
+///|
+fn WebGPURenderer::bloom_color(
+  self : WebGPURenderer,
+  width : UInt,
+  height : UInt,
+  label : String,
+) -> (GpuTexture, GpuTextureView) {
+  let texture = self.device.create_texture({
+    size: { width, height: Some(height), depth_or_array_layers: Some(1U), },
+    mip_level_count: Some(1U),
+    sample_count: Some(1U),
+    dimension: Some(@gpu.GpuTextureDimension::D2),
+    format: self.format,
+    usage: flags_color(),
+    view_formats: None,
+    texture_binding_view_dimension: None,
+    label: Some(label),
+  })
+  (texture, texture.create_view(None))
+}
+
+///|
+fn WebGPURenderer::ensure_bloom(
+  self : WebGPURenderer,
+  width : UInt,
+  height : UInt,
+) -> BloomBuffers {
+  match self.bloom_buffers {
+    Some(cached) =>
+      if cached.width == width && cached.height == height {
+        return cached
+      } else {
+        drop_bloom(cached)
+      }
+    None => ()
+  }
+  let a = self.bloom_color(width, height, "bloom-a")
+  let b = self.bloom_color(width, height, "bloom-b")
+  let buffers : BloomBuffers = {
+    width,
+    height,
+    a_texture: a.0,
+    a_view: a.1,
+    b_texture: b.0,
+    b_view: b.1,
+  }
+  self.bloom_buffers = Some(buffers)
+  buffers
+}
+
+///|
+fn WebGPURenderer::bloom_release(self : WebGPURenderer) -> Unit {
+  let mut index = 0
+  while index < self.bloom_held.length() {
+    self.bloom_held[index].drop()
+    index = index + 1
+  }
+  self.bloom_held = []
+}
+
+///|
+fn WebGPURenderer::bloom_group(
+  self : WebGPURenderer,
+  color : GpuTextureView,
+  glow : GpuTextureView,
+) -> GpuBindGroup {
+  let group = self.device.create_bind_group({
+    layout: self.bloom_layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(color), },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(self.bloom_sampler),
+      },
+      { binding: 2U, resource: @gpu.GpuBindingResource::GpuTextureView(glow), },
+      {
+        binding: 3U,
+        resource: @gpu.GpuBindingResource::GpuSampler(self.bloom_sampler),
+      },
+      {
+        binding: 4U,
+        resource: @gpu.GpuBindingResource::GpuBuffer(self.bloom_uniform),
+      },
+    ],
+    label: Some("bloom"),
+  })
+  self.bloom_held.push(group)
+  group
+}
+
+///|
+fn WebGPURenderer::bloom_submit(
+  self : WebGPURenderer,
+  pass : @post.BloomPass,
+  texel_x : Double,
+  texel_y : Double,
+  dir_x : Double,
+  dir_y : Double,
+  mode : Double,
+  color : GpuTextureView,
+  glow : GpuTextureView,
+  target : GpuTextureView,
+) -> Unit {
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(
+      self.bloom_uniform,
+      0UL,
+      @post.pack_bloom(pass, texel_x, texel_y, dir_x, dir_y, mode),
+      None,
+      None,
+    ),
+  )
+  let group = self.bloom_group(color, glow)
+  let encoder = self.device.create_command_encoder(None)
+  let draw = encoder.begin_render_pass({
+    color_attachments: [
+      Some({
+        view: target,
+        depth_slice: None,
+        resolve_target: None,
+        clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
+        load_op: @gpu.CLEAR,
+        store_op: @gpu.STORE,
+      }),
+    ],
+    depth_stencil_attachment: None,
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some("bloom"),
+  })
+  draw.set_pipeline(self.bloom)
+  ignore(draw.set_bind_group(0U, Some(group), None, None, None))
+  draw.draw(3U, Some(1U), None, None)
+  draw.end()
+  self.device.queue().submit([encoder.finish(None)])
+}
+
+///|
+/// 高通写到缓冲 A，水平模糊写到 B，垂直模糊写回 A，再把光加回原图并 `present`。
+/// 四次提交，每次的 uniform 才真正不同。采样的纹理和当前渲染目标分开。
+/// 只有全分辨率、核半径 6。窗口尺寸为 0 时什么也不做。
+/// r186: `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `luminosityHighPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L12
+pub fn WebGPURenderer::bloom(
+  self : WebGPURenderer,
+  source : @textures.RenderTarget,
+  pass : @post.BloomPass,
+) -> Unit {
+  let width = self.window.width()
+  let height = self.window.height()
+  if width == 0U || height == 0U {
+    return
+  }
+  self.sync_swapchain()
+  let frame = self.color_target(source.texture)
+  let buffers = self.ensure_bloom(frame.width, frame.height)
+  self.bloom_release()
+  let texel_x = 1.0 / frame.width.reinterpret_as_int().to_double()
+  let texel_y = 1.0 / frame.height.reinterpret_as_int().to_double()
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    0.0,
+    0.0,
+    0.0,
+    frame.view,
+    frame.view,
+    buffers.a_view,
+  )
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    1.0,
+    0.0,
+    1.0,
+    buffers.a_view,
+    buffers.a_view,
+    buffers.b_view,
+  )
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    0.0,
+    1.0,
+    1.0,
+    buffers.b_view,
+    buffers.b_view,
+    buffers.a_view,
+  )
+  let screen = self.context.get_current_texture().create_view(None)
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    0.0,
+    0.0,
+    2.0,
+    frame.view,
+    buffers.a_view,
+    screen,
+  )
   self.context.present()
 }
 

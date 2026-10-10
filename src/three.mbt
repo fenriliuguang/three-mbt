@@ -85,7 +85,16 @@ pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 pub using @compute {type StoragePositions, wave_position, workgroup_count}
 
 ///|
-pub using @post {type GrayscalePass, grayscale, type ToneMappingPass, tone_map}
+pub using @post {
+  bloom_mix,
+  grayscale,
+  high_pass,
+  luminance,
+  tone_map,
+  type BloomPass,
+  type GrayscalePass,
+  type ToneMappingPass,
+}
 
 ///|
 pub using @scenes {type Fog, type FogKind, type Scene}

@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/bloom"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/post",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct BloomScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  cube : @objects.Mesh
+  target : @textures.RenderTarget
+  pass : @post.BloomPass
+  mut angle : Double
+}
+pub fn BloomScene::new() -> Self
+pub fn BloomScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits
