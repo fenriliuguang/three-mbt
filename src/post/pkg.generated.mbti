@@ -46,6 +46,30 @@ pub fn BloomPass::set_smooth_width(Self, Double) -> Unit
 pub fn BloomPass::set_strength(Self, Double) -> Unit
 pub fn BloomPass::set_threshold(Self, Double) -> Unit
 
+pub(all) enum ComposerEffect {
+  Grayscale(GrayscalePass)
+  Tone(ToneMappingPass)
+  Bloom(BloomPass)
+}
+
+pub(all) struct ComposerPass {
+  effect : ComposerEffect
+  mut enabled : Bool
+}
+
+pub(all) struct EffectComposer {
+  mut passes : Array[ComposerPass]
+}
+pub fn EffectComposer::add_bloom(Self, BloomPass) -> Unit
+pub fn EffectComposer::add_grayscale(Self, GrayscalePass) -> Unit
+pub fn EffectComposer::add_pass(Self, ComposerEffect) -> Unit
+pub fn EffectComposer::add_tone(Self, ToneMappingPass) -> Unit
+pub fn EffectComposer::any_enabled(Self) -> Bool
+pub fn EffectComposer::is_last_enabled(Self, Int) -> Bool
+pub fn EffectComposer::new() -> Self
+pub fn EffectComposer::pass_count(Self) -> Int
+pub fn EffectComposer::set_enabled(Self, Int, Bool) -> Unit
+
 pub(all) struct GrayscalePass {
   mut amount : Double
 }

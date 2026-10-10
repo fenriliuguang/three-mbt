@@ -92,6 +92,9 @@ pub using @post {
   luminance,
   tone_map,
   type BloomPass,
+  type ComposerEffect,
+  type ComposerPass,
+  type EffectComposer,
   type GrayscalePass,
   type ToneMappingPass,
 }

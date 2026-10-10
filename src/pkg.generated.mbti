@@ -128,9 +128,15 @@ pub using @core {type BufferGeometry}
 
 pub using @math {type Color}
 
+pub using @post {type ComposerEffect}
+
+pub using @post {type ComposerPass}
+
 pub using @constants {type CoordinateSystem}
 
 pub using @lights {type DirectionalLight}
+
+pub using @post {type EffectComposer}
 
 pub using @math {type Euler}
 

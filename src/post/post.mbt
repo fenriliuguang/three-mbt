@@ -1,4 +1,4 @@
-// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
+// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
 
 ///|
 const WEIGHT_R : Double = 0.25
@@ -789,4 +789,112 @@ pub fn bloom_wgsl() -> String {
     #|  return vec4<f32>(color.rgb + glow.rgb * weight, color.a);
     #|}
   code
+}
+
+///|
+/// 一条通道里的效果。没有同名枚举，对应 `EffectComposer` 通道数组里的 `Pass`。
+/// r186: `Pass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/Pass.js#L16
+pub(all) enum ComposerEffect {
+  Grayscale(GrayscalePass)
+  Tone(ToneMappingPass)
+  Bloom(BloomPass)
+}
+
+///|
+/// 通道和它的 `enabled`。关掉之后合成时跳过。
+/// r186: `Pass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/Pass.js#L16
+pub(all) struct ComposerPass {
+  effect : ComposerEffect
+  mut enabled : Bool
+}
+
+///|
+/// 按加入顺序执行的后处理链。WebGPU 的节点管线仍是 `RenderPipeline`，这里只做通道顺序。
+/// 半精度目标、蒙版和复制通道还没做。每条通道都会写出新图像。
+/// r186: `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
+pub(all) struct EffectComposer {
+  mut passes : Array[ComposerPass]
+}
+
+///|
+pub fn EffectComposer::new() -> EffectComposer {
+  { passes: [], }
+}
+
+///|
+/// r186: `addPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L149
+pub fn EffectComposer::add_pass(
+  self : EffectComposer,
+  effect : ComposerEffect,
+) -> Unit {
+  self.passes.push({ effect, enabled: true, })
+}
+
+///|
+pub fn EffectComposer::add_grayscale(
+  self : EffectComposer,
+  pass : GrayscalePass,
+) -> Unit {
+  self.add_pass(Grayscale(pass))
+}
+
+///|
+pub fn EffectComposer::add_tone(
+  self : EffectComposer,
+  pass : ToneMappingPass,
+) -> Unit {
+  self.add_pass(Tone(pass))
+}
+
+///|
+pub fn EffectComposer::add_bloom(
+  self : EffectComposer,
+  pass : BloomPass,
+) -> Unit {
+  self.add_pass(Bloom(pass))
+}
+
+///|
+pub fn EffectComposer::pass_count(self : EffectComposer) -> Int {
+  self.passes.length()
+}
+
+///|
+pub fn EffectComposer::set_enabled(
+  self : EffectComposer,
+  index : Int,
+  enabled : Bool,
+) -> Unit {
+  if index >= 0 && index < self.passes.length() {
+    self.passes[index].enabled = enabled
+  }
+}
+
+///|
+pub fn EffectComposer::any_enabled(self : EffectComposer) -> Bool {
+  let mut index = 0
+  while index < self.passes.length() {
+    if self.passes[index].enabled {
+      return true
+    }
+    index = index + 1
+  }
+  false
+}
+
+///|
+/// 下标之后没有别的启用通道时为真。通道自己是否启用不参与判断。
+/// r186: `isLastEnabledPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L192
+pub fn EffectComposer::is_last_enabled(
+  self : EffectComposer,
+  index : Int,
+) -> Bool {
+  let mut next = index + 1
+  while next < self.passes.length() {
+    if self.passes[next].enabled {
+      return false
+    }
+    next = next + 1
+  }
+  true
 }

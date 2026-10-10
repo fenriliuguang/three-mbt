@@ -1,0 +1,7 @@
+import {
+  "fenriliuguang/three-mbt/examples/compose",
+}
+
+pkgtype(kind: "executable")
+
+// `moon run src/examples/compose/app` 只确认场景能建出来。上屏用 compose 组件。

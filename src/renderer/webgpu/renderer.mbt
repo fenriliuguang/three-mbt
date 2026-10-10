@@ -1,4 +1,4 @@
-// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
 
 ///|
 using @gpu {
@@ -81,6 +81,16 @@ struct PostGroup {
 
 ///|
 struct BloomBuffers {
+  width : UInt
+  height : UInt
+  a_texture : GpuTexture
+  a_view : GpuTextureView
+  b_texture : GpuTexture
+  b_view : GpuTextureView
+}
+
+///|
+struct ChainBuffers {
   width : UInt
   height : UInt
   a_texture : GpuTexture
@@ -190,6 +200,8 @@ pub struct WebGPURenderer {
   bloom_sampler : GpuSampler
   mut bloom_buffers : BloomBuffers?
   mut bloom_held : Array[GpuBindGroup]
+  mut chain_buffers : ChainBuffers?
+  mut compose_held : Array[GpuBindGroup]
   quad : GpuBuffer
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
@@ -1262,6 +1274,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     bloom_sampler: bloom.3,
     bloom_buffers: None,
     bloom_held: [],
+    chain_buffers: None,
+    compose_held: [],
     quad: pack_buffer(
       device,
       @common.point_quad_bytes(),
@@ -2623,6 +2637,54 @@ fn WebGPURenderer::bloom_submit(
 }
 
 ///|
+/// 高通、水平模糊、垂直模糊。光晕留在缓冲 A。调用方负责合成目标，也负责释放上一帧的绑定组。
+fn WebGPURenderer::bloom_blur(
+  self : WebGPURenderer,
+  source : GpuTextureView,
+  width : UInt,
+  height : UInt,
+  pass : @post.BloomPass,
+) -> GpuTextureView {
+  let buffers = self.ensure_bloom(width, height)
+  let texel_x = 1.0 / width.reinterpret_as_int().to_double()
+  let texel_y = 1.0 / height.reinterpret_as_int().to_double()
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    0.0,
+    0.0,
+    0.0,
+    source,
+    source,
+    buffers.a_view,
+  )
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    1.0,
+    0.0,
+    1.0,
+    buffers.a_view,
+    buffers.a_view,
+    buffers.b_view,
+  )
+  self.bloom_submit(
+    pass,
+    texel_x,
+    texel_y,
+    0.0,
+    1.0,
+    1.0,
+    buffers.b_view,
+    buffers.b_view,
+    buffers.a_view,
+  )
+  buffers.a_view
+}
+
+///|
 /// 高通写到缓冲 A，水平模糊写到 B，垂直模糊写回 A，再把光加回原图并 `present`。
 /// 四次提交，每次的 uniform 才真正不同。采样的纹理和当前渲染目标分开。
 /// 只有全分辨率、核半径 6。窗口尺寸为 0 时什么也不做。
@@ -2639,43 +2701,10 @@ pub fn WebGPURenderer::bloom(
   }
   self.sync_swapchain()
   let frame = self.color_target(source.texture)
-  let buffers = self.ensure_bloom(frame.width, frame.height)
   self.bloom_release()
+  let glow = self.bloom_blur(frame.view, frame.width, frame.height, pass)
   let texel_x = 1.0 / frame.width.reinterpret_as_int().to_double()
   let texel_y = 1.0 / frame.height.reinterpret_as_int().to_double()
-  self.bloom_submit(
-    pass,
-    texel_x,
-    texel_y,
-    0.0,
-    0.0,
-    0.0,
-    frame.view,
-    frame.view,
-    buffers.a_view,
-  )
-  self.bloom_submit(
-    pass,
-    texel_x,
-    texel_y,
-    1.0,
-    0.0,
-    1.0,
-    buffers.a_view,
-    buffers.a_view,
-    buffers.b_view,
-  )
-  self.bloom_submit(
-    pass,
-    texel_x,
-    texel_y,
-    0.0,
-    1.0,
-    1.0,
-    buffers.b_view,
-    buffers.b_view,
-    buffers.a_view,
-  )
   let screen = self.context.get_current_texture().create_view(None)
   self.bloom_submit(
     pass,
@@ -2685,10 +2714,215 @@ pub fn WebGPURenderer::bloom(
     0.0,
     2.0,
     frame.view,
-    buffers.a_view,
+    glow,
     screen,
   )
   self.context.present()
+}
+
+///|
+fn drop_chain(buffers : ChainBuffers) -> Unit {
+  buffers.a_view.drop()
+  buffers.b_view.drop()
+  buffers.a_texture.drop()
+  buffers.b_texture.drop()
+}
+
+///|
+fn WebGPURenderer::ensure_chain(
+  self : WebGPURenderer,
+  width : UInt,
+  height : UInt,
+) -> ChainBuffers {
+  match self.chain_buffers {
+    Some(cached) =>
+      if cached.width == width && cached.height == height {
+        return cached
+      } else {
+        drop_chain(cached)
+      }
+    None => ()
+  }
+  let a = self.bloom_color(width, height, "compose-a")
+  let b = self.bloom_color(width, height, "compose-b")
+  let buffers : ChainBuffers = {
+    width,
+    height,
+    a_texture: a.0,
+    a_view: a.1,
+    b_texture: b.0,
+    b_view: b.1,
+  }
+  self.chain_buffers = Some(buffers)
+  buffers
+}
+
+///|
+fn WebGPURenderer::compose_release(self : WebGPURenderer) -> Unit {
+  let mut index = 0
+  while index < self.compose_held.length() {
+    self.compose_held[index].drop()
+    index = index + 1
+  }
+  self.compose_held = []
+}
+
+///|
+fn WebGPURenderer::compose_group(
+  self : WebGPURenderer,
+  layout : GpuBindGroupLayout,
+  uniform : GpuBuffer,
+  view : GpuTextureView,
+) -> GpuBindGroup {
+  let group = self.device.create_bind_group({
+    layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(self.bloom_sampler),
+      },
+      { binding: 2U, resource: @gpu.GpuBindingResource::GpuBuffer(uniform), },
+    ],
+    label: Some("compose"),
+  })
+  self.compose_held.push(group)
+  group
+}
+
+///|
+fn WebGPURenderer::submit_fullscreen(
+  self : WebGPURenderer,
+  pipeline : GpuRenderPipeline,
+  group : GpuBindGroup,
+  view : GpuTextureView,
+  label : String,
+) -> Unit {
+  let encoder = self.device.create_command_encoder(None)
+  let draw = encoder.begin_render_pass({
+    color_attachments: [
+      Some({
+        view,
+        depth_slice: None,
+        resolve_target: None,
+        clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
+        load_op: @gpu.CLEAR,
+        store_op: @gpu.STORE,
+      }),
+    ],
+    depth_stencil_attachment: None,
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some(label),
+  })
+  draw.set_pipeline(pipeline)
+  ignore(draw.set_bind_group(0U, Some(group), None, None, None))
+  draw.draw(3U, Some(1U), None, None)
+  draw.end()
+  self.device.queue().submit([encoder.finish(None)])
+}
+
+///|
+fn WebGPURenderer::compose_effect(
+  self : WebGPURenderer,
+  effect : @post.ComposerEffect,
+  read : GpuTextureView,
+  target : GpuTextureView,
+  width : UInt,
+  height : UInt,
+) -> Unit {
+  match effect {
+    @post.Grayscale(pass) => {
+      ignore(
+        self.device
+        .queue()
+        .write_buffer_with_copy(
+          self.post_uniform,
+          0UL,
+          @post.pack_amount(pass.amount),
+          None,
+          None,
+        ),
+      )
+      let group = self.compose_group(self.post_layout, self.post_uniform, read)
+      self.submit_fullscreen(self.post, group, target, "compose")
+    }
+    @post.Tone(pass) => {
+      ignore(
+        self.device
+        .queue()
+        .write_buffer_with_copy(
+          self.tone_uniform,
+          0UL,
+          @post.pack_tone(pass.mapping, pass.exposure),
+          None,
+          None,
+        ),
+      )
+      let group = self.compose_group(self.tone_layout, self.tone_uniform, read)
+      self.submit_fullscreen(self.tone, group, target, "compose")
+    }
+    @post.Bloom(pass) => {
+      let glow = self.bloom_blur(read, width, height, pass)
+      let texel_x = 1.0 / width.reinterpret_as_int().to_double()
+      let texel_y = 1.0 / height.reinterpret_as_int().to_double()
+      self.bloom_submit(
+        pass, texel_x, texel_y, 0.0, 0.0, 2.0, read, glow, target,
+      )
+    }
+  }
+}
+
+///|
+/// 按通道顺序处理 `source`。前面的通道画进一对全尺寸缓冲，最后一条启用的通道画到窗口并 `present`。
+/// 关闭的通道跳过。没有启用的通道时不 `present`。窗口尺寸为 0 时什么也不做。
+/// 采样的纹理和当前渲染目标分开。节点版 `RenderPipeline`、半精度目标和蒙版还没做。
+/// r186: `render` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L214 ; `isLastEnabledPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L192
+pub fn WebGPURenderer::compose(
+  self : WebGPURenderer,
+  source : @textures.RenderTarget,
+  composer : @post.EffectComposer,
+) -> Unit {
+  let width = self.window.width()
+  let height = self.window.height()
+  if width == 0U || height == 0U {
+    return
+  }
+  if !composer.any_enabled() {
+    return
+  }
+  self.sync_swapchain()
+  let frame = self.color_target(source.texture)
+  self.compose_release()
+  self.bloom_release()
+  let mut read = frame.view
+  let mut slot = 0
+  let mut index = 0
+  let count = composer.pass_count()
+  while index < count {
+    let step = composer.passes[index]
+    if step.enabled {
+      if composer.is_last_enabled(index) {
+        let screen = self.context.get_current_texture().create_view(None)
+        self.compose_effect(
+          step.effect,
+          read,
+          screen,
+          frame.width,
+          frame.height,
+        )
+        self.context.present()
+        return
+      }
+      let buffers = self.ensure_chain(frame.width, frame.height)
+      let target = if slot == 0 { buffers.a_view } else { buffers.b_view }
+      self.compose_effect(step.effect, read, target, frame.width, frame.height)
+      read = target
+      slot = if slot == 0 { 1 } else { 0 }
+    }
+    index = index + 1
+  }
 }
 
 ///|

@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/compose"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/post",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ComposeScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  cube : @objects.Mesh
+  target : @textures.RenderTarget
+  composer : @post.EffectComposer
+  mut angle : Double
+}
+pub fn ComposeScene::new() -> Self
+pub fn ComposeScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits
