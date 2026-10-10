@@ -105,4 +105,95 @@ test "linear and reinhard tone mapping match r186" {
   assert_eq(wgsl.contains("params.mapping < 0.5"), true)
   assert_eq(wgsl.contains("scaled / (scaled + vec3<f32>(1.0))"), true)
   assert_eq(wgsl.contains("0.5 - y * 0.5"), true)
+  assert_eq(wgsl.contains("cineon_map"), true)
+  assert_eq(wgsl.contains("aces_map"), true)
+  assert_eq(wgsl.contains("agx_map"), true)
+  assert_eq(wgsl.contains("neutral_map"), true)
+}
+
+///|
+fn near(actual : Double, expected : Double, tol : Double) -> Bool {
+  let delta = actual - expected
+  let abs = if delta < 0.0 { -delta } else { delta }
+  abs <= tol
+}
+
+///|
+test "cineon aces agx and neutral match r186" {
+  let toe = @post.tone_map(
+    0.004,
+    0.0,
+    0.004,
+    @constants.ToneMapping::Cineon,
+    1.0,
+  )
+  assert_eq(toe.r, 0.0)
+  assert_eq(toe.g, 0.0)
+  assert_eq(toe.b, 0.0)
+  let film = @post.tone_map(
+    0.204,
+    1.0,
+    0.204,
+    @constants.ToneMapping::Cineon,
+    1.0,
+  )
+  assert_eq(near(film.r, 0.254688, 2.0e-4), true)
+  assert_eq(near(film.g, 0.683542, 2.0e-4), true)
+  assert_eq(near(film.b, 0.254688, 2.0e-4), true)
+  let aces0 = @post.tone_map(0.0, 0.0, 0.0, @constants.ToneMapping::ACES, 1.0)
+  assert_eq(aces0.r, 0.0)
+  assert_eq(aces0.g, 0.0)
+  assert_eq(aces0.b, 0.0)
+  let aces_dark = @post.tone_map(
+    0.5,
+    0.8,
+    0.2,
+    @constants.ToneMapping::ACES,
+    0.0,
+  )
+  assert_eq(aces_dark.r, 0.0)
+  assert_eq(aces_dark.g, 0.0)
+  assert_eq(aces_dark.b, 0.0)
+  let aces = @post.tone_map(0.18, 0.18, 0.18, @constants.ToneMapping::ACES, 1.0)
+  assert_eq(near(aces.r, 0.214097, 5.0e-4), true)
+  assert_eq(near(aces.g, 0.214097, 5.0e-4), true)
+  assert_eq(near(aces.b, 0.214097, 5.0e-4), true)
+  let aces_white = @post.tone_map(
+    1.0,
+    1.0,
+    1.0,
+    @constants.ToneMapping::ACES,
+    1.0,
+  )
+  assert_eq(near(aces_white.r, 0.765833, 5.0e-4), true)
+  let agx0 = @post.tone_map(0.0, 0.0, 0.0, @constants.ToneMapping::AgX, 1.0)
+  assert_eq(agx0.r, 0.0)
+  assert_eq(agx0.g, 0.0)
+  assert_eq(agx0.b, 0.0)
+  let agx = @post.tone_map(0.5, 0.2, 0.1, @constants.ToneMapping::AgX, 1.0)
+  assert_eq(near(agx.r, 0.441477, 1.0e-4), true)
+  assert_eq(near(agx.g, 0.236864, 1.0e-4), true)
+  assert_eq(near(agx.b, 0.150757, 1.0e-4), true)
+  let flat = @post.tone_map(0.1, 0.2, 0.3, @constants.ToneMapping::Neutral, 1.0)
+  assert_eq(near(flat.r, 0.06, 1.0e-4), true)
+  assert_eq(near(flat.g, 0.16, 1.0e-4), true)
+  assert_eq(near(flat.b, 0.26, 1.0e-4), true)
+  let low = @post.tone_map(
+    0.0625,
+    0.5,
+    0.5,
+    @constants.ToneMapping::Neutral,
+    1.0,
+  )
+  assert_eq(low.r, 0.0244140625)
+  assert_eq(low.g, 0.4619140625)
+  assert_eq(low.b, 0.4619140625)
+  let high = @post.tone_map(1.0, 0.9, 0.5, @constants.ToneMapping::Neutral, 1.0)
+  assert_eq(near(high.r, 0.869091, 1.0e-4), true)
+  assert_eq(near(high.g, 0.779779, 1.0e-4), true)
+  assert_eq(near(high.b, 0.422529, 1.0e-4), true)
+  assert_eq(@constants.ToneMapping::Cineon.to_int(), 3)
+  assert_eq(@constants.ToneMapping::ACES.to_int(), 4)
+  assert_eq(@constants.ToneMapping::AgX.to_int(), 6)
+  assert_eq(@constants.ToneMapping::Neutral.to_int(), 7)
 }

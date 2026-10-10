@@ -14,7 +14,7 @@ using @scenes {type Scene}
 using @textures {type RenderTarget}
 
 ///|
-/// 离屏场景是一盏光下的立方体。窗口由 Reinhard 全屏通道呈现，不另建屏幕网格。
+/// 离屏场景是一盏光下的立方体。窗口由 ACES 全屏通道呈现，不另建屏幕网格。
 pub(all) struct ToneScene {
   scene : Scene
   camera : PerspectiveCamera
@@ -47,13 +47,13 @@ pub fn ToneScene::new() -> ToneScene {
     camera,
     cube,
     target,
-    pass: ToneMappingPass::new(mapping=@constants.ToneMapping::Reinhard),
+    pass: ToneMappingPass::new(mapping=@constants.ToneMapping::ACES),
     angle: 0.0,
   }
 }
 
 ///|
-/// 每帧让立方体绕 Y 轴转过 `delta` 弧度。映射保持 Reinhard，曝光保持 1。
+/// 每帧让立方体绕 Y 轴转过 `delta` 弧度。映射保持 ACES，曝光保持 1。
 pub fn ToneScene::spin(self : ToneScene, delta : Double) -> Unit {
   self.angle = self.angle + delta
   ignore(self.cube.node.rotation.set(0.35, self.angle, 0.0))

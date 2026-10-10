@@ -233,11 +233,11 @@ pub const LINEAR_TONE_MAPPING : Int = 1
 pub const REINHARD_TONE_MAPPING : Int = 2
 
 ///|
-/// Hejl/Burgess-Dawson 胶片曲线。对齐 `CineonToneMapping`（3）。这一阶段还不采样它。
+/// Hejl/Burgess-Dawson 胶片曲线。对齐 `CineonToneMapping`（3）。
 pub const CINEON_TONE_MAPPING : Int = 3
 
 ///|
-/// ACES RRT+ODT 拟合。对齐 `ACESFilmicToneMapping`（4）。这一阶段还不采样它。
+/// ACES RRT+ODT 拟合。对齐 `ACESFilmicToneMapping`（4）。
 pub const ACES_FILMIC_TONE_MAPPING : Int = 4
 
 ///|
@@ -245,20 +245,24 @@ pub const ACES_FILMIC_TONE_MAPPING : Int = 4
 pub const CUSTOM_TONE_MAPPING : Int = 5
 
 ///|
-/// AgX。对齐 `AgXToneMapping`（6）。这一阶段还不采样它。
+/// AgX。对齐 `AgXToneMapping`（6）。
 pub const AGX_TONE_MAPPING : Int = 6
 
 ///|
-/// Khronos Neutral。对齐 `NeutralToneMapping`（7）。这一阶段还不采样它。
+/// Khronos Neutral。对齐 `NeutralToneMapping`（7）。
 pub const NEUTRAL_TONE_MAPPING : Int = 7
 
 ///|
-/// 这一阶段只采样 `No`、`Linear` 和 `Reinhard`。其余数值留在常量里。
-/// r186: `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `LinearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L431 ; `ReinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L439
+/// `Custom` 仍只留数值，不采样。其余七种都有曲线。
+/// r186: `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `LinearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L431 ; `ReinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L439 ; `CineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L447 ; `ACESFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L455 ; `AgXToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L473 ; `NeutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L483
 pub(all) enum ToneMapping {
   No
   Linear
   Reinhard
+  Cineon
+  ACES
+  AgX
+  Neutral
 }
 
 ///|
@@ -267,5 +271,9 @@ pub fn ToneMapping::to_int(self : ToneMapping) -> Int {
     No => NO_TONE_MAPPING
     Linear => LINEAR_TONE_MAPPING
     Reinhard => REINHARD_TONE_MAPPING
+    Cineon => CINEON_TONE_MAPPING
+    ACES => ACES_FILMIC_TONE_MAPPING
+    AgX => AGX_TONE_MAPPING
+    Neutral => NEUTRAL_TONE_MAPPING
   }
 }

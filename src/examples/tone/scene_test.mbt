@@ -7,18 +7,27 @@ test "tone scene draws one cube into a color target" {
   assert_eq(world.target.texture.height, 256)
   assert_eq(world.target.texture.attachment, true)
   assert_eq(world.target.texture.flip_y, false)
-  assert_eq(world.pass.mapping is @constants.ToneMapping::Reinhard, true)
+  assert_eq(world.pass.mapping is @constants.ToneMapping::ACES, true)
   assert_eq(world.pass.exposure, 1.0)
-  let mapped = @post.tone_map(
-    3.0,
-    3.0,
-    3.0,
+  let black = @post.tone_map(
+    0.0,
+    0.0,
+    0.0,
     world.pass.mapping,
     world.pass.exposure,
   )
-  assert_eq(mapped.r, 0.75)
-  assert_eq(mapped.g, 0.75)
-  assert_eq(mapped.b, 0.75)
+  assert_eq(black.r, 0.0)
+  assert_eq(black.g, 0.0)
+  assert_eq(black.b, 0.0)
+  let white = @post.tone_map(
+    1.0,
+    1.0,
+    1.0,
+    world.pass.mapping,
+    world.pass.exposure,
+  )
+  assert_eq(white.r > 0.7, true)
+  assert_eq(white.r < 0.8, true)
   @common.update_frame(world.scene.node, world.camera.node)
   let drawn = @common.collect_opaque(world.scene.node)
   assert_eq(drawn.length(), 1)

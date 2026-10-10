@@ -2280,7 +2280,7 @@ fn WebGPURenderer::tone_bind(
 
 ///|
 /// 把 `source` 铺满窗口并做色调映射，然后 `present`。
-/// `No` 保持原色。`Linear` 乘曝光后夹到 \[0, 1\]。`Reinhard` 用 `scaled / (scaled + 1)`。
+/// `No` 保持原色。`Linear` 乘曝光后夹到 \[0, 1\]。`Reinhard`、Cineon、ACES、AgX、Neutral 用 r186 的同名曲线。
 /// r186 在画到屏幕时由输出节点完成；这里仍是单独的全屏通道。窗口尺寸为 0 时什么也不做。
 /// r186: `toneMapping` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L192 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39
 pub fn WebGPURenderer::tone_map(

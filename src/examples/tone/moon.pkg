@@ -15,4 +15,4 @@ import {
   "fenriliuguang/three-mbt/renderer/common",
 } for "test"
 
-// 阶段 7：立方体先画进颜色目标，再按 Reinhard 铺到窗口。
+// 阶段 7：立方体先画进颜色目标，再按 ACES 铺到窗口。

@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, the animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, and a linear/Reinhard tone-mapping pass. Bloom, a full effect composer, and the rest of the node builder stay later.
+Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, the animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, and tone mapping through Neutral. Bloom, a full effect composer, and the rest of the node builder stay later.
 
 ## Pins
 
@@ -201,7 +201,7 @@ This phase has landed. `MeshStandardMaterial` defaults to roughness 1 and metaln
 
 ### 7. Whatever the next scene needs
 
-Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute, a grayscale post pass, transparent meshes, linear and Reinhard tone mapping. Each addition changes the matching row below from "later" to "ported".
+Order: `Points` / `Line`, instancing, shadows, `RenderTarget`, fog, the animation mixer, a glTF geometry and PBR subset, compute, a grayscale post pass, transparent meshes, tone mapping. Each addition changes the matching row below from "later" to "ported".
 
 Points and lines have landed. `PointsMaterial.size` is in pixels. When `sizeAttenuation` is set and the camera is perspective, the quad scales by `viewportHeight * 0.5 / -viewZ`, matching r186. WebGPU lines stay one pixel wide, as `Line` (strip) and `LineSegments` (list). `examples/points` draws both. The window sample is `scripts/build-points.sh`. Host playback stays out of this pass.
 
@@ -223,7 +223,7 @@ A grayscale post pass has landed. The scene is drawn into a color target, then a
 
 Transparent meshes have landed. A mesh with `transparent` set is drawn after the opaque list, from far to near in view space. The camera looks down -Z, so a smaller view-space z is farther and is drawn first. Equal depth keeps traverse order. Blending is source alpha over one-minus source alpha, and depth write stays on, matching r186's default material. Wireframe, transparent points, and transparent lines stay out of both lists. `examples/blend` is an opaque Lambert cube behind one at opacity 0.5. The window sample is `scripts/build-blend.sh`. Host playback stays out of this pass.
 
-Linear and Reinhard tone mapping have landed. `No` leaves the color alone and ignores exposure. `Linear` multiplies by exposure and clamps to [0, 1]. `Reinhard` is `scaled / (scaled + 1)`, then the same clamp. The default pass is `No` at exposure 1, matching r186's renderer. The curve runs as a fullscreen triangle over a color target, because the output node is not built yet. `examples/tone` is a Lambert cube with Reinhard at exposure 1. The window sample is `scripts/build-tone.sh`. Host playback stays out of this pass. Cineon, ACES Filmic, AgX, Neutral, bloom, and a full effect composer stay later.
+Tone mapping has landed for the r186 operators except `Custom`. `No` leaves the color alone and ignores exposure. `Linear` multiplies by exposure and clamps to [0, 1]. `Reinhard` is `scaled / (scaled + 1)`. Cineon is the Hejl/Burgess-Dawson curve. ACES is the RRT and ODT fit. AgX goes through Rec.2020, the inset and outset matrices, and the contrast polynomial. Neutral subtracts the low-end offset, then compresses highlights above 0.76. The default pass is `No` at exposure 1, matching r186's renderer. The curve runs as a fullscreen triangle over a color target, because the output node is not built yet. `examples/tone` is a Lambert cube with ACES at exposure 1. The window sample is `scripts/build-tone.sh`. Host playback stays out of this pass. `Custom`, bloom, and a full effect composer stay later.
 
 Phase 4 adds the two-material compiler. The rest of TSL and `WGSLNodeBuilder.js` stay upstream.
 
@@ -258,8 +258,8 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | a compute shader for point positions | `compute`, `renderer` |
 | planned | 7 | a grayscale post pass | `post`, `renderer` |
 | planned | 7 | transparent meshes, back to front | `objects`, `renderer` |
-| planned | 7 | Linear and Reinhard tone mapping | `post`, `renderer` |
-| later | 7 | Cineon, ACES Filmic, AgX, Neutral, bloom, an effect composer | `post` |
+| planned | 7 | No, Linear, Reinhard, Cineon, ACES Filmic, AgX, and Neutral tone mapping | `post`, `renderer` |
+| later | 7 | Custom tone mapping, bloom, an effect composer | `post` |
 | later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
 | excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
 

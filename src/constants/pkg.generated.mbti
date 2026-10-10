@@ -109,6 +109,10 @@ pub(all) enum ToneMapping {
   No
   Linear
   Reinhard
+  Cineon
+  ACES
+  AgX
+  Neutral
 }
 pub fn ToneMapping::to_int(Self) -> Int
 
