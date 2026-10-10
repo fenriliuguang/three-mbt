@@ -137,7 +137,7 @@ struct CullPipelines {
 }
 
 ///|
-/// 一帧里的不透明网格。深度比较是 `less`，近平面为 0。
+/// 一帧里的网格。深度比较是 `less`，近平面为 0。透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 pub struct WebGPURenderer {
   device : GpuDevice
@@ -152,6 +152,12 @@ pub struct WebGPURenderer {
   basic_instanced : CullPipelines
   lambert_instanced : CullPipelines
   standard_instanced : CullPipelines
+  basic_blend : CullPipelines
+  lambert_blend : CullPipelines
+  standard_blend : CullPipelines
+  basic_instanced_blend : CullPipelines
+  lambert_instanced_blend : CullPipelines
+  standard_instanced_blend : CullPipelines
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
@@ -359,7 +365,24 @@ fn unlit_pipeline(
   format : GpuTextureFormat,
   cull : GpuCullMode,
   instanced? : Bool = false,
+  blend? : Bool = false,
 ) -> GpuRenderPipeline {
+  let blend_state : @gpu.GpuBlendState? = if blend {
+    Some({
+      color: {
+        operation: Some(@gpu.GpuBlendOperation::ADD),
+        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+      },
+      alpha: {
+        operation: Some(@gpu.GpuBlendOperation::ADD),
+        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+      },
+    })
+  } else {
+    None
+  }
   device.create_render_pipeline({
     vertex: {
       buffers: Some(mesh_vertex_buffers(instanced)),
@@ -388,13 +411,13 @@ fn unlit_pipeline(
     }),
     multisample: None,
     fragment: Some({
-      targets: [Some({ format, blend: None, write_mask: None, })],
+      targets: [Some({ format, blend: blend_state, write_mask: None, })],
       module_: shader,
       entry_point: Some("fs"),
       constants: None,
     }),
     layout: @gpu.Specific(pipeline_layout),
-    label: Some("unlit"),
+    label: Some(if blend { "blend" } else { "unlit" }),
   })
 }
 
@@ -550,6 +573,7 @@ fn cull_pipelines(
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
   instanced? : Bool = false,
+  blend? : Bool = false,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -559,6 +583,7 @@ fn cull_pipelines(
       format,
       GpuCullMode::BACK,
       instanced~,
+      blend~,
     ),
     back: unlit_pipeline(
       device,
@@ -567,6 +592,7 @@ fn cull_pipelines(
       format,
       GpuCullMode::FRONT,
       instanced~,
+      blend~,
     ),
     double: unlit_pipeline(
       device,
@@ -575,6 +601,7 @@ fn cull_pipelines(
       format,
       GpuCullMode::NONE,
       instanced~,
+      blend~,
     ),
   }
 }
@@ -992,6 +1019,51 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       instanced=true,
     ),
+    basic_blend: cull_pipelines(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    lambert_blend: cull_pipelines(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    standard_blend: cull_pipelines(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    basic_instanced_blend: cull_pipelines(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    lambert_instanced_blend: cull_pipelines(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    standard_instanced_blend: cull_pipelines(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
     line_list: color_pipeline(
       device,
       line_shader,
@@ -1058,8 +1130,9 @@ fn WebGPURenderer::pipeline(
   self : WebGPURenderer,
   shading : @constants.Shading,
   side : @constants.Side,
+  blend : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, false)
+  self.cull_group(shading, side, false, blend)
 }
 
 ///|
@@ -1067,8 +1140,9 @@ fn WebGPURenderer::instanced_pipeline(
   self : WebGPURenderer,
   shading : @constants.Shading,
   side : @constants.Side,
+  blend : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, true)
+  self.cull_group(shading, side, true, blend)
 }
 
 ///|
@@ -1077,14 +1151,26 @@ fn WebGPURenderer::cull_group(
   shading : @constants.Shading,
   side : @constants.Side,
   instanced : Bool,
+  blend : Bool,
 ) -> GpuRenderPipeline {
-  let group = match (shading, instanced) {
-    (@constants.Basic, false) => self.basic
-    (@constants.Lambert, false) => self.lambert
-    (@constants.Standard, false) => self.standard
-    (@constants.Basic, true) => self.basic_instanced
-    (@constants.Lambert, true) => self.lambert_instanced
-    (@constants.Standard, true) => self.standard_instanced
+  let group = if blend {
+    match (shading, instanced) {
+      (@constants.Basic, false) => self.basic_blend
+      (@constants.Lambert, false) => self.lambert_blend
+      (@constants.Standard, false) => self.standard_blend
+      (@constants.Basic, true) => self.basic_instanced_blend
+      (@constants.Lambert, true) => self.lambert_instanced_blend
+      (@constants.Standard, true) => self.standard_instanced_blend
+    }
+  } else {
+    match (shading, instanced) {
+      (@constants.Basic, false) => self.basic
+      (@constants.Lambert, false) => self.lambert
+      (@constants.Standard, false) => self.standard
+      (@constants.Basic, true) => self.basic_instanced
+      (@constants.Lambert, true) => self.lambert_instanced
+      (@constants.Standard, true) => self.standard_instanced
+    }
   }
   match side {
     @constants.Front => group.front
@@ -2117,7 +2203,143 @@ pub fn WebGPURenderer::post(
 }
 
 ///|
-/// 更新矩阵，清屏，画出不透明网格。窗口目标会 `present`，颜色目标不会。
+/// 先画不透明网格，再按从远到近画透明网格。`blend` 为真时用 src-alpha 管线。
+fn WebGPURenderer::draw_meshes(
+  self : WebGPURenderer,
+  pass : @gpu.GpuRenderPassEncoder,
+  items : Array[@common.RenderItem],
+  camera : @core.Object3D,
+  state : @core.CameraState,
+  lights : @common.LightFrame,
+  fog : @scenes.Fog?,
+  width : UInt,
+  height : UInt,
+  shadow_group : GpuBindGroup,
+  blend : Bool,
+) -> Unit {
+  for item in items {
+    let draw_mesh = match item.instances {
+      Some(data) => data.count > 0
+      None => true
+    }
+    if !draw_mesh {
+      continue
+    }
+    match self.geometry_gpu(item.geometry) {
+      None => ()
+      Some(geometry) => {
+        let mvp = @common.model_view_projection(state, item.node)
+        let gpu = self.object_gpu(item.node)
+        let eye = camera.matrix_world.elements
+        let shade = shadow_pack(lights, item.node.receive_shadow)
+        let haze = fog_pack(fog, item.fog)
+        let uniforms = @common.pack_uniforms(
+          mvp,
+          @common.normal_matrix(item.node.matrix_world),
+          item.color,
+          item.opacity,
+          lights.ambient,
+          lights.color,
+          lights.direction,
+          item.node.matrix_world,
+          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
+          item.roughness,
+          item.metalness,
+          state.matrix_world_inverse,
+          width.reinterpret_as_int().to_double(),
+          height.reinterpret_as_int().to_double(),
+          1.0,
+          0.0,
+          shade.matrix,
+          shade.bias,
+          shade.normal_bias,
+          shade.enabled,
+          shade.texel,
+          haze.r,
+          haze.g,
+          haze.b,
+          haze.enabled,
+          haze.near,
+          haze.far,
+          haze.density,
+          haze.mode,
+        )
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
+        )
+        let batch = match item.instances {
+          Some(data) => Some(self.instance_gpu(data))
+          None => None
+        }
+        pass.set_pipeline(
+          match batch {
+            Some(_) => self.instanced_pipeline(item.shading, item.side, blend)
+            None => self.pipeline(item.shading, item.side, blend)
+          },
+        )
+        pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+        let instance_count = match item.instances {
+          Some(data) => {
+            let capacity = data.matrices.count
+            if data.count < capacity {
+              data.count
+            } else {
+              capacity
+            }
+          }
+          None => 1
+        }
+        match batch {
+          None => ()
+          Some(batch) => {
+            pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
+            pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
+          }
+        }
+        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        ignore(
+          pass.set_bind_group(
+            1U,
+            Some(self.texture_group(item.map)),
+            None,
+            None,
+            None,
+          ),
+        )
+        ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
+        match geometry.indices {
+          None =>
+            pass.draw(
+              geometry.vertex_count.reinterpret_as_uint(),
+              Some(instance_count.reinterpret_as_uint()),
+              None,
+              None,
+            )
+          Some(indices) => {
+            pass.set_index_buffer(
+              indices,
+              @gpu.GpuIndexFormat::UINT32,
+              None,
+              None,
+            )
+            pass.draw_indexed(
+              geometry.index_count.reinterpret_as_uint(),
+              Some(instance_count.reinterpret_as_uint()),
+              None,
+              None,
+              None,
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+///|
+/// 更新矩阵，清屏，先画不透明网格，再画透明网格。窗口目标会 `present`，颜色目标不会。
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
   scene : @scenes.Scene,
@@ -2195,126 +2417,30 @@ pub fn WebGPURenderer::render(
     None => self.shadow_dummy
     Some(shadow) => self.ensure_shadow(shadow.map_size).group
   }
-  let items = @common.collect_opaque(scene.node)
-  for item in items {
-    let draw_mesh = match item.instances {
-      Some(data) => data.count > 0
-      None => true
-    }
-    if !draw_mesh {
-      continue
-    }
-    match self.geometry_gpu(item.geometry) {
-      None => ()
-      Some(geometry) => {
-        let mvp = @common.model_view_projection(state, item.node)
-        let gpu = self.object_gpu(item.node)
-        let eye = camera.matrix_world.elements
-        let shade = shadow_pack(lights, item.node.receive_shadow)
-        let haze = fog_pack(scene.fog, item.fog)
-        let uniforms = @common.pack_uniforms(
-          mvp,
-          @common.normal_matrix(item.node.matrix_world),
-          item.color,
-          item.opacity,
-          lights.ambient,
-          lights.color,
-          lights.direction,
-          item.node.matrix_world,
-          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
-          item.roughness,
-          item.metalness,
-          state.matrix_world_inverse,
-          width.reinterpret_as_int().to_double(),
-          height.reinterpret_as_int().to_double(),
-          1.0,
-          0.0,
-          shade.matrix,
-          shade.bias,
-          shade.normal_bias,
-          shade.enabled,
-          shade.texel,
-          haze.r,
-          haze.g,
-          haze.b,
-          haze.enabled,
-          haze.near,
-          haze.far,
-          haze.density,
-          haze.mode,
-        )
-        ignore(
-          self.device
-          .queue()
-          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
-        )
-        let batch = match item.instances {
-          Some(data) => Some(self.instance_gpu(data))
-          None => None
-        }
-        pass.set_pipeline(
-          match batch {
-            Some(_) => self.instanced_pipeline(item.shading, item.side)
-            None => self.pipeline(item.shading, item.side)
-          },
-        )
-        pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
-        let instance_count = match item.instances {
-          Some(data) => {
-            let capacity = data.matrices.count
-            if data.count < capacity {
-              data.count
-            } else {
-              capacity
-            }
-          }
-          None => 1
-        }
-        match batch {
-          None => ()
-          Some(batch) => {
-            pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
-            pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
-          }
-        }
-        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
-        ignore(
-          pass.set_bind_group(
-            1U,
-            Some(self.texture_group(item.map)),
-            None,
-            None,
-            None,
-          ),
-        )
-        ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
-        match geometry.indices {
-          None =>
-            pass.draw(
-              geometry.vertex_count.reinterpret_as_uint(),
-              Some(instance_count.reinterpret_as_uint()),
-              None,
-              None,
-            )
-          Some(indices) => {
-            pass.set_index_buffer(
-              indices,
-              @gpu.GpuIndexFormat::UINT32,
-              None,
-              None,
-            )
-            pass.draw_indexed(
-              geometry.index_count.reinterpret_as_uint(),
-              Some(instance_count.reinterpret_as_uint()),
-              None,
-              None,
-              None,
-            )
-          }
-        }
-      }
-    }
-  }
+  self.draw_meshes(
+    pass,
+    @common.collect_opaque(scene.node),
+    camera,
+    state,
+    lights,
+    scene.fog,
+    width,
+    height,
+    shadow_group,
+    false,
+  )
+  self.draw_meshes(
+    pass,
+    @common.collect_transparent(scene.node, camera),
+    camera,
+    state,
+    lights,
+    scene.fog,
+    width,
+    height,
+    shadow_group,
+    true,
+  )
   let strokes = @common.collect_primitives(scene.node)
   let viewport_width = width.reinterpret_as_int().to_double()
   let viewport_height = height.reinterpret_as_int().to_double()

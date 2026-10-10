@@ -44,6 +44,66 @@ test "opaque list keeps a visible basic mesh" {
 }
 
 ///|
+test "transparent meshes draw far to near" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  let far_material = @materials.MeshBasicMaterial::new(hex=0xFF0000)
+  far_material.material.transparent = true
+  far_material.material.opacity = 0.25
+  let far_mesh = @objects.Mesh::new(box.geometry, far_material.material)
+  ignore(far_mesh.node.position.set(0.0, 0.0, 0.0))
+  ignore(scene.add(far_mesh))
+  let near_mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new(hex=0x00FF00).material,
+  )
+  near_mesh.set_transparent(true, opacity=0.5)
+  ignore(near_mesh.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(near_mesh))
+  let wire = @materials.MeshBasicMaterial::new()
+  wire.material.transparent = true
+  wire.material.wireframe = true
+  let wire_mesh = @objects.Mesh::new(box.geometry, wire.material)
+  ignore(scene.add(wire_mesh))
+  let solid = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(scene.add(solid))
+  @common.update_frame(scene.node, camera.node)
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(physical_equal(drawn[0].node, solid.node), true)
+  let glass = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(glass.length(), 2)
+  assert_eq(physical_equal(glass[0].node, far_mesh.node), true)
+  assert_eq(glass[0].opacity, 0.25)
+  assert_eq(@common.view_depth(camera.node, far_mesh.node), -5.0)
+  assert_eq(physical_equal(glass[1].node, near_mesh.node), true)
+  assert_eq(glass[1].opacity, 0.5)
+  assert_eq(@common.view_depth(camera.node, near_mesh.node), -3.0)
+  let tied = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  tied.set_transparent(true, opacity=1.0)
+  ignore(tied.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(tied))
+  @common.update_frame(scene.node, camera.node)
+  let same = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(same.length(), 3)
+  assert_eq(physical_equal(same[1].node, near_mesh.node), true)
+  assert_eq(physical_equal(same[2].node, tied.node), true)
+}
+
+///|
 test "opaque list keeps a mesh map" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

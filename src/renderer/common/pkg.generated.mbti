@@ -15,6 +15,8 @@ pub fn collect_opaque(@core.Object3D) -> Array[RenderItem]
 
 pub fn collect_primitives(@core.Object3D) -> Array[PrimitiveItem]
 
+pub fn collect_transparent(@core.Object3D, @core.Object3D) -> Array[RenderItem]
+
 pub fn copy_bytes_per_row(Int) -> Int
 
 pub let instance_color_stride : Int
@@ -50,6 +52,8 @@ pub let uniform_bytes : Int
 pub fn update_frame(@core.Object3D, @core.Object3D) -> Unit
 
 pub let vertex_stride : Int
+
+pub fn view_depth(@core.Object3D, @core.Object3D) -> Double
 
 // Errors
 

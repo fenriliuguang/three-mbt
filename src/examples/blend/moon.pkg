@@ -1,0 +1,15 @@
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/geometries",
+  "fenriliuguang/three-mbt/lights",
+  "fenriliuguang/three-mbt/materials",
+  "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+import {
+  "fenriliuguang/three-mbt/renderer/common",
+} for "test"
+
+// 阶段 7：不透明立方体在后，半透明立方体在前，按 src-alpha 混合。

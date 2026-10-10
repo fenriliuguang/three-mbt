@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/blend"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/scenes",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct BlendScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  solid : @objects.Mesh
+  glass : @objects.Mesh
+  mut angle : Double
+}
+pub fn BlendScene::new() -> Self
+pub fn BlendScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits

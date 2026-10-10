@@ -40,6 +40,7 @@ pub fn InstancedMesh::set_fog(Self, Bool) -> Unit
 pub fn InstancedMesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn InstancedMesh::set_matrix_at(Self, Int, @math.Matrix4) -> Unit
 pub fn InstancedMesh::set_side(Self, @constants.Side) -> Unit
+pub fn InstancedMesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn InstancedMesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for InstancedMesh
 
@@ -75,6 +76,7 @@ pub fn Mesh::refresh(Self) -> Unit
 pub fn Mesh::set_fog(Self, Bool) -> Unit
 pub fn Mesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn Mesh::set_side(Self, @constants.Side) -> Unit
+pub fn Mesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Mesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Mesh
 

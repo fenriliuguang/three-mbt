@@ -98,6 +98,19 @@ pub fn Mesh::set_fog(self : Mesh, enabled : Bool) -> Unit {
 }
 
 ///|
+/// `enabled` 为真时进入透明队列，并按 `opacity` 做 src-alpha 混合。
+/// 直接改 `material.transparent` 不会更新绑定。
+pub fn Mesh::set_transparent(
+  self : Mesh,
+  enabled : Bool,
+  opacity? : Double = 1.0,
+) -> Unit {
+  self.material.transparent = enabled
+  self.material.opacity = opacity
+  self.refresh()
+}
+
+///|
 fn primitive_binding(
   geometry : BufferGeometry,
   color : @math.Color,
@@ -386,6 +399,18 @@ pub fn InstancedMesh::set_side(
 ///|
 pub fn InstancedMesh::set_fog(self : InstancedMesh, enabled : Bool) -> Unit {
   self.material.fog = enabled
+  self.refresh()
+}
+
+///|
+/// 与 `Mesh::set_transparent` 相同。整个实例网格当作一个物体排序。
+pub fn InstancedMesh::set_transparent(
+  self : InstancedMesh,
+  enabled : Bool,
+  opacity? : Double = 1.0,
+) -> Unit {
+  self.material.transparent = enabled
+  self.material.opacity = opacity
   self.refresh()
 }
 
