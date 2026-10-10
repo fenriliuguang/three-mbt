@@ -1,3 +1,5 @@
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55
+
 ///|
 using @gpu {
   type GpuBindGroup,
@@ -139,6 +141,7 @@ struct CullPipelines {
 ///|
 /// 一帧里的网格。深度比较是 `less`，近平面为 0。透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
+/// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
@@ -1512,6 +1515,7 @@ fn WebGPURenderer::ensure_storage(
 
 ///|
 /// 把 `positions` 的波形写入存储缓冲。随后的 `render` 里，挂着同一几何体的点会读这块缓冲。
+/// r186: `compute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L2877
 pub fn WebGPURenderer::compute(
   self : WebGPURenderer,
   positions : @compute.StoragePositions,
@@ -2096,6 +2100,7 @@ fn WebGPURenderer::draw_shadow(
 
 ///|
 /// 下一帧画到 `target`。`None` 回到窗口，并在帧末 `present`。
+/// r186: `setRenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L2737
 pub fn WebGPURenderer::set_render_target(
   self : WebGPURenderer,
   target : @textures.RenderTarget?,
@@ -2152,6 +2157,7 @@ fn WebGPURenderer::post_bind(
 ///|
 /// 把 `source` 铺满窗口，并按 `pass.amount` 混进灰度，然后 `present`。
 /// 场景应先画进这个颜色目标。窗口尺寸为 0 时什么也不做。
+/// r186: `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9
 pub fn WebGPURenderer::post(
   self : WebGPURenderer,
   source : @textures.RenderTarget,
@@ -2340,6 +2346,7 @@ fn WebGPURenderer::draw_meshes(
 
 ///|
 /// 更新矩阵，清屏，先画不透明网格，再画透明网格。窗口目标会 `present`，颜色目标不会。
+/// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
   scene : @scenes.Scene,

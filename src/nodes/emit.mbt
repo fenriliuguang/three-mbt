@@ -1,3 +1,5 @@
+// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
+
 ///|
 fn wgsl_type(ty : ValueType) -> String {
   match ty {
@@ -61,6 +63,7 @@ fn emit_fields(
 
 ///|
 /// 把材质节点编成一段 WGSL。三种材质共用同一块 uniform。
+/// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
 pub fn emit_wgsl(program : Program) -> String {
   let lines = []
   lines.push("struct Uniforms {\n")
@@ -154,12 +157,14 @@ pub fn standard_instanced_wgsl() -> String {
 }
 
 ///|
+/// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 pub fn line_wgsl() -> String {
   emit_wgsl(line_program())
 }
 
 ///|
 /// 阴影贴图只写深度。uniform 只声明开头的 `mvp`，和完整 uniform 块的前 64 字节对齐。
+/// r186: `DirectionalLightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLightShadow.js#L9
 pub fn shadow_wgsl() -> String {
   "struct Uniforms {\n  mvp : mat4x4<f32>,\n}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n  @location(0) position : vec3<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.clip = uniforms.mvp * vec4<f32>(input.position, 1.0);\n  return output;\n}\n"
 }
@@ -185,6 +190,7 @@ fn uniform_header() -> String {
 ///|
 /// WebGPU 的点是 1 像素，所以这里把每个点展开成朝向相机的四边形。
 /// `size` 是像素。衰减打开时乘 `viewportHeight * 0.5 / -viewZ`，和 r186 的 `PointsMaterial` 一样。
+/// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 pub fn points_wgsl() -> String {
   uniform_header() +
   fog_preamble() +

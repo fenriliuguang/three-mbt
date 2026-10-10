@@ -1,3 +1,5 @@
+// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
+
 ///|
 using @core {
   type Object3D,
@@ -8,6 +10,7 @@ using @core {
 
 ///|
 /// 用来把若干节点当作一个整体变换。
+/// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20
 pub(all) struct Group {
   node : Object3D
 }
@@ -33,6 +36,7 @@ pub fn[T : @core.AsNode] Group::add(self : Group, child : T) -> Group {
 
 ///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。
+/// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
 pub(all) struct Mesh {
   node : Object3D
   geometry : BufferGeometry
@@ -100,6 +104,7 @@ pub fn Mesh::set_fog(self : Mesh, enabled : Bool) -> Unit {
 ///|
 /// `enabled` 为真时进入透明队列，并按 `opacity` 做 src-alpha 混合。
 /// 直接改 `material.transparent` 不会更新绑定。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19
 pub fn Mesh::set_transparent(
   self : Mesh,
   enabled : Bool,
@@ -126,6 +131,7 @@ fn primitive_binding(
 
 ///|
 /// 点。每个位置画一个朝向相机的四边形。
+/// r186: `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19
 pub(all) struct Points {
   node : Object3D
   geometry : BufferGeometry
@@ -175,6 +181,7 @@ pub fn Points::set_fog(self : Points, enabled : Bool) -> Unit {
 
 ///|
 /// 折线，对应 r186 的 `Line`。
+/// r186: `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41
 pub(all) struct Line {
   node : Object3D
   geometry : BufferGeometry
@@ -224,6 +231,7 @@ pub fn Line::set_fog(self : Line, enabled : Bool) -> Unit {
 
 ///|
 /// 成对线段，对应 r186 的 `LineSegments`。
+/// r186: `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14
 pub(all) struct LineSegments {
   node : Object3D
   geometry : BufferGeometry
@@ -328,6 +336,7 @@ fn read_matrix(
 ///|
 /// 同一几何体画多次。实例矩阵在物体矩阵之前相乘，和 r186 `InstancedMesh` 一样。
 /// 没有 `instanceColor` 时渲染器使用白色。默认不做视锥裁剪。
+/// r186: `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 pub(all) struct InstancedMesh {
   node : Object3D
   geometry : BufferGeometry
@@ -437,6 +446,7 @@ pub fn InstancedMesh::set_count(self : InstancedMesh, count : Int) -> Unit {
 }
 
 ///|
+/// r186: `setMatrixAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L104
 pub fn InstancedMesh::set_matrix_at(
   self : InstancedMesh,
   index : Int,
@@ -502,6 +512,7 @@ pub fn InstancedMesh::get_color_at(
 
 ///|
 /// 局部包围盒：几何体包围盒按每个实例矩阵变换后再求并。
+/// r186: `computeBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L115
 pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {
   self.geometry.compute_bounding_box()
   let box = match self.bounding_box {

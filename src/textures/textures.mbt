@@ -1,3 +1,5 @@
+// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32 ; `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15
+
 ///|
 /// `rgba8` 纹理。字节按行优先，第 0 行是图像顶部。没有 DOM 图片路径。
 ///
@@ -6,6 +8,7 @@
 ///
 /// `attachment` 为 true 时，像素在 GPU 颜色目标上，`data` 只是 1×1 占位。
 /// 这种纹理 `flip_y` 为 false：画面顶在纹理的 v = 0。
+/// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32
 pub(all) struct Texture {
   mut width : Int
   mut height : Int
@@ -132,6 +135,7 @@ pub fn Texture::rgba8(self : Texture) -> FixedArray[Byte] {
 ///|
 /// 离屏颜色目标。`texture` 交给 `Mesh::set_map` 后即可采样。
 /// 没有多重采样、模板缓冲和深度贴图。改尺寸会增加 `texture.version`。
+/// r186: `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15
 pub(all) struct RenderTarget {
   texture : Texture
 }

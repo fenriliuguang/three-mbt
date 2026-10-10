@@ -156,6 +156,7 @@ Samples live under `src/examples` because only packages inside the `source` dire
 3. three.js runtime tags become MoonBit types. `isMesh` becomes a trait or an enum. Uniforms use explicit layouts. Constant numeric values stay aligned with r186 so fixtures compare directly.
 4. Every phase has a runnable sample. The next phase starts after that sample runs.
 5. This is a semantic port. Upstream files that the port uses are listed in the table below.
+6. A ported implementation file carries an `r186` blob link. The first line is `// r186:` and points at the upstream file. Each public type that maps to a class, and each core function whose upstream name is not obvious from that type, has a `/// r186:` line on the declaration. The URL is `https://github.com/mrdoob/three.js/blob/r186/<path>#L<line>`. Tests, examples, ffi, and generated bindings stay unmarked. The comment rules are in `.cursor/skills/upstream-links/SKILL.md`.
 
 ## Phases
 

@@ -1,5 +1,8 @@
+// r186: `Plane` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L13
+
 ///|
 /// Hessian 法式平面。`Frustum` 用它描述六个裁剪面。
+/// r186: `Plane` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L13
 pub(all) struct Plane {
   normal : Vector3
   mut constant : Double

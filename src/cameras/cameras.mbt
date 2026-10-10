@@ -1,8 +1,11 @@
+// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17
+
 ///|
 using @core {type Object3D, type CameraState}
 
 ///|
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
+/// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23
 pub(all) struct PerspectiveCamera {
   node : Object3D
 }
@@ -30,6 +33,7 @@ pub impl @core.AsNode for PerspectiveCamera with fn to_node(self) {
 pub extend PerspectiveCamera with @core.AsNode::{to_node}
 
 ///|
+/// r186: `updateProjectionMatrix` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L131
 pub fn PerspectiveCamera::update_projection(self : PerspectiveCamera) -> Unit {
   match self.node.camera {
     None => ()
@@ -67,6 +71,7 @@ pub fn PerspectiveCamera::set_aspect(
 
 ///|
 /// 正交相机。`left` / `right` / `top` / `bottom` 是相机空间里的视锥边界。
+/// r186: `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17
 pub(all) struct OrthographicCamera {
   node : Object3D
 }
@@ -96,6 +101,7 @@ pub impl @core.AsNode for OrthographicCamera with fn to_node(self) {
 pub extend OrthographicCamera with @core.AsNode::{to_node}
 
 ///|
+/// r186: `updateProjectionMatrix` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L195
 pub fn OrthographicCamera::update_projection(self : OrthographicCamera) -> Unit {
   match self.node.camera {
     None => ()

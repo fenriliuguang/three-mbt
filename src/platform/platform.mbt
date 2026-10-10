@@ -1,5 +1,8 @@
+// r186: `CanvasTarget` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/CanvasTarget.js#L11 。窗口改接到 wasi-gfx surface，不走 DOM canvas
+
 ///|
 /// A window whose swapchain is configured for a WebGPU device.
+/// r186: `CanvasTarget` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/CanvasTarget.js#L11
 pub struct SurfaceTarget {
   device : @webgpu.GpuDevice
   window : @surface.Surface

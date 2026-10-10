@@ -1,5 +1,8 @@
+// r186: `Frustum` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L18
+
 ///|
 /// 六个裁剪面围成的视锥。平面顺序与 r186 `Frustum` 相同。
+/// r186: `Frustum` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L18
 pub(all) struct Frustum {
   planes : Array[Plane]
 }

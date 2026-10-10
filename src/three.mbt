@@ -1,3 +1,5 @@
+// r186: `Three.WebGPU` https://github.com/mrdoob/three.js/blob/r186/src/Three.WebGPU.js#L1
+
 ///|
 /// 本模块对齐的 three.js 修订版本。
 pub let upstream_revision : String = "r186"

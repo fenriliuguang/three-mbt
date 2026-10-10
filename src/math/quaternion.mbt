@@ -1,5 +1,8 @@
+// r186: `Quaternion` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L19
+
 ///|
 /// 单位四元数。写入分量请用 `set`，以便和欧拉角互相同步。
+/// r186: `Quaternion` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L19
 pub(all) struct Quaternion {
   mut x : Double
   mut y : Double
@@ -63,6 +66,7 @@ pub fn Quaternion::identity(self : Quaternion) -> Quaternion {
 }
 
 ///|
+/// r186: `setFromEuler` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L301
 pub fn Quaternion::set_from_euler(
   self : Quaternion,
   euler : Euler,
@@ -258,6 +262,7 @@ pub fn Quaternion::multiply_quaternions(
 }
 
 ///|
+/// r186: `slerp` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L534
 pub fn Quaternion::slerp(
   self : Quaternion,
   qb : Quaternion,

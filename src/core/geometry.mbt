@@ -1,5 +1,8 @@
+// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
+
 ///|
 /// `BufferGeometry` 的一组索引。`material_index` 对应 r186 的 group materialIndex。
+/// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 pub(all) struct GeometryGroup {
   start : Int
   count : Int
@@ -8,6 +11,7 @@ pub(all) struct GeometryGroup {
 
 ///|
 /// 几何体。属性按名字存放，索引和包围体单独保存。
+/// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 pub(all) struct BufferGeometry {
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?

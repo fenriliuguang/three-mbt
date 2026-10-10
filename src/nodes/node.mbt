@@ -1,3 +1,5 @@
+// r186: `Node` https://github.com/mrdoob/three.js/blob/r186/src/nodes/core/Node.js#L22 ; `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
+
 ///|
 /// 节点值的 WGSL 类型。uniform 里的 `vec3` 也按 `vec4` 存放，对齐到 16 字节。
 pub(all) enum ValueType {
@@ -10,6 +12,7 @@ pub(all) enum ValueType {
 
 ///|
 /// 材质图里的一个节点。覆盖基础材质、Lambert，以及 Standard 的直接光。
+/// r186: `Node` https://github.com/mrdoob/three.js/blob/r186/src/nodes/core/Node.js#L22
 pub(all) enum Node {
   Uniform(String, ValueType)
   Attribute(String, Int, ValueType)
@@ -29,6 +32,7 @@ pub(all) enum Node {
 }
 
 ///|
+/// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
 pub(all) struct Program {
   uniforms : Array[(String, ValueType)]
   attributes : Array[(String, Int, ValueType)]
@@ -66,6 +70,7 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
 ///|
 /// 雾因子乘在片元颜色上。`fog.w` 小于 0.5 时这个材质不吃雾。
 /// 线性雾是 smoothstep，`fog_params.w` 大于 0.5 时改成指数平方。
+/// r186: `rangeFogFactor` https://github.com/mrdoob/three.js/blob/r186/src/nodes/fog/Fog.js#L40 ; `densityFogFactor` https://github.com/mrdoob/three.js/blob/r186/src/nodes/fog/Fog.js#L57
 fn fog_preamble() -> String {
   "fn apply_fog(color : vec4<f32>, depth : f32) -> vec4<f32> {\n  if ((uniforms.fog).w < 0.5) {\n    return color;\n  }\n  var factor = 0.0;\n  let near = (uniforms.fog_params).x;\n  let far = (uniforms.fog_params).y;\n  let density = (uniforms.fog_params).z;\n  if ((uniforms.fog_params).w < 0.5) {\n    let span = max(far - near, 0.000001);\n    let t = clamp((depth - near) / span, 0.0, 1.0);\n    factor = t * t * (3.0 - 2.0 * t);\n  } else {\n    let amount = density * depth;\n    factor = 1.0 - exp(-amount * amount);\n  }\n  return vec4<f32>(mix(color.xyz, (uniforms.fog).xyz, factor), color.w);\n}\n\n"
 }
@@ -92,6 +97,7 @@ fn with_fog(
 }
 
 ///|
+/// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18
 fn shadow_preamble() -> String {
   "fn direct_shadow(world : vec3<f32>, normal : vec3<f32>) -> f32 {\n  if ((uniforms.shadow).z < 0.5) {\n    return 1.0;\n  }\n  let shifted = world + normalize(normal) * (uniforms.shadow).y;\n  let clip = uniforms.shadow_matrix * vec4<f32>(shifted, 1.0);\n  let uv = clip.xy / clip.w;\n  let depth = clip.z / clip.w + (uniforms.shadow).x;\n  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0 || depth < 0.0 || depth > 1.0) {\n    return 1.0;\n  }\n  let texel = (uniforms.shadow).w;\n  var sum = 0.0;\n  for (var y = -1; y <= 1; y = y + 1) {\n    for (var x = -1; x <= 1; x = x + 1) {\n      let offset = vec2<f32>(f32(x), f32(y)) * texel;\n      sum = sum + textureSampleCompare(shadow_map, shadow_sampler, uv + offset, depth);\n    }\n  }\n  return sum / 9.0;\n}\n\n"
 }
@@ -99,6 +105,7 @@ fn shadow_preamble() -> String {
 ///|
 /// 直接光的 Cook-Torrance。粗糙度下限 0.0525，电介质 F0 为 0.04，与 r186 的物理光照一致。
 /// 环境光只乘漫反射。没有环境贴图，所以金属在背光处是黑的。
+/// r186: `D_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/D_GGX.js#L6 ; `V_GGX_SmithCorrelated` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/V_GGX_SmithCorrelated.js#L7 ; `F_Schlick` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/F_Schlick.js#L3 ; `BRDF_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/BRDF_GGX.js#L12
 fn standard_preamble() -> String {
   let lines = [
     "fn D_GGX(alpha : f32, NoH : f32) -> f32 {\n", "  let a2 = alpha * alpha;\n",
@@ -194,6 +201,7 @@ fn with_instance_color(
 ///|
 /// 不受光照。法线乘 0 只是为了让顶点布局和 Lambert 一致。贴图采样乘在颜色上，没有贴图时渲染器绑一张白纹理。
 /// `instanced` 为真时再乘实例矩阵和实例颜色。
+/// r186: `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14
 pub fn basic_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = Attribute("normal", 1, Vec3)
@@ -227,6 +235,7 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
 
 ///|
 /// Lambert：`color * (ambient + lightColor * max(dot(N, L), 0))`。
+/// r186: `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24
 pub fn lambert_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = mesh_normal(instanced)
@@ -289,6 +298,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
 
 ///|
 /// Standard：`baseColor * (1 - metalness)` 的 Lambert 漫反射，加上 GGX 高光。`baseColor` 已乘贴图。
+/// r186: `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub fn standard_program(instanced? : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let placed = mesh_local(position, instanced)
@@ -336,6 +346,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
 
 ///|
 /// 折线和线段。只有位置和颜色，线宽由光栅器固定为 1 像素。
+/// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 pub fn line_program() -> Program {
   let position = Attribute("position", 0, Vec3)
   let placed = Node::Vec4(position, Float(1.0))

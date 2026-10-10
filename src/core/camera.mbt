@@ -1,5 +1,8 @@
+// r186: `Camera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/Camera.js#L18
+
 ///|
 /// 相机的投影和视图逆矩阵。透视与正交共用这一组字段。
+/// r186: `Camera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/Camera.js#L18
 pub(all) struct CameraState {
   projection : @math.Matrix4
   projection_inverse : @math.Matrix4

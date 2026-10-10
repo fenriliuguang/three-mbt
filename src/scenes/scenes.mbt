@@ -1,8 +1,11 @@
+// r186: `Scene` https://github.com/mrdoob/three.js/blob/r186/src/scenes/Scene.js#L10 ; `Fog` https://github.com/mrdoob/three.js/blob/r186/src/scenes/Fog.js#L12 ; `FogExp2` https://github.com/mrdoob/three.js/blob/r186/src/scenes/FogExp2.js#L13
+
 ///|
 using @core {type Object3D}
 
 ///|
 /// 线性雾或指数平方雾，对应 r186 的 `Fog` 和 `FogExp2`。
+/// r186: `Fog` https://github.com/mrdoob/three.js/blob/r186/src/scenes/Fog.js#L12
 pub(all) enum FogKind {
   Linear
   Exp2
@@ -10,6 +13,7 @@ pub(all) enum FogKind {
 
 ///|
 /// `near` 和 `far` 是视图空间深度，只给线性雾用。`density` 只给指数平方雾用。
+/// r186: `Fog` https://github.com/mrdoob/three.js/blob/r186/src/scenes/Fog.js#L12
 pub(all) struct Fog {
   color : @math.Color
   mut near : Double
@@ -36,6 +40,7 @@ pub fn Fog::linear(
 
 ///|
 /// 指数平方雾。默认密度 `0.00025`，与 r186 `FogExp2` 相同。
+/// r186: `FogExp2` https://github.com/mrdoob/three.js/blob/r186/src/scenes/FogExp2.js#L13
 pub fn Fog::exp2(hex? : Int = 0xFFFFFF, density? : Double = 0.00025) -> Fog {
   {
     color: @math.Color::new().set_hex(hex),
@@ -48,6 +53,7 @@ pub fn Fog::exp2(hex? : Int = 0xFFFFFF, density? : Double = 0.00025) -> Fog {
 
 ///|
 /// 深度上的雾因子，0 是原色，1 是雾的颜色。线性雾用 smoothstep，指数雾是 `1 - exp(-density² depth²)`。
+/// r186: `rangeFogFactor` https://github.com/mrdoob/three.js/blob/r186/src/nodes/fog/Fog.js#L40 ; `densityFogFactor` https://github.com/mrdoob/three.js/blob/r186/src/nodes/fog/Fog.js#L57
 pub fn Fog::factor(self : Fog, depth : Double) -> Double {
   match self.kind {
     Linear => {
@@ -71,6 +77,7 @@ pub fn Fog::factor(self : Fog, depth : Double) -> Double {
 
 ///|
 /// 场景根节点。背景色是可选的纯色。雾是可选的线性雾或指数平方雾。
+/// r186: `Scene` https://github.com/mrdoob/three.js/blob/r186/src/scenes/Scene.js#L10
 pub(all) struct Scene {
   node : Object3D
   mut background : @math.Color?

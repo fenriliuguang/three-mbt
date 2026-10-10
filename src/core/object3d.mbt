@@ -1,3 +1,5 @@
+// r186: `Object3D` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L64
+
 ///|
 let next_object_id : Ref[Int] = Ref::Ref(1)
 
@@ -40,6 +42,7 @@ fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
 ///|
 /// 场景图节点。欧拉角和四元数通过回调保持同步；直接写 `rotation.x` 不会更新四元数，
 /// 请用 `rotation.set` 或 `set_x` / `set_y` / `set_z`。
+/// r186: `Object3D` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L64
 pub(all) struct Object3D {
   id : Int
   mut name : String
@@ -160,6 +163,7 @@ pub fn Object3D::remove_event_listener(
 }
 
 ///|
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
 pub fn Object3D::dispatch_event(self : Object3D, event : ObjectEvent) -> Unit {
   match self.listeners.get(event.kind) {
     None => ()
@@ -175,6 +179,7 @@ pub fn Object3D::dispatch_event(self : Object3D, event : ObjectEvent) -> Unit {
 }
 
 ///|
+/// r186: `updateMatrix` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1144
 pub fn Object3D::update_matrix(self : Object3D) -> Unit {
   ignore(self.matrix.compose(self.position, self.quaternion, self.scale))
   match self.pivot {
@@ -216,6 +221,7 @@ fn Object3D::update_view_inverse(self : Object3D) -> Unit {
 }
 
 ///|
+/// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1176
 pub fn Object3D::update_matrix_world(
   self : Object3D,
   force? : Bool = false,
@@ -307,6 +313,7 @@ pub fn Object3D::get_world_position(
 }
 
 ///|
+/// r186: `lookAt` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L694
 pub fn Object3D::look_at(
   self : Object3D,
   x : Double,
@@ -410,6 +417,7 @@ pub fn Object3D::get_object_by_name(
 }
 
 ///|
+/// r186: `traverse` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1081
 pub fn Object3D::traverse(self : Object3D, visit : (Object3D) -> Unit) -> Unit {
   visit(self)
   let count = self.children.length()

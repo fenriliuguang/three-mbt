@@ -1,3 +1,5 @@
+// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20
+
 ///|
 const WEIGHT_R : Double = 0.25
 
@@ -21,6 +23,7 @@ fn clamp_amount(amount : Double) -> Double {
 ///|
 /// 把颜色往灰度上混。`amount` 为 0 时保持原色，为 1 时只剩灰度。
 /// 灰度是 `0.25 r + 0.5 g + 0.25 b`，三项都能用二进制精确表示。
+/// r186: 没有同名类。全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20
 pub(all) struct GrayscalePass {
   mut amount : Double
 }
@@ -72,6 +75,7 @@ pub fn pack_amount(amount : Double) -> FixedArray[Byte] {
 
 ///|
 /// 全屏三角形。颜色目标的顶在 v = 0，窗口的顶在 clip y = 1，所以 v 用 `0.5 - y * 0.5`。
+/// r186: `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9
 pub fn grayscale_wgsl() -> String {
   let code =
     #|struct VertexOutput {

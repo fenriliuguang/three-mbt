@@ -1,5 +1,8 @@
+// r186: `Euler` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L25
+
 ///|
 /// 欧拉角顺序。默认 `XYZ`，与 r186 `Euler.DEFAULT_ORDER` 相同。
+/// r186: `Euler` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L25
 pub(all) enum EulerOrder {
   XYZ
   YXZ
@@ -12,6 +15,7 @@ pub(all) enum EulerOrder {
 ///|
 /// 弧度制欧拉角。写入分量请用 `set` 或 `set_x` / `set_y` / `set_z`，
 /// 这样挂在 `Object3D` 上时才会同步四元数。直接改字段不会触发回调。
+/// r186: `Euler` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L25
 pub(all) struct Euler {
   mut x : Double
   mut y : Double
@@ -180,6 +184,7 @@ pub fn Euler::set_from_rotation_matrix(
 }
 
 ///|
+/// r186: `setFromQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L328
 pub fn Euler::set_from_quaternion(
   self : Euler,
   q : Quaternion,

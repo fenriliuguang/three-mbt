@@ -1,8 +1,11 @@
+// r186: `BoxGeometry` https://github.com/mrdoob/three.js/blob/r186/src/geometries/BoxGeometry.js#L20
+
 ///|
 using @core {type BufferGeometry, type BufferAttribute}
 
 ///|
 /// 盒子构造参数。生成之后再改这些数不会重建顶点。
+/// r186: `BoxGeometry` https://github.com/mrdoob/three.js/blob/r186/src/geometries/BoxGeometry.js#L20
 pub(all) struct BoxParameters {
   width : Double
   height : Double
@@ -14,6 +17,7 @@ pub(all) struct BoxParameters {
 
 ///|
 /// 以原点为中心、棱平行于坐标轴的盒子。顶点布局对齐 r186 `BoxGeometry`。
+/// r186: `BoxGeometry` https://github.com/mrdoob/three.js/blob/r186/src/geometries/BoxGeometry.js#L20
 pub(all) struct BoxGeometry {
   geometry : BufferGeometry
   parameters : BoxParameters

@@ -1,5 +1,8 @@
+// r186: `Matrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L31
+
 ///|
 /// 列主序 3×3 矩阵。`set` 的参数按行主序书写，与 r186 `Matrix3` 相同。
+/// r186: `Matrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L31
 pub(all) struct Matrix3 {
   elements : FixedArray[Double]
 }
@@ -134,6 +137,7 @@ pub fn Matrix3::transpose(self : Matrix3) -> Matrix3 {
 
 ///|
 /// 法线矩阵：给定 4×4 矩阵左上 3×3 的逆转置。对齐 r186 `Matrix3.getNormalMatrix`。
+/// r186: `getNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L352
 pub fn Matrix3::get_normal_matrix(self : Matrix3, matrix4 : Matrix4) -> Matrix3 {
   self.set_from_matrix4(matrix4).invert().transpose()
 }

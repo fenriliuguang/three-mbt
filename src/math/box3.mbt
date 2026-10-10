@@ -1,5 +1,8 @@
+// r186: `Box3` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L6
+
 ///|
 /// 轴对齐包围盒。空盒的下界是 +∞，上界是 -∞，与 r186 `Box3` 相同。
+/// r186: `Box3` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L6
 pub(all) struct Box3 {
   min : Vector3
   max : Vector3

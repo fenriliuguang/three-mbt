@@ -1,5 +1,8 @@
+// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
+
 ///|
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
+/// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 pub(all) struct BufferAttribute {
   array : Array[Double]
   item_size : Int

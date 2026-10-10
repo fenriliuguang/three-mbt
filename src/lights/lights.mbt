@@ -1,3 +1,5 @@
+// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15 ; `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32
+
 ///|
 using @core {type Object3D, type NodeKind, type LightKind, type LightState}
 
@@ -21,6 +23,7 @@ fn make_light(
 
 ///|
 /// 环境光。颜色和强度先作为数据，阶段 4 才进入着色。
+/// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15
 pub(all) struct AmbientLight {
   node : Object3D
 }
@@ -44,6 +47,7 @@ pub extend AmbientLight with @core.AsNode::{to_node}
 ///|
 /// 平行光。从自身位置指向 `target`，默认位置是 `(0, 1, 0)`。
 /// `shadow` 与节点上的阴影数据是同一个对象。`cast_shadow` 打开后才会渲染阴影贴图。
+/// r186: `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32
 pub(all) struct DirectionalLight {
   node : Object3D
   target : Object3D
@@ -92,6 +96,7 @@ pub fn DirectionalLight::new(
 }
 
 ///|
+/// r186: `DirectionalLightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLightShadow.js#L9
 pub fn DirectionalLight::cast_shadow(
   self : DirectionalLight,
   enabled : Bool,

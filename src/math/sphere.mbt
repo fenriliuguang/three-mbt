@@ -1,5 +1,8 @@
+// r186: `Sphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L12
+
 ///|
 /// 球体。半径为负表示空球，与 r186 `Sphere` 相同。
+/// r186: `Sphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L12
 pub(all) struct Sphere {
   center : Vector3
   mut radius : Double

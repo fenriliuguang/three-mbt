@@ -1,3 +1,5 @@
+// r186: `GLTFLoader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L129
+
 ///|
 /// glTF JSON 读不下来，或用到了这份子集以外的数据。
 pub(all) suberror GltfError {
@@ -72,6 +74,7 @@ priv struct NodeDesc {
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。
 /// 贴图、蒙皮、形变、动画、相机和灯光先不读。
+/// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(
   text : String,
   bin? : Bytes = b"",

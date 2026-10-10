@@ -1,3 +1,5 @@
+// r186: `StorageBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/StorageBufferAttribute.js#L17
+
 ///|
 /// 计算着色器一个工作组的线程数。与 `wave_wgsl` 里的 `@workgroup_size` 相同。
 pub const WORKGROUP_SIZE : Int = 64
@@ -11,6 +13,7 @@ const AMPLITUDE : Double = 0.5
 ///|
 /// 沿 X 铺开的点。`y = sin(x π + time) * 0.5`，`z` 为 0。
 /// `count` 至少为 1。几何体上的 `position` 是同一公式的 CPU 副本。
+/// r186: `StorageBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/StorageBufferAttribute.js#L17
 pub(all) struct StoragePositions {
   geometry : @core.BufferGeometry
   count : Int
@@ -95,6 +98,7 @@ pub fn pack_wave_params(time : Double, count : Int) -> FixedArray[Byte] {
 
 ///|
 /// 写入 `array<f32>`，每个点三个紧排的 `xyz`。绑定组 0：存储缓冲和上面的 uniform。
+/// r186: 波公式是本地的。派发对应 `compute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L2877
 pub fn wave_wgsl() -> String {
   let code =
     #|struct WaveParams {

@@ -1,5 +1,8 @@
+// r186: `Vector4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L27
+
 ///|
 /// 四维向量。对齐 three.js r186 `Vector4` 的运算子集。
+/// r186: `Vector4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L27
 pub(all) struct Vector4 {
   mut x : Double
   mut y : Double

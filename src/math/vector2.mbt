@@ -1,5 +1,8 @@
+// r186: `Vector2` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L28
+
 ///|
 /// 二维向量。对齐 three.js r186 `Vector2` 的运算子集。
+/// r186: `Vector2` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L28
 pub(all) struct Vector2 {
   mut x : Double
   mut y : Double

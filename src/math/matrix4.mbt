@@ -1,5 +1,8 @@
+// r186: `Matrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L42
+
 ///|
 /// 列主序 4×4 矩阵。`set` 的参数按行主序书写，与 r186 `Matrix4` 相同。
+/// r186: `Matrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L42
 pub(all) struct Matrix4 {
   elements : FixedArray[Double]
 }
@@ -230,6 +233,7 @@ pub fn Matrix4::make_rotation_from_euler(
 }
 
 ///|
+/// r186: `compose` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L470
 pub fn Matrix4::compose(
   self : Matrix4,
   position : Vector3,
@@ -368,6 +372,7 @@ pub fn Matrix4::extract_rotation(self : Matrix4, m : Matrix4) -> Matrix4 {
 }
 
 ///|
+/// r186: `decompose` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L1071
 pub fn Matrix4::decompose(
   self : Matrix4,
   position : Vector3,
@@ -412,6 +417,7 @@ pub fn Matrix4::decompose(
 }
 
 ///|
+/// r186: `lookAt` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L483
 pub fn Matrix4::look_at(
   self : Matrix4,
   eye : Vector3,
@@ -632,6 +638,7 @@ pub fn Matrix4::transpose(self : Matrix4) -> Matrix4 {
 
 ///|
 /// 透视投影。默认 WebGPU、非反转深度，与本仓库的绘制路径一致。
+/// r186: `makePerspective` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L1140
 pub fn Matrix4::make_perspective(
   self : Matrix4,
   left : Double,
@@ -689,6 +696,7 @@ pub fn Matrix4::make_perspective(
 
 ///|
 /// 正交投影。默认 WebGPU、非反转深度。
+/// r186: `makeOrthographic` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L1200
 pub fn Matrix4::make_orthographic(
   self : Matrix4,
   left : Double,

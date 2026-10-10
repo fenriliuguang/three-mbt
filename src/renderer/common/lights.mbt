@@ -1,8 +1,11 @@
+// r186: `Lighting` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Lighting.js#L14
+
 ///|
 using @core {type LightState}
 
 ///|
 /// 这一帧要采样的平行光阴影。矩阵把世界坐标变到阴影贴图的 `uv` 和深度。
+/// r186: `DirectionalLightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLightShadow.js#L9
 pub(all) struct ShadowFrame {
   camera : @core.Object3D
   matrix : @math.Matrix4
@@ -14,6 +17,7 @@ pub(all) struct ShadowFrame {
 
 ///|
 /// 这一帧的环境光和第一盏平行光。颜色已经乘上强度。
+/// r186: `Lighting` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Lighting.js#L14
 pub(all) struct LightFrame {
   ambient : @math.Vector3
   color : @math.Vector3

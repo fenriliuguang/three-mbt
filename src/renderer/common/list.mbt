@@ -1,8 +1,11 @@
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94
+
 ///|
 using @core {type BufferGeometry, type Object3D}
 
 ///|
 /// 网格绘制项。线框不进不透明队列，也不进透明队列。
+/// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65
 pub(all) struct RenderItem {
   node : Object3D
   geometry : BufferGeometry
@@ -19,6 +22,7 @@ pub(all) struct RenderItem {
 
 ///|
 /// 收集当前可见的不透明网格。不做视锥裁剪，也不排序。
+/// r186: `reversePainterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L45
 pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
@@ -125,6 +129,7 @@ fn sort_far_to_near(items : Array[DepthItem]) -> Unit {
 
 ///|
 /// 物体原点在相机视图空间里的 z。相机前方为负，和 r186 的 `-mvPosition` 同一套轴向。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L14
 pub fn view_depth(camera : Object3D, object : Object3D) -> Double {
   match camera.camera {
     None => 0.0
@@ -141,6 +146,7 @@ pub fn view_depth(camera : Object3D, object : Object3D) -> Double {
 
 ///|
 /// 透明网格，从远到近。深度相同则保持遍历顺序。线框不在此列。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L14
 pub fn collect_transparent(
   root : Object3D,
   camera : Object3D,
@@ -194,6 +200,7 @@ pub fn update_frame(scene : Object3D, camera : Object3D) -> Unit {
 
 ///|
 /// `projection * matrixWorldInverse * matrixWorld`。矩阵按列主序存放。
+/// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn model_view_projection(
   camera : @core.CameraState,
   object : Object3D,

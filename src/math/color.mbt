@@ -1,6 +1,9 @@
+// r186: `Color` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L88
+
 ///|
 /// 线性工作空间里的 RGB 颜色，通道范围通常是 \[0, 1\]。
 /// `set_hex` 把 sRGB 十六进制转成线性，与 r186 默认的 `ColorManagement` 一致。
+/// r186: `Color` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L88
 pub(all) struct Color {
   mut r : Double
   mut g : Double
@@ -17,6 +20,7 @@ pub fn Color::new(
 }
 
 ///|
+/// r186: `setRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L58
 pub fn Color::set_rgb(
   self : Color,
   r : Double,
@@ -30,6 +34,7 @@ pub fn Color::set_rgb(
 }
 
 ///|
+/// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()
   self.r = srgb_to_linear(((hex >> 16) & 255).to_double() / 255.0)

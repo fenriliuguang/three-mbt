@@ -1,5 +1,8 @@
+// r186: `Vector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L29
+
 ///|
 /// 三维向量。对齐 three.js r186 `Vector3` 里场景图和矩阵会用到的运算。
+/// r186: `Vector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L29
 pub(all) struct Vector3 {
   mut x : Double
   mut y : Double
@@ -103,6 +106,7 @@ pub fn Vector3::dot(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// r186: `cross` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L478
 pub fn Vector3::cross(self : Vector3, v : Vector3) -> Vector3 {
   self.cross_vectors(self, v)
 }
@@ -136,6 +140,7 @@ pub fn Vector3::length(self : Vector3) -> Double {
 }
 
 ///|
+/// r186: `normalize` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L439
 pub fn Vector3::normalize(self : Vector3) -> Vector3 {
   let len = self.length()
   if len == 0.0 {
@@ -178,6 +183,7 @@ pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L450
 pub fn Vector3::apply_matrix4(self : Vector3, m : Matrix4) -> Vector3 {
   let x = self.x
   let y = self.y

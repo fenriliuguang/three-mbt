@@ -1,3 +1,5 @@
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664
+
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
 pub const FRONT_SIDE : Int = 0
@@ -12,6 +14,7 @@ pub const DOUBLE_SIDE : Int = 2
 
 ///|
 /// 三角形绕序。数值与 r186 `src/constants.js` 一致。
+/// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `DoubleSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L108
 pub(all) enum Side {
   Front
   Back
@@ -28,6 +31,7 @@ pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
 
 ///|
 /// 投影矩阵使用的坐标系。本仓库默认 WebGPU。
+/// r186: `WebGLCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1656 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664
 pub(all) enum CoordinateSystem {
   WebGL
   WebGPU
@@ -44,6 +48,7 @@ pub fn Side::to_int(self : Side) -> Int {
 
 ///|
 /// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
+/// r186: 没有同名枚举。`Basic` `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14 ; `Lambert` `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24 ; `Standard` `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) enum Shading {
   Basic
   Lambert
@@ -96,6 +101,7 @@ pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
 
 ///|
 /// 纹理包裹方式。数值与 r186 `src/constants.js` 一致。
+/// r186: `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556
 pub(all) enum Wrapping {
   Repeat
   ClampToEdge
@@ -104,6 +110,7 @@ pub(all) enum Wrapping {
 
 ///|
 /// 纹理放大或缩小过滤。本阶段不生成 mipmap，mipmap 项只决定采样器怎么声明。
+/// r186: `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LinearFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L613
 pub(all) enum TextureFilter {
   Nearest
   NearestMipmapNearest
@@ -181,6 +188,7 @@ pub const INTERPOLATE_SMOOTH : Int = 2302
 
 ///|
 /// 动画循环方式。
+/// r186: `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `LoopRepeat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1134
 pub(all) enum LoopMode {
   Once
   Repeat
@@ -189,6 +197,7 @@ pub(all) enum LoopMode {
 
 ///|
 /// 关键帧插值。`Smooth` 的数值留在常量里，采样只用离散和线性。
+/// r186: `InterpolateDiscrete` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1151 ; `InterpolateLinear` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1159 ; `InterpolateSmooth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1167
 pub(all) enum Interpolation {
   Discrete
   Linear

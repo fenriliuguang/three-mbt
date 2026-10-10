@@ -1,3 +1,5 @@
+// r186: `Attributes` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Attributes.js#L12 ; `UniformsGroup` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/UniformsGroup.js#L12
+
 ///|
 using @core {type BufferAttribute}
 
@@ -159,6 +161,7 @@ pub fn pad_texture_rows(
 
 ///|
 /// 把模型矩阵的法线矩阵放进 4×4 的左上角，供 WGSL 的 `mat4x4` 使用。
+/// r186: `getNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L352
 pub fn normal_matrix(model : @math.Matrix4) -> @math.Matrix4 {
   let source = @math.Matrix3::new().get_normal_matrix(model).elements
   let matrix = @math.Matrix4::new()
@@ -246,6 +249,7 @@ pub fn pack_uniforms(
 ///|
 /// 把正交阴影相机的裁剪空间变到贴图坐标。WebGPU 的 `y` 向上，所以这里把 `y` 翻转到贴图。
 /// 深度已经在 `0..1`，不再做一次 `0.5` 缩放。
+/// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18
 pub fn shadow_matrix(
   projection : @math.Matrix4,
   view : @math.Matrix4,

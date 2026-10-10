@@ -1,3 +1,5 @@
+// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16
+
 ///|
 using @core {type Object3D}
 
@@ -7,6 +9,7 @@ using @constants {type Interpolation, type LoopMode}
 ///|
 /// 一条关键帧。`value_size` 为 3 时按向量线性插值，为 4 时按四元数 slerp。
 /// 时间必须非递减。三次样条不在这一阶段。
+/// r186: `KeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/KeyframeTrack.js#L19
 pub(all) struct KeyframeTrack {
   name : String
   times : Array[Double]
@@ -35,6 +38,7 @@ fn check_track(
 
 ///|
 /// 向量轨道，对应 `.position` 或 `.scale`。每个关键帧 3 个数。
+/// r186: `VectorKeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/tracks/VectorKeyframeTrack.js#L8
 pub fn KeyframeTrack::vector(
   name : String,
   times : Array[Double],
@@ -46,6 +50,7 @@ pub fn KeyframeTrack::vector(
 
 ///|
 /// 四元数轨道，对应 `.quaternion`。每个关键帧 4 个数，顺序是 `xyzw`。
+/// r186: `QuaternionKeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/tracks/QuaternionKeyframeTrack.js#L9
 pub fn KeyframeTrack::quaternion(
   name : String,
   times : Array[Double],
@@ -57,6 +62,7 @@ pub fn KeyframeTrack::quaternion(
 
 ///|
 /// 一组轨道。`duration` 小于 0 时取最后一帧的时间。
+/// r186: `AnimationClip` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationClip.js#L15
 pub(all) struct AnimationClip {
   name : String
   tracks : Array[KeyframeTrack]
@@ -113,6 +119,7 @@ priv struct Contrib {
 ///|
 /// 一个片段在混合器里的播放状态。`repetitions` 小于 0 表示无限循环。
 /// 默认循环播放，权重 1。调用 `play` 之后才会写入场景。
+/// r186: `AnimationAction` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationAction.js#L7
 pub(all) struct AnimationAction {
   clip : AnimationClip
   mut time : Double
@@ -143,6 +150,7 @@ fn AnimationAction::make(clip : AnimationClip) -> AnimationAction {
 }
 
 ///|
+/// r186: `play` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationAction.js#L176
 pub fn AnimationAction::play(self : AnimationAction) -> Unit {
   self.enabled = true
   self.paused = false
@@ -186,6 +194,7 @@ pub fn AnimationAction::set_time_scale(
 
 ///|
 /// 把片段写到 `root` 及其具名子节点上。
+/// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16
 pub struct AnimationMixer {
   root : Object3D
   mut time : Double
@@ -209,6 +218,7 @@ pub fn AnimationMixer::set_time_scale(
 
 ///|
 /// 同一个片段再次调用会返回已经创建的动作。
+/// r186: `clipAction` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L557
 pub fn AnimationMixer::clip_action(
   self : AnimationMixer,
   clip : AnimationClip,
@@ -224,6 +234,7 @@ pub fn AnimationMixer::clip_action(
 }
 
 ///|
+/// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L676
 pub fn AnimationMixer::update(self : AnimationMixer, delta : Double) -> Unit {
   let step = delta * self.time_scale
   self.time = self.time + step
@@ -405,6 +416,7 @@ fn node_name(name : String, suffix : Int) -> String {
 }
 
 ///|
+/// r186: `PropertyBinding` https://github.com/mrdoob/three.js/blob/r186/src/animation/PropertyBinding.js#L109
 fn property_of(name : String) -> (String, Property)? {
   if name.has_suffix(".position") {
     Some((node_name(name, 9), Position))
