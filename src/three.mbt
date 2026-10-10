@@ -24,12 +24,21 @@ pub using @constants {
   NEAREST_FILTER,
   NEAREST_MIPMAP_LINEAR_FILTER,
   NEAREST_MIPMAP_NEAREST_FILTER,
+  ACES_FILMIC_TONE_MAPPING,
+  AGX_TONE_MAPPING,
+  CINEON_TONE_MAPPING,
+  CUSTOM_TONE_MAPPING,
+  LINEAR_TONE_MAPPING,
+  NEUTRAL_TONE_MAPPING,
+  NO_TONE_MAPPING,
+  REINHARD_TONE_MAPPING,
   REPEAT_WRAPPING,
   WEBGPU_COORDINATE_SYSTEM,
   type CoordinateSystem,
   type Interpolation,
   type LoopMode,
   type Shading,
+  type ToneMapping,
   type Side,
   type TextureFilter,
   type Wrapping,
@@ -76,7 +85,7 @@ pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
 pub using @compute {type StoragePositions, wave_position, workgroup_count}
 
 ///|
-pub using @post {type GrayscalePass, grayscale}
+pub using @post {type GrayscalePass, grayscale, type ToneMappingPass, tone_map}
 
 ///|
 pub using @scenes {type Fog, type FogKind, type Scene}

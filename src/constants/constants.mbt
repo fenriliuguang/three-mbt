@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -217,5 +217,55 @@ pub fn Interpolation::to_int(self : Interpolation) -> Int {
   match self {
     Discrete => INTERPOLATE_DISCRETE
     Linear => INTERPOLATE_LINEAR
+  }
+}
+
+///|
+/// 不做色调映射。对齐 `NoToneMapping`（0）。
+pub const NO_TONE_MAPPING : Int = 0
+
+///|
+/// 乘以曝光后夹到 \[0, 1\]。对齐 `LinearToneMapping`（1）。
+pub const LINEAR_TONE_MAPPING : Int = 1
+
+///|
+/// `scaled / (scaled + 1)`。对齐 `ReinhardToneMapping`（2）。
+pub const REINHARD_TONE_MAPPING : Int = 2
+
+///|
+/// Hejl/Burgess-Dawson 胶片曲线。对齐 `CineonToneMapping`（3）。这一阶段还不采样它。
+pub const CINEON_TONE_MAPPING : Int = 3
+
+///|
+/// ACES RRT+ODT 拟合。对齐 `ACESFilmicToneMapping`（4）。这一阶段还不采样它。
+pub const ACES_FILMIC_TONE_MAPPING : Int = 4
+
+///|
+/// 由调用方自己改着色器。对齐 `CustomToneMapping`（5）。这一阶段还不采样它。
+pub const CUSTOM_TONE_MAPPING : Int = 5
+
+///|
+/// AgX。对齐 `AgXToneMapping`（6）。这一阶段还不采样它。
+pub const AGX_TONE_MAPPING : Int = 6
+
+///|
+/// Khronos Neutral。对齐 `NeutralToneMapping`（7）。这一阶段还不采样它。
+pub const NEUTRAL_TONE_MAPPING : Int = 7
+
+///|
+/// 这一阶段只采样 `No`、`Linear` 和 `Reinhard`。其余数值留在常量里。
+/// r186: `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `LinearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L431 ; `ReinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L439
+pub(all) enum ToneMapping {
+  No
+  Linear
+  Reinhard
+}
+
+///|
+pub fn ToneMapping::to_int(self : ToneMapping) -> Int {
+  match self {
+    No => NO_TONE_MAPPING
+    Linear => LINEAR_TONE_MAPPING
+    Reinhard => REINHARD_TONE_MAPPING
   }
 }

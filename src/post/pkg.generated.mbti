@@ -2,6 +2,7 @@
 package "fenriliuguang/three-mbt/post"
 
 import {
+  "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/math",
 }
 
@@ -12,6 +13,12 @@ pub fn grayscale_wgsl() -> String
 
 pub fn pack_amount(Double) -> FixedArray[Byte]
 
+pub fn pack_tone(@constants.ToneMapping, Double) -> FixedArray[Byte]
+
+pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double) -> @math.Color
+
+pub fn tone_wgsl() -> String
+
 // Errors
 
 // Types and methods
@@ -20,6 +27,14 @@ pub(all) struct GrayscalePass {
 }
 pub fn GrayscalePass::new(amount? : Double) -> Self
 pub fn GrayscalePass::set_amount(Self, Double) -> Unit
+
+pub(all) struct ToneMappingPass {
+  mut mapping : @constants.ToneMapping
+  mut exposure : Double
+}
+pub fn ToneMappingPass::new(mapping? : @constants.ToneMapping, exposure? : Double) -> Self
+pub fn ToneMappingPass::set_exposure(Self, Double) -> Unit
+pub fn ToneMappingPass::set_mapping(Self, @constants.ToneMapping) -> Unit
 
 // Type aliases
 

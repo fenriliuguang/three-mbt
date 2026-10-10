@@ -170,6 +170,10 @@ pub struct WebGPURenderer {
   post_layout : GpuBindGroupLayout
   post_uniform : GpuBuffer
   mut post_group : PostGroup?
+  tone : GpuRenderPipeline
+  tone_layout : GpuBindGroupLayout
+  tone_uniform : GpuBuffer
+  mut tone_group : PostGroup?
   quad : GpuBuffer
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
@@ -737,9 +741,12 @@ fn wave_pipeline(
 }
 
 ///|
-fn post_pipeline(
+fn fullscreen_pipeline(
   device : GpuDevice,
   format : GpuTextureFormat,
+  code : String,
+  name : String,
+  uniform_bytes : FixedArray[Byte],
 ) -> (GpuBindGroupLayout, GpuRenderPipeline, GpuBuffer) {
   let layout = device.create_bind_group_layout({
     entries: [
@@ -776,14 +783,14 @@ fn post_pipeline(
         storage_texture: None,
       },
     ],
-    label: Some("post"),
+    label: Some(name),
   })
   let pipeline_layout = device.create_pipeline_layout({
     bind_group_layouts: [Some(layout)],
     immediate_size: None,
-    label: Some("post"),
+    label: Some(name),
   })
-  let shader = shader_module(device, @post.grayscale_wgsl(), "post")
+  let shader = shader_module(device, code, name)
   let pipeline = device.create_render_pipeline({
     vertex: {
       buffers: None,
@@ -807,11 +814,11 @@ fn post_pipeline(
       constants: None,
     }),
     layout: @gpu.Specific(pipeline_layout),
-    label: Some("post"),
+    label: Some(name),
   })
   let uniform = pack_buffer(
     device,
-    @post.pack_amount(1.0),
+    uniform_bytes,
     vertex=false,
     index=false,
     uniform=true,
@@ -977,7 +984,20 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     label: Some("shadow-dummy"),
   })
   let wave = wave_pipeline(device)
-  let post = post_pipeline(device, format)
+  let post = fullscreen_pipeline(
+    device,
+    format,
+    @post.grayscale_wgsl(),
+    "post",
+    @post.pack_amount(1.0),
+  )
+  let tone = fullscreen_pipeline(
+    device,
+    format,
+    @post.tone_wgsl(),
+    "tone",
+    @post.pack_tone(@constants.ToneMapping::No, 1.0),
+  )
   let white = upload_texture(
     device,
     texture_layout,
@@ -1097,6 +1117,10 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     post_layout: post.0,
     post_uniform: post.2,
     post_group: None,
+    tone: tone.1,
+    tone_layout: tone.0,
+    tone_uniform: tone.2,
+    tone_group: None,
     quad: pack_buffer(
       device,
       @common.point_quad_bytes(),
@@ -2201,6 +2225,107 @@ pub fn WebGPURenderer::post(
     label: Some("post"),
   })
   draw.set_pipeline(self.post)
+  ignore(draw.set_bind_group(0U, Some(group), None, None, None))
+  draw.draw(3U, Some(1U), None, None)
+  draw.end()
+  self.device.queue().submit([encoder.finish(None)])
+  self.context.present()
+}
+
+///|
+fn WebGPURenderer::tone_bind(
+  self : WebGPURenderer,
+  source : @textures.Texture,
+) -> GpuBindGroup {
+  let frame = self.color_target(source)
+  match self.tone_group {
+    Some(cached) =>
+      if physical_equal(cached.source, source) &&
+        cached.version == source.version &&
+        cached.width == frame.width &&
+        cached.height == frame.height {
+        return cached.group
+      } else {
+        cached.group.drop()
+      }
+    None => ()
+  }
+  let group = self.device.create_bind_group({
+    layout: self.tone_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(frame.view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(frame.sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuBuffer(self.tone_uniform),
+      },
+    ],
+    label: Some("tone"),
+  })
+  self.tone_group = Some({
+    source,
+    version: source.version,
+    width: frame.width,
+    height: frame.height,
+    group,
+  })
+  group
+}
+
+///|
+/// 把 `source` 铺满窗口并做色调映射，然后 `present`。
+/// `No` 保持原色。`Linear` 乘曝光后夹到 \[0, 1\]。`Reinhard` 用 `scaled / (scaled + 1)`。
+/// r186 在画到屏幕时由输出节点完成；这里仍是单独的全屏通道。窗口尺寸为 0 时什么也不做。
+/// r186: `toneMapping` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L192 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39
+pub fn WebGPURenderer::tone_map(
+  self : WebGPURenderer,
+  source : @textures.RenderTarget,
+  pass : @post.ToneMappingPass,
+) -> Unit {
+  let width = self.window.width()
+  let height = self.window.height()
+  if width == 0U || height == 0U {
+    return
+  }
+  self.sync_swapchain()
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(
+      self.tone_uniform,
+      0UL,
+      @post.pack_tone(pass.mapping, pass.exposure),
+      None,
+      None,
+    ),
+  )
+  let group = self.tone_bind(source.texture)
+  let color = self.context.get_current_texture().create_view(None)
+  let encoder = self.device.create_command_encoder(None)
+  let draw = encoder.begin_render_pass({
+    color_attachments: [
+      Some({
+        view: color,
+        depth_slice: None,
+        resolve_target: None,
+        clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
+        load_op: @gpu.CLEAR,
+        store_op: @gpu.STORE,
+      }),
+    ],
+    depth_stencil_attachment: None,
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some("tone"),
+  })
+  draw.set_pipeline(self.tone)
   ignore(draw.set_bind_group(0U, Some(group), None, None, None))
   draw.draw(3U, Some(1U), None, None)
   draw.end()

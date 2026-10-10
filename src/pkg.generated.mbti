@@ -19,9 +19,17 @@ import {
 }
 
 // Values
+pub const ACES_FILMIC_TONE_MAPPING : Int = 4
+
+pub const AGX_TONE_MAPPING : Int = 6
+
 pub const BACK_SIDE : Int = 1
 
+pub const CINEON_TONE_MAPPING : Int = 3
+
 pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
+
+pub const CUSTOM_TONE_MAPPING : Int = 5
 
 pub const DOUBLE_SIDE : Int = 2
 
@@ -39,6 +47,8 @@ pub const LINEAR_MIPMAP_LINEAR_FILTER : Int = 1008
 
 pub const LINEAR_MIPMAP_NEAREST_FILTER : Int = 1007
 
+pub const LINEAR_TONE_MAPPING : Int = 1
+
 pub const LOOP_ONCE : Int = 2200
 
 pub const LOOP_PING_PONG : Int = 2202
@@ -52,6 +62,12 @@ pub const NEAREST_FILTER : Int = 1003
 pub const NEAREST_MIPMAP_LINEAR_FILTER : Int = 1005
 
 pub const NEAREST_MIPMAP_NEAREST_FILTER : Int = 1004
+
+pub const NEUTRAL_TONE_MAPPING : Int = 7
+
+pub const NO_TONE_MAPPING : Int = 0
+
+pub const REINHARD_TONE_MAPPING : Int = 2
 
 pub const REPEAT_WRAPPING : Int = 1000
 
@@ -70,6 +86,8 @@ pub fn parse(String, bin? : Bytes) -> @objects.Group raise @gltf.GltfError
 pub fn rad_to_deg(Double) -> Double
 
 pub fn srgb_to_linear(Double) -> Double
+
+pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double) -> @math.Color
 
 pub let upstream_revision : String
 
@@ -191,6 +209,10 @@ pub using @compute {type StoragePositions}
 pub using @textures {type Texture}
 
 pub using @constants {type TextureFilter}
+
+pub using @constants {type ToneMapping}
+
+pub using @post {type ToneMappingPass}
 
 pub using @math {type Vector2}
 

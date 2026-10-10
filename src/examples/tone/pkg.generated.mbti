@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "fenriliuguang/three-mbt/examples/tone"
+
+import {
+  "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/objects",
+  "fenriliuguang/three-mbt/post",
+  "fenriliuguang/three-mbt/scenes",
+  "fenriliuguang/three-mbt/textures",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct ToneScene {
+  scene : @scenes.Scene
+  camera : @cameras.PerspectiveCamera
+  cube : @objects.Mesh
+  target : @textures.RenderTarget
+  pass : @post.ToneMappingPass
+  mut angle : Double
+}
+pub fn ToneScene::new() -> Self
+pub fn ToneScene::spin(Self, Double) -> Unit
+
+// Type aliases
+
+// Traits
