@@ -226,6 +226,7 @@ pub fn Object3D::clear(Self) -> Self
 pub fn Object3D::dispatch_event(Self, ObjectEvent) -> Unit
 pub fn Object3D::get_object_by_name(Self, String) -> Self?
 pub fn Object3D::get_world_position(Self, @math.Vector3) -> @math.Vector3
+pub fn Object3D::local_to_world(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::look_at(Self, Double, Double, Double) -> Unit
 pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit
 pub fn Object3D::new(kind? : NodeKind) -> Self
@@ -247,6 +248,7 @@ pub fn Object3D::traverse_visible(Self, (Self) -> Unit) -> Unit
 pub fn Object3D::update_matrix(Self) -> Unit
 pub fn Object3D::update_matrix_world(Self, force? : Bool) -> Unit
 pub fn Object3D::update_world_matrix(Self, update_parents? : Bool, update_children? : Bool, force? : Bool) -> Unit
+pub fn Object3D::world_to_local(Self, @math.Vector3) -> @math.Vector3
 pub impl AsNode for Object3D
 
 pub(all) struct ObjectEvent {

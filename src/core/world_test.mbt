@@ -90,6 +90,27 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "local and world vectors round trip through the child" {
+  let parent = @core.Object3D::new()
+  ignore(parent.position.set(10.0, 0.0, 0.0))
+  ignore(parent.rotation.set(0.0, 0.5, 0.0))
+  let child = @core.Object3D::new()
+  ignore(child.position.set(0.0, 0.0, 4.0))
+  ignore(parent.add(child))
+  let point = @math.Vector3::new(z=1.0)
+  ignore(child.local_to_world(point))
+  assert_close(point.x, 12.397127693021)
+  assert_close(point.y, 0.0)
+  assert_close(point.z, 4.38791280945)
+  ignore(child.world_to_local(point))
+  assert_close(point.x, 0.0)
+  assert_close(point.y, 0.0)
+  assert_close(point.z, 1.0)
+  assert_close(child.matrix_world.elements[12], 11.9177021544)
+  assert_close(child.matrix_world.elements[14], 3.51033024756)
+}
+
+///|
 test "lookAt matches r186 quaternion" {
   let looker = @core.Object3D::new()
   ignore(looker.position.set(0.0, 0.0, 5.0))

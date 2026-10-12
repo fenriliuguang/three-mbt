@@ -320,6 +320,27 @@ pub fn Object3D::get_world_position(
 }
 
 ///|
+/// r186: `localToWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L663
+pub fn Object3D::local_to_world(
+  self : Object3D,
+  vector : @math.Vector3,
+) -> @math.Vector3 {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  vector.apply_matrix4(self.matrix_world)
+}
+
+///|
+/// r186: `worldToLocal` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L677
+pub fn Object3D::world_to_local(
+  self : Object3D,
+  vector : @math.Vector3,
+) -> @math.Vector3 {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  let inverse = @math.Matrix4::new().copy(self.matrix_world).invert()
+  vector.apply_matrix4(inverse)
+}
+
+///|
 /// r186: `lookAt` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L694
 pub fn Object3D::look_at(
   self : Object3D,

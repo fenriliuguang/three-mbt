@@ -257,6 +257,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `rotateOnWorldAxis` has landed. The axis is assumed normalized, and the parent is assumed not rotated. The turn is premultiplied, so it applies before the object's existing rotation. A right-angle yaw then a world-X quarter turn is `(0.5, 0.5, 0.5, 0.5)`. The same yaw then a local X quarter turn is `(0.5, 0.5, -0.5, 0.5)`.
 
+`localToWorld` and `worldToLocal` have landed. Both update the world matrix from the parents first. Local to world multiplies by that matrix. World to local multiplies by a copy of its inverse, so the stored world matrix stays intact. A child at local `(0, 0, 4)` under a parent shifted by 10 and yawed by 0.5 turns local `(0, 0, 1)` into world `(12.397127693021, 0, 4.38791280945)`, and the reverse returns the local point.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -326,6 +328,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | perspective `filmGauge` setter | `cameras` |
 | planned | 7 | Object3D local `rotateOnAxis` and `translateOnAxis` | `core`, `math` |
 | planned | 7 | Object3D `rotateOnWorldAxis` | `core` |
+| planned | 7 | Object3D `localToWorld` and `worldToLocal` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
