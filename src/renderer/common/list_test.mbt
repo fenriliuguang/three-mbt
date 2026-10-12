@@ -557,6 +557,30 @@ test "wireframe meshes stay in the shadow list as triangles" {
 }
 
 ///|
+test "instanced wireframes stay in the wireframe list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let wire = @materials.MeshBasicMaterial::new()
+  wire.material.wireframe = true
+  let mesh = @objects.InstancedMesh::new(box.geometry, wire.material, 2)
+  ignore(scene.add(mesh))
+  let solid = @objects.InstancedMesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+    2,
+  )
+  ignore(scene.add(solid))
+  let drawn = @common.collect_wireframe(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(physical_equal(drawn[0].node, mesh.node), true)
+  match drawn[0].instances {
+    None => panic()
+    Some(data) => assert_eq(data.count, 2)
+  }
+  assert_eq(@common.collect_opaque(scene.node).length(), 1)
+}
+
+///|
 fn point_at(z : Double) -> @core.BufferGeometry {
   let geometry = @core.BufferGeometry::new()
   ignore(

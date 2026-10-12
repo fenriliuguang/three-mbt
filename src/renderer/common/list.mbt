@@ -95,8 +95,8 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
 }
 
 ///|
-/// 线框网格。透明与不透明都收集。实例化线框不在这里。
-/// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
+/// 线框网格。透明与不透明、普通与实例化都收集。
+/// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 pub fn collect_wireframe(
   root : Object3D,
   frustum? : @math.Frustum,
@@ -110,7 +110,6 @@ pub fn collect_wireframe(
           None => ()
           Some(binding) =>
             if binding.wireframe &&
-              binding.instances is None &&
               on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
@@ -124,7 +123,7 @@ pub fn collect_wireframe(
                 roughness: binding.roughness,
                 metalness: binding.metalness,
                 fog: binding.fog,
-                instances: None,
+                instances: binding.instances,
               })
             }
         }

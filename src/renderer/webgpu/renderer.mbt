@@ -204,6 +204,9 @@ pub struct WebGPURenderer {
   basic_lines : GpuRenderPipeline
   lambert_lines : GpuRenderPipeline
   standard_lines : GpuRenderPipeline
+  basic_lines_instanced : GpuRenderPipeline
+  lambert_lines_instanced : GpuRenderPipeline
+  standard_lines_instanced : GpuRenderPipeline
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
@@ -1319,6 +1322,33 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       GpuCullMode::NONE,
       lines=true,
     ),
+    basic_lines_instanced: unlit_pipeline(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+    ),
+    lambert_lines_instanced: unlit_pipeline(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+    ),
+    standard_lines_instanced: unlit_pipeline(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+    ),
     line_list: color_pipeline(
       device,
       line_shader,
@@ -1427,11 +1457,20 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
 fn WebGPURenderer::wire_pipeline(
   self : WebGPURenderer,
   shading : @constants.Shading,
+  instanced : Bool,
 ) -> GpuRenderPipeline {
-  match shading {
-    @constants.Basic => self.basic_lines
-    @constants.Lambert => self.lambert_lines
-    @constants.Standard => self.standard_lines
+  if instanced {
+    match shading {
+      @constants.Basic => self.basic_lines_instanced
+      @constants.Lambert => self.lambert_lines_instanced
+      @constants.Standard => self.standard_lines_instanced
+    }
+  } else {
+    match shading {
+      @constants.Basic => self.basic_lines
+      @constants.Lambert => self.lambert_lines
+      @constants.Standard => self.standard_lines
+    }
   }
 }
 
@@ -3325,7 +3364,7 @@ fn WebGPURenderer::draw_meshes(
       Some(data) => data.count > 0
       None => true
     }
-    if !draw_mesh || (lines && item.instances is Some(_)) {
+    if !draw_mesh {
       continue
     }
     let wire = if lines { self.ensure_wire(item.geometry) } else { None }
@@ -3382,7 +3421,7 @@ fn WebGPURenderer::draw_meshes(
         }
         pass.set_pipeline(
           if lines {
-            self.wire_pipeline(item.shading)
+            self.wire_pipeline(item.shading, batch is Some(_))
           } else {
             match batch {
               Some(_) => self.instanced_pipeline(item.shading, item.side, blend)
@@ -3432,7 +3471,7 @@ fn WebGPURenderer::draw_meshes(
               )
               pass.draw_indexed(
                 wire.index_count.reinterpret_as_uint(),
-                Some(1U),
+                Some(instance_count.reinterpret_as_uint()),
                 None,
                 None,
                 None,
@@ -3645,7 +3684,7 @@ fn WebGPURenderer::draw_transparent(
 
 ///|
 /// 更新矩阵，清屏，先画不透明网格，再画线框，然后画不透明的点和线，最后按从远到近画透明物体。窗口目标会 `present`，颜色目标不会。
-/// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边。阴影通道用三角形投射，包含线框，但只保留阴影相机看得到的层。
+/// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边。实例化线框用实例着色器，每条边按实例画一次。阴影通道用三角形投射，包含线框，但只保留阴影相机看得到的层。
 /// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
