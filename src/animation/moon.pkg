@@ -1,4 +1,4 @@
-// 阶段 7。AnimationClip、线性与离散关键帧、AnimationMixer。
+// 阶段 7。AnimationClip、线性与离散关键帧、AnimationMixer、形变权重。
 import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",

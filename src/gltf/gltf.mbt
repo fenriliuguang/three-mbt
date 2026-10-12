@@ -132,7 +132,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图和蒙皮先不读。动画通道里的 `weights` 仍跳过。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光、聚光、贴图和蒙皮先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1063,7 +1063,7 @@ fn baked_geometry(
 ///|
 /// 节点 `weights` 按索引盖过 `mesh.weights`。更短的节点列表保留后面的网格权重。
 /// 和网格权重相同时共用烘焙结果；不同时从原始几何复制再烘焙，避免改到共享网格。
-/// 权重全是 0 时共用未烘焙的几何。动画通道里的 `weights` 仍不采样。
+/// 权重全是 0 时共用未烘焙的几何。动画采样会在第一次写入时复制仍共享的几何。
 /// r186: `createNodeMesh` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4213
 fn geometry_for(
   prim : Prim,
@@ -1399,6 +1399,22 @@ fn mesh_from(
     material.emissive_intensity = prim.mat.emissive_intensity
   }
   let mesh = @objects.Mesh::new(geometry, material)
+  if prim.targets.length() > 0 {
+    let weights = resolve_weights(
+      prim.mesh_weights,
+      node_weights,
+      prim.targets.length(),
+    )
+    mesh.node.morph = Some(@core.MorphState::{
+      base_position: copied_attribute(prim.geometry, "position"),
+      base_normal: optional_attribute(prim.geometry, "normal"),
+      base_color: optional_attribute(prim.geometry, "color"),
+      targets: core_targets(prim.targets),
+      weights,
+      shared: physical_equal(geometry, prim.baked) ||
+      physical_equal(geometry, prim.geometry),
+    })
+  }
   if prim.mat.double_sided {
     mesh.set_side(@constants.Side::Double)
   }
@@ -1736,6 +1752,118 @@ fn unreferenced(nodes : Array[NodeDesc]) -> Array[Int] {
 ///|
 
 ///|
+fn copied_attribute(
+  geometry : @core.BufferGeometry,
+  name : String,
+) -> Array[Double] {
+  match optional_attribute(geometry, name) {
+    None => []
+    Some(values) => values
+  }
+}
+
+///|
+fn optional_attribute(
+  geometry : @core.BufferGeometry,
+  name : String,
+) -> Array[Double]? {
+  match geometry.get_attribute(name) {
+    None => None
+    Some(attribute) => Some(attribute.array.copy())
+  }
+}
+
+///|
+fn core_targets(targets : Array[MorphTarget]) -> Array[@core.MorphTarget] {
+  let out = []
+  for target in targets {
+    out.push(@core.MorphTarget::{
+      position: target.position,
+      normal: target.normal,
+      color: target.color,
+    })
+  }
+  out
+}
+
+///|
+fn morph_count(node : @core.Object3D) -> Int? {
+  match node.morph {
+    Some(state) => Some(state.targets.length())
+    None => {
+      let mut count = -1
+      for child in node.children {
+        match child.morph {
+          Some(state) => count = state.targets.length()
+          None => ()
+        }
+      }
+      if count < 0 {
+        None
+      } else {
+        Some(count)
+      }
+    }
+  }
+}
+
+///|
+/// 没有形变目标时不建轨道。输出按目标个数切分，`CUBICSPLINE` 仍是三份。
+/// r186: `_createAnimationTracks` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4579
+fn weights_track(
+  node_name : String,
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  samplers : Array[Map[String, Json]],
+  channel : Map[String, Json],
+  count : Int,
+) -> @animation.KeyframeTrack raise GltfError {
+  let sampler_index = match channel.get("sampler") {
+    None => raise GltfError::Invalid("animation sampler")
+    Some(value) => as_f64(value).to_int()
+  }
+  if sampler_index < 0 || sampler_index >= samplers.length() {
+    raise GltfError::Invalid("animation sampler")
+  }
+  let sampler = samplers[sampler_index]
+  let kind = animation_interpolation(
+    opt_string(sampler, "interpolation", "LINEAR"),
+  )
+  let times = read_values(
+    bins,
+    views,
+    accs,
+    require_f64(sampler, "input").to_int(),
+    1,
+  )
+  let output = read_values(
+    bins,
+    views,
+    accs,
+    require_f64(sampler, "output").to_int(),
+    1,
+  )
+  let copies = match kind {
+    Cubic => 3
+    _ => 1
+  }
+  if times.length() == 0 || output.length() != times.length() * count * copies {
+    raise GltfError::Invalid("animation output")
+  }
+  let name = node_name + ".morphTargetInfluences"
+  let track = match kind {
+    Cubic => @animation.KeyframeTrack::cubic_numbers(name, times, output, count)
+    _ => @animation.KeyframeTrack::numbers(name, times, output, count)
+  }
+  match kind {
+    Step => track.interpolation = @constants.Interpolation::Discrete
+    _ => ()
+  }
+  track
+}
+
+///|
 fn track_suffix(path : String) -> String raise GltfError {
   match path {
     "translation" => "position"
@@ -1793,7 +1921,17 @@ fn load_animation(
         }
         let node_name = built[node_index].name
         let path = opt_string(target, "path", "")
-        if node_name != "" && path != "weights" {
+        if node_name != "" && path == "weights" {
+          match morph_count(built[node_index]) {
+            None => ()
+            Some(count) =>
+              tracks.push(
+                weights_track(
+                  node_name, bins, views, accs, samplers, channel, count,
+                ),
+              )
+          }
+        } else if node_name != "" && path != "weights" {
           let suffix = track_suffix(path)
           let sampler_index = match channel.get("sampler") {
             None => raise GltfError::Invalid("animation sampler")

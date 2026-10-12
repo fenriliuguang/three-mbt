@@ -32,8 +32,10 @@ pub(all) struct BufferGeometry {
   groups : Array[GeometryGroup]
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
+  mut version : Int
 }
 pub fn BufferGeometry::add_group(Self, Int, Int, material_index? : Int) -> Unit
+pub fn BufferGeometry::clone(Self) -> Self
 pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
 pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
@@ -105,7 +107,7 @@ pub(all) struct LightState {
 }
 
 pub(all) struct MeshBinding {
-  geometry : BufferGeometry
+  mut geometry : BufferGeometry
   color : @math.Color
   shading : @constants.Shading
   mut side : @constants.Side
@@ -120,6 +122,22 @@ pub(all) struct MeshBinding {
   emissive : @math.Color
   mut emissive_intensity : Double
   instances : InstanceData?
+}
+
+pub(all) struct MorphState {
+  base_position : Array[Double]
+  base_normal : Array[Double]?
+  base_color : Array[Double]?
+  targets : Array[MorphTarget]
+  mut weights : Array[Double]
+  mut shared : Bool
+}
+pub fn MorphState::write(Self, BufferGeometry) -> Unit
+
+pub(all) struct MorphTarget {
+  position : Array[Double]?
+  normal : Array[Double]?
+  color : Array[Double]?
 }
 
 pub(all) enum NodeKind {
@@ -165,6 +183,7 @@ pub(all) struct Object3D {
   mut mesh : MeshBinding?
   mut primitive : PrimitiveBinding?
   mut light : LightState?
+  mut morph : MorphState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 pub fn Object3D::add(Self, Self) -> Self

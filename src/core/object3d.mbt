@@ -72,6 +72,7 @@ pub(all) struct Object3D {
   mut mesh : MeshBinding?
   mut primitive : PrimitiveBinding?
   mut light : LightState?
+  mut morph : MorphState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 
@@ -109,6 +110,7 @@ pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
     mesh: None,
     primitive: None,
     light: None,
+    morph: None,
     listeners: Map([]),
   }
 }

@@ -42,6 +42,7 @@ pub struct AnimationMixer {
   mut time_scale : Double
   actions : Array[AnimationAction]
   bindings : Array[PoseBinding]
+  weight_poses : Array[WeightPose]
 }
 pub fn AnimationMixer::clip_action(Self, AnimationClip) -> AnimationAction
 pub fn AnimationMixer::new(@core.Object3D) -> Self
@@ -56,12 +57,16 @@ pub(all) struct KeyframeTrack {
   mut interpolation : @constants.Interpolation
   cubic_spline : Bool
 }
+pub fn KeyframeTrack::cubic_numbers(String, Array[Double], Array[Double], Int) -> Self
 pub fn KeyframeTrack::cubic_quaternion(String, Array[Double], Array[Double]) -> Self
 pub fn KeyframeTrack::cubic_vector(String, Array[Double], Array[Double]) -> Self
+pub fn KeyframeTrack::numbers(String, Array[Double], Array[Double], Int) -> Self
 pub fn KeyframeTrack::quaternion(String, Array[Double], Array[Double]) -> Self
 pub fn KeyframeTrack::vector(String, Array[Double], Array[Double]) -> Self
 
 type PoseBinding
+
+type WeightPose
 
 // Type aliases
 

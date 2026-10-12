@@ -94,6 +94,46 @@ pub fn KeyframeTrack::quaternion(
 }
 
 ///|
+/// 标量序列。glTF 的 `weights` 每个关键帧有一份形变权重，`value_size` 是目标个数。
+/// r186: `NumberKeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/tracks/NumberKeyframeTrack.js#L8
+pub fn KeyframeTrack::numbers(
+  name : String,
+  times : Array[Double],
+  values : Array[Double],
+  value_size : Int,
+) -> KeyframeTrack {
+  check_track(times, values, value_size)
+  {
+    name,
+    times,
+    values,
+    value_size,
+    interpolation: Linear,
+    cubic_spline: false,
+  }
+}
+
+///|
+/// glTF `CUBICSPLINE` 标量序列。每个关键帧是切入切线、顶点、切出切线，各 `value_size` 个数。
+/// r186: `GLTFCubicSplineInterpolant` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2128
+pub fn KeyframeTrack::cubic_numbers(
+  name : String,
+  times : Array[Double],
+  values : Array[Double],
+  value_size : Int,
+) -> KeyframeTrack {
+  check_cubic(times, values, value_size)
+  {
+    name,
+    times,
+    values,
+    value_size,
+    interpolation: Linear,
+    cubic_spline: true,
+  }
+}
+
+///|
 /// glTF `CUBICSPLINE` 向量轨道。每个关键帧 9 个数：切入切线、顶点、切出切线。
 /// r186: `GLTFCubicSplineInterpolant` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2128
 pub fn KeyframeTrack::cubic_vector(
@@ -272,11 +312,19 @@ pub struct AnimationMixer {
   mut time_scale : Double
   actions : Array[AnimationAction]
   bindings : Array[PoseBinding]
+  weight_poses : Array[WeightPose]
 }
 
 ///|
 pub fn AnimationMixer::new(root : Object3D) -> AnimationMixer {
-  { root, time: 0.0, time_scale: 1.0, actions: [], bindings: [], }
+  {
+    root,
+    time: 0.0,
+    time_scale: 1.0,
+    actions: [],
+    bindings: [],
+    weight_poses: [],
+  }
 }
 
 ///|
@@ -333,6 +381,33 @@ pub fn AnimationMixer::update(self : AnimationMixer, delta : Double) -> Unit {
   }
   for binding in self.bindings {
     apply_binding(binding, contribs)
+  }
+  let samples = []
+  for action in sampling {
+    for track in action.clip.tracks {
+      if track.name.has_suffix(".morphTargetInfluences") {
+        let target_name = node_name(track.name, 22)
+        let target = if target_name == "" {
+          Some(self.root)
+        } else {
+          self.root.get_object_by_name(target_name)
+        }
+        match target {
+          None => ()
+          Some(node) => {
+            ensure_weight_pose(self, node)
+            samples.push({
+              node,
+              values: sample_values(track, clip_time(action)),
+              weight: action.weight,
+            })
+          }
+        }
+      }
+    }
+  }
+  for pose in self.weight_poses {
+    apply_morph_weights(pose.node, blend_weights(pose.rest, samples, pose.node))
   }
 }
 
@@ -638,6 +713,220 @@ fn cubic_channel(
   let s1 = (-1.0 - weight_next) * ppp + (1.5 + weight_next) * pp + 0.5 * p
   let s_next = weight_next * ppp - weight_next * pp
   s_prev * prev + s0 * v0 + s1 * v1 + s_next * next
+}
+
+///|
+struct WeightPose {
+  node : Object3D
+  rest : Array[Double]
+}
+
+///|
+priv struct WeightSample {
+  node : Object3D
+  values : Array[Double]
+  weight : Double
+}
+
+///|
+fn ensure_weight_pose(mixer : AnimationMixer, node : Object3D) -> Unit {
+  for pose in mixer.weight_poses {
+    if physical_equal(pose.node, node) {
+      return
+    }
+  }
+  match current_weights(node) {
+    None => ()
+    Some(rest) => mixer.weight_poses.push({ node, rest, })
+  }
+}
+
+///|
+fn current_weights(node : Object3D) -> Array[Double]? {
+  match node.morph {
+    Some(state) => Some(state.weights.copy())
+    None => {
+      let mut found : Array[Double]? = None
+      for child in node.children {
+        if found is None {
+          match child.morph {
+            Some(state) => found = Some(state.weights.copy())
+            None => ()
+          }
+        }
+      }
+      found
+    }
+  }
+}
+
+///|
+fn blend_weights(
+  rest : Array[Double],
+  samples : Array[WeightSample],
+  node : Object3D,
+) -> Array[Double] {
+  let out = []
+  let mut index = 0
+  while index < rest.length() {
+    out.push(0.0)
+    index = index + 1
+  }
+  let mut total = 0.0
+  for sample in samples {
+    if physical_equal(sample.node, node) && sample.weight != 0.0 {
+      total = total + sample.weight
+      index = 0
+      while index < out.length() {
+        let value = if index < sample.values.length() {
+          sample.values[index]
+        } else {
+          0.0
+        }
+        out[index] = out[index] + value * sample.weight
+        index = index + 1
+      }
+    }
+  }
+  if total <= 0.0 {
+    rest.copy()
+  } else {
+    if total < 1.0 {
+      let rest_weight = 1.0 - total
+      index = 0
+      while index < out.length() {
+        out[index] = out[index] + rest[index] * rest_weight
+        index = index + 1
+      }
+    }
+    out
+  }
+}
+
+///|
+/// 写入这个节点，以及多原语分组的直接子网格。
+/// r186: `weights` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4597
+fn apply_morph_weights(node : Object3D, weights : Array[Double]) -> Unit {
+  write_morph(node, weights)
+  for child in node.children {
+    match child.morph {
+      None => ()
+      Some(_) => write_morph(child, weights)
+    }
+  }
+}
+
+///|
+fn write_morph(node : Object3D, weights : Array[Double]) -> Unit {
+  match node.morph {
+    None => ()
+    Some(state) => {
+      state.weights = weights.copy()
+      if state.shared {
+        match node.mesh {
+          None => ()
+          Some(binding) => {
+            binding.geometry = binding.geometry.clone()
+            state.shared = false
+          }
+        }
+      }
+      match node.mesh {
+        None => ()
+        Some(binding) => state.write(binding.geometry)
+      }
+    }
+  }
+}
+
+///|
+fn sample_values(track : KeyframeTrack, time : Double) -> Array[Double] {
+  let times = track.times
+  let count = times.length()
+  if time <= times[0] {
+    return key_vector(track, 0)
+  }
+  let mut index = 0
+  while index + 1 < count && times[index + 1] <= time {
+    index = index + 1
+  }
+  if index >= count - 1 {
+    return key_vector(track, index)
+  }
+  if track.cubic_spline {
+    return cubic_vector(track, index, time)
+  }
+  if track.interpolation is Discrete {
+    return key_vector(track, index)
+  }
+  let span = times[index + 1] - times[index]
+  let alpha = if span <= 0.0 { 0.0 } else { (time - times[index]) / span }
+  let out = []
+  let mut component = 0
+  while component < track.value_size {
+    let start = keyed(track, index, component)
+    let end = keyed(track, index + 1, component)
+    out.push(start + (end - start) * alpha)
+    component = component + 1
+  }
+  out
+}
+
+///|
+fn key_vector(track : KeyframeTrack, index : Int) -> Array[Double] {
+  let out = []
+  let mut component = 0
+  while component < track.value_size {
+    out.push(keyed(track, index, component))
+    component = component + 1
+  }
+  out
+}
+
+///|
+fn keyed(track : KeyframeTrack, index : Int, component : Int) -> Double {
+  let stride = track.value_size
+  let base = if track.cubic_spline {
+    index * stride * 3 + stride
+  } else {
+    index * stride
+  }
+  track.values[base + component]
+}
+
+///|
+fn cubic_vector(
+  track : KeyframeTrack,
+  index : Int,
+  time : Double,
+) -> Array[Double] {
+  let t0 = track.times[index]
+  let t1 = track.times[index + 1]
+  let td = t1 - t0
+  if td == 0.0 {
+    return key_vector(track, index)
+  }
+  let p = (time - t0) / td
+  let pp = p * p
+  let ppp = pp * p
+  let s2 = -2.0 * ppp + 3.0 * pp
+  let s3 = ppp - pp
+  let s0 = 1.0 - s2
+  let s1 = s3 - pp + p
+  let stride = track.value_size
+  let offset0 = index * stride * 3
+  let offset1 = offset0 + stride * 3
+  let out = []
+  let mut component = 0
+  while component < stride {
+    let p0 = track.values[offset0 + component + stride]
+    let m0 = track.values[offset0 + component + stride * 2] * td
+    let p1 = track.values[offset1 + component + stride]
+    let m1 = track.values[offset1 + component] * td
+    out.push(s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1)
+    component = component + 1
+  }
+  out
 }
 
 ///|

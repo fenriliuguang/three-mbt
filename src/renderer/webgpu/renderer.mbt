@@ -33,6 +33,7 @@ struct GeometryGpu {
   indices : GpuBuffer?
   index_count : Int
   vertex_count : Int
+  mut version : Int
 }
 
 ///|
@@ -1601,6 +1602,9 @@ fn WebGPURenderer::geometry_gpu(
 ) -> GeometryGpu? {
   for cached in self.geometries {
     if physical_equal(cached.geometry, geometry) {
+      if cached.version != geometry.version {
+        self.upload_geometry(cached, geometry)
+      }
       return Some(cached)
     }
   }
@@ -1644,10 +1648,41 @@ fn WebGPURenderer::geometry_gpu(
           indices,
           index_count,
           vertex_count: position.count,
+          version: geometry.version,
         }
         self.geometries.push(cached)
         Some(cached)
       }
+  }
+}
+
+///|
+fn WebGPURenderer::upload_geometry(
+  self : WebGPURenderer,
+  cached : GeometryGpu,
+  geometry : @core.BufferGeometry,
+) -> Unit {
+  match geometry.get_attribute("position") {
+    None => ()
+    Some(position) => {
+      ignore(
+        self.device
+        .queue()
+        .write_buffer_with_copy(
+          cached.vertices,
+          0UL,
+          @common.pack_position_normal_uv(
+            position,
+            geometry.get_attribute("normal"),
+            geometry.get_attribute("uv"),
+            color=geometry.get_attribute("color"),
+          ),
+          None,
+          None,
+        ),
+      )
+      cached.version = geometry.version
+    }
   }
 }
 

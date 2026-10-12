@@ -18,6 +18,7 @@ pub(all) struct BufferGeometry {
   groups : Array[GeometryGroup]
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
+  mut version : Int
 }
 
 ///|
@@ -28,6 +29,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     groups: [],
     bounding_box: None,
     bounding_sphere: None,
+    version: 0,
   }
 }
 
@@ -134,5 +136,53 @@ pub fn BufferGeometry::compute_bounding_sphere(self : BufferGeometry) -> Unit {
       sphere.radius = max_radius_sq.sqrt()
     }
     _ => self.bounding_sphere = None
+  }
+}
+
+///|
+/// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
+pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
+  let geometry = BufferGeometry::new()
+  copy_attribute(self, geometry, "position")
+  copy_attribute(self, geometry, "normal")
+  copy_attribute(self, geometry, "uv")
+  copy_attribute(self, geometry, "color")
+  match self.index {
+    None => ()
+    Some(index) =>
+      ignore(
+        geometry.set_index(
+          BufferAttribute::new(
+            index.array.copy(),
+            index.item_size,
+            normalized=index.normalized,
+          ),
+        ),
+      )
+  }
+  geometry.bounding_box = self.bounding_box
+  geometry.bounding_sphere = self.bounding_sphere
+  geometry
+}
+
+///|
+fn copy_attribute(
+  source : BufferGeometry,
+  geometry : BufferGeometry,
+  name : String,
+) -> Unit {
+  match source.get_attribute(name) {
+    None => ()
+    Some(attribute) =>
+      ignore(
+        geometry.set_attribute(
+          name,
+          BufferAttribute::new(
+            attribute.array.copy(),
+            attribute.item_size,
+            normalized=attribute.normalized,
+          ),
+        ),
+      )
   }
 }

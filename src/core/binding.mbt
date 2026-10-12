@@ -4,7 +4,7 @@
 /// 挂在网格节点上的绘制数据。颜色与材质共享同一个 `Color`。
 /// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65
 pub(all) struct MeshBinding {
-  geometry : BufferGeometry
+  mut geometry : BufferGeometry
   color : @math.Color
   shading : @constants.Shading
   mut side : @constants.Side

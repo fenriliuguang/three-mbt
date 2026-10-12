@@ -346,6 +346,54 @@ test "glTF position morph weights are baked into vertices" {
 }
 
 ///|
+test "glTF weight tracks rebake morph targets" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"stay","mesh":0},{"name":"blob","mesh":0}],"meshes":[{"weights":[0],"primitives":[{"attributes":{"POSITION":0},"targets":[{"POSITION":1}]}]}],"animations":[{"name":"swell","samplers":[{"input":2,"output":3}],"channels":[{"sampler":0,"target":{"node":1,"path":"weights"}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":2,"type":"SCALAR"},{"bufferView":3,"componentType":5126,"count":2,"type":"SCALAR"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":8},{"buffer":0,"byteOffset":80,"byteLength":8}],"buffers":[{"byteLength":88,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAgD8AAAAAAACAPw=="}]}
+  let asset = @gltf.parse(text)
+  let track = asset.animations[0].tracks[0]
+  assert_eq(asset.animations[0].tracks.length(), 1)
+  assert_eq(track.name, "blob.morphTargetInfluences")
+  assert_eq(track.value_size, 1)
+  let root = asset.scene.node
+  assert_eq(
+    physical_equal(geometry_of(root, "stay"), geometry_of(root, "blob")),
+    true,
+  )
+  let mixer = @animation.AnimationMixer::new(root)
+  let action = mixer.clip_action(asset.animations[0])
+  action.play()
+  mixer.update(0.0)
+  assert_eq(position_of(root, "blob").get_y(0), 0.0)
+  assert_eq(position_of(root, "stay").get_y(0), 0.0)
+  assert_eq(
+    physical_equal(geometry_of(root, "stay"), geometry_of(root, "blob")),
+    false,
+  )
+  mixer.update(0.5)
+  assert_eq(position_of(root, "blob").get_y(0), 1.0)
+  assert_eq(position_of(root, "blob").get_y(1), 1.0)
+  assert_eq(position_of(root, "blob").get_y(2), 2.0)
+  assert_eq(position_of(root, "stay").get_y(0), 0.0)
+  assert_eq(position_of(root, "stay").get_y(2), 1.0)
+}
+
+///|
+fn position_of(root : @core.Object3D, name : String) -> @core.BufferAttribute {
+  match must(root, name).mesh {
+    None => panic()
+    Some(binding) => binding.geometry.get_attribute("position").unwrap()
+  }
+}
+
+///|
+fn geometry_of(root : @core.Object3D, name : String) -> @core.BufferGeometry {
+  match must(root, name).mesh {
+    None => panic()
+    Some(binding) => binding.geometry
+  }
+}
+
+///|
 test "glTF normal morph weights are baked into normals" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"blob","mesh":0}],"meshes":[{"weights":[0.5],"primitives":[{"attributes":{"POSITION":0,"NORMAL":1},"targets":[{"POSITION":2,"NORMAL":3}]}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":3,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":36},{"buffer":0,"byteOffset":108,"byteLength":36}],"buffers":[{"byteLength":144,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABA"}]}
