@@ -3451,6 +3451,11 @@ fn WebGPURenderer::draw_meshes(
           haze.density,
           haze.mode,
           alpha_test=item.alpha_test,
+          side=match item.side {
+            @constants.Front => 0.0
+            @constants.Back => -1.0
+            @constants.Double => 1.0
+          },
           emissive_r=item.emissive.r,
           emissive_g=item.emissive.g,
           emissive_b=item.emissive.b,

@@ -742,6 +742,117 @@ test "alpha test is packed into surface z" {
 }
 
 ///|
+test "material side is packed into surface w" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let front = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+  )
+  assert_eq(front[284], b'\x00')
+  assert_eq(front[287], b'\x00')
+  let double = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    side=1.0,
+  )
+  assert_eq(double[284], b'\x00')
+  assert_eq(double[285], b'\x00')
+  assert_eq(double[286], b'\x80')
+  assert_eq(double[287], b'\x3F')
+  let back = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    side=-1.0,
+  )
+  assert_eq(back[284], b'\x00')
+  assert_eq(back[285], b'\x00')
+  assert_eq(back[286], b'\x80')
+  assert_eq(back[287], b'\xBF')
+}
+
+///|
 test "emissive reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

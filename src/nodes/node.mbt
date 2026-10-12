@@ -31,6 +31,7 @@ pub(all) enum Node {
   DirectShadow
   PointTerm
   SpotTerm
+  FacingNormal
 }
 
 ///|
@@ -310,6 +311,14 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
 }
 
 ///|
+/// 背面法线。`surface.w` 大于 0.5 时只在背面片元取反，小于 -0.5 时整面取反。
+/// r186: `negateOnBackSide` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/FrontFacingNode.js#L91
+/// r186: `faceDirection` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/normal_fragment_begin.glsl.js#L2
+fn facing_preamble() -> String {
+  "fn facing_normal(n : vec3<f32>, front : bool) -> vec3<f32> {\n  let side = (uniforms.surface).w;\n  if (side > 0.5) {\n    if (front) {\n      return n;\n    }\n    return -n;\n  }\n  if (side < -0.5) {\n    return -n;\n  }\n  return n;\n}\n\n"
+}
+
+///|
 /// Lambert：`color * (ambient + lightColor * max(dot(N, L), 0))`。
 /// r186: `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24
 pub fn lambert_program(instanced? : Bool = false) -> Program {
@@ -319,7 +328,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     Mul(Uniform("normal_matrix", Mat4), Vec4(normal, Float(0.0))),
     "xyz",
   )
-  let n = Normalize(Varying("v_normal", Vec3))
+  let n = Normalize(FacingNormal)
   let ndotl = Max(
     Dot(n, Swizzle(Uniform("light_direction", Vec4), "xyz")),
     Float(0.0),
@@ -379,11 +388,12 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     shadowed: true,
     preamble: if instanced {
       instance_preamble() +
+      facing_preamble() +
       shadow_preamble() +
       point_preamble() +
       spot_preamble()
     } else {
-      shadow_preamble() + point_preamble() + spot_preamble()
+      facing_preamble() + shadow_preamble() + point_preamble() + spot_preamble()
     },
   }
 }
@@ -435,11 +445,13 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     shadowed: true,
     preamble: if instanced {
       instance_preamble() +
+      facing_preamble() +
       shadow_preamble() +
       point_preamble() +
       spot_preamble() +
       standard_preamble()
     } else {
+      facing_preamble() +
       shadow_preamble() +
       point_preamble() +
       spot_preamble() +

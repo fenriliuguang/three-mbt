@@ -26,7 +26,7 @@ test "lambert material uses ambient and one directional light" {
   let wgsl = @nodes.lambert_wgsl()
   assert_eq(
     includes(
-      wgsl, "max(dot(normalize(input.v_normal), (uniforms.light_direction).xyz), 0.0)",
+      wgsl, "max(dot(normalize(facing_normal(input.v_normal, front)), (uniforms.light_direction).xyz), 0.0)",
     ),
     true,
   )
@@ -82,7 +82,9 @@ test "lambert and standard add one point light" {
   assert_eq(includes(lambert, "fn point_falloff("), true)
   assert_eq(includes(lambert, "1.0 / max(pow(dist, decay), 0.01)"), true)
   assert_eq(
-    includes(lambert, "point_term(input.v_world, input.v_normal)"),
+    includes(
+      lambert, "point_term(input.v_world, facing_normal(input.v_normal, front))",
+    ),
     true,
   )
   assert_eq(includes(standard, "fn point_standard("), true)
@@ -98,7 +100,12 @@ test "lambert and standard add one point light" {
   assert_eq(includes(basic, "fn point_standard("), false)
   assert_eq(includes(lambert, "fn spot_falloff("), true)
   assert_eq(includes(lambert, "fn spot_cone("), true)
-  assert_eq(includes(lambert, "spot_term(input.v_world, input.v_normal)"), true)
+  assert_eq(
+    includes(
+      lambert, "spot_term(input.v_world, facing_normal(input.v_normal, front))",
+    ),
+    true,
+  )
   assert_eq(includes(standard, "fn spot_standard("), true)
   assert_eq(
     includes(standard, "spot_standard(N, V, world, diffuse, f0, alpha)"),
@@ -106,6 +113,20 @@ test "lambert and standard add one point light" {
   )
   assert_eq(includes(basic, "fn spot_term("), false)
   assert_eq(includes(basic, "fn spot_standard("), false)
+}
+
+///|
+test "double sided materials flip the shading normal" {
+  let lambert = @nodes.lambert_wgsl()
+  let standard = @nodes.standard_wgsl()
+  let basic = @nodes.basic_wgsl()
+  let call = "facing_normal(input.v_normal, front)"
+  assert_eq(includes(lambert, "fn facing_normal("), true)
+  assert_eq(includes(lambert, call), true)
+  assert_eq(includes(standard, "fn facing_normal("), true)
+  assert_eq(includes(standard, call), true)
+  assert_eq(includes(basic, "fn facing_normal("), false)
+  assert_eq(includes(lambert, "@builtin(front_facing) front : bool"), true)
 }
 
 ///|
@@ -139,7 +160,9 @@ test "lit materials sample a directional shadow map" {
   assert_eq(includes(lambert, "texture_depth_2d"), true)
   assert_eq(includes(lambert, "(uniforms.ambient).xyz"), true)
   assert_eq(
-    includes(lambert, "direct_shadow(input.v_world, input.v_normal)"),
+    includes(
+      lambert, "direct_shadow(input.v_world, facing_normal(input.v_normal, front))",
+    ),
     true,
   )
   assert_eq(includes(@nodes.basic_wgsl(), "shadow_map"), false)

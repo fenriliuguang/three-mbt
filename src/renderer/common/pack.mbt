@@ -6,6 +6,7 @@ using @core {type BufferAttribute}
 ///|
 /// 五块 `mat4x4<f32>` 和十九块 `vec4<f32>`。624 字节。
 /// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
+/// `surface` 是 `(roughness, metalness, alphaTest, side)`。`side` 为 1 表示双面，-1 表示只画背面并翻转法线。
 /// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
 /// 再后面是聚光的位置、方向（`w` 为开关）、颜色，以及 `(distance, decay, coneCos, penumbraCos)`。
 pub let uniform_bytes : Int = 624
@@ -283,6 +284,7 @@ pub fn pack_uniforms(
   spot_cone_cos? : Double = 1.0,
   spot_penumbra_cos? : Double = 1.0,
   spot_enabled? : Double = 0.0,
+  side? : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -299,6 +301,7 @@ pub fn pack_uniforms(
   write_f32(dst, 272, roughness)
   write_f32(dst, 276, metalness)
   write_f32(dst, 280, alpha_test)
+  write_f32(dst, 284, side)
   write_f32(dst, 288, viewport_width)
   write_f32(dst, 292, viewport_height)
   write_f32(dst, 304, point_size)

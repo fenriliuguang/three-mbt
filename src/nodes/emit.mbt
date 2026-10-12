@@ -43,12 +43,15 @@ fn emit_expr(node : Node) -> String {
     TextureSample(uv) =>
       "textureSample(map_texture, map_sampler, \{emit_expr(uv)})"
     StandardLit(base) =>
-      "standard_lit(\{emit_expr(base)}, input.v_normal, input.v_world)"
+      "standard_lit(\{emit_expr(base)}, facing_normal(input.v_normal, front), input.v_world)"
     InstanceNormal(normal) =>
       "instance_normal(\{emit_expr(normal)}, input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2)"
-    DirectShadow => "direct_shadow(input.v_world, input.v_normal)"
-    PointTerm => "point_term(input.v_world, input.v_normal)"
-    SpotTerm => "spot_term(input.v_world, input.v_normal)"
+    DirectShadow =>
+      "direct_shadow(input.v_world, facing_normal(input.v_normal, front))"
+    PointTerm =>
+      "point_term(input.v_world, facing_normal(input.v_normal, front))"
+    SpotTerm => "spot_term(input.v_world, facing_normal(input.v_normal, front))"
+    FacingNormal => "facing_normal(input.v_normal, front)"
   }
 }
 
@@ -117,7 +120,7 @@ pub fn emit_wgsl(program : Program) -> String {
     lines.push("  output.\{name} = \{emit_expr(expr)};\n")
   }
   lines.push(
-    "  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput) -> @location(0) vec4<f32> {\n",
+    "  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput, @builtin(front_facing) front : bool) -> @location(0) vec4<f32> {\n",
   )
   lines.push(
     "  let color = apply_fog(\{emit_expr(program.fragment_color)}, input.v_fog_depth);\n",
