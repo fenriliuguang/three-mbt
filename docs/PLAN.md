@@ -247,6 +247,8 @@ Perspective `setViewOffset` has landed. It sets `aspect` to `fullWidth / fullHei
 
 Orthographic `setViewOffset` has landed. It does not change `aspect`. The scale is the frustum width and height divided by the full frame and by `zoom`. The left half of a frustum from `-2` to `2` and `-1` to `1` becomes `-2` to `0`, and the x translation term becomes `1`. `clearViewOffset` restores the full frustum.
 
+`set_near` and `set_far` have landed on both cameras. They write the plane and rebuild the projection. Perspective keeps the same x and y scale, because the frustum height grows with `near`. Orthographic keeps the same x and y scale too. Only the depth terms change.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -311,6 +313,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | perspective view bounds and view size | `cameras` |
 | planned | 7 | perspective `setViewOffset` and `clearViewOffset` | `cameras` |
 | planned | 7 | orthographic `setViewOffset` and `clearViewOffset` | `cameras` |
+| planned | 7 | `near` and `far` setters on both cameras | `cameras` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

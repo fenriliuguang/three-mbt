@@ -16,6 +16,8 @@ pub(all) struct OrthographicCamera {
 }
 pub fn OrthographicCamera::clear_view_offset(Self) -> Unit
 pub fn OrthographicCamera::new(left? : Double, right? : Double, top? : Double, bottom? : Double, near? : Double, far? : Double) -> Self
+pub fn OrthographicCamera::set_far(Self, Double) -> Unit
+pub fn OrthographicCamera::set_near(Self, Double) -> Unit
 pub fn OrthographicCamera::set_view_offset(Self, Double, Double, Double, Double, Double, Double) -> Unit
 pub fn OrthographicCamera::set_zoom(Self, Double) -> Unit
 pub fn OrthographicCamera::to_node(Self) -> @core.Object3D
@@ -32,9 +34,11 @@ pub fn PerspectiveCamera::film_width(Self) -> Double
 pub fn PerspectiveCamera::focal_length(Self) -> Double
 pub fn PerspectiveCamera::new(fov? : Double, aspect? : Double, near? : Double, far? : Double) -> Self
 pub fn PerspectiveCamera::set_aspect(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_far(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_film_offset(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_focal_length(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_fov(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_near(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_view_offset(Self, Double, Double, Double, Double, Double, Double) -> Unit
 pub fn PerspectiveCamera::set_zoom(Self, Double) -> Unit
 pub fn PerspectiveCamera::to_node(Self) -> @core.Object3D

@@ -235,6 +235,63 @@ test "perspective view offset takes the left half" {
 }
 
 ///|
+test "near and far rebuild the depth terms" {
+  let perspective = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  perspective.set_near(1.0)
+  match perspective.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.near, 1.0)
+      assert_close(state.projection.elements[0], 1.20628514279)
+      assert_close(state.projection.elements[10], -1.010101010101)
+      assert_close(state.projection.elements[14], -1.010101010101)
+    }
+  }
+  perspective.set_near(0.1)
+  perspective.set_far(50.0)
+  match perspective.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.far, 50.0)
+      assert_close(state.projection.elements[10], -1.002004008016)
+      assert_close(state.projection.elements[14], -0.100200400802)
+    }
+  }
+  let ortho = @cameras.OrthographicCamera::new(
+    left=-2.0,
+    right=2.0,
+    top=1.0,
+    bottom=-1.0,
+    near=0.1,
+    far=10.0,
+  )
+  ortho.set_near(1.0)
+  match ortho.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.near, 1.0)
+      assert_close(state.projection.elements[0], 0.5)
+      assert_close(state.projection.elements[10], -0.111111111111)
+      assert_close(state.projection.elements[14], -0.111111111111)
+    }
+  }
+  ortho.set_far(50.0)
+  match ortho.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.far, 50.0)
+      assert_close(state.projection.elements[10], -0.020408163265)
+      assert_close(state.projection.elements[14], -0.020408163265)
+    }
+  }
+}
+
+///|
 test "orthographic view offset takes the left half" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

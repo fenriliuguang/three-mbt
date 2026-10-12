@@ -5,7 +5,7 @@ using @core {type Object3D, type CameraState}
 
 ///|
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
-/// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。两个设置都会重算投影。
+/// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。`set_near` 和 `set_far` 只改深度项并重算投影。
 /// `film_gauge` 默认 35。横构图的胶片宽度等于它，高度按宽高比缩小；竖构图相反。`set_focal_length` 用胶片高度改 `fov` 并重算投影。
 /// `view_bounds` 用投影逆矩阵给出某个距离上的可视矩形，`view_size` 是它的宽高。投影里的 `view` 偏移会算进去。
 /// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `zoom` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L63 ; `filmOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L129
@@ -81,6 +81,34 @@ pub fn PerspectiveCamera::set_zoom(
     None => ()
     Some(camera) => {
       camera.zoom = zoom
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn PerspectiveCamera::set_near(
+  self : PerspectiveCamera,
+  near : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.near = near
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn PerspectiveCamera::set_far(
+  self : PerspectiveCamera,
+  far : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.far = far
       camera.update_projection()
     }
   }
@@ -223,7 +251,7 @@ pub fn PerspectiveCamera::view_size(
 
 ///|
 /// 正交相机。`left` / `right` / `top` / `bottom` 是相机空间里的视锥边界。
-/// `set_view_offset` 在这块视锥里取子矩形，不改 `aspect`。
+/// `set_view_offset` 在这块视锥里取子矩形，不改 `aspect`。`set_near` 和 `set_far` 只改深度项。
 /// r186: `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17
 pub(all) struct OrthographicCamera {
   node : Object3D
@@ -259,6 +287,34 @@ pub fn OrthographicCamera::update_projection(self : OrthographicCamera) -> Unit 
   match self.node.camera {
     None => ()
     Some(camera) => camera.update_projection()
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_near(
+  self : OrthographicCamera,
+  near : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.near = near
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_far(
+  self : OrthographicCamera,
+  far : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.far = far
+      camera.update_projection()
+    }
   }
 }
 
