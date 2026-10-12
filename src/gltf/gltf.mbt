@@ -104,7 +104,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点。点光、聚光、贴图、蒙皮、法线形变和节点权重先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`。点光、聚光、贴图、蒙皮、顶点色形变和节点权重先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -693,25 +693,17 @@ fn load_primitive(
   match obj.get("targets") {
     None => ()
     Some(value) =>
-      apply_morph_positions(
-        geometry,
-        as_array(value),
-        weights,
-        bins,
-        views,
-        accs,
-      )
+      apply_morph_targets(geometry, as_array(value), weights, bins, views, accs)
   }
   { geometry, mat, }
 }
 
 ///|
-
-///|
-/// 按 `mesh.weights` 把 `POSITION` 增量加进顶点。法线形变和节点权重先不加。
-/// 这不是运行时的 `morphTargetInfluences`，只烘焙默认权重。
+/// 按 `mesh.weights` 把 `POSITION` 和 `NORMAL` 增量加进已有属性。
+/// 没有法线属性时跳过 `NORMAL` 目标。顶点色形变和节点权重先不加。
+/// 这不是运行时的 `morphTargetInfluences`，只烘焙默认权重。上游把增量放进 `morphAttributes`。
 /// r186: `addMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2387 ; `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2474
-fn apply_morph_positions(
+fn apply_morph_targets(
   geometry : @core.BufferGeometry,
   targets : Array[Json],
   weights : Array[Double],
@@ -723,6 +715,7 @@ fn apply_morph_positions(
     None => return
     Some(attribute) => attribute
   }
+  let normal = geometry.get_attribute("normal")
   let mut index = 0
   while index < targets.length() {
     let weight = if index < weights.length() { weights[index] } else { 0.0 }
@@ -730,32 +723,50 @@ fn apply_morph_positions(
       let target = as_object(targets[index])
       match target.get("POSITION") {
         None => ()
-        Some(accessor) => {
-          let deltas = read_values(
-            bins,
-            views,
-            accs,
-            as_f64(accessor).to_int(),
-            3,
+        Some(accessor) =>
+          add_weighted_deltas(
+            position,
+            read_values(bins, views, accs, as_f64(accessor).to_int(), 3),
+            weight,
           )
-          if deltas.length() != position.count * 3 {
-            raise GltfError::Invalid("morph target")
+      }
+      match normal {
+        None => ()
+        Some(attribute) =>
+          match target.get("NORMAL") {
+            None => ()
+            Some(accessor) =>
+              add_weighted_deltas(
+                attribute,
+                read_values(bins, views, accs, as_f64(accessor).to_int(), 3),
+                weight,
+              )
           }
-          let mut vertex = 0
-          while vertex < position.count {
-            let base = vertex * 3
-            position.set_xyz(
-              vertex,
-              position.get_x(vertex) + weight * deltas[base],
-              position.get_y(vertex) + weight * deltas[base + 1],
-              position.get_z(vertex) + weight * deltas[base + 2],
-            )
-            vertex = vertex + 1
-          }
-        }
       }
     }
     index = index + 1
+  }
+}
+
+///|
+fn add_weighted_deltas(
+  attribute : @core.BufferAttribute,
+  deltas : Array[Double],
+  weight : Double,
+) -> Unit raise GltfError {
+  if deltas.length() != attribute.count * 3 {
+    raise GltfError::Invalid("morph target")
+  }
+  let mut vertex = 0
+  while vertex < attribute.count {
+    let base = vertex * 3
+    attribute.set_xyz(
+      vertex,
+      attribute.get_x(vertex) + weight * deltas[base],
+      attribute.get_y(vertex) + weight * deltas[base + 1],
+      attribute.get_z(vertex) + weight * deltas[base + 2],
+    )
+    vertex = vertex + 1
   }
 }
 

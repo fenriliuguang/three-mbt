@@ -344,3 +344,23 @@ test "glTF position morph weights are baked into vertices" {
     }
   }
 }
+
+///|
+test "glTF normal morph weights are baked into normals" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"blob","mesh":0}],"meshes":[{"weights":[0.5],"primitives":[{"attributes":{"POSITION":0,"NORMAL":1},"targets":[{"POSITION":2,"NORMAL":3}]}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":3,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":36},{"buffer":0,"byteOffset":108,"byteLength":36}],"buffers":[{"byteLength":144,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABA"}]}
+  match must(@gltf.parse(text).scene.node, "blob").mesh {
+    None => panic()
+    Some(binding) => {
+      let position = binding.geometry.get_attribute("position").unwrap()
+      let normal = binding.geometry.get_attribute("normal").unwrap()
+      assert_eq(position.get_y(0), 1.0)
+      assert_eq(position.get_y(1), 1.0)
+      assert_eq(position.get_y(2), 2.0)
+      assert_eq(normal.get_z(0), 2.0)
+      assert_eq(normal.get_x(1), 0.0)
+      assert_eq(normal.get_z(1), 2.0)
+      assert_eq(normal.get_z(2), 2.0)
+    }
+  }
+}
