@@ -49,6 +49,40 @@ test "matrix compose and decompose match r186" {
 }
 
 ///|
+test "transformDirection uses the upper 3x3 and normalizes" {
+  let translated = @math.Matrix4::new().compose(
+    @math.Vector3::new(x=10.0),
+    @math.Quaternion::new(),
+    @math.Vector3::new(x=1.0, y=1.0, z=1.0),
+  )
+  let forward = @math.Vector3::new(z=1.0)
+  ignore(forward.transform_direction(translated))
+  assert_eq(forward.x, 0.0)
+  assert_eq(forward.y, 0.0)
+  assert_eq(forward.z, 1.0)
+  let yaw = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    1.5707963267948966,
+  )
+  let turned = @math.Matrix4::new().make_rotation_from_quaternion(yaw)
+  let axis = @math.Vector3::new(x=1.0)
+  ignore(axis.transform_direction(turned))
+  assert_close(axis.x, 0.0)
+  assert_close(axis.y, 0.0)
+  assert_close(axis.z, -1.0)
+  let scaled = @math.Matrix4::new().compose(
+    @math.Vector3::new(),
+    @math.Quaternion::new(),
+    @math.Vector3::new(x=2.0, y=1.0, z=1.0),
+  )
+  let diagonal = @math.Vector3::new(x=1.0, y=1.0)
+  ignore(diagonal.transform_direction(scaled))
+  assert_close(diagonal.x, 0.894427190999916)
+  assert_close(diagonal.y, 0.447213595499958)
+  assert_close(diagonal.z, 0.0)
+}
+
+///|
 test "applyQuaternion rotates a unit axis" {
   let axis = @math.Vector3::new(x=1.0)
   let turn = @math.Quaternion::new().set_from_axis_angle(

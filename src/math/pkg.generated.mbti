@@ -220,6 +220,7 @@ pub fn Vector3::set_from_matrix_column(Self, Matrix4, Int) -> Self
 pub fn Vector3::set_from_matrix_position(Self, Matrix4) -> Self
 pub fn Vector3::sub(Self, Self) -> Self
 pub fn Vector3::sub_vectors(Self, Self, Self) -> Self
+pub fn Vector3::transform_direction(Self, Matrix4) -> Self
 
 pub(all) struct Vector4 {
   mut x : Double

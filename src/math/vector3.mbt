@@ -217,6 +217,20 @@ pub fn Vector3::apply_quaternion(self : Vector3, q : Quaternion) -> Vector3 {
 }
 
 ///|
+/// 只用矩阵左上 3×3，并把结果归一化。平移不参与。
+/// r186: `transformDirection` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L525
+pub fn Vector3::transform_direction(self : Vector3, m : Matrix4) -> Vector3 {
+  let x = self.x
+  let y = self.y
+  let z = self.z
+  let e = m.elements
+  self.x = e[0] * x + e[4] * y + e[8] * z
+  self.y = e[1] * x + e[5] * y + e[9] * z
+  self.z = e[2] * x + e[6] * y + e[10] * z
+  self.normalize()
+}
+
+///|
 pub fn Vector3::set_from_matrix_position(
   self : Vector3,
   m : Matrix4,

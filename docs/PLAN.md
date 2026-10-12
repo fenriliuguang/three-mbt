@@ -275,6 +275,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `dispose` has landed. It dispatches a `dispose` event and does not remove the object from its parent. Geometries, materials, and textures stay shared, so this call does not free them.
 
+`Vector3.transformDirection` has landed. It multiplies by the upper 3×3 of a matrix and normalizes. Translation is ignored, so a pure shift leaves `(0, 0, 1)` unchanged. A right-angle yaw turns `(1, 0, 0)` into `(0, 0, -1)`. Scale `(2, 1, 1)` turns `(1, 1, 0)` into `(0.894427190999916, 0.447213595499958, 0)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -353,6 +355,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D `getObjectById` | `core` |
 | planned | 7 | Object3D `copy` and `clone` | `core` |
 | planned | 7 | Object3D `dispose` | `core` |
+| planned | 7 | `Vector3.transformDirection` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
