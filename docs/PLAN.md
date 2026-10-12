@@ -243,6 +243,8 @@ Perspective focal length has landed. `filmGauge` still defaults to 35. Landscape
 
 Perspective `getViewBounds` and `getViewSize` have landed. At a distance along the view direction, the bounds are the NDC corners `(-1, -1, 0.5)` and `(1, 1, 0.5)` through the inverse projection, then scaled by `-distance / z`. The size is the width and height of that rectangle. `zoom` 2 halves both. View offset stays out, so the rectangle is the full frustum.
 
+Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
+
 `shadowSide` has landed. It defaults to null. A null side flips the material side for the shadow pass: front draws back faces, back draws front faces, and double draws both. A set value is used as-is. The shadow map is not VSM, so that path's unflipped default stays out. Points and lines do not cast shadows.
 
 A hemisphere light has landed. The first visible one adds indirect diffuse on Lambert and Standard. Sky and ground colors are multiplied by intensity. The direction is the light's world position, normalized, and defaults to `(0, 1, 0)`. A zero-length position stays zero, so the mix weight is 0.5. The weight is `dot(normal, direction) * 0.5 + 0.5`, then `mix(ground, sky, weight)`. It does not add specular and does not cast shadows. A second hemisphere light is ignored. The uniform block grows by 48 bytes to 672. Basic materials, points, and lines do not sample it.
@@ -301,6 +303,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | perspective `zoom` and `filmOffset` | `cameras` |
 | planned | 7 | perspective focal length, film width, and film height | `cameras` |
 | planned | 7 | perspective view bounds and view size | `cameras` |
+| planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
 | planned | 7 | double-sided and back-sided shading normals | `nodes`, `renderer` |
 | planned | 7 | emissive maps on Lambert and Standard | `materials`, `renderer` |

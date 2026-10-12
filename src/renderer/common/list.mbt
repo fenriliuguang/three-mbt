@@ -51,7 +51,8 @@ pub fn collect_opaque(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if !binding.transparent &&
+            if binding.visible &&
+              !binding.transparent &&
               !binding.wireframe &&
               on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
@@ -120,7 +121,8 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
         match node.mesh {
           None => ()
           Some(binding) =>
-            if !binding.transparent &&
+            if binding.visible &&
+              !binding.transparent &&
               on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, None) {
               items.push({
@@ -174,7 +176,8 @@ pub fn collect_wireframe(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.wireframe &&
+            if binding.visible &&
+              binding.wireframe &&
               on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
@@ -287,7 +290,8 @@ pub fn collect_primitives(
     match node.primitive {
       None => ()
       Some(binding) =>
-        if !binding.transparent &&
+        if binding.visible &&
+          !binding.transparent &&
           on_camera_layer(node, camera) &&
           kept_by_frustum(node, binding.geometry, frustum) {
           items.push({
@@ -324,7 +328,8 @@ pub fn collect_transparent_primitives(
     match node.primitive {
       None => ()
       Some(binding) =>
-        if binding.transparent &&
+        if binding.visible &&
+          binding.transparent &&
           on_camera_layer(node, Some(camera)) &&
           kept_by_frustum(node, binding.geometry, frustum) {
           items.push({
@@ -546,7 +551,8 @@ pub fn collect_transparent(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.transparent &&
+            if binding.visible &&
+              binding.transparent &&
               !binding.wireframe &&
               on_camera_layer(node, Some(camera)) &&
               kept_by_frustum(node, binding.geometry, frustum) {

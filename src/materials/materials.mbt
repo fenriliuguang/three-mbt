@@ -23,8 +23,9 @@ pub(all) enum MaterialKind {
 /// `color_write` 默认打开。关掉后颜色通道不写颜色，深度测试和深度写入不变。阴影通道没有颜色目标。
 /// `premultiplied_alpha` 默认关闭。打开后透明混合的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。不透明绘制没有混合，这个开关不起作用。
 /// `shadow_side` 默认空。空着时阴影通道把正面翻成背面、背面翻成正面，双面保持双面。设了值就按那个面投射，不再翻转。
-/// 改 `side`、`shadow_side`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`depth_func`、`color_write`、`premultiplied_alpha`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
+/// `visible` 默认打开。关掉后这个材质不进颜色列表，也不进阴影列表。节点的 `visible` 仍然单独决定整棵子树。
+/// 改 `side`、`shadow_side`、`visible`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`depth_func`、`color_write`、`premultiplied_alpha`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -43,6 +44,7 @@ pub(all) struct Material {
   mut depth_func : @constants.DepthFunc
   mut color_write : Bool
   mut premultiplied_alpha : Bool
+  mut visible : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -72,6 +74,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     depth_func: @constants.LessEqual,
     color_write: true,
     premultiplied_alpha: false,
+    visible: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -114,6 +117,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     depth_func: @constants.LessEqual,
     color_write: true,
     premultiplied_alpha: false,
+    visible: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -162,6 +166,7 @@ pub fn Material::standard(
     depth_func: @constants.LessEqual,
     color_write: true,
     premultiplied_alpha: false,
+    visible: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -212,6 +217,7 @@ pub(all) struct PointsMaterial {
   mut depth_func : @constants.DepthFunc
   mut color_write : Bool
   mut premultiplied_alpha : Bool
+  mut visible : Bool
 }
 
 ///|
@@ -232,6 +238,7 @@ pub fn PointsMaterial::new(
     depth_func: @constants.LessEqual,
     color_write: true,
     premultiplied_alpha: false,
+    visible: true,
   }
 }
 
@@ -248,6 +255,7 @@ pub(all) struct LineBasicMaterial {
   mut depth_func : @constants.DepthFunc
   mut color_write : Bool
   mut premultiplied_alpha : Bool
+  mut visible : Bool
 }
 
 ///|
@@ -262,5 +270,6 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     depth_func: @constants.LessEqual,
     color_write: true,
     premultiplied_alpha: false,
+    visible: true,
   }
 }

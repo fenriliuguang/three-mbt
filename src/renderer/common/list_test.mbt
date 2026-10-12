@@ -1280,6 +1280,59 @@ test "shadow side flips the material side unless set" {
 }
 
 ///|
+test "material visible defaults on and hides draws" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let shown = @materials.MeshBasicMaterial::new()
+  assert_eq(shown.material.visible, true)
+  let kept = @objects.Mesh::new(box.geometry, shown.material)
+  kept.node.cast_shadow = true
+  ignore(scene.add(kept))
+  let hidden = @materials.MeshLambertMaterial::new()
+  hidden.material.visible = false
+  let mesh = @objects.Mesh::new(box.geometry, hidden.material)
+  mesh.node.cast_shadow = true
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(physical_equal(drawn[0].node, kept.node), true)
+  let shadows = @common.collect_shadow(scene.node)
+  assert_eq(shadows.length(), 1)
+  assert_eq(physical_equal(shadows[0].node, kept.node), true)
+  let wire = @materials.MeshBasicMaterial::new()
+  wire.material.wireframe = true
+  wire.material.visible = false
+  let edges = @objects.Mesh::new(box.geometry, wire.material)
+  ignore(scene.add(edges))
+  assert_eq(@common.collect_wireframe(scene.node).length(), 0)
+  let glass = @materials.MeshLambertMaterial::new()
+  glass.material.transparent = true
+  glass.material.visible = false
+  let blended = @objects.Mesh::new(box.geometry, glass.material)
+  ignore(scene.add(blended))
+  let camera = @cameras.PerspectiveCamera::new(fov=50.0, aspect=1.0)
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  @common.update_frame(scene.node, camera.node)
+  assert_eq(@common.collect_transparent(scene.node, camera.node).length(), 0)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  assert_eq(points_material.visible, true)
+  points_material.visible = false
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  line_material.transparent = true
+  line_material.visible = false
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  assert_eq(@common.collect_primitives(scene.node).length(), 0)
+  assert_eq(
+    @common.collect_transparent_primitives(scene.node, camera.node).length(),
+    0,
+  )
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

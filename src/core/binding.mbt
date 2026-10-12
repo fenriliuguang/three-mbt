@@ -23,6 +23,7 @@ pub(all) struct MeshBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  mut visible : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -69,6 +70,7 @@ pub(all) struct PrimitiveBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  visible : Bool
 }
 
 ///|

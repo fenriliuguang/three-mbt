@@ -85,6 +85,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     depth_func: self.material.depth_func,
     color_write: self.material.color_write,
     premultiplied_alpha: self.material.premultiplied_alpha,
+    visible: self.material.visible,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
@@ -144,6 +145,7 @@ fn primitive_binding(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied_alpha : Bool,
+  visible : Bool,
 ) -> @core.PrimitiveBinding {
   {
     geometry,
@@ -159,6 +161,7 @@ fn primitive_binding(
     depth_func,
     color_write,
     premultiplied_alpha,
+    visible,
   }
 }
 
@@ -207,6 +210,7 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.depth_func,
       self.material.color_write,
       self.material.premultiplied_alpha,
+      self.material.visible,
     ),
   )
 }
@@ -276,6 +280,7 @@ pub fn Line::refresh(self : Line) -> Unit {
       self.material.depth_func,
       self.material.color_write,
       self.material.premultiplied_alpha,
+      self.material.visible,
     ),
   )
 }
@@ -345,6 +350,7 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.depth_func,
       self.material.color_write,
       self.material.premultiplied_alpha,
+      self.material.visible,
     ),
   )
 }
@@ -490,6 +496,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     depth_func: self.material.depth_func,
     color_write: self.material.color_write,
     premultiplied_alpha: self.material.premultiplied_alpha,
+    visible: self.material.visible,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
