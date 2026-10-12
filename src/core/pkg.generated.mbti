@@ -225,7 +225,10 @@ pub fn Object3D::add_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
 pub fn Object3D::clear(Self) -> Self
 pub fn Object3D::dispatch_event(Self, ObjectEvent) -> Unit
 pub fn Object3D::get_object_by_name(Self, String) -> Self?
+pub fn Object3D::get_world_direction(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::get_world_position(Self, @math.Vector3) -> @math.Vector3
+pub fn Object3D::get_world_quaternion(Self, @math.Quaternion) -> @math.Quaternion
+pub fn Object3D::get_world_scale(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::local_to_world(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::look_at(Self, Double, Double, Double) -> Unit
 pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit

@@ -320,6 +320,43 @@ pub fn Object3D::get_world_position(
 }
 
 ///|
+/// r186: `getWorldQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1010
+pub fn Object3D::get_world_quaternion(
+  self : Object3D,
+  target : @math.Quaternion,
+) -> @math.Quaternion {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  let position = @math.Vector3::new()
+  let scale = @math.Vector3::new()
+  ignore(self.matrix_world.decompose(position, target, scale))
+  target
+}
+
+///|
+/// r186: `getWorldScale` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1026
+pub fn Object3D::get_world_scale(
+  self : Object3D,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  let position = @math.Vector3::new()
+  let quaternion = @math.Quaternion::new()
+  ignore(self.matrix_world.decompose(position, quaternion, target))
+  target
+}
+
+///|
+/// r186: `getWorldDirection` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1042
+pub fn Object3D::get_world_direction(
+  self : Object3D,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  let e = self.matrix_world.elements
+  target.set(e[8], e[9], e[10]).normalize()
+}
+
+///|
 /// r186: `localToWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L663
 pub fn Object3D::local_to_world(
   self : Object3D,

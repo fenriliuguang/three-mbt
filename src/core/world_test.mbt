@@ -90,6 +90,43 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "world rotation scale and direction follow the parent" {
+  let parent = @core.Object3D::new()
+  ignore(parent.position.set(10.0, 0.0, 0.0))
+  ignore(parent.rotation.set(0.0, 0.5, 0.0))
+  let child = @core.Object3D::new()
+  ignore(child.position.set(0.0, 0.0, 4.0))
+  ignore(parent.add(child))
+  parent.update_matrix_world()
+  let rotation = @math.Quaternion::new()
+  ignore(child.get_world_quaternion(rotation))
+  assert_close(rotation.x, parent.quaternion.x)
+  assert_close(rotation.y, parent.quaternion.y)
+  assert_close(rotation.z, parent.quaternion.z)
+  assert_close(rotation.w, parent.quaternion.w)
+  let scale = @math.Vector3::new()
+  ignore(child.get_world_scale(scale))
+  assert_eq(scale.x, 1.0)
+  assert_eq(scale.y, 1.0)
+  assert_eq(scale.z, 1.0)
+  let direction = @math.Vector3::new()
+  ignore(child.get_world_direction(direction))
+  assert_close(direction.x, 0.479425538604)
+  assert_close(direction.y, 0.0)
+  assert_close(direction.z, 0.87758256189)
+  let scaled = @core.Object3D::new()
+  ignore(scaled.scale.set(2.0, 3.0, 4.0))
+  let nested = @core.Object3D::new()
+  ignore(nested.scale.set(0.5, 2.0, 1.0))
+  ignore(scaled.add(nested))
+  let world_scale = @math.Vector3::new()
+  ignore(nested.get_world_scale(world_scale))
+  assert_eq(world_scale.x, 1.0)
+  assert_eq(world_scale.y, 6.0)
+  assert_eq(world_scale.z, 4.0)
+}
+
+///|
 test "local and world vectors round trip through the child" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))

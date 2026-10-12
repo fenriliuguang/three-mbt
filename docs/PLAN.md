@@ -259,6 +259,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `localToWorld` and `worldToLocal` have landed. Both update the world matrix from the parents first. Local to world multiplies by that matrix. World to local multiplies by a copy of its inverse, so the stored world matrix stays intact. A child at local `(0, 0, 4)` under a parent shifted by 10 and yawed by 0.5 turns local `(0, 0, 1)` into world `(12.397127693021, 0, 4.38791280945)`, and the reverse returns the local point.
 
+`getWorldQuaternion`, `getWorldScale`, and `getWorldDirection` have landed. Each updates the world matrix from the parents first. The quaternion and scale come from decomposing that matrix. The direction is the matrix's third column, normalized, which is the object's positive Z axis in world space. A child with no local rotation copies its parent's quaternion. Parent scale `(2, 3, 4)` and child scale `(0.5, 2, 1)` multiply to `(1, 6, 4)`. The same yawed child used above looks along `(0.479425538604, 0, 0.87758256189)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -329,6 +331,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D local `rotateOnAxis` and `translateOnAxis` | `core`, `math` |
 | planned | 7 | Object3D `rotateOnWorldAxis` | `core` |
 | planned | 7 | Object3D `localToWorld` and `worldToLocal` | `core` |
+| planned | 7 | Object3D `getWorldQuaternion`, `getWorldScale`, and `getWorldDirection` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
