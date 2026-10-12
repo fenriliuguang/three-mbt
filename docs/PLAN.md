@@ -253,7 +253,9 @@ Orthographic `left`, `right`, `top`, and `bottom` setters have landed. Each one 
 
 Perspective `set_film_gauge` has landed. The gauge still defaults to 35. Setting it to 70 doubles landscape film width and film height, and doubles the focal length at the same fov. A film offset of 3.5 then shifts the frustum by half as much, because the shift is `near * filmOffset / filmWidth`.
 
-Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X, Y, and Z helpers. The axis is assumed normalized. Rotation multiplies the quaternion on the right, so the bound Euler stays in step. Translation copies the axis, rotates it by the quaternion, and adds that offset to the position. `rotateY` by a right angle then `translateX(2)` lands at `(0, 0, -2)`. World-axis rotation stays out.
+Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X, Y, and Z helpers. The axis is assumed normalized. Rotation multiplies the quaternion on the right, so the bound Euler stays in step. Translation copies the axis, rotates it by the quaternion, and adds that offset to the position. `rotateY` by a right angle then `translateX(2)` lands at `(0, 0, -2)`.
+
+`rotateOnWorldAxis` has landed. The axis is assumed normalized, and the parent is assumed not rotated. The turn is premultiplied, so it applies before the object's existing rotation. A right-angle yaw then a world-X quarter turn is `(0.5, 0.5, 0.5, 0.5)`. The same yaw then a local X quarter turn is `(0.5, 0.5, -0.5, 0.5)`.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -323,6 +325,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | orthographic `left`, `right`, `top`, and `bottom` setters | `cameras` |
 | planned | 7 | perspective `filmGauge` setter | `cameras` |
 | planned | 7 | Object3D local `rotateOnAxis` and `translateOnAxis` | `core`, `math` |
+| planned | 7 | Object3D `rotateOnWorldAxis` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

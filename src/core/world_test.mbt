@@ -71,6 +71,25 @@ test "local rotate and translate match r186" {
 }
 
 ///|
+test "world axis rotation premultiplies the quaternion" {
+  let right_angle = 1.5707963267948966
+  let world = @core.Object3D::new()
+  ignore(world.rotate_y(right_angle))
+  ignore(world.rotate_on_world_axis(@math.Vector3::new(x=1.0), right_angle))
+  assert_close(world.quaternion.x, 0.5)
+  assert_close(world.quaternion.y, 0.5)
+  assert_close(world.quaternion.z, 0.5)
+  assert_close(world.quaternion.w, 0.5)
+  let body = @core.Object3D::new()
+  ignore(body.rotate_y(right_angle))
+  ignore(body.rotate_x(right_angle))
+  assert_close(body.quaternion.x, 0.5)
+  assert_close(body.quaternion.y, 0.5)
+  assert_close(body.quaternion.z, -0.5)
+  assert_close(body.quaternion.w, 0.5)
+}
+
+///|
 test "lookAt matches r186 quaternion" {
   let looker = @core.Object3D::new()
   ignore(looker.position.set(0.0, 0.0, 5.0))

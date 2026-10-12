@@ -374,6 +374,19 @@ pub fn Object3D::rotate_on_axis(
 }
 
 ///|
+/// 绕世界轴旋转。轴假定已归一化，并且父节点没有旋转。
+/// r186: `rotateOnWorldAxis` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L551
+pub fn Object3D::rotate_on_world_axis(
+  self : Object3D,
+  axis : @math.Vector3,
+  angle : Double,
+) -> Object3D {
+  let turn = @math.Quaternion::new().set_from_axis_angle(axis, angle)
+  ignore(self.quaternion.premultiply(turn))
+  self
+}
+
+///|
 /// r186: `rotateX` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L571
 pub fn Object3D::rotate_x(self : Object3D, angle : Double) -> Object3D {
   self.rotate_on_axis(@math.Vector3::new(x=1.0), angle)
