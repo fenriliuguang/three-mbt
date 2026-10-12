@@ -104,7 +104,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。点光、聚光、贴图、蒙皮和形变先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点。点光、聚光、贴图、蒙皮、法线形变和节点权重先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -623,6 +623,7 @@ fn load_primitive(
   views : Array[View],
   accs : Array[Acc],
   materials : Array[Mat],
+  weights : Array[Double],
 ) -> Prim raise GltfError {
   match obj.get("mode") {
     None => ()
@@ -689,7 +690,73 @@ fn load_primitive(
       materials[at]
     }
   }
+  match obj.get("targets") {
+    None => ()
+    Some(value) =>
+      apply_morph_positions(
+        geometry,
+        as_array(value),
+        weights,
+        bins,
+        views,
+        accs,
+      )
+  }
   { geometry, mat, }
+}
+
+///|
+
+///|
+/// 按 `mesh.weights` 把 `POSITION` 增量加进顶点。法线形变和节点权重先不加。
+/// 这不是运行时的 `morphTargetInfluences`，只烘焙默认权重。
+/// r186: `addMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2387 ; `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2474
+fn apply_morph_positions(
+  geometry : @core.BufferGeometry,
+  targets : Array[Json],
+  weights : Array[Double],
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+) -> Unit raise GltfError {
+  let position = match geometry.get_attribute("position") {
+    None => return
+    Some(attribute) => attribute
+  }
+  let mut index = 0
+  while index < targets.length() {
+    let weight = if index < weights.length() { weights[index] } else { 0.0 }
+    if weight != 0.0 {
+      let target = as_object(targets[index])
+      match target.get("POSITION") {
+        None => ()
+        Some(accessor) => {
+          let deltas = read_values(
+            bins,
+            views,
+            accs,
+            as_f64(accessor).to_int(),
+            3,
+          )
+          if deltas.length() != position.count * 3 {
+            raise GltfError::Invalid("morph target")
+          }
+          let mut vertex = 0
+          while vertex < position.count {
+            let base = vertex * 3
+            position.set_xyz(
+              vertex,
+              position.get_x(vertex) + weight * deltas[base],
+              position.get_y(vertex) + weight * deltas[base + 1],
+              position.get_z(vertex) + weight * deltas[base + 2],
+            )
+            vertex = vertex + 1
+          }
+        }
+      }
+    }
+    index = index + 1
+  }
 }
 
 ///|
@@ -708,11 +775,22 @@ fn load_meshes(
       None => []
       Some(value) => as_array(value)
     }
+    let weights = match listed[i].get("weights") {
+      None => []
+      Some(value) => as_doubles(value)
+    }
     let built = []
     let mut p = 0
     while p < prims.length() {
       built.push(
-        load_primitive(as_object(prims[p]), bins, views, accs, materials),
+        load_primitive(
+          as_object(prims[p]),
+          bins,
+          views,
+          accs,
+          materials,
+          weights,
+        ),
       )
       p = p + 1
     }

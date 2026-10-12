@@ -327,3 +327,20 @@ test "an unlit glTF material becomes a basic mesh" {
     }
   }
 }
+
+///|
+test "glTF position morph weights are baked into vertices" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"blob","mesh":0}],"meshes":[{"weights":[0.5],"primitives":[{"attributes":{"POSITION":0},"targets":[{"POSITION":1}]}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36}],"buffers":[{"byteLength":72,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAA"}]}
+  match must(@gltf.parse(text).scene.node, "blob").mesh {
+    None => panic()
+    Some(binding) => {
+      let position = binding.geometry.get_attribute("position").unwrap()
+      assert_eq(position.get_y(0), 1.0)
+      assert_eq(position.get_x(1), 1.0)
+      assert_eq(position.get_y(1), 1.0)
+      assert_eq(position.get_y(2), 2.0)
+      assert_eq(position.get_z(2), 0.0)
+    }
+  }
+}
