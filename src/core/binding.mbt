@@ -17,6 +17,7 @@ pub(all) struct MeshBinding {
   fog : Bool
   mut alpha_test : Double
   flat_shading : Bool
+  depth_write : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -58,6 +59,7 @@ pub(all) struct PrimitiveBinding {
   opacity : Double
   transparent : Bool
   fog : Bool
+  depth_write : Bool
 }
 
 ///|

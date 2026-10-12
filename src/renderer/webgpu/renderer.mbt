@@ -181,6 +181,7 @@ struct CullPipelines {
 
 ///|
 /// 一帧里的网格。深度比较是 `less`，近平面为 0。透明网格用另一组开启混合的管线。
+/// `depth_write` 为假时改用不写深度的管线。阴影通道始终写深度。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
 pub struct WebGPURenderer {
@@ -197,29 +198,53 @@ pub struct WebGPURenderer {
   surface_alpha : Array[@textures.Texture?]
   surface_groups : Array[GpuBindGroup]
   basic : CullPipelines
+  basic_read : CullPipelines
   lambert : CullPipelines
+  lambert_read : CullPipelines
   standard : CullPipelines
+  standard_read : CullPipelines
   basic_instanced : CullPipelines
+  basic_instanced_read : CullPipelines
   lambert_instanced : CullPipelines
+  lambert_instanced_read : CullPipelines
   standard_instanced : CullPipelines
+  standard_instanced_read : CullPipelines
   basic_blend : CullPipelines
+  basic_blend_read : CullPipelines
   lambert_blend : CullPipelines
+  lambert_blend_read : CullPipelines
   standard_blend : CullPipelines
+  standard_blend_read : CullPipelines
   basic_instanced_blend : CullPipelines
+  basic_instanced_blend_read : CullPipelines
   lambert_instanced_blend : CullPipelines
+  lambert_instanced_blend_read : CullPipelines
   standard_instanced_blend : CullPipelines
+  standard_instanced_blend_read : CullPipelines
   basic_lines : GpuRenderPipeline
+  basic_lines_read : GpuRenderPipeline
   lambert_lines : GpuRenderPipeline
+  lambert_lines_read : GpuRenderPipeline
   standard_lines : GpuRenderPipeline
+  standard_lines_read : GpuRenderPipeline
   basic_lines_instanced : GpuRenderPipeline
+  basic_lines_instanced_read : GpuRenderPipeline
   lambert_lines_instanced : GpuRenderPipeline
+  lambert_lines_instanced_read : GpuRenderPipeline
   standard_lines_instanced : GpuRenderPipeline
+  standard_lines_instanced_read : GpuRenderPipeline
   line_list : GpuRenderPipeline
+  line_list_read : GpuRenderPipeline
   line_strip : GpuRenderPipeline
+  line_strip_read : GpuRenderPipeline
   points : GpuRenderPipeline
+  points_read : GpuRenderPipeline
   line_list_blend : GpuRenderPipeline
+  line_list_blend_read : GpuRenderPipeline
   line_strip_blend : GpuRenderPipeline
+  line_strip_blend_read : GpuRenderPipeline
   points_blend : GpuRenderPipeline
+  points_blend_read : GpuRenderPipeline
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
@@ -447,6 +472,7 @@ fn unlit_pipeline(
   instanced? : Bool = false,
   blend? : Bool = false,
   lines? : Bool = false,
+  depth_write? : Bool = true,
 ) -> GpuRenderPipeline {
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
@@ -486,7 +512,7 @@ fn unlit_pipeline(
     }),
     depth_stencil: Some({
       format: @gpu.GpuTextureFormat::DEPTH24PLUS,
-      depth_write_enabled: Some(true),
+      depth_write_enabled: Some(depth_write),
       depth_compare: Some(@gpu.GpuCompareFunction::LESS),
       stencil_front: None,
       stencil_back: None,
@@ -558,6 +584,7 @@ fn color_pipeline(
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
   blend? : Bool = false,
+  depth_write? : Bool = true,
 ) -> GpuRenderPipeline {
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
@@ -635,7 +662,7 @@ fn color_pipeline(
     }),
     depth_stencil: Some({
       format: @gpu.GpuTextureFormat::DEPTH24PLUS,
-      depth_write_enabled: Some(true),
+      depth_write_enabled: Some(depth_write),
       depth_compare: Some(@gpu.GpuCompareFunction::LESS),
       stencil_front: None,
       stencil_back: None,
@@ -678,6 +705,7 @@ fn cull_pipelines(
   format : GpuTextureFormat,
   instanced? : Bool = false,
   blend? : Bool = false,
+  depth_write? : Bool = true,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -688,6 +716,7 @@ fn cull_pipelines(
       GpuCullMode::BACK,
       instanced~,
       blend~,
+      depth_write~,
     ),
     back: unlit_pipeline(
       device,
@@ -697,6 +726,7 @@ fn cull_pipelines(
       GpuCullMode::FRONT,
       instanced~,
       blend~,
+      depth_write~,
     ),
     double: unlit_pipeline(
       device,
@@ -706,6 +736,7 @@ fn cull_pipelines(
       GpuCullMode::NONE,
       instanced~,
       blend~,
+      depth_write~,
     ),
   }
 }
@@ -1336,14 +1367,43 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     surface_alpha: [],
     surface_groups: [],
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
+    basic_read: cull_pipelines(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      depth_write=false,
+    ),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
+    lambert_read: cull_pipelines(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      depth_write=false,
+    ),
     standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
+    standard_read: cull_pipelines(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      depth_write=false,
+    ),
     basic_instanced: cull_pipelines(
       device,
       basic_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
+    ),
+    basic_instanced_read: cull_pipelines(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      depth_write=false,
     ),
     lambert_instanced: cull_pipelines(
       device,
@@ -1352,12 +1412,28 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       instanced=true,
     ),
+    lambert_instanced_read: cull_pipelines(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      depth_write=false,
+    ),
     standard_instanced: cull_pipelines(
       device,
       standard_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
+    ),
+    standard_instanced_read: cull_pipelines(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      depth_write=false,
     ),
     basic_blend: cull_pipelines(
       device,
@@ -1366,6 +1442,14 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       blend=true,
     ),
+    basic_blend_read: cull_pipelines(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      depth_write=false,
+    ),
     lambert_blend: cull_pipelines(
       device,
       lambert_shader,
@@ -1373,12 +1457,28 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       blend=true,
     ),
+    lambert_blend_read: cull_pipelines(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      depth_write=false,
+    ),
     standard_blend: cull_pipelines(
       device,
       standard_shader,
       pipeline_layout,
       format,
       blend=true,
+    ),
+    standard_blend_read: cull_pipelines(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      depth_write=false,
     ),
     basic_instanced_blend: cull_pipelines(
       device,
@@ -1388,6 +1488,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
+    basic_instanced_blend_read: cull_pipelines(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      depth_write=false,
+    ),
     lambert_instanced_blend: cull_pipelines(
       device,
       lambert_instanced_shader,
@@ -1395,6 +1504,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       instanced=true,
       blend=true,
+    ),
+    lambert_instanced_blend_read: cull_pipelines(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      depth_write=false,
     ),
     standard_instanced_blend: cull_pipelines(
       device,
@@ -1404,6 +1522,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
+    standard_instanced_blend_read: cull_pipelines(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      depth_write=false,
+    ),
     basic_lines: unlit_pipeline(
       device,
       basic_shader,
@@ -1411,6 +1538,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       GpuCullMode::NONE,
       lines=true,
+    ),
+    basic_lines_read: unlit_pipeline(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
     ),
     lambert_lines: unlit_pipeline(
       device,
@@ -1420,6 +1556,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       GpuCullMode::NONE,
       lines=true,
     ),
+    lambert_lines_read: unlit_pipeline(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
+    ),
     standard_lines: unlit_pipeline(
       device,
       standard_shader,
@@ -1427,6 +1572,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       GpuCullMode::NONE,
       lines=true,
+    ),
+    standard_lines_read: unlit_pipeline(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
     ),
     basic_lines_instanced: unlit_pipeline(
       device,
@@ -1437,6 +1591,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       lines=true,
     ),
+    basic_lines_instanced_read: unlit_pipeline(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
+    ),
     lambert_lines_instanced: unlit_pipeline(
       device,
       lambert_instanced_shader,
@@ -1445,6 +1609,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       GpuCullMode::NONE,
       instanced=true,
       lines=true,
+    ),
+    lambert_lines_instanced_read: unlit_pipeline(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
     ),
     standard_lines_instanced: unlit_pipeline(
       device,
@@ -1455,6 +1629,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       lines=true,
     ),
+    standard_lines_instanced_read: unlit_pipeline(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
+    ),
     line_list: color_pipeline(
       device,
       line_shader,
@@ -1462,6 +1646,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       @gpu.GpuPrimitiveTopology::LINE_LIST,
       false,
+    ),
+    line_list_read: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      depth_write=false,
     ),
     line_strip: color_pipeline(
       device,
@@ -1471,6 +1664,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::LINE_STRIP,
       false,
     ),
+    line_strip_read: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      depth_write=false,
+    ),
     points: color_pipeline(
       device,
       points_shader,
@@ -1478,6 +1680,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
+    ),
+    points_read: color_pipeline(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      depth_write=false,
     ),
     line_list_blend: color_pipeline(
       device,
@@ -1488,6 +1699,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
+    line_list_blend_read: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      blend=true,
+      depth_write=false,
+    ),
     line_strip_blend: color_pipeline(
       device,
       line_shader,
@@ -1497,6 +1718,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
+    line_strip_blend_read: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      blend=true,
+      depth_write=false,
+    ),
     points_blend: color_pipeline(
       device,
       points_shader,
@@ -1505,6 +1736,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
       blend=true,
+    ),
+    points_blend_read: color_pipeline(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      blend=true,
+      depth_write=false,
     ),
     wave: wave.1,
     wave_layout: wave.0,
@@ -1564,18 +1805,33 @@ fn WebGPURenderer::wire_pipeline(
   self : WebGPURenderer,
   shading : @constants.Shading,
   instanced : Bool,
+  depth_write : Bool,
 ) -> GpuRenderPipeline {
   if instanced {
-    match shading {
-      @constants.Basic => self.basic_lines_instanced
-      @constants.Lambert => self.lambert_lines_instanced
-      @constants.Standard => self.standard_lines_instanced
+    if depth_write {
+      match shading {
+        @constants.Basic => self.basic_lines_instanced
+        @constants.Lambert => self.lambert_lines_instanced
+        @constants.Standard => self.standard_lines_instanced
+      }
+    } else {
+      match shading {
+        @constants.Basic => self.basic_lines_instanced_read
+        @constants.Lambert => self.lambert_lines_instanced_read
+        @constants.Standard => self.standard_lines_instanced_read
+      }
     }
-  } else {
+  } else if depth_write {
     match shading {
       @constants.Basic => self.basic_lines
       @constants.Lambert => self.lambert_lines
       @constants.Standard => self.standard_lines
+    }
+  } else {
+    match shading {
+      @constants.Basic => self.basic_lines_read
+      @constants.Lambert => self.lambert_lines_read
+      @constants.Standard => self.standard_lines_read
     }
   }
 }
@@ -1615,8 +1871,9 @@ fn WebGPURenderer::pipeline(
   shading : @constants.Shading,
   side : @constants.Side,
   blend : Bool,
+  depth_write : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, false, blend)
+  self.cull_group(shading, side, false, blend, depth_write)
 }
 
 ///|
@@ -1625,8 +1882,9 @@ fn WebGPURenderer::instanced_pipeline(
   shading : @constants.Shading,
   side : @constants.Side,
   blend : Bool,
+  depth_write : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, true, blend)
+  self.cull_group(shading, side, true, blend, depth_write)
 }
 
 ///|
@@ -1636,17 +1894,29 @@ fn WebGPURenderer::cull_group(
   side : @constants.Side,
   instanced : Bool,
   blend : Bool,
+  depth_write : Bool,
 ) -> GpuRenderPipeline {
   let group = if blend {
-    match (shading, instanced) {
-      (@constants.Basic, false) => self.basic_blend
-      (@constants.Lambert, false) => self.lambert_blend
-      (@constants.Standard, false) => self.standard_blend
-      (@constants.Basic, true) => self.basic_instanced_blend
-      (@constants.Lambert, true) => self.lambert_instanced_blend
-      (@constants.Standard, true) => self.standard_instanced_blend
+    if depth_write {
+      match (shading, instanced) {
+        (@constants.Basic, false) => self.basic_blend
+        (@constants.Lambert, false) => self.lambert_blend
+        (@constants.Standard, false) => self.standard_blend
+        (@constants.Basic, true) => self.basic_instanced_blend
+        (@constants.Lambert, true) => self.lambert_instanced_blend
+        (@constants.Standard, true) => self.standard_instanced_blend
+      }
+    } else {
+      match (shading, instanced) {
+        (@constants.Basic, false) => self.basic_blend_read
+        (@constants.Lambert, false) => self.lambert_blend_read
+        (@constants.Standard, false) => self.standard_blend_read
+        (@constants.Basic, true) => self.basic_instanced_blend_read
+        (@constants.Lambert, true) => self.lambert_instanced_blend_read
+        (@constants.Standard, true) => self.standard_instanced_blend_read
+      }
     }
-  } else {
+  } else if depth_write {
     match (shading, instanced) {
       (@constants.Basic, false) => self.basic
       (@constants.Lambert, false) => self.lambert
@@ -1654,6 +1924,15 @@ fn WebGPURenderer::cull_group(
       (@constants.Basic, true) => self.basic_instanced
       (@constants.Lambert, true) => self.lambert_instanced
       (@constants.Standard, true) => self.standard_instanced
+    }
+  } else {
+    match (shading, instanced) {
+      (@constants.Basic, false) => self.basic_read
+      (@constants.Lambert, false) => self.lambert_read
+      (@constants.Standard, false) => self.standard_read
+      (@constants.Basic, true) => self.basic_instanced_read
+      (@constants.Lambert, true) => self.lambert_instanced_read
+      (@constants.Standard, true) => self.standard_instanced_read
     }
   }
   match side {
@@ -3774,11 +4053,18 @@ fn WebGPURenderer::draw_meshes(
         }
         pass.set_pipeline(
           if lines {
-            self.wire_pipeline(item.shading, batch is Some(_))
+            self.wire_pipeline(item.shading, batch is Some(_), item.depth_write)
           } else {
             match batch {
-              Some(_) => self.instanced_pipeline(item.shading, item.side, blend)
-              None => self.pipeline(item.shading, item.side, blend)
+              Some(_) =>
+                self.instanced_pipeline(
+                  item.shading,
+                  item.side,
+                  blend,
+                  item.depth_write,
+                )
+              None =>
+                self.pipeline(item.shading, item.side, blend, item.depth_write)
             }
           },
         )
@@ -3950,9 +4236,15 @@ fn WebGPURenderer::draw_strokes(
             if geometry.point_count > 0 {
               pass.set_pipeline(
                 if blend {
-                  self.points_blend
-                } else {
+                  if item.depth_write {
+                    self.points_blend
+                  } else {
+                    self.points_blend_read
+                  }
+                } else if item.depth_write {
                   self.points
+                } else {
+                  self.points_read
                 },
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
@@ -3969,9 +4261,15 @@ fn WebGPURenderer::draw_strokes(
             self.draw_lines(
               pass,
               if blend {
-                self.line_strip_blend
-              } else {
+                if item.depth_write {
+                  self.line_strip_blend
+                } else {
+                  self.line_strip_blend_read
+                }
+              } else if item.depth_write {
                 self.line_strip
+              } else {
+                self.line_strip_read
               },
               geometry,
             )
@@ -3979,9 +4277,15 @@ fn WebGPURenderer::draw_strokes(
             self.draw_lines(
               pass,
               if blend {
-                self.line_list_blend
-              } else {
+                if item.depth_write {
+                  self.line_list_blend
+                } else {
+                  self.line_list_blend_read
+                }
+              } else if item.depth_write {
                 self.line_list
+              } else {
+                self.line_list_read
               },
               geometry,
             )

@@ -79,6 +79,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     fog: self.material.fog,
     alpha_test: self.material.alpha_test,
     flat_shading: self.material.flat_shading,
+    depth_write: self.material.depth_write,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
@@ -133,8 +134,19 @@ fn primitive_binding(
   opacity : Double,
   transparent : Bool,
   fog : Bool,
+  depth_write : Bool,
 ) -> @core.PrimitiveBinding {
-  { geometry, color, kind, size, size_attenuation, opacity, transparent, fog, }
+  {
+    geometry,
+    color,
+    kind,
+    size,
+    size_attenuation,
+    opacity,
+    transparent,
+    fog,
+    depth_write,
+  }
 }
 
 ///|
@@ -177,6 +189,7 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.opacity,
       self.material.transparent,
       self.material.fog,
+      self.material.depth_write,
     ),
   )
 }
@@ -241,6 +254,7 @@ pub fn Line::refresh(self : Line) -> Unit {
       self.material.opacity,
       self.material.transparent,
       self.material.fog,
+      self.material.depth_write,
     ),
   )
 }
@@ -305,6 +319,7 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.opacity,
       self.material.transparent,
       self.material.fog,
+      self.material.depth_write,
     ),
   )
 }
@@ -444,6 +459,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     fog: self.material.fog,
     alpha_test: self.material.alpha_test,
     flat_shading: self.material.flat_shading,
+    depth_write: self.material.depth_write,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,

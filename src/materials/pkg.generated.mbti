@@ -17,6 +17,7 @@ pub(all) struct LineBasicMaterial {
   mut opacity : Double
   mut transparent : Bool
   mut fog : Bool
+  mut depth_write : Bool
 }
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
 
@@ -32,6 +33,7 @@ pub(all) struct Material {
   mut fog : Bool
   mut alpha_test : Double
   mut flat_shading : Bool
+  mut depth_write : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -73,6 +75,7 @@ pub(all) struct PointsMaterial {
   mut opacity : Double
   mut transparent : Bool
   mut fog : Bool
+  mut depth_write : Bool
 }
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 

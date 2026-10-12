@@ -103,6 +103,7 @@ pub(all) struct PrimitiveItem {
   size_attenuation : Bool
   opacity : Double
   fog : Bool
+  depth_write : Bool
 }
 
 pub(all) struct RenderItem {
@@ -118,6 +119,7 @@ pub(all) struct RenderItem {
   fog : Bool
   alpha_test : Double
   flat_shading : Bool
+  depth_write : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?

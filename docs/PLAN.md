@@ -225,6 +225,8 @@ A grayscale post pass has landed. The scene is drawn into a color target, then a
 
 Transparent meshes have landed. A mesh with `transparent` set is drawn after the opaque list, from far to near in view space. The camera looks down -Z, so a smaller view-space z is farther and is drawn first. Equal `render_order` and equal depth keep traverse order. Blending is source alpha over one-minus source alpha, and depth write stays on, matching r186's default material. Wireframe meshes are drawn as edges and stay out of both triangle lists. Transparent points and lines are sorted with the transparent meshes, far to near, and blended with source alpha over one-minus source alpha. Depth write stays on. `examples/blend` is an opaque Lambert cube behind one at opacity 0.5. The window sample is `scripts/build-blend.sh`. Host playback stays out of this pass.
 
+`depthWrite` has landed. It defaults to true. A mesh, point, or line with it set to false uses a color pipeline that does not write depth. Blended and wireframe draws follow the same flag. The shadow pass still writes depth. `depthTest` stays on.
+
 A hemisphere light has landed. The first visible one adds indirect diffuse on Lambert and Standard. Sky and ground colors are multiplied by intensity. The direction is the light's world position, normalized, and defaults to `(0, 1, 0)`. A zero-length position stays zero, so the mix weight is 0.5. The weight is `dot(normal, direction) * 0.5 + 0.5`, then `mix(ground, sky, weight)`. It does not add specular and does not cast shadows. A second hemisphere light is ignored. The uniform block grows by 48 bytes to 672. Basic materials, points, and lines do not sample it.
 
 `Object3D.render_order` is honored inside each color list. A lower value is drawn first. Opaque meshes, wireframe meshes, and opaque points and lines use that as their only sort key and keep traverse order on a tie. They are not sorted by depth. Transparent meshes and transparent points and lines compare `render_order` before view-space depth. The shadow list stays in traverse order. There is no `groupOrder`.
@@ -272,6 +274,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | point lights and glTF punctual point lights | `lights`, `renderer`, `gltf` |
 | planned | 7 | spot lights and glTF punctual spot lights | `lights`, `renderer`, `gltf` |
 | planned | 7 | hemisphere lights on Lambert and Standard diffuse | `lights`, `nodes`, `renderer` |
+| planned | 7 | `depthWrite` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | double-sided and back-sided shading normals | `nodes`, `renderer` |
 | planned | 7 | emissive maps on Lambert and Standard | `materials`, `renderer` |
 | planned | 7 | roughness maps on Standard | `materials`, `nodes`, `renderer` |

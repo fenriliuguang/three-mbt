@@ -992,6 +992,38 @@ test "flat shading reaches the render list" {
 }
 
 ///|
+test "depth write defaults on and can be turned off" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let kept = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(scene.add(kept))
+  let quiet = @materials.MeshBasicMaterial::new()
+  quiet.material.depth_write = false
+  let mesh = @objects.Mesh::new(box.geometry, quiet.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].depth_write, true)
+  assert_eq(drawn[1].depth_write, false)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  points_material.depth_write = false
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  assert_eq(line_material.depth_write, true)
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes.length(), 2)
+  assert_eq(strokes[0].depth_write, false)
+  assert_eq(strokes[1].depth_write, true)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()
