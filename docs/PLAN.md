@@ -251,6 +251,8 @@ Orthographic `setViewOffset` has landed. It does not change `aspect`. The scale 
 
 Orthographic `left`, `right`, `top`, and `bottom` setters have landed. Each one writes that edge and rebuilds the projection. From the default square, `left = -2` and `right = 2` with near `0.1` and far `10` match the existing wide frustum. Doubling `top` and `bottom` halves the vertical scale.
 
+Perspective `set_film_gauge` has landed. The gauge still defaults to 35. Setting it to 70 doubles landscape film width and film height, and doubles the focal length at the same fov. A film offset of 3.5 then shifts the frustum by half as much, because the shift is `near * filmOffset / filmWidth`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -317,6 +319,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | orthographic `setViewOffset` and `clearViewOffset` | `cameras` |
 | planned | 7 | `near` and `far` setters on both cameras | `cameras` |
 | planned | 7 | orthographic `left`, `right`, `top`, and `bottom` setters | `cameras` |
+| planned | 7 | perspective `filmGauge` setter | `cameras` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

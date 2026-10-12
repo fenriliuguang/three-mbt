@@ -170,6 +170,29 @@ test "perspective focal length follows the film height" {
 }
 
 ///|
+test "film gauge scales film size and the offset" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  assert_eq(camera.film_width(), 35.0)
+  camera.set_film_gauge(70.0)
+  assert_eq(camera.film_width(), 70.0)
+  assert_eq(camera.film_height(), 39.375)
+  assert_close(camera.focal_length(), 42.2199799975)
+  camera.set_film_offset(3.5)
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.film_gauge, 70.0)
+      assert_close(state.projection.elements[8], 0.060314257139)
+    }
+  }
+}
+
+///|
 test "perspective view bounds scale with distance and zoom" {
   let camera = @cameras.PerspectiveCamera::new(
     fov=50.0,
