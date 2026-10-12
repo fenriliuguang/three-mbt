@@ -602,6 +602,31 @@ pub fn Object3D::clear(self : Object3D) -> Object3D {
 }
 
 ///|
+/// 挂到新父节点下，并保持世界变换。不支持非均匀缩放的父节点。
+/// r186: `attach` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L874
+pub fn Object3D::attach(self : Object3D, object : Object3D) -> Object3D {
+  self.update_world_matrix(update_parents=true, update_children=false)
+  let relative = @math.Matrix4::new().copy(self.matrix_world).invert()
+  match object.parent {
+    None => ()
+    Some(parent) => {
+      parent.update_world_matrix(update_parents=true, update_children=false)
+      ignore(relative.multiply(parent.matrix_world))
+    }
+  }
+  object.apply_matrix4(relative)
+  ignore(object.remove_from_parent())
+  object.parent = Some(self)
+  self.children.push(object)
+  object.update_world_matrix(update_parents=false, update_children=true)
+  object.dispatch_event(ObjectEvent::new("added"))
+  let child_added = ObjectEvent::new("childadded")
+  child_added.child = Some(object)
+  self.dispatch_event(child_added)
+  self
+}
+
+///|
 /// 深度优先，先看自己再看子节点。名字相同的话返回最先遇到的那个。
 pub fn Object3D::get_object_by_name(
   self : Object3D,

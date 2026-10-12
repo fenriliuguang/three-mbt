@@ -90,6 +90,48 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "attach keeps the world position and rotation" {
+  let source = @core.Object3D::new()
+  ignore(source.position.set(10.0, 0.0, 0.0))
+  let child = @core.Object3D::new()
+  ignore(child.position.set(1.0, 0.0, 0.0))
+  ignore(source.add(child))
+  let dest = @core.Object3D::new()
+  ignore(dest.position.set(3.0, 0.0, 0.0))
+  let hits = Ref::Ref(0)
+  dest.add_event_listener("childadded", fn(_event) { hits.val = hits.val + 1 })
+  ignore(dest.attach(child))
+  assert_eq(hits.val, 1)
+  assert_eq(source.children.length(), 0)
+  assert_eq(dest.children.length(), 1)
+  assert_close(child.position.x, 8.0)
+  assert_eq(child.position.y, 0.0)
+  assert_eq(child.position.z, 0.0)
+  let shifted = @math.Vector3::new()
+  ignore(child.get_world_position(shifted))
+  assert_close(shifted.x, 11.0)
+  assert_close(shifted.y, 0.0)
+  assert_close(shifted.z, 0.0)
+  let yawed = @core.Object3D::new()
+  ignore(yawed.position.set(10.0, 0.0, 0.0))
+  ignore(yawed.rotation.set(0.0, 0.5, 0.0))
+  let offset = @core.Object3D::new()
+  ignore(offset.position.set(0.0, 0.0, 4.0))
+  ignore(yawed.add(offset))
+  let root = @core.Object3D::new()
+  ignore(root.attach(offset))
+  assert_close(offset.quaternion.x, yawed.quaternion.x)
+  assert_close(offset.quaternion.y, yawed.quaternion.y)
+  assert_close(offset.quaternion.z, yawed.quaternion.z)
+  assert_close(offset.quaternion.w, yawed.quaternion.w)
+  let world = @math.Vector3::new()
+  ignore(offset.get_world_position(world))
+  assert_close(world.x, 11.9177021544)
+  assert_close(world.y, 0.0)
+  assert_close(world.z, 3.51033024756)
+}
+
+///|
 test "rotation setters write the quaternion and the bound euler" {
   let right_angle = 1.5707963267948966
   let half = 0.7071067811865476
