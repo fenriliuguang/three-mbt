@@ -749,3 +749,10 @@ pub fn Object3D::copy(
   }
   self
 }
+
+///|
+/// 发出 `dispose`。几何、材质和纹理是共享的，要各自释放。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1665
+pub fn Object3D::dispose(self : Object3D) -> Unit {
+  self.dispatch_event(ObjectEvent::new("dispose"))
+}

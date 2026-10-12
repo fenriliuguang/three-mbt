@@ -90,6 +90,21 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "dispose notifies listeners" {
+  let object = @core.Object3D::new()
+  let hits = Ref::Ref(0)
+  let kind = Ref::Ref("")
+  object.add_event_listener("dispose", fn(event) {
+    hits.val = hits.val + 1
+    kind.val = event.kind
+  })
+  object.dispose()
+  assert_eq(hits.val, 1)
+  assert_eq(kind.val, "dispose")
+  assert_eq(object.children.length(), 0)
+}
+
+///|
 test "clone copies the transform and the children" {
   let source = @core.Object3D::new(kind=@core.NodeKind::Mesh)
   source.name = "box"
