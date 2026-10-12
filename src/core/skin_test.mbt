@@ -192,3 +192,37 @@ test "twelve influences blend the third joint set" {
   assert_eq(position.get_y(0), 0.0)
   assert_eq(position.get_z(0), 0.0)
 }
+
+///|
+test "sixteen influences blend the fourth joint set" {
+  let first = @core.Object3D::new()
+  ignore(first.position.set(4.0, 0.0, 0.0))
+  first.update_matrix_world(force=true)
+  let second = @core.Object3D::new()
+  second.update_matrix_world(force=true)
+  let mesh = @core.Object3D::new()
+  mesh.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let skin = @core.SkinState::{
+    joints: [first, second],
+    inverse_binds: [@math.Matrix4::new(), @math.Matrix4::new()],
+    bind_position: [0.0, 0.0, 0.0],
+    bind_normal: None,
+    indices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    weights: [
+      0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0,
+      0.0,
+    ],
+  }
+  skin.write(mesh, geometry)
+  let position = geometry.get_attribute("position").unwrap()
+  assert_eq(position.get_x(0), 1.0)
+  assert_eq(position.get_y(0), 0.0)
+  assert_eq(position.get_z(0), 0.0)
+}

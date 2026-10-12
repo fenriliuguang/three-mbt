@@ -1,4 +1,4 @@
-// 阶段 7。glTF 2.0 的几何、PBR 因子、自发光和强度、相机、关键帧、平行光、点光、聚光、静态形变、节点权重、形变动画、顶点色形变、稀疏 accessor，以及 CPU 线性蒙皮，含成对的 `JOINTS_2`。不读贴图。形变增量在蒙皮之前加上。
+// 阶段 7。glTF 2.0 的几何、PBR 因子、自发光和强度、相机、关键帧、平行光、点光、聚光、静态形变、节点权重、形变动画、顶点色形变、稀疏 accessor，以及 CPU 线性蒙皮，含成对的 `JOINTS_3`。不读贴图。形变增量在蒙皮之前加上。
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
