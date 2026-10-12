@@ -1,4 +1,4 @@
-// r186: `GLTFLoader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L129
+// r186: `GLTFLoader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L129 ; `loadSkin` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4052
 
 ///|
 /// glTF JSON 读不下来，或用到了这份子集以外的数据。
@@ -73,6 +73,8 @@ priv struct Prim {
   targets : Array[MorphTarget]
   mesh_weights : Array[Double]
   baked : @core.BufferGeometry
+  joints : Array[Int]?
+  weights : Array[Double]?
 }
 
 ///|
@@ -94,6 +96,7 @@ priv struct NodeDesc {
   camera : Int?
   light : Int?
   weights : Array[Double]?
+  skin : Int?
 }
 
 ///|
@@ -132,7 +135,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图和蒙皮先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。已有形变目标时也不蒙皮。`JOINTS_1` 先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -144,8 +147,9 @@ pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let meshes = load_meshes(root, bins, views, accs, materials)
   let cameras = load_cameras(root)
   let lights = load_punctuals(root)
+  let skins = load_skins(root, bins, views, accs)
   let nodes = load_nodes(root)
-  let built = build_nodes(nodes, meshes, cameras, lights)
+  let built = build_nodes(nodes, meshes, cameras, lights, skins)
   link_children(nodes, built)
   let animations = load_animations(root, bins, views, accs, built)
   let group = @objects.Group::new()
@@ -368,6 +372,7 @@ fn component_count(kind : String) -> Int raise GltfError {
     "VEC2" => 2
     "VEC3" => 3
     "VEC4" => 4
+    "MAT4" => 16
     _ => raise GltfError::Invalid("unsupported accessor type")
   }
 }
@@ -964,7 +969,18 @@ fn load_primitive(
     Some(value) => read_morph_targets(as_array(value), bins, views, accs)
   }
   let baked = baked_geometry(geometry, targets, weights)
-  { geometry, mat, targets, mesh_weights: weights, baked, }
+  let (joints, skin_weights) = read_skin_attributes(
+    attrs, bins, views, accs, geometry,
+  )
+  {
+    geometry,
+    mat,
+    targets,
+    mesh_weights: weights,
+    baked,
+    joints,
+    weights: skin_weights,
+  }
 }
 
 ///|
@@ -1322,6 +1338,10 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     None => None
     Some(value) => Some(as_doubles(value))
   }
+  let skin = match obj.get("skin") {
+    None => None
+    Some(value) => Some(as_f64(value).to_int())
+  }
   {
     name: opt_string(obj, "name", ""),
     children,
@@ -1340,6 +1360,7 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     sz,
     matrix,
     weights,
+    skin,
   }
 }
 
@@ -1696,16 +1717,322 @@ fn light_object(light : Punctual) -> @core.Object3D {
 }
 
 ///|
+priv struct SkinDef {
+  joints : Array[Int]
+  inverses : Array[@math.Matrix4]
+}
+
+///|
+priv struct PendingSkin {
+  node : @core.Object3D
+  skin : Int
+  joints : Array[Int]
+  weights : Array[Double]
+}
+
+///|
+/// 关节下标指向节点。`inverseBindMatrices` 缺省是单位矩阵，数量少于关节时拒绝。
+/// r186: `loadSkin` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4052
+fn load_skins(
+  root : Map[String, Json],
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+) -> Array[SkinDef] raise GltfError {
+  let listed = objects(root, "skins")
+  let out = []
+  let mut i = 0
+  while i < listed.length() {
+    out.push(load_skin(listed[i], bins, views, accs))
+    i = i + 1
+  }
+  out
+}
+
+///|
+fn load_skin(
+  obj : Map[String, Json],
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+) -> SkinDef raise GltfError {
+  let joints = match obj.get("joints") {
+    None => raise GltfError::Invalid("skin joints")
+    Some(value) => as_ints(value)
+  }
+  let inverses = match obj.get("inverseBindMatrices") {
+    None => identity_matrices(joints.length())
+    Some(value) => {
+      let matrices = read_values(bins, views, accs, as_f64(value).to_int(), 16)
+      let count = matrices.length() / 16
+      if count < joints.length() {
+        raise GltfError::Invalid("inverseBindMatrices")
+      }
+      let out = []
+      let mut index = 0
+      while index < joints.length() {
+        out.push(matrix_from(matrices, index * 16))
+        index = index + 1
+      }
+      out
+    }
+  }
+  { joints, inverses, }
+}
+
+///|
+fn matrix_from(values : Array[Double], offset : Int) -> @math.Matrix4 {
+  let m = @math.Matrix4::new()
+  let mut i = 0
+  while i < 16 {
+    m.elements[i] = values[offset + i]
+    i = i + 1
+  }
+  m
+}
+
+///|
+fn identity_matrices(count : Int) -> Array[@math.Matrix4] {
+  let out = []
+  let mut index = 0
+  while index < count {
+    out.push(@math.Matrix4::new())
+    index = index + 1
+  }
+  out
+}
+
+///|
+/// 只读 `JOINTS_0` 和 `WEIGHTS_0`。缺一则不蒙皮。`JOINTS_1` 先不读。
+fn read_skin_attributes(
+  attrs : Map[String, Json],
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  geometry : @core.BufferGeometry,
+) -> (Array[Int]?, Array[Double]?) raise GltfError {
+  match (attrs.get("JOINTS_0"), attrs.get("WEIGHTS_0")) {
+    (Some(joints), Some(weights)) => {
+      let joint_index = as_f64(joints).to_int()
+      let weight_index = as_f64(weights).to_int()
+      let joint_values = read_joints(bins, views, accs, joint_index)
+      let weight_values = read_weights(bins, views, accs, weight_index)
+      let count = match geometry.get_attribute("position") {
+        None => 0
+        Some(attribute) => attribute.count
+      }
+      if joint_values.length() != count * 4 ||
+        weight_values.length() != count * 4 {
+        raise GltfError::Invalid("skin attributes")
+      }
+      (Some(joint_values), Some(weight_values))
+    }
+    _ => (None, None)
+  }
+}
+
+///|
+fn accessor_at(accs : Array[Acc], index : Int) -> Acc raise GltfError {
+  if index < 0 || index >= accs.length() {
+    raise GltfError::Invalid("accessor index")
+  }
+  accs[index]
+}
+
+///|
+fn read_joints(
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  index : Int,
+) -> Array[Int] raise GltfError {
+  let acc = accessor_at(accs, index)
+  if acc.normalized ||
+    (acc.component_type != 5121 && acc.component_type != 5123) {
+    raise GltfError::Invalid("JOINTS_0")
+  }
+  let values = read_values(bins, views, accs, index, 4)
+  let out = []
+  let mut i = 0
+  while i < values.length() {
+    out.push(values[i].to_int())
+    i = i + 1
+  }
+  out
+}
+
+///|
+fn read_weights(
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  index : Int,
+) -> Array[Double] raise GltfError {
+  let acc = accessor_at(accs, index)
+  let float_weights = acc.component_type == 5126 && !acc.normalized
+  let byte_weights = (acc.component_type == 5121 || acc.component_type == 5123) &&
+    acc.normalized
+  if !float_weights && !byte_weights {
+    raise GltfError::Invalid("WEIGHTS_0")
+  }
+  read_values(bins, views, accs, index, 4)
+}
+
+///|
+fn check_skin_joints(
+  skins : Array[SkinDef],
+  node_count : Int,
+) -> Unit raise GltfError {
+  let mut i = 0
+  while i < skins.length() {
+    let joints = skins[i].joints
+    let mut j = 0
+    while j < joints.length() {
+      let index = joints[j]
+      if index < 0 || index >= node_count {
+        raise GltfError::Invalid("skin joint")
+      }
+      j = j + 1
+    }
+    i = i + 1
+  }
+}
+
+///|
+/// 有形变目标的原语先不蒙皮，避免和形变烘焙抢同一份顶点。
+fn remember_skin(
+  pending : Array[PendingSkin],
+  node : @core.Object3D,
+  skin : Int,
+  prim : Prim,
+) -> Unit {
+  if prim.targets.length() > 0 {
+    return
+  }
+  match prim.joints {
+    None => ()
+    Some(joints) =>
+      match prim.weights {
+        None => ()
+        Some(weights) => pending.push({ node, skin, joints, weights, })
+      }
+  }
+}
+
+///|
+fn bind_pending(
+  pending : Array[PendingSkin],
+  skins : Array[SkinDef],
+  built : Array[@core.Object3D],
+) -> Unit raise GltfError {
+  let mut i = 0
+  while i < pending.length() {
+    let item = pending[i]
+    if item.skin < 0 || item.skin >= skins.length() {
+      raise GltfError::Invalid("skin index")
+    }
+    let def = skins[item.skin]
+    let joint_nodes = []
+    let mut j = 0
+    while j < def.joints.length() {
+      joint_nodes.push(built[def.joints[j]])
+      j = j + 1
+    }
+    bind_skin(item.node, joint_nodes, def.inverses, item.joints, item.weights)
+    i = i + 1
+  }
+}
+
+///|
+/// 每个蒙皮原语复制一份几何，避免改到共用这份网格的节点。
+/// 绑定矩阵是单位矩阵。
+/// r186: `bind` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L230 ; `loadNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4297
+fn bind_skin(
+  node : @core.Object3D,
+  joints : Array[@core.Object3D],
+  inverses : Array[@math.Matrix4],
+  indices : Array[Int],
+  weights : Array[Double],
+) -> Unit {
+  match node.mesh {
+    None => ()
+    Some(binding) => {
+      let geometry = binding.geometry.clone()
+      binding.geometry = geometry
+      let count = match geometry.get_attribute("position") {
+        None => 0
+        Some(attribute) => attribute.count
+      }
+      node.skin = Some(@core.SkinState::{
+        joints,
+        inverse_binds: inverses,
+        bind_position: copied_attribute(geometry, "position"),
+        bind_normal: optional_attribute(geometry, "normal"),
+        indices,
+        weights: normalized_skin_weights(weights, count),
+      })
+    }
+  }
+}
+
+///|
+/// 四个权重按绝对值之和缩放到 1。全是 0 时写成 `(1, 0, 0, 0)`。
+/// r186: `normalizeSkinWeights` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L262
+fn normalized_skin_weights(
+  weights : Array[Double],
+  count : Int,
+) -> Array[Double] {
+  let out = weights.copy()
+  let mut vertex = 0
+  while vertex < count {
+    let mut sum = 0.0
+    let mut influence = 0
+    while influence < 4 {
+      let weight = out[vertex * 4 + influence]
+      let absolute = if weight < 0.0 { -weight } else { weight }
+      sum = sum + absolute
+      influence = influence + 1
+    }
+    if sum == 0.0 {
+      out[vertex * 4] = 1.0
+      out[vertex * 4 + 1] = 0.0
+      out[vertex * 4 + 2] = 0.0
+      out[vertex * 4 + 3] = 0.0
+    } else {
+      let scale = 1.0 / sum
+      influence = 0
+      while influence < 4 {
+        let at = vertex * 4 + influence
+        out[at] = out[at] * scale
+        influence = influence + 1
+      }
+    }
+    vertex = vertex + 1
+  }
+  out
+}
+
+///|
 fn build_nodes(
   nodes : Array[NodeDesc],
   meshes : Array[Array[Prim]],
   cameras : Array[Cam],
   lights : Array[Punctual],
+  skins : Array[SkinDef],
 ) -> Array[@core.Object3D] raise GltfError {
+  check_skin_joints(skins, nodes.length())
+  let pending : Array[PendingSkin] = []
   let built = []
   let mut i = 0
   while i < nodes.length() {
     let desc = nodes[i]
+    match desc.skin {
+      None => ()
+      Some(index) =>
+        if index < 0 || index >= skins.length() {
+          raise GltfError::Invalid("skin index")
+        }
+    }
     let parts = []
     match desc.mesh {
       None => ()
@@ -1716,7 +2043,13 @@ fn build_nodes(
         let prims = meshes[index]
         let mut p = 0
         while p < prims.length() {
-          parts.push(mesh_from(prims[p], desc.weights).node)
+          let mesh = mesh_from(prims[p], desc.weights)
+          match desc.skin {
+            None => ()
+            Some(skin_index) =>
+              remember_skin(pending, mesh.node, skin_index, prims[p])
+          }
+          parts.push(mesh.node)
           p = p + 1
         }
       }
@@ -1769,6 +2102,7 @@ fn build_nodes(
     built.push(node)
     i = i + 1
   }
+  bind_pending(pending, skins, built)
   built
 }
 

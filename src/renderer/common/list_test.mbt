@@ -1252,3 +1252,41 @@ test "transparent points and lines sort far to near" {
   assert_eq(@common.view_depth(camera.node, near.node), -3.0)
   assert_eq(@common.collect_primitives(scene.node).length(), 1)
 }
+
+///|
+test "update_frame skins a mesh from its bind pose" {
+  let scene = @scenes.Scene::new()
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let mesh = @objects.Mesh::new(
+    geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  let joint = @core.Object3D::new()
+  ignore(joint.position.set(2.0, 0.0, 0.0))
+  ignore(scene.add(joint))
+  ignore(scene.add(mesh))
+  mesh.node.skin = Some(@core.SkinState::{
+    joints: [joint],
+    inverse_binds: [@math.Matrix4::new()],
+    bind_position: [0.0, 0.0, 0.0],
+    bind_normal: None,
+    indices: [0, 0, 0, 0],
+    weights: [1.0, 0.0, 0.0, 0.0],
+  })
+  let camera = @cameras.PerspectiveCamera::new()
+  @common.update_frame(scene.node, camera.node)
+  match mesh.node.mesh {
+    None => assert_eq(false, true)
+    Some(binding) =>
+      assert_eq(
+        binding.geometry.get_attribute("position").unwrap().get_x(0),
+        2.0,
+      )
+  }
+}

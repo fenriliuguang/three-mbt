@@ -8,6 +8,7 @@ import {
 }
 
 // Values
+pub fn apply_skins(Object3D) -> Unit
 
 // Errors
 
@@ -193,6 +194,7 @@ pub(all) struct Object3D {
   mut primitive : PrimitiveBinding?
   mut light : LightState?
   mut morph : MorphState?
+  mut skin : SkinState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 pub fn Object3D::add(Self, Self) -> Self
@@ -251,6 +253,16 @@ pub(all) struct ShadowState {
   mut normal_bias : Double
   mut radius : Double
 }
+
+pub(all) struct SkinState {
+  joints : Array[Object3D]
+  inverse_binds : Array[@math.Matrix4]
+  bind_position : Array[Double]
+  bind_normal : Array[Double]?
+  indices : Array[Int]
+  weights : Array[Double]
+}
+pub fn SkinState::write(Self, Object3D, BufferGeometry) -> Unit
 
 // Type aliases
 

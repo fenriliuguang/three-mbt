@@ -483,9 +483,11 @@ fn kept_by_frustum(
 
 ///|
 /// 先更新场景，再更新相机，这样挂在场景里的相机能读到父节点的世界矩阵。
+/// 世界矩阵就绪后，按绑定姿态重算蒙皮顶点。
 pub fn update_frame(scene : Object3D, camera : Object3D) -> Unit {
   scene.update_matrix_world(force=true)
   camera.update_matrix_world(force=true)
+  @core.apply_skins(scene)
 }
 
 ///|
