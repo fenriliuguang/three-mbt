@@ -1,4 +1,4 @@
-// 阶段 7。glTF 2.0 的几何、PBR 因子、相机、关键帧、平行光、静态形变和节点权重。不读贴图、蒙皮、点光和聚光。
+// 阶段 7。glTF 2.0 的几何、PBR 因子、相机、关键帧、平行光、静态形变、节点权重和顶点色形变。不读贴图、蒙皮、点光和聚光。
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",

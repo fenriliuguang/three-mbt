@@ -406,3 +406,46 @@ test "glTF node weights override mesh morph weights" {
   assert_eq(physical_equal(geometry("plain"), geometry("flat")), false)
   assert_eq(physical_equal(geometry("plain"), geometry("partial")), false)
 }
+
+///|
+test "glTF color morph weights are baked into vertex colors" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2]}],"nodes":[{"name":"rgb","mesh":0},{"name":"rgba","mesh":1},{"name":"plain","mesh":2}],"meshes":[{"weights":[0.5],"primitives":[{"attributes":{"POSITION":0,"COLOR_0":1},"targets":[{"COLOR_0":2}]}]},{"weights":[0.5],"primitives":[{"attributes":{"POSITION":0,"COLOR_0":3},"targets":[{"COLOR_0":4}]}]},{"weights":[1],"primitives":[{"attributes":{"POSITION":0},"targets":[{"COLOR_0":2}]}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":3,"componentType":5126,"count":3,"type":"VEC4"},{"bufferView":4,"componentType":5126,"count":3,"type":"VEC4"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":36},{"buffer":0,"byteOffset":108,"byteLength":48},{"buffer":0,"byteOffset":156,"byteLength":48}],"buffers":[{"byteLength":204,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAAACAPwAAAAAAAAAAAACAPwAAgD8AAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABA"}]}
+  let root = @gltf.parse(text).scene.node
+  match must(root, "rgb").mesh {
+    None => panic()
+    Some(binding) => {
+      let color = binding.geometry.get_attribute("color").unwrap()
+      let position = binding.geometry.get_attribute("position").unwrap()
+      assert_eq(color.item_size, 3)
+      assert_eq(color.get_x(0), 1.0)
+      assert_eq(color.get_z(0), 1.0)
+      assert_eq(color.get_y(1), 1.0)
+      assert_eq(color.get_z(1), 1.0)
+      assert_eq(color.get_z(2), 2.0)
+      assert_eq(position.get_x(1), 1.0)
+      assert_eq(position.get_y(2), 1.0)
+    }
+  }
+  match must(root, "rgba").mesh {
+    None => panic()
+    Some(binding) => {
+      let color = binding.geometry.get_attribute("color").unwrap()
+      assert_eq(color.item_size, 4)
+      assert_eq(color.get_x(0), 1.0)
+      assert_eq(color.get_y(0), 0.0)
+      assert_eq(color.get_component(0, 3), 2.0)
+      assert_eq(color.get_component(2, 3), 2.0)
+    }
+  }
+  match must(root, "plain").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.geometry.get_attribute("color") is None, true)
+      assert_eq(
+        binding.geometry.get_attribute("position").unwrap().get_y(2),
+        1.0,
+      )
+    }
+  }
+}

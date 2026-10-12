@@ -47,6 +47,7 @@ priv struct Mat {
 priv struct MorphTarget {
   position : Array[Double]?
   normal : Array[Double]?
+  color : Array[Double]?
 }
 
 ///|
@@ -109,12 +110,12 @@ pub(all) struct Gltf {
 /// 从 glTF 2.0 JSON 读出默认场景。
 ///
 /// 缓冲来自 `data:` URI 的 base64。第 0 个缓冲没有 URI 时，用 `bin` 填上。
-/// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0` 和索引。
+/// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0`、`COLOR_0` 和索引。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图、蒙皮和顶点色形变先不读。动画通道里的 `weights` 仍跳过。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图和蒙皮先不读。动画通道里的 `weights` 仍跳过。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -615,6 +616,28 @@ fn read_values(
 }
 
 ///|
+fn color_width(accs : Array[Acc], index : Int) -> Int raise GltfError {
+  if index < 0 || index >= accs.length() {
+    raise GltfError::Invalid("accessor index")
+  }
+  let width = accs[index].components
+  if width != 3 && width != 4 {
+    raise GltfError::Invalid("color accessor")
+  }
+  width
+}
+
+///|
+fn read_color(
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  index : Int,
+) -> Array[Double] raise GltfError {
+  read_values(bins, views, accs, index, color_width(accs, index))
+}
+
+///|
 fn put_attribute(
   geometry : @core.BufferGeometry,
   name : String,
@@ -677,6 +700,18 @@ fn load_primitive(
         2,
       )
   }
+  match attrs.get("COLOR_0") {
+    None => ()
+    Some(index) => {
+      let at = as_f64(index).to_int()
+      put_attribute(
+        geometry,
+        "color",
+        read_color(bins, views, accs, at),
+        color_width(accs, at),
+      )
+    }
+  }
   match obj.get("indices") {
     None => ()
     Some(index) => {
@@ -729,15 +764,20 @@ fn read_morph_targets(
       Some(accessor) =>
         Some(read_values(bins, views, accs, as_f64(accessor).to_int(), 3))
     }
-    out.push({ position, normal, })
+    let color = match target.get("COLOR_0") {
+      None => None
+      Some(accessor) =>
+        Some(read_color(bins, views, accs, as_f64(accessor).to_int()))
+    }
+    out.push({ position, normal, color, })
     index = index + 1
   }
   out
 }
 
 ///|
-/// 按权重把 `POSITION` 和 `NORMAL` 增量加进已有属性。
-/// 没有法线属性时跳过 `NORMAL` 目标。顶点色形变先不加。
+/// 按权重把 `POSITION`、`NORMAL` 和 `COLOR_0` 增量加进已有属性。
+/// 没有法线或顶点色属性时跳过对应目标。
 /// 这不是运行时的 `morphTargetInfluences`，只烘焙这一份权重。上游把增量放进 `morphAttributes`。
 /// r186: `addMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2387 ; `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2474
 fn apply_stored_morphs(
@@ -750,6 +790,7 @@ fn apply_stored_morphs(
     Some(attribute) => attribute
   }
   let normal = geometry.get_attribute("normal")
+  let color = geometry.get_attribute("color")
   let mut index = 0
   while index < targets.length() {
     let weight = if index < weights.length() { weights[index] } else { 0.0 }
@@ -762,6 +803,14 @@ fn apply_stored_morphs(
         None => ()
         Some(attribute) =>
           match targets[index].normal {
+            None => ()
+            Some(deltas) => add_weighted_deltas(attribute, deltas, weight)
+          }
+      }
+      match color {
+        None => ()
+        Some(attribute) =>
+          match targets[index].color {
             None => ()
             Some(deltas) => add_weighted_deltas(attribute, deltas, weight)
           }
@@ -886,6 +935,7 @@ fn clone_geometry(source : @core.BufferGeometry) -> @core.BufferGeometry {
   copy_named(source, geometry, "position")
   copy_named(source, geometry, "normal")
   copy_named(source, geometry, "uv")
+  copy_named(source, geometry, "color")
   match source.index {
     None => ()
     Some(index) =>
@@ -930,18 +980,18 @@ fn add_weighted_deltas(
   deltas : Array[Double],
   weight : Double,
 ) -> Unit raise GltfError {
-  if deltas.length() != attribute.count * 3 {
+  if deltas.length() != attribute.count * attribute.item_size {
     raise GltfError::Invalid("morph target")
   }
   let mut vertex = 0
   while vertex < attribute.count {
-    let base = vertex * 3
-    attribute.set_xyz(
-      vertex,
-      attribute.get_x(vertex) + weight * deltas[base],
-      attribute.get_y(vertex) + weight * deltas[base + 1],
-      attribute.get_z(vertex) + weight * deltas[base + 2],
-    )
+    let base = vertex * attribute.item_size
+    let mut component = 0
+    while component < attribute.item_size {
+      let at = base + component
+      attribute.array[at] = attribute.array[at] + weight * deltas[at]
+      component = component + 1
+    }
     vertex = vertex + 1
   }
 }
