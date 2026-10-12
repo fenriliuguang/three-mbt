@@ -115,3 +115,90 @@ test "two primitives become children of the node" {
     Some(_) => ()
   }
 }
+
+///|
+test "glTF cameras become perspective and orthographic nodes" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"eye","translation":[1,2,3],"camera":0},{"camera":1}],"cameras":[{"name":"unused","type":"perspective","perspective":{"yfov":0.5,"aspectRatio":2,"znear":0.25,"zfar":40}},{"name":"flat","type":"orthographic","orthographic":{"xmag":2,"ymag":3,"znear":0.5,"zfar":50}}]}
+  let group = @gltf.parse(text)
+  let eye = must(group.node, "eye")
+  assert_eq(eye.kind is @core.NodeKind::PerspectiveCamera, true)
+  assert_eq(eye.position.x, 1.0)
+  assert_eq(eye.position.y, 2.0)
+  assert_eq(eye.position.z, 3.0)
+  match eye.camera {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.kind is @core.ProjectionKind::Perspective, true)
+      assert_eq(state.fov, @math.rad_to_deg(0.5))
+      assert_eq(state.aspect, 2.0)
+      assert_eq(state.near, 0.25)
+      assert_eq(state.far, 40.0)
+    }
+  }
+  let flat = must(group.node, "flat")
+  assert_eq(flat.kind is @core.NodeKind::OrthographicCamera, true)
+  match flat.camera {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.kind is @core.ProjectionKind::Orthographic, true)
+      assert_eq(state.left, -2.0)
+      assert_eq(state.right, 2.0)
+      assert_eq(state.top, 3.0)
+      assert_eq(state.bottom, -3.0)
+      assert_eq(state.near, 0.5)
+      assert_eq(state.far, 50.0)
+    }
+  }
+  let wide_text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"wide","camera":0}],"cameras":[{"type":"perspective","perspective":{"yfov":0.5,"aspectRatio":0,"znear":0,"zfar":0}}]}
+  let wide = @gltf.parse(wide_text)
+  match must(wide.node, "wide").camera {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.aspect, 1.0)
+      assert_eq(state.near, 1.0)
+      assert_eq(state.far, 2000000.0)
+    }
+  }
+}
+
+///|
+test "a mesh and a camera share a group, and a camera index can repeat" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2]}],"nodes":[{"name":"both","mesh":0,"camera":0},{"name":"left","translation":[1,0,0],"camera":0},{"name":"right","translation":[0,2,0],"camera":0}],"cameras":[{"name":"eye","type":"perspective","perspective":{"yfov":0.5,"znear":1}}],"meshes":[{"primitives":[{"attributes":{"POSITION":0}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
+  let group = @gltf.parse(text)
+  let both = must(group.node, "both")
+  assert_eq(both.kind is @core.NodeKind::Group, true)
+  assert_eq(both.children.length(), 2)
+  match both.children[0].mesh {
+    None => panic()
+    Some(binding) =>
+      assert_eq(binding.geometry.get_attribute("position").unwrap().count, 3)
+  }
+  let child = both.children[1]
+  assert_eq(child.name, "eye")
+  assert_eq(child.kind is @core.NodeKind::PerspectiveCamera, true)
+  let left = must(group.node, "left")
+  let right = must(group.node, "right")
+  assert_eq(physical_equal(left, right), false)
+  assert_eq(left.position.x, 1.0)
+  assert_eq(right.position.y, 2.0)
+  match left.camera {
+    None => panic()
+    Some(state) => assert_eq(state.fov, @math.rad_to_deg(0.5))
+  }
+}
+
+///|
+test "an unknown glTF camera type is rejected" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"camera":0}],"cameras":[{"type":"fisheye"}]}
+  let failed = try {
+    ignore(@gltf.parse(text))
+    false
+  } catch {
+    @gltf.GltfError::Invalid(_) => true
+  }
+  assert_eq(failed, true)
+}

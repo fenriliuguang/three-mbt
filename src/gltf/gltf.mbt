@@ -64,6 +64,25 @@ priv struct NodeDesc {
   sy : Double
   sz : Double
   matrix : Array[Double]?
+  camera : Int?
+}
+
+///|
+priv enum CamKind {
+  Perspective
+  Orthographic
+}
+
+///|
+priv struct Cam {
+  kind : CamKind
+  fov : Double
+  aspect : Double
+  xmag : Double
+  ymag : Double
+  znear : Double
+  zfar : Double
+  name : String
 }
 
 ///|
@@ -73,7 +92,7 @@ priv struct NodeDesc {
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0` 和索引。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。
-/// 贴图、蒙皮、形变、动画、相机和灯光先不读。
+/// 节点上的相机会建成透视或正交相机。贴图、蒙皮、形变、动画和灯光先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(
   text : String,
@@ -86,8 +105,9 @@ pub fn parse(
   let accs = load_accessors(root)
   let materials = load_materials(root)
   let meshes = load_meshes(root, bins, views, accs, materials)
+  let cameras = load_cameras(root)
   let nodes = load_nodes(root)
-  let built = build_nodes(nodes, meshes)
+  let built = build_nodes(nodes, meshes, cameras)
   link_children(nodes, built)
   let group = @objects.Group::new()
   let roots = scene_roots(root, nodes)
@@ -728,6 +748,10 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     None => None
     Some(value) => Some(as_f64(value).to_int())
   }
+  let camera = match obj.get("camera") {
+    None => None
+    Some(value) => Some(as_f64(value).to_int())
+  }
   let children = match obj.get("children") {
     None => []
     Some(value) => as_ints(value)
@@ -736,6 +760,7 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     name: opt_string(obj, "name", ""),
     children,
     mesh,
+    camera,
     tx,
     ty,
     tz,
@@ -800,40 +825,164 @@ fn mesh_from(prim : Prim) -> @objects.Mesh {
 }
 
 ///|
+/// `0` 按 JavaScript 的 `||` 换成默认值。
+fn or_nonzero(value : Double, fallback : Double) -> Double {
+  if value == 0.0 {
+    fallback
+  } else {
+    value
+  }
+}
+
+///|
+/// r186: `loadCamera` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4014
+fn load_camera(obj : Map[String, Json]) -> Cam raise GltfError {
+  let name = opt_string(obj, "name", "")
+  match opt_string(obj, "type", "") {
+    "perspective" => {
+      let params = match obj.get("perspective") {
+        None => raise GltfError::Invalid("camera parameters")
+        Some(value) => as_object(value)
+      }
+      match params.get("yfov") {
+        None => raise GltfError::Invalid("perspective yfov")
+        Some(value) =>
+          {
+            kind: Perspective,
+            fov: @math.rad_to_deg(as_f64(value)),
+            aspect: or_nonzero(opt_f64(params, "aspectRatio", 1.0), 1.0),
+            xmag: 0.0,
+            ymag: 0.0,
+            znear: or_nonzero(opt_f64(params, "znear", 1.0), 1.0),
+            zfar: or_nonzero(opt_f64(params, "zfar", 2000000.0), 2000000.0),
+            name,
+          }
+      }
+    }
+    "orthographic" => {
+      let params = match obj.get("orthographic") {
+        None => raise GltfError::Invalid("camera parameters")
+        Some(value) => as_object(value)
+      }
+      {
+        kind: Orthographic,
+        fov: 50.0,
+        aspect: 1.0,
+        xmag: require_f64(params, "xmag"),
+        ymag: require_f64(params, "ymag"),
+        znear: require_f64(params, "znear"),
+        zfar: require_f64(params, "zfar"),
+        name,
+      }
+    }
+    _ => raise GltfError::Invalid("camera type")
+  }
+}
+
+///|
+fn require_f64(obj : Map[String, Json], key : String) -> Double raise GltfError {
+  match obj.get(key) {
+    None => raise GltfError::Invalid(key)
+    Some(value) => as_f64(value)
+  }
+}
+
+///|
+fn load_cameras(root : Map[String, Json]) -> Array[Cam] raise GltfError {
+  let listed = objects(root, "cameras")
+  let out = []
+  let mut i = 0
+  while i < listed.length() {
+    out.push(load_camera(listed[i]))
+    i = i + 1
+  }
+  out
+}
+
+///|
+fn camera_object(cam : Cam) -> @core.Object3D {
+  match cam.kind {
+    Perspective => {
+      let camera = @cameras.PerspectiveCamera::new(
+        fov=cam.fov,
+        aspect=cam.aspect,
+        near=cam.znear,
+        far=cam.zfar,
+      )
+      camera.node.name = cam.name
+      camera.node
+    }
+    Orthographic => {
+      let camera = @cameras.OrthographicCamera::new(
+        left=-cam.xmag,
+        right=cam.xmag,
+        top=cam.ymag,
+        bottom=-cam.ymag,
+        near=cam.znear,
+        far=cam.zfar,
+      )
+      camera.node.name = cam.name
+      camera.node
+    }
+  }
+}
+
+///|
 fn build_nodes(
   nodes : Array[NodeDesc],
   meshes : Array[Array[Prim]],
+  cameras : Array[Cam],
 ) -> Array[@core.Object3D] raise GltfError {
   let built = []
   let mut i = 0
   while i < nodes.length() {
     let desc = nodes[i]
-    let node = match desc.mesh {
-      None => {
-        let group = @objects.Group::new()
-        apply_transform(group.node, desc)
-        group.node
-      }
+    let parts = []
+    match desc.mesh {
+      None => ()
       Some(index) => {
         if index < 0 || index >= meshes.length() {
           raise GltfError::Invalid("mesh index")
         }
         let prims = meshes[index]
-        if prims.length() == 1 {
-          let mesh = mesh_from(prims[0])
-          apply_transform(mesh.node, desc)
-          mesh.node
-        } else {
-          let group = @objects.Group::new()
-          apply_transform(group.node, desc)
-          let mut p = 0
-          while p < prims.length() {
-            ignore(group.add(mesh_from(prims[p])))
-            p = p + 1
-          }
-          group.node
+        let mut p = 0
+        while p < prims.length() {
+          parts.push(mesh_from(prims[p]).node)
+          p = p + 1
         }
       }
+    }
+    match desc.camera {
+      None => ()
+      Some(index) => {
+        if index < 0 || index >= cameras.length() {
+          raise GltfError::Invalid("camera index")
+        }
+        parts.push(camera_object(cameras[index]))
+      }
+    }
+    let node = if parts.length() == 0 {
+      let group = @objects.Group::new()
+      apply_transform(group.node, desc)
+      group.node
+    } else if parts.length() == 1 {
+      apply_transform(parts[0], desc)
+      if desc.name == "" {
+        match desc.camera {
+          None => ()
+          Some(index) => parts[0].name = cameras[index].name
+        }
+      }
+      parts[0]
+    } else {
+      let group = @objects.Group::new()
+      apply_transform(group.node, desc)
+      let mut p = 0
+      while p < parts.length() {
+        ignore(group.node.add(parts[p]))
+        p = p + 1
+      }
+      group.node
     }
     built.push(node)
     i = i + 1
