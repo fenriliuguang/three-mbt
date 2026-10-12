@@ -65,6 +65,7 @@ priv struct NodeDesc {
   sz : Double
   matrix : Array[Double]?
   camera : Int?
+  light : Int?
 }
 
 ///|
@@ -102,7 +103,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`，插值是 `LINEAR` 与 `STEP`。
-/// 贴图、蒙皮、形变、三次样条和灯光先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。点光、聚光、贴图、蒙皮、形变和三次样条先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -113,8 +114,9 @@ pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let materials = load_materials(root)
   let meshes = load_meshes(root, bins, views, accs, materials)
   let cameras = load_cameras(root)
+  let lights = load_punctuals(root)
   let nodes = load_nodes(root)
-  let built = build_nodes(nodes, meshes, cameras)
+  let built = build_nodes(nodes, meshes, cameras, lights)
   link_children(nodes, built)
   let animations = load_animations(root, bins, views, accs, built)
   let group = @objects.Group::new()
@@ -760,6 +762,7 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     None => None
     Some(value) => Some(as_f64(value).to_int())
   }
+  let light = node_light(obj)
   let children = match obj.get("children") {
     None => []
     Some(value) => as_ints(value)
@@ -769,6 +772,7 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     children,
     mesh,
     camera,
+    light,
     tx,
     ty,
     tz,
@@ -936,10 +940,106 @@ fn camera_object(cam : Cam) -> @core.Object3D {
 }
 
 ///|
+
+///|
+priv struct Punctual {
+  r : Double
+  g : Double
+  b : Double
+  intensity : Double
+  name : String
+}
+
+///|
+fn extension_block(
+  obj : Map[String, Json],
+  name : String,
+) -> Map[String, Json]? raise GltfError {
+  match obj.get("extensions") {
+    None => None
+    Some(value) => {
+      let extensions = as_object(value)
+      match extensions.get(name) {
+        None => None
+        Some(block) => Some(as_object(block))
+      }
+    }
+  }
+}
+
+///|
+fn node_light(obj : Map[String, Json]) -> Int? raise GltfError {
+  match extension_block(obj, "KHR_lights_punctual") {
+    None => None
+    Some(block) =>
+      match block.get("light") {
+        None => None
+        Some(value) => Some(as_f64(value).to_int())
+      }
+  }
+}
+
+///|
+/// 平行光的目标在本地 `(0, 0, -1)`，位置先归零，再套节点变换。
+/// r186: `_loadLight` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L695
+fn load_punctual(
+  obj : Map[String, Json],
+  index : Int,
+) -> Punctual raise GltfError {
+  match opt_string(obj, "type", "") {
+    "directional" => ()
+    _ => raise GltfError::Invalid("punctual light type")
+  }
+  let (r, g, b) = match obj.get("color") {
+    None => (1.0, 1.0, 1.0)
+    Some(value) => {
+      let nums = as_doubles(value)
+      if nums.length() < 3 {
+        raise GltfError::Invalid("light color")
+      }
+      (nums[0], nums[1], nums[2])
+    }
+  }
+  let given = opt_string(obj, "name", "")
+  let name = if given == "" { "light_\{index}" } else { given }
+  { r, g, b, intensity: opt_f64(obj, "intensity", 1.0), name, }
+}
+
+///|
+fn load_punctuals(root : Map[String, Json]) -> Array[Punctual] raise GltfError {
+  let lights = match extension_block(root, "KHR_lights_punctual") {
+    None => []
+    Some(block) => objects(block, "lights")
+  }
+  let out = []
+  let mut i = 0
+  while i < lights.length() {
+    out.push(load_punctual(lights[i], i))
+    i = i + 1
+  }
+  out
+}
+
+///|
+fn light_object(light : Punctual) -> @core.Object3D {
+  let sun = @lights.DirectionalLight::new(intensity=light.intensity)
+  ignore(sun.node.position.set(0.0, 0.0, 0.0))
+  match sun.node.light {
+    None => ()
+    Some(state) => ignore(state.color.set_rgb(light.r, light.g, light.b))
+  }
+  ignore(sun.target.position.set(0.0, 0.0, -1.0))
+  ignore(sun.node.add(sun.target))
+  sun.node.name = light.name
+  sun.node
+}
+
+///|
 fn build_nodes(
   nodes : Array[NodeDesc],
   meshes : Array[Array[Prim]],
   cameras : Array[Cam],
+  lights : Array[Punctual],
 ) -> Array[@core.Object3D] raise GltfError {
   let built = []
   let mut i = 0
@@ -969,6 +1069,15 @@ fn build_nodes(
         parts.push(camera_object(cameras[index]))
       }
     }
+    match desc.light {
+      None => ()
+      Some(index) => {
+        if index < 0 || index >= lights.length() {
+          raise GltfError::Invalid("light index")
+        }
+        parts.push(light_object(lights[index]))
+      }
+    }
     let node = if parts.length() == 0 {
       let group = @objects.Group::new()
       apply_transform(group.node, desc)
@@ -979,6 +1088,10 @@ fn build_nodes(
         match desc.camera {
           None => ()
           Some(index) => parts[0].name = cameras[index].name
+        }
+        match desc.light {
+          None => ()
+          Some(index) => parts[0].name = lights[index].name
         }
       }
       parts[0]

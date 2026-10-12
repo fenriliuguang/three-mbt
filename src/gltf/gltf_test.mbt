@@ -250,3 +250,61 @@ test "a glTF cubic spline animation is rejected" {
   }
   assert_eq(failed, true)
 }
+
+///|
+test "glTF directional lights point down local -Z" {
+  let text =
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"directional","name":"unused","color":[0.5,0.25,0],"intensity":2},{"type":"directional"}]}},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"sun","translation":[1,2,3],"extensions":{"KHR_lights_punctual":{"light":0}}},{"extensions":{"KHR_lights_punctual":{"light":1}}}]}
+  let scene = @gltf.parse(text).scene
+  let sun = must(scene.node, "sun")
+  assert_eq(sun.kind is @core.NodeKind::DirectionalLight, true)
+  assert_eq(sun.position.x, 1.0)
+  assert_eq(sun.position.y, 2.0)
+  assert_eq(sun.position.z, 3.0)
+  assert_eq(sun.children.length(), 1)
+  match sun.light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.kind is @core.LightKind::Directional, true)
+      assert_eq(state.intensity, 2.0)
+      assert_eq(state.color.r, 0.5)
+      assert_eq(state.color.g, 0.25)
+      assert_eq(state.color.b, 0.0)
+      match state.target {
+        None => panic()
+        Some(target) => {
+          assert_eq(physical_equal(target, sun.children[0]), true)
+          assert_eq(target.position.x, 0.0)
+          assert_eq(target.position.y, 0.0)
+          assert_eq(target.position.z, -1.0)
+        }
+      }
+    }
+  }
+  let fill = must(scene.node, "light_1")
+  assert_eq(fill.position.x, 0.0)
+  assert_eq(fill.position.y, 0.0)
+  assert_eq(fill.position.z, 0.0)
+  match fill.light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.intensity, 1.0)
+      assert_eq(state.color.r, 1.0)
+      assert_eq(state.color.g, 1.0)
+      assert_eq(state.color.b, 1.0)
+    }
+  }
+}
+
+///|
+test "a glTF point light is rejected" {
+  let text =
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"point"}]}},"nodes":[{}]}
+  let failed = try {
+    ignore(@gltf.parse(text).scene)
+    false
+  } catch {
+    @gltf.GltfError::Invalid(_) => true
+  }
+  assert_eq(failed, true)
+}

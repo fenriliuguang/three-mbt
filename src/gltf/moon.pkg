@@ -1,9 +1,10 @@
-// 阶段 7。glTF 2.0 的几何、PBR 因子、相机和关键帧。不读贴图、蒙皮、形变、三次样条和灯光。
+// 阶段 7。glTF 2.0 的几何、PBR 因子、相机、关键帧和平行光。不读贴图、蒙皮、形变、三次样条、点光和聚光。
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/objects",
