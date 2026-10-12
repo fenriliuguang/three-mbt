@@ -49,6 +49,20 @@ test "matrix compose and decompose match r186" {
 }
 
 ///|
+test "angleTo matches the right angle and the zero vector" {
+  let axis = @math.Vector3::new(x=1.0)
+  assert_eq(axis.angle_to(axis), 0.0)
+  assert_close(axis.angle_to(@math.Vector3::new(z=-1.0)), 1.5707963267948966)
+  assert_close(axis.angle_to(@math.Vector3::new(x=-1.0)), 3.141592653589793)
+  assert_close(
+    axis.angle_to(@math.Vector3::new(x=1.0, y=1.0)),
+    0.7853981633974483,
+  )
+  assert_close(@math.Vector3::new().angle_to(axis), 1.5707963267948966)
+  assert_eq(axis.x, 1.0)
+}
+
+///|
 test "transformDirection uses the upper 3x3 and normalizes" {
   let translated = @math.Matrix4::new().compose(
     @math.Vector3::new(x=10.0),

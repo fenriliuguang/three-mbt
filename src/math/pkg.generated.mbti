@@ -197,6 +197,7 @@ pub(all) struct Vector3 {
 }
 pub fn Vector3::add(Self, Self) -> Self
 pub fn Vector3::add_vectors(Self, Self, Self) -> Self
+pub fn Vector3::angle_to(Self, Self) -> Double
 pub fn Vector3::apply_matrix4(Self, Matrix4) -> Self
 pub fn Vector3::apply_quaternion(Self, Quaternion) -> Self
 pub fn Vector3::clone(Self) -> Self

@@ -183,6 +183,17 @@ pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L933
+pub fn Vector3::angle_to(self : Vector3, v : Vector3) -> Double {
+  let denominator = (self.length_sq() * v.length_sq()).sqrt()
+  if denominator == 0.0 {
+    return @std.PI / 2.0
+  }
+  let theta = self.dot(v) / denominator
+  @std.acos(theta.clamp(min=-1.0, max=1.0))
+}
+
+///|
 /// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L450
 pub fn Vector3::apply_matrix4(self : Vector3, m : Matrix4) -> Vector3 {
   let x = self.x
