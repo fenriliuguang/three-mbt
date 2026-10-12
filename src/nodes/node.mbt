@@ -336,10 +336,12 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
 
 ///|
 /// 背面法线。`surface.w` 大于 0.5 时只在背面片元取反，小于 -0.5 时整面取反。
+/// `emissive.w` 大于 0.5 时改用视图空间位置的屏幕导数，再变回世界空间，不再按侧面翻转。
 /// r186: `negateOnBackSide` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/FrontFacingNode.js#L91
 /// r186: `faceDirection` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/normal_fragment_begin.glsl.js#L2
+/// r186: `FLAT_SHADED` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/normal_fragment_begin.glsl.js#L6
 fn facing_preamble() -> String {
-  "fn facing_normal(n : vec3<f32>, front : bool) -> vec3<f32> {\n  let side = (uniforms.surface).w;\n  if (side > 0.5) {\n    if (front) {\n      return n;\n    }\n    return -n;\n  }\n  if (side < -0.5) {\n    return -n;\n  }\n  return n;\n}\n\n"
+  "fn facing_normal(n : vec3<f32>, front : bool) -> vec3<f32> {\n  if ((uniforms.emissive).w > 0.5) {\n    let view_pos = (uniforms.view * vec4<f32>(input.v_world, 1.0)).xyz;\n    let n_view = normalize(cross(dpdx(view_pos), dpdy(view_pos)));\n    return normalize(vec3<f32>(dot((uniforms.view)[0].xyz, n_view), dot((uniforms.view)[1].xyz, n_view), dot((uniforms.view)[2].xyz, n_view)));\n  }\n  let side = (uniforms.surface).w;\n  if (side > 0.5) {\n    if (front) {\n      return n;\n    }\n    return -n;\n  }\n  if (side < -0.5) {\n    return -n;\n  }\n  return n;\n}\n\n"
 }
 
 ///|

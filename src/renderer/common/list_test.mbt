@@ -869,6 +869,19 @@ test "emissive reaches the render list" {
 }
 
 ///|
+test "flat shading reaches the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshLambertMaterial::new()
+  assert_eq(material.material.flat_shading, false)
+  material.material.flat_shading = true
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn[0].flat_shading, true)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()
@@ -1027,6 +1040,42 @@ test "emissive is packed after the fog parameters" {
   assert_eq(uniforms[507], b'\x00')
   assert_eq(uniforms[508], b'\x00')
   assert_eq(uniforms[511], b'\x00')
+  let flat = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    @math.Vector3::new(x=0.0, y=0.0, z=0.0),
+    @math.Vector3::new(x=0.0, y=0.0, z=0.0),
+    @math.Vector3::new(x=0.0, y=0.0, z=1.0),
+    mvp,
+    @math.Vector3::new(x=0.0, y=0.0, z=0.0),
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    flat_shading=1.0,
+  )
+  assert_eq(flat[508], b'\x00')
+  assert_eq(flat[509], b'\x00')
+  assert_eq(flat[510], b'\x80')
+  assert_eq(flat[511], b'\x3F')
 }
 
 ///|

@@ -7,6 +7,7 @@ using @core {type BufferAttribute}
 /// 五块 `mat4x4<f32>` 和十九块 `vec4<f32>`。624 字节。
 /// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
 /// `surface` 是 `(roughness, metalness, alphaTest, side)`。`side` 为 1 表示双面，-1 表示只画背面并翻转法线。
+/// 自发光 `rgb` 的 `w` 是平直着色开关：大于 0.5 时用法线导数，默认 0。不增加这 624 字节。
 /// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
 /// 再后面是聚光的位置、方向（`w` 为开关）、颜色，以及 `(distance, decay, coneCos, penumbraCos)`。
 pub let uniform_bytes : Int = 624
@@ -261,6 +262,7 @@ pub fn pack_uniforms(
   emissive_g? : Double = 0.0,
   emissive_b? : Double = 0.0,
   emissive_intensity? : Double = 1.0,
+  flat_shading? : Double = 0.0,
   point_x? : Double = 0.0,
   point_y? : Double = 0.0,
   point_z? : Double = 0.0,
@@ -323,6 +325,7 @@ pub fn pack_uniforms(
   write_f32(dst, 496, emissive_r * emissive_intensity)
   write_f32(dst, 500, emissive_g * emissive_intensity)
   write_f32(dst, 504, emissive_b * emissive_intensity)
+  write_f32(dst, 508, flat_shading)
   write_f32(dst, 512, point_x)
   write_f32(dst, 516, point_y)
   write_f32(dst, 520, point_z)

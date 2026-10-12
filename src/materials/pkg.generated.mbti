@@ -31,6 +31,7 @@ pub(all) struct Material {
   mut metalness : Double
   mut fog : Bool
   mut alpha_test : Double
+  mut flat_shading : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?

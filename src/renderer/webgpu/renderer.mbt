@@ -3728,6 +3728,7 @@ fn WebGPURenderer::draw_meshes(
           emissive_g=item.emissive.g,
           emissive_b=item.emissive.b,
           emissive_intensity=item.emissive_intensity,
+          flat_shading=if item.flat_shading { 1.0 } else { 0.0 },
           point_x=lights.point_position.x,
           point_y=lights.point_position.y,
           point_z=lights.point_position.z,

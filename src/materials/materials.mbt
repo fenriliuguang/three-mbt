@@ -16,8 +16,9 @@ pub(all) enum MaterialKind {
 /// `roughness_map` 只进 Standard：绿色通道乘在粗糙度上，再取 0.0525 下限。没有贴图时同样绑白纹理。
 /// `metalness_map` 也只进 Standard：蓝色通道乘在金属度上，再夹到 0 和 1。没有贴图时绑白纹理。
 /// `alpha_map` 的绿色通道乘在片元 alpha 上，乘完再做 `alpha_test`。Basic、Lambert、Standard 都采样。没有贴图时绑白纹理。
-/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133
+/// `flat_shading` 默认关闭。打开后 Lambert 和 Standard 忽略顶点法线，改用视图空间位置的屏幕导数。
+/// 改 `side`、`alpha_test`、`flat_shading`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -29,6 +30,7 @@ pub(all) struct Material {
   mut metalness : Double
   mut fog : Bool
   mut alpha_test : Double
+  mut flat_shading : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -51,6 +53,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     metalness: 0.0,
     fog: true,
     alpha_test: 0.0,
+    flat_shading: false,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -86,6 +89,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     metalness: 0.0,
     fog: true,
     alpha_test: 0.0,
+    flat_shading: false,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -127,6 +131,7 @@ pub fn Material::standard(
     metalness,
     fog: true,
     alpha_test: 0.0,
+    flat_shading: false,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,

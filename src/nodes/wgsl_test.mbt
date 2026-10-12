@@ -115,6 +115,21 @@ test "standard multiplies metalness by the blue channel" {
 }
 
 ///|
+test "flat shading replaces the normal with screen derivatives" {
+  let deriv = "cross(dpdx(view_pos), dpdy(view_pos))"
+  assert_eq(includes(@nodes.lambert_wgsl(), deriv), true)
+  assert_eq(includes(@nodes.lambert_instanced_wgsl(), deriv), true)
+  assert_eq(includes(@nodes.standard_wgsl(), deriv), true)
+  assert_eq(includes(@nodes.standard_instanced_wgsl(), deriv), true)
+  assert_eq(
+    includes(@nodes.lambert_wgsl(), "(uniforms.emissive).w > 0.5"),
+    true,
+  )
+  assert_eq(includes(@nodes.basic_wgsl(), "dpdx"), false)
+  assert_eq(includes(@nodes.line_wgsl(), "dpdx"), false)
+}
+
+///|
 test "color and emissive maps decode sRGB" {
   let basic = @nodes.basic_wgsl()
   let lambert = @nodes.lambert_wgsl()

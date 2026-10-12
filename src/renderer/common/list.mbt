@@ -18,6 +18,7 @@ pub(all) struct RenderItem {
   metalness : Double
   fog : Bool
   alpha_test : Double
+  flat_shading : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -58,6 +59,7 @@ pub fn collect_opaque(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                flat_shading: binding.flat_shading,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -99,6 +101,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                flat_shading: binding.flat_shading,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -145,6 +148,7 @@ pub fn collect_wireframe(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                flat_shading: binding.flat_shading,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -410,6 +414,7 @@ pub fn collect_transparent(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                flat_shading: binding.flat_shading,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,

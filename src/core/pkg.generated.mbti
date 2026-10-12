@@ -126,6 +126,7 @@ pub(all) struct MeshBinding {
   metalness : Double
   fog : Bool
   mut alpha_test : Double
+  flat_shading : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   emissive_map : @textures.Texture?
