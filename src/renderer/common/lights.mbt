@@ -1,4 +1,4 @@
-// r186: `Lighting` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Lighting.js#L14
+// r186: `Lighting` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Lighting.js#L14 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100
 
 ///|
 using @core {type LightState}
@@ -96,8 +96,11 @@ fn light_direction(node : @core.Object3D, light : LightState) -> @math.Vector3 {
 }
 
 ///|
-/// 遍历可见节点。多盏平行光只保留第一盏。
-pub fn collect_lights(root : @core.Object3D) -> LightFrame {
+/// 遍历可见节点。多盏平行光只保留第一盏。传入相机时，层掩码不相交的灯跳过。
+pub fn collect_lights(
+  root : @core.Object3D,
+  camera? : @core.Object3D,
+) -> LightFrame {
   let accum = {
     ambient: @math.Vector3::new(),
     color: @math.Vector3::new(),
@@ -106,25 +109,27 @@ pub fn collect_lights(root : @core.Object3D) -> LightFrame {
     shadow: None,
   }
   root.traverse_visible(fn(node : @core.Object3D) {
-    match node.light {
-      None => ()
-      Some(light) =>
-        match light.kind {
-          @core.Ambient => ignore(accum.ambient.add(scaled_color(light)))
-          @core.Directional =>
-            if !accum.found_directional {
-              accum.found_directional = true
-              ignore(accum.color.copy(scaled_color(light)))
-              ignore(accum.direction.copy(light_direction(node, light)))
-              if node.cast_shadow {
-                match light.shadow {
-                  None => ()
-                  Some(shadow) =>
-                    accum.shadow = Some(place_shadow(node, light, shadow))
+    if on_camera_layer(node, camera) {
+      match node.light {
+        None => ()
+        Some(light) =>
+          match light.kind {
+            @core.Ambient => ignore(accum.ambient.add(scaled_color(light)))
+            @core.Directional =>
+              if !accum.found_directional {
+                accum.found_directional = true
+                ignore(accum.color.copy(scaled_color(light)))
+                ignore(accum.direction.copy(light_direction(node, light)))
+                if node.cast_shadow {
+                  match light.shadow {
+                    None => ()
+                    Some(shadow) =>
+                      accum.shadow = Some(place_shadow(node, light, shadow))
+                  }
                 }
               }
-            }
-        }
+          }
+      }
     }
   })
   {

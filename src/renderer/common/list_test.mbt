@@ -448,3 +448,38 @@ test "frustum drops spheres behind the camera" {
     }
   }
 }
+
+///|
+test "camera layers hide meshes and lights" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  mesh.node.layers.set(1)
+  ignore(scene.add(mesh))
+  let ambient = @lights.AmbientLight::new(hex=0xFFFFFF, intensity=0.25)
+  ambient.node.layers.set(1)
+  ignore(scene.add(ambient))
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  @common.update_frame(scene.node, camera.node)
+  assert_eq(@common.collect_opaque(scene.node, camera=camera.node).length(), 0)
+  let hidden = @common.collect_lights(scene.node, camera=camera.node)
+  assert_eq(hidden.ambient.x, 0.0)
+  assert_eq(hidden.ambient.y, 0.0)
+  assert_eq(hidden.ambient.z, 0.0)
+  let all = @common.collect_lights(scene.node)
+  assert_eq(all.ambient.x, 0.25)
+  camera.node.layers.enable(1)
+  assert_eq(@common.collect_opaque(scene.node, camera=camera.node).length(), 1)
+  let shown = @common.collect_lights(scene.node, camera=camera.node)
+  assert_eq(shown.ambient.x, 0.25)
+  assert_eq(shown.ambient.y, 0.25)
+  assert_eq(shown.ambient.z, 0.25)
+}

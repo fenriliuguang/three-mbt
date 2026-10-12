@@ -1,4 +1,4 @@
-// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100
 
 ///|
 using @core {type BufferGeometry, type Object3D}
@@ -26,6 +26,7 @@ pub(all) struct RenderItem {
 pub fn collect_opaque(
   root : Object3D,
   frustum? : @math.Frustum,
+  camera? : Object3D,
 ) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
@@ -36,6 +37,7 @@ pub fn collect_opaque(
           Some(binding) =>
             if !binding.transparent &&
               !binding.wireframe &&
+              on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
                 node,
@@ -78,6 +80,7 @@ pub(all) struct PrimitiveItem {
 pub fn collect_primitives(
   root : Object3D,
   frustum? : @math.Frustum,
+  camera? : Object3D,
 ) -> Array[PrimitiveItem] {
   let items = []
   root.traverse_visible(fn(node) {
@@ -85,6 +88,7 @@ pub fn collect_primitives(
       None => ()
       Some(binding) =>
         if !binding.transparent &&
+          on_camera_layer(node, camera) &&
           kept_by_frustum(node, binding.geometry, frustum) {
           items.push({
             node,
@@ -170,6 +174,7 @@ pub fn collect_transparent(
           Some(binding) =>
             if binding.transparent &&
               !binding.wireframe &&
+              on_camera_layer(node, Some(camera)) &&
               kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
                 node,
@@ -216,6 +221,16 @@ pub fn camera_frustum(state : @core.CameraState) -> @math.Frustum {
     coordinate_system=state.coordinate_system,
     reversed_depth=state.reversed_depth,
   )
+}
+
+///|
+/// 没传相机时不看层。传了相机时，层掩码必须相交。
+/// r186: `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100
+fn on_camera_layer(node : Object3D, camera : Object3D?) -> Bool {
+  match camera {
+    None => true
+    Some(camera) => node.layers.intersects(camera.layers)
+  }
 }
 
 ///|

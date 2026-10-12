@@ -2191,7 +2191,7 @@ fn WebGPURenderer::draw_shadow(
     enabled: 0.0,
     texel: 0.0,
   }
-  let items = @common.collect_opaque(scene.node)
+  let items = @common.collect_opaque(scene.node, camera=shadow.camera)
   for item in items {
     if !item.node.cast_shadow {
       continue
@@ -3311,7 +3311,7 @@ fn WebGPURenderer::draw_meshes(
 
 ///|
 /// 更新矩阵，清屏，先画不透明网格，再画透明网格。窗口目标会 `present`，颜色目标不会。
-/// 颜色通道按相机视锥裁剪。阴影通道仍画出全部投射体。
+/// 颜色通道按相机视锥和层掩码裁剪。阴影通道仍画出全部投射体，但只保留阴影相机看得到的层。
 /// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
@@ -3353,7 +3353,7 @@ pub fn WebGPURenderer::render(
     None => (0.0, 0.0, 0.0)
     Some(background) => (background.r, background.g, background.b)
   }
-  let lights = @common.collect_lights(scene.node)
+  let lights = @common.collect_lights(scene.node, camera~)
   match lights.shadow {
     None => ()
     Some(shadow) => self.draw_shadow(scene, shadow)
@@ -3393,7 +3393,7 @@ pub fn WebGPURenderer::render(
   let view = @common.camera_frustum(state)
   self.draw_meshes(
     pass,
-    @common.collect_opaque(scene.node, frustum=view),
+    @common.collect_opaque(scene.node, frustum=view, camera~),
     camera,
     state,
     lights,
@@ -3415,7 +3415,7 @@ pub fn WebGPURenderer::render(
     shadow_group,
     true,
   )
-  let strokes = @common.collect_primitives(scene.node, frustum=view)
+  let strokes = @common.collect_primitives(scene.node, frustum=view, camera~)
   let viewport_width = width.reinterpret_as_int().to_double()
   let viewport_height = height.reinterpret_as_int().to_double()
   for item in strokes {

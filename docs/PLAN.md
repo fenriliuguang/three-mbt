@@ -181,7 +181,7 @@ This phase has landed. Package tests compare compose and decompose, the WebGPU p
 
 A minimal `WebGPURenderer.render`: matrix updates, one opaque list, a depth buffer, unlit WGSL, vertex buffers, and an MVP uniform. `examples/cube` is a rotating cube. Frustum culling, sorting, and multi-pass wait.
 
-This phase has landed. `WebGPURenderer` updates matrices, collects visible opaque meshes, uploads positions and indices, and draws them with one unlit WGSL program. The cube scene lives in `examples/cube`. The window sample is the wasm component built by `scripts/build-cube.sh`. The color pass drops a mesh, point, or line when `frustum_culled` is set and its bounding sphere misses the camera frustum. The sphere is computed on first use. `frustum_culled` false keeps the object. The shadow pass still draws every caster. Wireframe stays later. Transparent meshes are drawn in phase 7.
+This phase has landed. `WebGPURenderer` updates matrices, collects visible opaque meshes, uploads positions and indices, and draws them with one unlit WGSL program. The cube scene lives in `examples/cube`. The window sample is the wasm component built by `scripts/build-cube.sh`. The color pass drops a mesh, point, or line when `frustum_culled` is set and its bounding sphere misses the camera frustum. The sphere is computed on first use. `frustum_culled` false keeps the object. The shadow pass still draws every caster, but it uses the shadow camera's layers. A mesh, point, line, or light whose layer mask misses the camera is skipped. Wireframe stays later. Transparent meshes are drawn in phase 7.
 
 ### 4. A second material
 
@@ -265,6 +265,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | a grayscale post pass | `post`, `renderer` |
 | planned | 7 | transparent meshes, back to front | `objects`, `renderer` |
 | planned | 7 | view frustum culling by bounding sphere | `renderer` |
+| planned | 7 | camera layers filter meshes, points, lines, and lights | `renderer` |
 | planned | 7 | No, Linear, Reinhard, Cineon, ACES Filmic, AgX, and Neutral tone mapping, optional sRGB output | `post`, `renderer` |
 | planned | 7 | Five-level bloom: kernels 6, 10, 14, 18, 22 and additive composite | `post`, `renderer` |
 | planned | 7 | Effect composer pass chain: grayscale, tone mapping, bloom, copy | `post`, `renderer` |
