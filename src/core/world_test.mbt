@@ -90,6 +90,68 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "clone copies the transform and the children" {
+  let source = @core.Object3D::new(kind=@core.NodeKind::Mesh)
+  source.name = "box"
+  ignore(source.position.set(1.0, 2.0, 3.0))
+  ignore(source.rotation.set(0.0, 0.5, 0.0))
+  source.rotation.order = @math.EulerOrder::YXZ
+  ignore(source.scale.set(2.0, 3.0, 4.0))
+  source.visible = false
+  source.cast_shadow = true
+  source.render_order = 7
+  source.layers.set(2)
+  source.pivot = Some(@math.Vector3::new(x=1.0, y=2.0, z=3.0))
+  let arm = @core.Object3D::new()
+  arm.name = "arm"
+  ignore(arm.position.set(4.0, 0.0, 0.0))
+  ignore(source.add(arm))
+  let cloned = source.clone()
+  assert_eq(cloned.id == source.id, false)
+  assert_eq(cloned.name, "box")
+  match cloned.kind {
+    Mesh => assert_eq(true, true)
+    _ => assert_eq(false, true)
+  }
+  assert_eq(cloned.position.x, 1.0)
+  assert_eq(cloned.position.y, 2.0)
+  assert_eq(cloned.position.z, 3.0)
+  assert_close(cloned.quaternion.y, source.quaternion.y)
+  assert_close(cloned.quaternion.w, source.quaternion.w)
+  assert_close(cloned.rotation.y, 0.5)
+  match cloned.rotation.order {
+    YXZ => assert_eq(true, true)
+    _ => assert_eq(false, true)
+  }
+  assert_eq(cloned.scale.x, 2.0)
+  assert_eq(cloned.scale.y, 3.0)
+  assert_eq(cloned.scale.z, 4.0)
+  assert_eq(cloned.visible, false)
+  assert_eq(cloned.cast_shadow, true)
+  assert_eq(cloned.render_order, 7)
+  assert_eq(cloned.layers.mask, 4)
+  assert_eq(cloned.children.length(), 1)
+  assert_eq(cloned.children[0].name, "arm")
+  assert_eq(cloned.children[0].position.x, 4.0)
+  assert_eq(cloned.children[0].id == arm.id, false)
+  match cloned.children[0].parent {
+    Some(parent) => assert_eq(parent.id, cloned.id)
+    None => assert_eq(false, true)
+  }
+  match source.pivot {
+    Some(pivot) => pivot.x = 9.0
+    None => assert_eq(false, true)
+  }
+  match cloned.pivot {
+    Some(pivot) => assert_eq(pivot.x, 1.0)
+    None => assert_eq(false, true)
+  }
+  let flat = source.clone(recursive=false)
+  assert_eq(flat.children.length(), 0)
+  assert_eq(source.children.length(), 1)
+}
+
+///|
 test "get object by id searches self then descendants" {
   let root = @core.Object3D::new()
   let child = @core.Object3D::new()

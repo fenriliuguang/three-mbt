@@ -271,6 +271,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `getObjectById` has landed. The search starts at the node itself, then walks children depth first, and returns the first match. A parent can find a grandchild. A child does not find its parent. An unknown id returns nothing. Dynamic property lookup stays out.
 
+`copy` and `clone` have landed. `clone` keeps the node kind and assigns a new id. It copies the name, transform, Euler order, matrices, layer mask, visibility, shadow flags, frustum culling, render order, and a cloned pivot. Children are cloned by default and parented to the copy. `recursive` false copies only the node. Mesh bindings, cameras, lights, morphs, skins, listeners, and the parent pointer stay with the source. `static`, `animations`, and `userData` are not fields on this object.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -347,6 +349,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D `attach` | `core` |
 | planned | 7 | Object3D `traverseAncestors` | `core` |
 | planned | 7 | Object3D `getObjectById` | `core` |
+| planned | 7 | Object3D `copy` and `clone` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

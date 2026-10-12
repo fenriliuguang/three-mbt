@@ -226,6 +226,8 @@ pub fn Object3D::apply_matrix4(Self, @math.Matrix4) -> Unit
 pub fn Object3D::apply_quaternion(Self, @math.Quaternion) -> Self
 pub fn Object3D::attach(Self, Self) -> Self
 pub fn Object3D::clear(Self) -> Self
+pub fn Object3D::clone(Self, recursive? : Bool) -> Self
+pub fn Object3D::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Object3D::dispatch_event(Self, ObjectEvent) -> Unit
 pub fn Object3D::get_object_by_id(Self, Int) -> Self?
 pub fn Object3D::get_object_by_name(Self, String) -> Self?

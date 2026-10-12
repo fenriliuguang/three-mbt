@@ -703,3 +703,49 @@ pub fn Object3D::traverse_ancestors(
     }
   }
 }
+
+///|
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Object3D::clone(self : Object3D, recursive? : Bool = true) -> Object3D {
+  Object3D::new(kind=self.kind).copy(self, recursive~)
+}
+
+///|
+/// 复制变换、层和标志。网格、相机、灯光、形变和蒙皮留在源对象上。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1605
+pub fn Object3D::copy(
+  self : Object3D,
+  source : Object3D,
+  recursive? : Bool = true,
+) -> Object3D {
+  self.name = source.name
+  ignore(self.up.copy(source.up))
+  ignore(self.position.copy(source.position))
+  self.rotation.order = source.rotation.order
+  ignore(self.quaternion.copy(source.quaternion))
+  ignore(self.scale.copy(source.scale))
+  self.pivot = match source.pivot {
+    None => None
+    Some(pivot) => Some(pivot.clone())
+  }
+  ignore(self.matrix.copy(source.matrix))
+  ignore(self.matrix_world.copy(source.matrix_world))
+  self.matrix_auto_update = source.matrix_auto_update
+  self.matrix_world_auto_update = source.matrix_world_auto_update
+  self.matrix_world_needs_update = source.matrix_world_needs_update
+  self.layers.mask = source.layers.mask
+  self.visible = source.visible
+  self.cast_shadow = source.cast_shadow
+  self.receive_shadow = source.receive_shadow
+  self.frustum_culled = source.frustum_culled
+  self.render_order = source.render_order
+  if recursive {
+    let count = source.children.length()
+    let mut index = 0
+    while index < count {
+      ignore(self.add(source.children[index].clone()))
+      index = index + 1
+    }
+  }
+  self
+}
