@@ -40,8 +40,7 @@ fn emit_expr(node : Node) -> String {
     Normalize(value) => "normalize(\{emit_expr(value)})"
     Vec4(xyz, w) => "vec4<f32>(\{emit_expr(xyz)}, \{emit_expr(w)})"
     Swizzle(value, suffix) => "(\{emit_expr(value)}).\{suffix}"
-    TextureSample(uv) =>
-      "textureSample(map_texture, map_sampler, \{emit_expr(uv)})"
+    TextureSample(uv) => "sample_color(\{emit_expr(uv)})"
     StandardLit(base) =>
       "standard_lit(\{emit_expr(base)}, facing_normal(input.v_normal, front), input.v_world)"
     InstanceNormal(normal) =>
@@ -52,10 +51,21 @@ fn emit_expr(node : Node) -> String {
       "point_term(input.v_world, facing_normal(input.v_normal, front))"
     SpotTerm => "spot_term(input.v_world, facing_normal(input.v_normal, front))"
     FacingNormal => "facing_normal(input.v_normal, front)"
-    EmissiveSample =>
-      "textureSample(emissive_texture, emissive_sampler, input.v_uv)"
+    EmissiveSample => "sample_emissive(input.v_uv)"
     AlphaSample => "textureSample(alpha_texture, alpha_sampler, input.v_uv)"
   }
+}
+
+///|
+/// 颜色贴图和自发光贴图按 r186 `SRGBToLinear` 解码。alpha 保持存储值。粗糙度、金属度和透明贴图不解码。
+/// r186: `SRGBToLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L205
+fn color_decode_wgsl(emissive : Bool) -> String {
+  let mut text = "fn srgb_to_linear(c : vec3<f32>) -> vec3<f32> {\n  let low = c * 0.0773993808;\n  let high = pow(c * 0.9478672986 + 0.0521327014, vec3<f32>(2.4));\n  return select(high, low, c < vec3<f32>(0.04045));\n}\n\nfn sample_color(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(map_texture, map_sampler, uv);\n  return vec4<f32>(srgb_to_linear(texel.xyz), texel.w);\n}\n\n"
+  if emissive {
+    text = text +
+      "fn sample_emissive(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(emissive_texture, emissive_sampler, uv);\n  return vec4<f32>(srgb_to_linear(texel.xyz), texel.w);\n}\n\n"
+  }
+  text
 }
 
 ///|
@@ -111,6 +121,9 @@ pub fn emit_wgsl(program : Program) -> String {
     lines.push("@group(3) @binding(7) var alpha_sampler : sampler;\n")
   }
   lines.push("\n")
+  if program.sampled {
+    lines.push(color_decode_wgsl(program.emissive))
+  }
   if program.preamble != "" {
     lines.push(program.preamble)
   }

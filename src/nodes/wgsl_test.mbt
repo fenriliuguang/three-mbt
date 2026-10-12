@@ -6,10 +6,7 @@ fn includes(text : String, part : String) -> Bool {
 ///|
 test "basic material ignores lights" {
   let wgsl = @nodes.basic_wgsl()
-  assert_eq(
-    includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
-    true,
-  )
+  assert_eq(includes(wgsl, "sample_color(input.v_uv)"), true)
   assert_eq(includes(wgsl, "uniforms.color"), true)
   assert_eq(includes(wgsl, "uniforms.mvp"), true)
   assert_eq(includes(wgsl, "@location(0) position : vec3<f32>"), true)
@@ -35,10 +32,7 @@ test "lambert material uses ambient and one directional light" {
   assert_eq(includes(wgsl, "uniforms.normal_matrix"), true)
   assert_eq(includes(wgsl, "@location(0) v_normal : vec3<f32>"), true)
   assert_eq(includes(wgsl, "@location(1) v_uv : vec2<f32>"), true)
-  assert_eq(
-    includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
-    true,
-  )
+  assert_eq(includes(wgsl, "sample_color(input.v_uv)"), true)
   assert_eq(includes(wgsl, "input.v_color"), true)
 }
 
@@ -60,10 +54,7 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
   assert_eq(includes(wgsl, "uniforms.camera_position"), true)
   assert_eq(includes(wgsl, "@location(2) v_world : vec3<f32>"), true)
   assert_eq(includes(wgsl, "(uniforms.ambient).xyz * diffuse"), true)
-  assert_eq(
-    includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
-    true,
-  )
+  assert_eq(includes(wgsl, "sample_color(input.v_uv)"), true)
   assert_eq(includes(wgsl, "input.v_color"), true)
   assert_eq(includes(wgsl, "return vec4<f32>(direct + indirect, base.w)"), true)
 }
@@ -77,7 +68,7 @@ test "lambert and standard add emissive after lighting" {
   assert_eq(includes(@nodes.standard_instanced_wgsl(), expr), true)
   assert_eq(includes(@nodes.basic_wgsl(), expr), false)
   assert_eq(includes(@nodes.basic_instanced_wgsl(), expr), false)
-  let sample = "textureSample(emissive_texture, emissive_sampler, input.v_uv)"
+  let sample = "sample_emissive(input.v_uv)"
   assert_eq(includes(@nodes.lambert_wgsl(), sample), true)
   assert_eq(includes(@nodes.standard_wgsl(), sample), true)
   assert_eq(includes(@nodes.basic_wgsl(), sample), false)
@@ -121,6 +112,43 @@ test "standard multiplies metalness by the blue channel" {
   assert_eq(includes(@nodes.lambert_instanced_wgsl(), sample), false)
   assert_eq(includes(@nodes.basic_wgsl(), sample), false)
   assert_eq(includes(@nodes.basic_instanced_wgsl(), "metalness_texture"), false)
+}
+
+///|
+test "color and emissive maps decode sRGB" {
+  let basic = @nodes.basic_wgsl()
+  let lambert = @nodes.lambert_wgsl()
+  let standard = @nodes.standard_wgsl()
+  assert_eq(includes(basic, "fn srgb_to_linear("), true)
+  assert_eq(includes(basic, "0.0773993808"), true)
+  assert_eq(includes(basic, "0.04045"), true)
+  assert_eq(includes(basic, "0.9478672986"), true)
+  assert_eq(includes(basic, "0.0521327014"), true)
+  assert_eq(includes(basic, "sample_color(input.v_uv)"), true)
+  assert_eq(includes(basic, "fn sample_emissive("), false)
+  assert_eq(includes(lambert, "fn sample_emissive("), true)
+  assert_eq(includes(standard, "fn sample_emissive("), true)
+  assert_eq(includes(standard, "srgb_to_linear(texel.xyz)"), true)
+  assert_eq(
+    includes(
+      standard, "textureSample(roughness_texture, roughness_sampler, input.v_uv)",
+    ),
+    true,
+  )
+  assert_eq(
+    includes(
+      standard, "textureSample(metalness_texture, metalness_sampler, input.v_uv)",
+    ),
+    true,
+  )
+  assert_eq(
+    includes(
+      standard, "textureSample(alpha_texture, alpha_sampler, input.v_uv)",
+    ),
+    true,
+  )
+  assert_eq(includes(@nodes.line_wgsl(), "fn srgb_to_linear("), false)
+  assert_eq(includes(@nodes.points_wgsl(), "fn srgb_to_linear("), false)
 }
 
 ///|
