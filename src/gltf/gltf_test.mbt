@@ -15,7 +15,9 @@ fn must(root : @core.Object3D, name : String) -> @core.Object3D {
 
 ///|
 test "parse reads a triangle, a linear color, and the node hierarchy" {
-  let group = @gltf.parse(triangle_gltf())
+  let asset = @gltf.parse(triangle_gltf())
+  assert_eq(asset.animations.length(), 0)
+  let group = asset.scene
   assert_eq(group.node.name, "main")
   assert_eq(must(group.node, "arm").position.x, 1.0)
   let tri = must(group.node, "tri")
@@ -58,7 +60,7 @@ test "parse reads a triangle, a linear color, and the node hierarchy" {
 test "a node matrix replaces translation rotation and scale" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"moved","translation":[9,9,9],"matrix":[1,0,0,0,0,1,0,0,0,0,1,0,4,0,0,1]}]}
-  let group = @gltf.parse(text)
+  let group = @gltf.parse(text).scene
   let moved = must(group.node, "moved")
   assert_eq(moved.position.x, 4.0)
   assert_eq(moved.position.y, 0.0)
@@ -74,7 +76,7 @@ test "buffer 0 can be supplied when the uri is missing" {
   )
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"tri","mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteOffset":4,"byteLength":36}],"buffers":[{"byteLength":106}]}
-  let group = @gltf.parse(text, bin~)
+  let group = @gltf.parse(text, bin~).scene
   match must(group.node, "tri").mesh {
     None => panic()
     Some(binding) =>
@@ -90,7 +92,7 @@ test "glTF 1.0 is rejected" {
   let text =
     #|{"asset":{"version":"1.0"}}
   let failed = try {
-    ignore(@gltf.parse(text))
+    ignore(@gltf.parse(text).scene)
     false
   } catch {
     @gltf.GltfError::Invalid(_) => true
@@ -102,7 +104,7 @@ test "glTF 1.0 is rejected" {
 test "two primitives become children of the node" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"multi","mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0}},{"attributes":{"POSITION":0}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
-  let node = must(@gltf.parse(text).node, "multi")
+  let node = must(@gltf.parse(text).scene.node, "multi")
   assert_eq(node.kind is @core.NodeKind::Group, true)
   assert_eq(node.children.length(), 2)
   match node.children[0].mesh {
@@ -120,7 +122,7 @@ test "two primitives become children of the node" {
 test "glTF cameras become perspective and orthographic nodes" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"eye","translation":[1,2,3],"camera":0},{"camera":1}],"cameras":[{"name":"unused","type":"perspective","perspective":{"yfov":0.5,"aspectRatio":2,"znear":0.25,"zfar":40}},{"name":"flat","type":"orthographic","orthographic":{"xmag":2,"ymag":3,"znear":0.5,"zfar":50}}]}
-  let group = @gltf.parse(text)
+  let group = @gltf.parse(text).scene
   let eye = must(group.node, "eye")
   assert_eq(eye.kind is @core.NodeKind::PerspectiveCamera, true)
   assert_eq(eye.position.x, 1.0)
@@ -152,7 +154,7 @@ test "glTF cameras become perspective and orthographic nodes" {
   }
   let wide_text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"wide","camera":0}],"cameras":[{"type":"perspective","perspective":{"yfov":0.5,"aspectRatio":0,"znear":0,"zfar":0}}]}
-  let wide = @gltf.parse(wide_text)
+  let wide = @gltf.parse(wide_text).scene
   match must(wide.node, "wide").camera {
     None => panic()
     Some(state) => {
@@ -167,7 +169,7 @@ test "glTF cameras become perspective and orthographic nodes" {
 test "a mesh and a camera share a group, and a camera index can repeat" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2]}],"nodes":[{"name":"both","mesh":0,"camera":0},{"name":"left","translation":[1,0,0],"camera":0},{"name":"right","translation":[0,2,0],"camera":0}],"cameras":[{"name":"eye","type":"perspective","perspective":{"yfov":0.5,"znear":1}}],"meshes":[{"primitives":[{"attributes":{"POSITION":0}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
-  let group = @gltf.parse(text)
+  let group = @gltf.parse(text).scene
   let both = must(group.node, "both")
   assert_eq(both.kind is @core.NodeKind::Group, true)
   assert_eq(both.children.length(), 2)
@@ -195,7 +197,53 @@ test "an unknown glTF camera type is rejected" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"camera":0}],"cameras":[{"type":"fisheye"}]}
   let failed = try {
-    ignore(@gltf.parse(text))
+    ignore(@gltf.parse(text).scene)
+    false
+  } catch {
+    @gltf.GltfError::Invalid(_) => true
+  }
+  assert_eq(failed, true)
+}
+
+///|
+test "glTF translation and scale become keyframe tracks" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"arm","translation":[8,0,0]}],"animations":[{"name":"slide","samplers":[{"input":0,"output":1},{"input":0,"output":1,"interpolation":"STEP"}],"channels":[{"sampler":0,"target":{"node":0,"path":"translation"}},{"sampler":1,"target":{"node":0,"path":"scale"}},{"sampler":0,"target":{"path":"translation"}},{"sampler":0,"target":{"node":0,"path":"weights"}}]},{"samplers":[],"channels":[]}],"accessors":[{"bufferView":0,"componentType":5126,"count":2,"type":"SCALAR"},{"bufferView":1,"componentType":5126,"count":2,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":8},{"buffer":0,"byteOffset":8,"byteLength":24}],"buffers":[{"byteLength":32,"uri":"data:application/octet-stream;base64,AAAAAAAAgD8AAAAAAAAAAAAAAAAAAIBAAAAAAAAAAAA="}]}
+  let asset = @gltf.parse(text)
+  assert_eq(asset.animations.length(), 2)
+  let slide = asset.animations[0]
+  assert_eq(slide.name, "slide")
+  assert_eq(slide.duration, 1.0)
+  assert_eq(slide.tracks.length(), 2)
+  assert_eq(slide.tracks[0].name, "arm.position")
+  assert_eq(
+    slide.tracks[0].interpolation is @constants.Interpolation::Linear,
+    true,
+  )
+  assert_eq(slide.tracks[0].times[1], 1.0)
+  assert_eq(slide.tracks[0].values[3], 4.0)
+  assert_eq(slide.tracks[1].name, "arm.scale")
+  assert_eq(
+    slide.tracks[1].interpolation is @constants.Interpolation::Discrete,
+    true,
+  )
+  assert_eq(asset.animations[1].name, "animation_1")
+  assert_eq(asset.animations[1].tracks.length(), 0)
+  let mixer = @animation.AnimationMixer::new(asset.scene.node)
+  let action = mixer.clip_action(slide)
+  action.play()
+  mixer.update(0.0)
+  assert_eq(must(asset.scene.node, "arm").position.x, 0.0)
+  mixer.update(0.5)
+  assert_eq(must(asset.scene.node, "arm").position.x, 2.0)
+}
+
+///|
+test "a glTF cubic spline animation is rejected" {
+  let text =
+    #|{"asset":{"version":"2.0"},"nodes":[{"name":"arm"}],"animations":[{"samplers":[{"input":0,"output":1,"interpolation":"CUBICSPLINE"}],"channels":[{"sampler":0,"target":{"node":0,"path":"rotation"}}]}]}
+  let failed = try {
+    ignore(@gltf.parse(text).scene)
     false
   } catch {
     @gltf.GltfError::Invalid(_) => true

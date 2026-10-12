@@ -2,11 +2,12 @@
 package "fenriliuguang/three-mbt/gltf"
 
 import {
+  "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/objects",
 }
 
 // Values
-pub fn parse(String, bin? : Bytes) -> @objects.Group raise GltfError
+pub fn parse(String, bin? : Bytes) -> Gltf raise GltfError
 
 // Errors
 pub(all) suberror GltfError {
@@ -14,6 +15,10 @@ pub(all) suberror GltfError {
 }
 
 // Types and methods
+pub(all) struct Gltf {
+  scene : @objects.Group
+  animations : Array[@animation.AnimationClip]
+}
 
 // Type aliases
 

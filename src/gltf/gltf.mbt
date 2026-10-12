@@ -86,18 +86,25 @@ priv struct Cam {
 }
 
 ///|
+/// `parse` 的结果。`scene` 是默认场景，`animations` 是关键帧片段。
+/// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
+pub(all) struct Gltf {
+  scene : @objects.Group
+  animations : Array[@animation.AnimationClip]
+}
+
+///|
 /// 从 glTF 2.0 JSON 读出默认场景。
 ///
 /// 缓冲来自 `data:` URI 的 base64。第 0 个缓冲没有 URI 时，用 `bin` 填上。
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0` 和索引。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。
-/// 节点上的相机会建成透视或正交相机。贴图、蒙皮、形变、动画和灯光先不读。
+/// 节点上的相机会建成透视或正交相机。
+/// 动画读取 `translation`、`rotation` 和 `scale`，插值是 `LINEAR` 与 `STEP`。
+/// 贴图、蒙皮、形变、三次样条和灯光先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
-pub fn parse(
-  text : String,
-  bin? : Bytes = b"",
-) -> @objects.Group raise GltfError {
+pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
   check_version(root)
   let bins = load_buffers(root, bin)
@@ -109,6 +116,7 @@ pub fn parse(
   let nodes = load_nodes(root)
   let built = build_nodes(nodes, meshes, cameras)
   link_children(nodes, built)
+  let animations = load_animations(root, bins, views, accs, built)
   let group = @objects.Group::new()
   let roots = scene_roots(root, nodes)
   let mut i = 0
@@ -121,7 +129,7 @@ pub fn parse(
     i = i + 1
   }
   group.node.name = roots.name
-  group
+  { scene: group, animations, }
 }
 
 ///|
@@ -1041,6 +1049,133 @@ fn unreferenced(nodes : Array[NodeDesc]) -> Array[Int] {
     i = i + 1
   }
   roots
+}
+
+///|
+
+///|
+fn track_suffix(path : String) -> String raise GltfError {
+  match path {
+    "translation" => "position"
+    "rotation" => "quaternion"
+    "scale" => "scale"
+    _ => raise GltfError::Invalid("animation path")
+  }
+}
+
+///|
+fn animation_interpolation(
+  name : String,
+) -> @constants.Interpolation raise GltfError {
+  match name {
+    "LINEAR" => @constants.Interpolation::Linear
+    "STEP" => @constants.Interpolation::Discrete
+    "CUBICSPLINE" => raise GltfError::Invalid("cubic spline animation")
+    _ => raise GltfError::Invalid("animation interpolation")
+  }
+}
+
+///|
+/// r186: `loadAnimation` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4124
+fn load_animation(
+  obj : Map[String, Json],
+  index : Int,
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  built : Array[@core.Object3D],
+) -> @animation.AnimationClip raise GltfError {
+  let given = opt_string(obj, "name", "")
+  let name = if given == "" { "animation_\{index}" } else { given }
+  let samplers = objects(obj, "samplers")
+  let channels = objects(obj, "channels")
+  let tracks = []
+  let mut i = 0
+  while i < channels.length() {
+    let channel = channels[i]
+    let target = match channel.get("target") {
+      None => raise GltfError::Invalid("animation target")
+      Some(value) => as_object(value)
+    }
+    match target.get("node") {
+      None => ()
+      Some(node_value) => {
+        let node_index = as_f64(node_value).to_int()
+        if node_index < 0 || node_index >= built.length() {
+          raise GltfError::Invalid("animation node")
+        }
+        let node_name = built[node_index].name
+        let path = opt_string(target, "path", "")
+        if node_name != "" && path != "weights" {
+          let suffix = track_suffix(path)
+          let sampler_index = match channel.get("sampler") {
+            None => raise GltfError::Invalid("animation sampler")
+            Some(value) => as_f64(value).to_int()
+          }
+          if sampler_index < 0 || sampler_index >= samplers.length() {
+            raise GltfError::Invalid("animation sampler")
+          }
+          let sampler = samplers[sampler_index]
+          let interpolation = animation_interpolation(
+            opt_string(sampler, "interpolation", "LINEAR"),
+          )
+          let times = read_values(
+            bins,
+            views,
+            accs,
+            require_f64(sampler, "input").to_int(),
+            1,
+          )
+          let size = if path == "rotation" { 4 } else { 3 }
+          let output = read_values(
+            bins,
+            views,
+            accs,
+            require_f64(sampler, "output").to_int(),
+            size,
+          )
+          if times.length() == 0 || output.length() != times.length() * size {
+            raise GltfError::Invalid("animation output")
+          }
+          let track = if path == "rotation" {
+            @animation.KeyframeTrack::quaternion(
+              node_name + "." + suffix,
+              times,
+              output,
+            )
+          } else {
+            @animation.KeyframeTrack::vector(
+              node_name + "." + suffix,
+              times,
+              output,
+            )
+          }
+          track.interpolation = interpolation
+          tracks.push(track)
+        }
+      }
+    }
+    i = i + 1
+  }
+  @animation.AnimationClip::new(name, tracks)
+}
+
+///|
+fn load_animations(
+  root : Map[String, Json],
+  bins : Array[Bin],
+  views : Array[View],
+  accs : Array[Acc],
+  built : Array[@core.Object3D],
+) -> Array[@animation.AnimationClip] raise GltfError {
+  let listed = objects(root, "animations")
+  let out = []
+  let mut i = 0
+  while i < listed.length() {
+    out.push(load_animation(listed[i], i, bins, views, accs, built))
+    i = i + 1
+  }
+  out
 }
 
 ///|

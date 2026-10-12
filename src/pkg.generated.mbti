@@ -99,7 +99,7 @@ pub fn linear_to_srgb(Double) -> Double
 
 pub fn luminance(Double, Double, Double) -> Double
 
-pub fn parse(String, bin? : Bytes) -> @objects.Group raise @gltf.GltfError
+pub fn parse(String, bin? : Bytes) -> @gltf.Gltf raise @gltf.GltfError
 
 pub fn rad_to_deg(Double) -> Double
 
@@ -163,6 +163,8 @@ pub using @scenes {type FogKind}
 pub using @math {type Frustum}
 
 pub using @core {type GeometryGroup}
+
+pub using @gltf {type Gltf}
 
 pub using @gltf {type GltfError}
 

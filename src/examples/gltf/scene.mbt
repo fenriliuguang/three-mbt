@@ -18,7 +18,8 @@ pub(all) struct GltfScene {
 
 ///|
 pub fn GltfScene::new() -> GltfScene {
-  let root = @loader.parse(box_gltf()) catch { _ => panic() }
+  let asset = @loader.parse(box_gltf()) catch { _ => panic() }
+  let root = asset.scene
   let scene = Scene::new()
   scene.set_background(@math.Color::new().set_hex(0x0D1A33))
   ignore(scene.add(root))

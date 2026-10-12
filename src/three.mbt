@@ -118,7 +118,7 @@ pub using @animation {
 }
 
 ///|
-pub using @gltf {parse, type GltfError}
+pub using @gltf {parse, type Gltf, type GltfError}
 
 ///|
 pub using @objects {
