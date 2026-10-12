@@ -89,6 +89,7 @@ pub using @post {
   bloom_kernel_radius,
   bloom_level_weight,
   bloom_mip_size,
+  bloom_scaled_size,
   bloom_tinted,
   bloom_mix,
   grayscale,

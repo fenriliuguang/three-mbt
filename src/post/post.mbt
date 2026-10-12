@@ -655,6 +655,7 @@ pub(all) struct BloomPass {
   mut tint_r : Array[Double]
   mut tint_g : Array[Double]
   mut tint_b : Array[Double]
+  mut resolution_scale : Double
 }
 
 ///|
@@ -671,7 +672,18 @@ pub fn BloomPass::new(
     tint_r: [1.0, 1.0, 1.0, 1.0, 1.0],
     tint_g: [1.0, 1.0, 1.0, 1.0, 1.0],
     tint_b: [1.0, 1.0, 1.0, 1.0, 1.0],
+    resolution_scale: 1.0,
   }
+}
+
+///|
+/// 内部目标相对输入的缩放。1 是全分辨率。r186 的默认值是 0.5。小于 0 当成 0。
+/// r186: `setResolutionScale` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L297
+pub fn BloomPass::set_resolution_scale(
+  self : BloomPass,
+  scale : Double,
+) -> Unit {
+  self.resolution_scale = if scale < 0.0 { 0.0 } else { scale }
 }
 
 ///|
@@ -776,11 +788,15 @@ pub fn bloom_kernel_radius(level : Int) -> Int {
 }
 
 ///|
-/// 第 `level` 级的边长。第 0 级用原尺寸，之后每级对半，至少是 1。
-/// r186 默认再乘 `resolutionScale` 0.5；这里第 0 级保持全分辨率。
+/// 第 `level` 级的边长。先 `floor(base * scale)`，再每级对半，至少是 1。
 /// r186: `setSize` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L322
-pub fn bloom_mip_size(base : Int, level : Int) -> Int {
-  let mut size = if base < 1 { 1 } else { base }
+pub fn bloom_scaled_size(base : Int, level : Int, scale : Double) -> Int {
+  let safe = if base < 1 { 1 } else { base }
+  let clamped = if scale < 0.0 { 0.0 } else { scale }
+  let mut size = (safe.to_double() * clamped).floor().to_int()
+  if size < 1 {
+    size = 1
+  }
   let steps = if level < 0 { 0 } else { level }
   let mut index = 0
   while index < steps {
@@ -791,6 +807,12 @@ pub fn bloom_mip_size(base : Int, level : Int) -> Int {
     index = index + 1
   }
   size
+}
+
+///|
+/// 缩放为 1 时的边长，和第 0 级全分辨率的现有路径相同。
+pub fn bloom_mip_size(base : Int, level : Int) -> Int {
+  bloom_scaled_size(base, level, 1.0)
 }
 
 ///|

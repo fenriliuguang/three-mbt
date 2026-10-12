@@ -2758,9 +2758,22 @@ fn WebGPURenderer::bloom_prepare(
   height : UInt,
   pass : @post.BloomPass,
 ) -> GpuTextureView {
-  let pyramid = self.ensure_bloom(width, height)
-  let full_x = 1.0 / width.reinterpret_as_int().to_double()
-  let full_y = 1.0 / height.reinterpret_as_int().to_double()
+  let base_w = @post.bloom_scaled_size(
+    width.reinterpret_as_int(),
+    0,
+    pass.resolution_scale,
+  )
+  let base_h = @post.bloom_scaled_size(
+    height.reinterpret_as_int(),
+    0,
+    pass.resolution_scale,
+  )
+  let pyramid = self.ensure_bloom(
+    base_w.reinterpret_as_uint(),
+    base_h.reinterpret_as_uint(),
+  )
+  let full_x = 1.0 / base_w.to_double()
+  let full_y = 1.0 / base_h.to_double()
   self.bloom_submit(
     pass,
     full_x,
