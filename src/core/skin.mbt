@@ -16,6 +16,7 @@ pub(all) struct SkinState {
 
 ///|
 /// 用当前关节世界矩阵重写 `position`，已有法线时也重写 `normal`。
+/// 节点上有形变时，先把当前权重的 `POSITION` 和 `NORMAL` 增量加进未烘焙的底数。
 /// 权重为 0，或关节下标越界的影响，不参与累加。
 /// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319 ; `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L290
 pub fn SkinState::write(
@@ -26,21 +27,18 @@ pub fn SkinState::write(
   let bind_inverse = @math.Matrix4::new()
   ignore(bind_inverse.copy(node.matrix_world).invert())
   let bones = bone_matrices(self)
+  let positions = morphed_source(node, self.bind_position, true)
   write_skinned(
-    geometry,
-    "position",
-    self.bind_position,
-    self,
-    bones,
-    bind_inverse,
-    true,
+    geometry, "position", positions, self, bones, bind_inverse, true,
   )
   match self.bind_normal {
     None => ()
-    Some(values) =>
+    Some(values) => {
+      let normals = morphed_source(node, values, false)
       write_skinned(
-        geometry, "normal", values, self, bones, bind_inverse, false,
+        geometry, "normal", normals, self, bones, bind_inverse, false,
       )
+    }
   }
   geometry.bounding_box = None
   geometry.bounding_sphere = None
@@ -61,6 +59,59 @@ pub fn apply_skins(root : Object3D) -> Unit {
         }
     }
   })
+}
+
+///|
+/// 形变增量先加进绑定姿态，再交给蒙皮。glTF 的增量是相对底数的。
+/// r186: `morphtarget_vertex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js#L11 ; `skinning_vertex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/skinning_vertex.glsl.js#L4
+fn morphed_source(
+  node : Object3D,
+  bind : Array[Double],
+  position : Bool,
+) -> Array[Double] {
+  match node.morph {
+    None => bind
+    Some(morph) => {
+      let base = if position {
+        Some(morph.base_position)
+      } else {
+        morph.base_normal
+      }
+      match base {
+        None => bind
+        Some(values) => {
+          let out = values.copy()
+          let mut index = 0
+          while index < morph.targets.length() {
+            let weight = if index < morph.weights.length() {
+              morph.weights[index]
+            } else {
+              0.0
+            }
+            if weight != 0.0 {
+              let deltas = if position {
+                morph.targets[index].position
+              } else {
+                morph.targets[index].normal
+              }
+              match deltas {
+                None => ()
+                Some(deltas) => {
+                  let mut component = 0
+                  while component < out.length() && component < deltas.length() {
+                    out[component] = out[component] + deltas[component] * weight
+                    component = component + 1
+                  }
+                }
+              }
+            }
+            index = index + 1
+          }
+          out
+        }
+      }
+    }
+  }
 }
 
 ///|

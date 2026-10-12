@@ -154,7 +154,7 @@ test "glTF skin uses an identity inverse bind and a parent joint" {
 }
 
 ///|
-test "glTF skin covers each primitive and skips morphs and partial attributes" {
+test "glTF skin covers each primitive and morphs before the joint" {
   let duo =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"bone"},{"name":"duo","mesh":0,"skin":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0,"JOINTS_0":1,"WEIGHTS_0":2}},{"attributes":{"POSITION":0,"JOINTS_0":1,"WEIGHTS_0":2}}]}],"skins":[{"joints":[0],"inverseBindMatrices":3}],"accessors":[{"bufferView":0,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":1,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":3,"componentType":5126,"count":1,"type":"MAT4"}],"bufferViews":[{"buffer":0,"byteLength":12},{"buffer":0,"byteOffset":12,"byteLength":4},{"buffer":0,"byteOffset":16,"byteLength":16},{"buffer":0,"byteOffset":32,"byteLength":64}],"buffers":[{"byteLength":96,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/"}]}
   let root = @gltf.parse(duo).scene.node
@@ -171,14 +171,29 @@ test "glTF skin covers each primitive and skips morphs and partial attributes" {
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"bone","translation":[5,0,0]},{"name":"blob","mesh":0,"skin":0}],"meshes":[{"weights":[1],"primitives":[{"attributes":{"POSITION":0,"JOINTS_0":2,"WEIGHTS_0":3},"targets":[{"POSITION":1}]}]}],"skins":[{"joints":[0],"inverseBindMatrices":4}],"accessors":[{"bufferView":0,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":2,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":3,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":4,"componentType":5126,"count":1,"type":"MAT4"}],"bufferViews":[{"buffer":0,"byteLength":12},{"buffer":0,"byteOffset":12,"byteLength":12},{"buffer":0,"byteOffset":24,"byteLength":4},{"buffer":0,"byteOffset":28,"byteLength":16},{"buffer":0,"byteOffset":44,"byteLength":64}],"buffers":[{"byteLength":108,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/"}]}
   let morphed = @gltf.parse(morph).scene.node
   let blob = skin_node(morphed, "blob")
-  assert_eq(has_skin(blob), false)
+  assert_eq(has_skin(blob), true)
   pose_skin(morphed)
   match blob.mesh {
     None => panic()
     Some(binding) => {
       let position = binding.geometry.get_attribute("position").unwrap()
-      assert_eq(position.get_x(0), 0.0)
+      assert_eq(position.get_x(0), 5.0)
       assert_eq(position.get_y(0), 1.0)
+      assert_eq(position.get_z(0), 0.0)
+    }
+  }
+  match blob.morph {
+    None => panic()
+    Some(state) => state.weights[0] = 0.0
+  }
+  pose_skin(morphed)
+  pose_skin(morphed)
+  match blob.mesh {
+    None => panic()
+    Some(binding) => {
+      let position = binding.geometry.get_attribute("position").unwrap()
+      assert_eq(position.get_x(0), 5.0)
+      assert_eq(position.get_y(0), 0.0)
     }
   }
   let partial =
