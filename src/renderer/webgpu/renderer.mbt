@@ -80,13 +80,26 @@ struct PostGroup {
 }
 
 ///|
-struct BloomBuffers {
+priv struct BloomLevel {
   width : UInt
   height : UInt
-  a_texture : GpuTexture
-  a_view : GpuTextureView
-  b_texture : GpuTexture
-  b_view : GpuTextureView
+  h_texture : GpuTexture
+  h_view : GpuTextureView
+  v_texture : GpuTexture
+  v_view : GpuTextureView
+}
+
+///|
+struct BloomPyramid {
+  width : UInt
+  height : UInt
+  bright_texture : GpuTexture
+  bright_view : GpuTextureView
+  levels : Array[BloomLevel]
+  acc_texture : GpuTexture
+  acc_view : GpuTextureView
+  acc2_texture : GpuTexture
+  acc2_view : GpuTextureView
 }
 
 ///|
@@ -198,7 +211,7 @@ pub struct WebGPURenderer {
   bloom_layout : GpuBindGroupLayout
   bloom_uniform : GpuBuffer
   bloom_sampler : GpuSampler
-  mut bloom_buffers : BloomBuffers?
+  mut bloom_pyramid : BloomPyramid?
   mut bloom_held : Array[GpuBindGroup]
   mut chain_buffers : ChainBuffers?
   mut compose_held : Array[GpuBindGroup]
@@ -1272,7 +1285,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     bloom_layout: bloom.0,
     bloom_uniform: bloom.2,
     bloom_sampler: bloom.3,
-    bloom_buffers: None,
+    bloom_pyramid: None,
     bloom_held: [],
     chain_buffers: None,
     compose_held: [],
@@ -2489,11 +2502,26 @@ pub fn WebGPURenderer::tone_map(
 }
 
 ///|
-fn drop_bloom(buffers : BloomBuffers) -> Unit {
-  buffers.a_view.drop()
-  buffers.b_view.drop()
-  buffers.a_texture.drop()
-  buffers.b_texture.drop()
+fn drop_bloom_level(level : BloomLevel) -> Unit {
+  level.h_view.drop()
+  level.v_view.drop()
+  level.h_texture.drop()
+  level.v_texture.drop()
+}
+
+///|
+fn drop_bloom(pyramid : BloomPyramid) -> Unit {
+  pyramid.bright_view.drop()
+  pyramid.bright_texture.drop()
+  let mut index = 0
+  while index < pyramid.levels.length() {
+    drop_bloom_level(pyramid.levels[index])
+    index = index + 1
+  }
+  pyramid.acc_view.drop()
+  pyramid.acc2_view.drop()
+  pyramid.acc_texture.drop()
+  pyramid.acc2_texture.drop()
 }
 
 ///|
@@ -2522,8 +2550,8 @@ fn WebGPURenderer::ensure_bloom(
   self : WebGPURenderer,
   width : UInt,
   height : UInt,
-) -> BloomBuffers {
-  match self.bloom_buffers {
+) -> BloomPyramid {
+  match self.bloom_pyramid {
     Some(cached) =>
       if cached.width == width && cached.height == height {
         return cached
@@ -2532,18 +2560,55 @@ fn WebGPURenderer::ensure_bloom(
       }
     None => ()
   }
-  let a = self.bloom_color(width, height, "bloom-a")
-  let b = self.bloom_color(width, height, "bloom-b")
-  let buffers : BloomBuffers = {
+  let bright = self.bloom_color(width, height, "bloom-bright")
+  let levels : Array[BloomLevel] = []
+  let mut level = 0
+  let mut mip_w = width.reinterpret_as_int()
+  let mut mip_h = height.reinterpret_as_int()
+  if mip_w < 1 {
+    mip_w = 1
+  }
+  if mip_h < 1 {
+    mip_h = 1
+  }
+  while level < 5 {
+    let wu = mip_w.reinterpret_as_uint()
+    let hu = mip_h.reinterpret_as_uint()
+    let horizontal = self.bloom_color(wu, hu, "bloom-h")
+    let vertical = self.bloom_color(wu, hu, "bloom-v")
+    levels.push({
+      width: wu,
+      height: hu,
+      h_texture: horizontal.0,
+      h_view: horizontal.1,
+      v_texture: vertical.0,
+      v_view: vertical.1,
+    })
+    mip_w = mip_w / 2
+    mip_h = mip_h / 2
+    if mip_w < 1 {
+      mip_w = 1
+    }
+    if mip_h < 1 {
+      mip_h = 1
+    }
+    level = level + 1
+  }
+  let acc = self.bloom_color(width, height, "bloom-acc")
+  let acc2 = self.bloom_color(width, height, "bloom-acc2")
+  let pyramid : BloomPyramid = {
     width,
     height,
-    a_texture: a.0,
-    a_view: a.1,
-    b_texture: b.0,
-    b_view: b.1,
+    bright_texture: bright.0,
+    bright_view: bright.1,
+    levels,
+    acc_texture: acc.0,
+    acc_view: acc.1,
+    acc2_texture: acc2.0,
+    acc2_view: acc2.1,
   }
-  self.bloom_buffers = Some(buffers)
-  buffers
+  self.bloom_pyramid = Some(pyramid)
+  pyramid
 }
 
 ///|
@@ -2595,6 +2660,8 @@ fn WebGPURenderer::bloom_submit(
   dir_x : Double,
   dir_y : Double,
   mode : Double,
+  kernel : Double,
+  factor : Double,
   color : GpuTextureView,
   glow : GpuTextureView,
   target : GpuTextureView,
@@ -2605,7 +2672,16 @@ fn WebGPURenderer::bloom_submit(
     .write_buffer_with_copy(
       self.bloom_uniform,
       0UL,
-      @post.pack_bloom(pass, texel_x, texel_y, dir_x, dir_y, mode),
+      @post.pack_bloom(
+        pass,
+        texel_x,
+        texel_y,
+        dir_x,
+        dir_y,
+        mode,
+        kernel~,
+        factor~,
+      ),
       None,
       None,
     ),
@@ -2637,58 +2713,152 @@ fn WebGPURenderer::bloom_submit(
 }
 
 ///|
-/// 高通、水平模糊、垂直模糊。光晕留在缓冲 A。调用方负责合成目标，也负责释放上一帧的绑定组。
-fn WebGPURenderer::bloom_blur(
+/// 高通之后逐级模糊，再把五级光累加。返回累加结果，不画到最终目标。
+fn WebGPURenderer::bloom_prepare(
   self : WebGPURenderer,
   source : GpuTextureView,
   width : UInt,
   height : UInt,
   pass : @post.BloomPass,
 ) -> GpuTextureView {
-  let buffers = self.ensure_bloom(width, height)
-  let texel_x = 1.0 / width.reinterpret_as_int().to_double()
-  let texel_y = 1.0 / height.reinterpret_as_int().to_double()
+  let pyramid = self.ensure_bloom(width, height)
+  let full_x = 1.0 / width.reinterpret_as_int().to_double()
+  let full_y = 1.0 / height.reinterpret_as_int().to_double()
   self.bloom_submit(
     pass,
-    texel_x,
-    texel_y,
+    full_x,
+    full_y,
     0.0,
     0.0,
     0.0,
+    6.0,
+    1.0,
     source,
     source,
-    buffers.a_view,
+    pyramid.bright_view,
   )
+  let mut input = pyramid.bright_view
+  let mut level = 0
+  while level < 5 {
+    let mip = pyramid.levels[level]
+    let texel_x = 1.0 / mip.width.reinterpret_as_int().to_double()
+    let texel_y = 1.0 / mip.height.reinterpret_as_int().to_double()
+    let kernel = @post.bloom_kernel_radius(level).to_double()
+    self.bloom_submit(
+      pass,
+      texel_x,
+      texel_y,
+      1.0,
+      0.0,
+      1.0,
+      kernel,
+      1.0,
+      input,
+      input,
+      mip.h_view,
+    )
+    self.bloom_submit(
+      pass,
+      texel_x,
+      texel_y,
+      0.0,
+      1.0,
+      1.0,
+      kernel,
+      1.0,
+      mip.h_view,
+      mip.h_view,
+      mip.v_view,
+    )
+    input = mip.v_view
+    level = level + 1
+  }
+  let factor = fn(index : Int) -> Double {
+    match index {
+      0 => 1.0
+      1 => 0.8
+      2 => 0.6
+      3 => 0.4
+      _ => 0.2
+    }
+  }
   self.bloom_submit(
     pass,
-    texel_x,
-    texel_y,
-    1.0,
     0.0,
-    1.0,
-    buffers.a_view,
-    buffers.a_view,
-    buffers.b_view,
-  )
-  self.bloom_submit(
-    pass,
-    texel_x,
-    texel_y,
     0.0,
-    1.0,
-    1.0,
-    buffers.b_view,
-    buffers.b_view,
-    buffers.a_view,
+    0.0,
+    0.0,
+    3.0,
+    6.0,
+    factor(0),
+    pyramid.levels[0].v_view,
+    pyramid.levels[0].v_view,
+    pyramid.acc_view,
   )
-  buffers.a_view
+  level = 1
+  let mut in_acc = true
+  while level < 5 {
+    let glow = pyramid.levels[level].v_view
+    if in_acc {
+      self.bloom_submit(
+        pass,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        4.0,
+        6.0,
+        factor(level),
+        pyramid.acc_view,
+        glow,
+        pyramid.acc2_view,
+      )
+    } else {
+      self.bloom_submit(
+        pass,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        4.0,
+        6.0,
+        factor(level),
+        pyramid.acc2_view,
+        glow,
+        pyramid.acc_view,
+      )
+    }
+    in_acc = !in_acc
+    level = level + 1
+  }
+  if in_acc {
+    pyramid.acc_view
+  } else {
+    pyramid.acc2_view
+  }
 }
 
 ///|
-/// 高通写到缓冲 A，水平模糊写到 B，垂直模糊写回 A，再把光加回原图并 `present`。
-/// 四次提交，每次的 uniform 才真正不同。采样的纹理和当前渲染目标分开。
-/// 只有全分辨率、核半径 6。窗口尺寸为 0 时什么也不做。
-/// r186: `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `luminosityHighPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L12
+/// 把已经加权的五级光加回 `source`，画进 `target`。
+fn WebGPURenderer::bloom_to(
+  self : WebGPURenderer,
+  source : GpuTextureView,
+  width : UInt,
+  height : UInt,
+  pass : @post.BloomPass,
+  target : GpuTextureView,
+) -> Unit {
+  let glow = self.bloom_prepare(source, width, height, pass)
+  self.bloom_submit(
+    pass, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 1.0, source, glow, target,
+  )
+}
+
+///|
+/// 高通后做五级可分离模糊，核半径 6、10、14、18、22，再把光加回原图并 `present`。
+/// 第 0 级是全分辨率，之后每级对半。每次提交单独发生，采样目标和渲染目标分开。
+/// 窗口尺寸为 0 时什么也不做。半精度目标还没做。
+/// r186: `updateBefore` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L348 ; `luminosityHighPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L12
 pub fn WebGPURenderer::bloom(
   self : WebGPURenderer,
   source : @textures.RenderTarget,
@@ -2702,17 +2872,17 @@ pub fn WebGPURenderer::bloom(
   self.sync_swapchain()
   let frame = self.color_target(source.texture)
   self.bloom_release()
-  let glow = self.bloom_blur(frame.view, frame.width, frame.height, pass)
-  let texel_x = 1.0 / frame.width.reinterpret_as_int().to_double()
-  let texel_y = 1.0 / frame.height.reinterpret_as_int().to_double()
+  let glow = self.bloom_prepare(frame.view, frame.width, frame.height, pass)
   let screen = self.context.get_current_texture().create_view(None)
   self.bloom_submit(
     pass,
-    texel_x,
-    texel_y,
     0.0,
     0.0,
-    2.0,
+    0.0,
+    0.0,
+    5.0,
+    6.0,
+    1.0,
     frame.view,
     glow,
     screen,
@@ -2863,14 +3033,7 @@ fn WebGPURenderer::compose_effect(
       let group = self.compose_group(self.tone_layout, self.tone_uniform, read)
       self.submit_fullscreen(self.tone, group, target, "compose")
     }
-    @post.Bloom(pass) => {
-      let glow = self.bloom_blur(read, width, height, pass)
-      let texel_x = 1.0 / width.reinterpret_as_int().to_double()
-      let texel_y = 1.0 / height.reinterpret_as_int().to_double()
-      self.bloom_submit(
-        pass, texel_x, texel_y, 0.0, 0.0, 2.0, read, glow, target,
-      )
-    }
+    @post.Bloom(pass) => self.bloom_to(read, width, height, pass, target)
   }
 }
 

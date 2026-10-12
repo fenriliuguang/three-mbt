@@ -645,7 +645,7 @@ pub fn gaussian_coefficient(index : Int, kernel_radius : Int) -> Double {
 
 ///|
 /// 泛光。默认强度 1、半径 0、阈值 0、过渡 0.01，与 r186 `BloomNode` 相同。
-/// 这一阶段只有全分辨率的一级模糊，半径 6。后面四级 mip 和半精度目标还没做。
+/// 五级核半径是 6、10、14、18、22。第 0 级用全分辨率，之后每级对半。半精度目标和染色还没做。
 /// r186: `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
 pub(all) struct BloomPass {
   mut strength : Double
@@ -687,7 +687,7 @@ pub fn BloomPass::set_smooth_width(
 }
 
 ///|
-/// 48 字节 uniform。依次是阈值、过渡、强度、半径、纹素、方向和模式。
+/// 48 字节 uniform。依次是阈值、过渡、强度、半径、纹素、方向、模式、核半径和该级系数。
 pub fn pack_bloom(
   pass : BloomPass,
   texel_x : Double,
@@ -695,6 +695,8 @@ pub fn pack_bloom(
   dir_x : Double,
   dir_y : Double,
   mode : Double,
+  kernel? : Double = 6.0,
+  factor? : Double = 1.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(48, b'\x00')
   write_f32(dst, 0, pass.threshold)
@@ -706,11 +708,63 @@ pub fn pack_bloom(
   write_f32(dst, 24, dir_x)
   write_f32(dst, 28, dir_y)
   write_f32(dst, 32, mode)
+  write_f32(dst, 36, kernel)
+  write_f32(dst, 40, factor)
   dst
 }
 
 ///|
-/// 全屏三角形。模式 0 是高通，1 是半径 6 的可分离高斯，2 把光加回原图。
+/// 五级模糊的核半径，对应 `kernelSizeArray`。
+/// r186: `kernelSizeArray` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L425
+pub fn bloom_kernel_radius(level : Int) -> Int {
+  match level {
+    0 => 6
+    1 => 10
+    2 => 14
+    3 => 18
+    _ => 22
+  }
+}
+
+///|
+/// 第 `level` 级的边长。第 0 级用原尺寸，之后每级对半，至少是 1。
+/// r186 默认再乘 `resolutionScale` 0.5；这里第 0 级保持全分辨率。
+/// r186: `setSize` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L322
+pub fn bloom_mip_size(base : Int, level : Int) -> Int {
+  let mut size = if base < 1 { 1 } else { base }
+  let steps = if level < 0 { 0 } else { level }
+  let mut index = 0
+  while index < steps {
+    size = size / 2
+    if size < 1 {
+      size = 1
+    }
+    index = index + 1
+  }
+  size
+}
+
+///|
+/// 第 `level` 级的合成权重，`strength * lerpBloomFactor(bloomFactors[level], radius)`。
+/// r186: `lerpBloomFactor` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L579 ; `bloomFactors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L435
+pub fn bloom_level_weight(
+  level : Int,
+  strength : Double,
+  radius : Double,
+) -> Double {
+  let factor = match level {
+    0 => 1.0
+    1 => 0.8
+    2 => 0.6
+    3 => 0.4
+    _ => 0.2
+  }
+  let t = clamp_radius(radius)
+  strength * ((1.0 - t) * factor + t * (1.2 - factor))
+}
+
+///|
+/// 全屏三角形。模式 0 是高通，1 是可分离高斯，2 把一级光加回原图，3 写出加权光，4 把加权光累加，5 把累加结果加回原图。
 /// r186: `luminosityHighPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L12
 pub fn bloom_wgsl() -> String {
   let code =
@@ -739,8 +793,8 @@ pub fn bloom_wgsl() -> String {
     #|  dir_x : f32,
     #|  dir_y : f32,
     #|  mode : f32,
-    #|  pad0 : f32,
-    #|  pad1 : f32,
+    #|  kernel : f32,
+    #|  factor : f32,
     #|  pad2 : f32,
     #|}
     #|
@@ -751,15 +805,16 @@ pub fn bloom_wgsl() -> String {
     #|@group(0) @binding(4) var<uniform> params : BloomParams;
     #|
     #|fn gauss(i : f32) -> f32 {
-    #|  let sigma = 2.0;
+    #|  let sigma = max(params.kernel, 1.0) / 3.0;
     #|  return 0.39894 * exp(-0.5 * i * i / (sigma * sigma)) / sigma;
     #|}
     #|
     #|fn blur(uv : vec2<f32>) -> vec3<f32> {
     #|  var sum = textureSample(color_tex, color_samp, uv).rgb * gauss(0.0);
-    #|  for (var i = 1; i < 6; i = i + 2) {
+    #|  let radius = i32(max(params.kernel, 1.0));
+    #|  for (var i = 1; i < radius; i = i + 2) {
     #|    let wa = gauss(f32(i));
-    #|    let wb = select(gauss(f32(i + 1)), 0.0, i + 1 >= 6);
+    #|    let wb = select(gauss(f32(i + 1)), 0.0, i + 1 >= radius);
     #|    let w = wa + wb;
     #|    let offset = (f32(i) * wa + f32(i + 1) * wb) / max(w, 0.000001);
     #|    let delta = vec2<f32>(params.dir_x, params.dir_y) * vec2<f32>(params.texel_x, params.texel_y) * offset;
@@ -768,6 +823,12 @@ pub fn bloom_wgsl() -> String {
     #|    sum = sum + (left + right) * w;
     #|  }
     #|  return sum;
+    #|}
+    #|
+    #|fn bloom_weight() -> f32 {
+    #|  let t = clamp(params.radius, 0.0, 1.0);
+    #|  let mirror = 1.2 - params.factor;
+    #|  return params.strength * mix(params.factor, mirror, t);
     #|}
     #|
     #|@fragment
@@ -784,9 +845,17 @@ pub fn bloom_wgsl() -> String {
     #|    return vec4<f32>(blur(input.uv), 1.0);
     #|  }
     #|  let glow = textureSample(glow_tex, glow_samp, input.uv);
-    #|  let t = clamp(params.radius, 0.0, 1.0);
-    #|  let weight = params.strength * ((1.0 - t) + t * 0.2);
-    #|  return vec4<f32>(color.rgb + glow.rgb * weight, color.a);
+    #|  let weight = bloom_weight();
+    #|  if (params.mode < 2.5) {
+    #|    return vec4<f32>(color.rgb + glow.rgb * weight, color.a);
+    #|  }
+    #|  if (params.mode < 3.5) {
+    #|    return vec4<f32>(glow.rgb * weight, 1.0);
+    #|  }
+    #|  if (params.mode < 4.5) {
+    #|    return vec4<f32>(color.rgb + glow.rgb * weight, 1.0);
+    #|  }
+    #|  return vec4<f32>(color.rgb + glow.rgb, color.a);
     #|}
   code
 }

@@ -86,6 +86,9 @@ pub using @compute {type StoragePositions, wave_position, workgroup_count}
 
 ///|
 pub using @post {
+  bloom_kernel_radius,
+  bloom_level_weight,
+  bloom_mip_size,
   bloom_mix,
   grayscale,
   high_pass,

@@ -14,7 +14,7 @@ using @scenes {type Scene}
 using @textures {type RenderTarget}
 
 ///|
-/// 离屏场景是一盏光下的立方体。窗口由一级全分辨率泛光呈现，不另建屏幕网格。
+/// 离屏场景是一盏光下的立方体。窗口由五级泛光呈现，不另建屏幕网格。
 pub(all) struct BloomScene {
   scene : Scene
   camera : PerspectiveCamera

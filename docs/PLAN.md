@@ -2,7 +2,7 @@
 
 Move the drawable three.js r186 world to MoonBit: the scene graph plus a WebGPU-only renderer. Presentation and input go through [wasi-gfx](https://github.com/wasi-gfx/wasi-gfx). The GPU goes through [wasi:webgpu](https://github.com/WebAssembly/wasi-webgpu).
 
-Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, the animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, tone mapping through Neutral, a single-resolution bloom pass, and an effect-composer pass chain. The remaining bloom mips, half-float targets, `Custom` tone mapping, the node `RenderPipeline`, and the rest of the node builder stay later.
+Phase 0 through phase 6 have landed: the module, a swapchain clear, the CPU scene graph, an unlit cube, a Lambert cube with ambient and directional light, an `rgba8` textured cube whose camera follows pointer events, and a Standard material cube. Phase 7 has started with points, lines, instancing, directional shadows, render targets, fog, the animation mixer, a glTF geometry and PBR subset, a compute shader that writes point positions, a grayscale fullscreen pass, transparent meshes drawn back to front, tone mapping through Neutral, a five-level bloom pass, and an effect-composer pass chain. Half-float targets, `Custom` tone mapping, the node `RenderPipeline`, and the rest of the node builder stay later.
 
 ## Pins
 
@@ -227,7 +227,7 @@ Transparent meshes have landed. A mesh with `transparent` set is drawn after the
 
 Tone mapping has landed for the r186 operators except `Custom`. `No` leaves the color alone and ignores exposure. `Linear` multiplies by exposure and clamps to [0, 1]. `Reinhard` is `scaled / (scaled + 1)`. Cineon is the Hejl/Burgess-Dawson curve. ACES is the RRT and ODT fit. AgX goes through Rec.2020, the inset and outset matrices, and the contrast polynomial. Neutral subtracts the low-end offset, then compresses highlights above 0.76. The default pass is `No` at exposure 1, matching r186's renderer. The curve runs as a fullscreen triangle over a color target, because the output node is not built yet. `examples/tone` is a Lambert cube with ACES at exposure 1. The window sample is `scripts/build-tone.sh`. Host playback stays out of this pass. `Custom` stays later.
 
-A single-resolution bloom pass has landed. The high pass uses Rec.709 luminance and `smoothstep` across `smoothWidth`. One separable Gaussian of kernel radius 6 blurs that result, then the composite adds it with `lerpBloomFactor` for the first mip. The four passes are separate submits so each uniform is visible, and a pass never samples the texture it is rendering. `examples/bloom` is a Lambert cube with threshold 0.2, strength 1, and radius 0. The window sample is `scripts/build-bloom.sh`. Host playback stays out of this pass. Mips 1–4 and half-float targets stay later.
+A five-level bloom pass has landed. The high pass uses Rec.709 luminance and `smoothstep` across `smoothWidth`. Separable Gaussians use kernel radii 6, 10, 14, 18, and 22. Level 0 stays full resolution; each later level is half the previous one, at least one pixel. The composite adds `strength * lerpBloomFactor(bloomFactors[level], radius)` for factors 1, 0.8, 0.6, 0.4, and 0.2. Each pass is its own submit, and a pass never samples the texture it is rendering. `examples/bloom` is a Lambert cube with threshold 0.2, strength 1, and radius 0. The window sample is `scripts/build-bloom.sh`. Host playback stays out of this pass. r186's default half-resolution scale, half-float targets, and per-level tint stay later.
 
 An effect composer has landed as an ordered pass chain. `EffectComposer` holds grayscale, tone-mapping, and bloom passes. A pass with `enabled` false is skipped. Earlier passes draw into a pair of full-size canvas-format buffers, and the last enabled pass draws to the window and presents. The scene is still drawn by `render` into a color target first. `examples/compose` is a Lambert cube with grayscale at amount 0.5, then ACES at exposure 1. The window sample is `scripts/build-compose.sh`. Host playback stays out of this pass. The node `RenderPipeline`, half-float targets, masks, and a copy pass stay later.
 
@@ -265,9 +265,9 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | a grayscale post pass | `post`, `renderer` |
 | planned | 7 | transparent meshes, back to front | `objects`, `renderer` |
 | planned | 7 | No, Linear, Reinhard, Cineon, ACES Filmic, AgX, and Neutral tone mapping | `post`, `renderer` |
-| planned | 7 | Single-resolution bloom: high pass, kernel radius 6, additive composite | `post`, `renderer` |
+| planned | 7 | Five-level bloom: kernels 6, 10, 14, 18, 22 and additive composite | `post`, `renderer` |
 | planned | 7 | Effect composer pass chain: grayscale, tone mapping, bloom | `post`, `renderer` |
-| later | 7 | Custom tone mapping, bloom mips 1–4, half-float targets, node `RenderPipeline` | `post` |
+| later | 7 | Custom tone mapping, half-float targets, bloom tint, node `RenderPipeline` | `post` |
 | later | 7 | The whole of `WGSLNodeBuilder.js`, the whole of `src/nodes`, PMREM, MaterialX | The fragment a material needs, when it needs it |
 | excluded |  | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
 
