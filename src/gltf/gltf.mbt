@@ -21,6 +21,16 @@ priv struct View {
 }
 
 ///|
+priv struct SparseRef {
+  count : Int
+  index_view : Int
+  index_offset : Int
+  index_type : Int
+  value_view : Int
+  value_offset : Int
+}
+
+///|
 priv struct Acc {
   view : Int
   offset : Int
@@ -28,6 +38,7 @@ priv struct Acc {
   components : Int
   component_type : Int
   normalized : Bool
+  sparse : SparseRef?
 }
 
 ///|
@@ -111,6 +122,7 @@ pub(all) struct Gltf {
 ///
 /// 缓冲来自 `data:` URI 的 base64。第 0 个缓冲没有 URI 时，用 `bin` 填上。
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0`、`COLOR_0` 和索引。
+/// 稀疏 accessor 按索引替换元素；没有 `bufferView` 时底数是 0。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
@@ -363,7 +375,11 @@ fn load_accessors(root : Map[String, Json]) -> Array[Acc] raise GltfError {
   while i < listed.length() {
     let obj = listed[i]
     let view = match obj.get("bufferView") {
-      None => raise GltfError::Invalid("accessor needs a bufferView")
+      None =>
+        match obj.get("sparse") {
+          None => raise GltfError::Invalid("accessor needs a bufferView")
+          Some(_) => -1
+        }
       Some(value) => as_f64(value).to_int()
     }
     out.push({
@@ -373,6 +389,7 @@ fn load_accessors(root : Map[String, Json]) -> Array[Acc] raise GltfError {
       components: component_count(opt_string(obj, "type", "")),
       component_type: opt_f64(obj, "componentType", 0.0).to_int(),
       normalized: opt_bool(obj, "normalized", false),
+      sparse: load_sparse(obj),
     })
     i = i + 1
   }
@@ -553,6 +570,34 @@ fn read_acc(
   views : Array[View],
   acc : Acc,
 ) -> Array[Double] raise GltfError {
+  let out = if acc.view < 0 {
+    if acc.count < 0 {
+      raise GltfError::Invalid("accessor range")
+    }
+    zero_values(acc.count * acc.components)
+  } else {
+    read_dense(bins, views, acc)
+  }
+  apply_sparse(out, bins, views, acc)
+}
+
+///|
+fn zero_values(count : Int) -> Array[Double] {
+  let out = []
+  let mut index = 0
+  while index < count {
+    out.push(0.0)
+    index = index + 1
+  }
+  out
+}
+
+///|
+fn read_dense(
+  bins : Array[Bin],
+  views : Array[View],
+  acc : Acc,
+) -> Array[Double] raise GltfError {
   if acc.view < 0 || acc.view >= views.length() {
     raise GltfError::Invalid("bufferView index")
   }
@@ -595,6 +640,121 @@ fn read_acc(
     i = i + 1
   }
   out
+}
+
+///|
+/// 稀疏块按索引盖过稠密值。底数和替换值用同一套归一化。
+/// r186: `loadAccessor` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3213
+fn apply_sparse(
+  values : Array[Double],
+  bins : Array[Bin],
+  views : Array[View],
+  acc : Acc,
+) -> Array[Double] raise GltfError {
+  match acc.sparse {
+    None => values
+    Some(sparse) => {
+      if sparse.count < 0 || sparse.count > acc.count {
+        raise GltfError::Invalid("sparse count")
+      }
+      let index_view = sparse_view(views, sparse.index_view)
+      let value_view = sparse_view(views, sparse.value_view)
+      let index_bin = sparse_bin(bins, index_view)
+      let value_bin = sparse_bin(bins, value_view)
+      let index_width = component_width(sparse.index_type)
+      let value_width = component_width(acc.component_type)
+      if sparse.index_offset < 0 || sparse.value_offset < 0 {
+        raise GltfError::Invalid("accessor range")
+      }
+      if sparse.count > 0 {
+        let index_end = sparse.index_offset + sparse.count * index_width
+        let value_end = sparse.value_offset +
+          sparse.count * acc.components * value_width
+        if index_end > index_view.byte_length ||
+          value_end > value_view.byte_length ||
+          index_view.offset + index_view.byte_length > index_bin.limit ||
+          value_view.offset + value_view.byte_length > value_bin.limit {
+          raise GltfError::Invalid("accessor reads past the buffer view")
+        }
+      }
+      let mut index = 0
+      while index < sparse.count {
+        let index_at = index_view.offset +
+          sparse.index_offset +
+          index * index_width
+        let element = read_component(index_bin, index_at, sparse.index_type).to_int()
+        if element < 0 || element >= acc.count {
+          raise GltfError::Invalid("sparse index")
+        }
+        let mut component = 0
+        while component < acc.components {
+          let value_at = value_view.offset +
+            sparse.value_offset +
+            (index * acc.components + component) * value_width
+          let raw = read_component(value_bin, value_at, acc.component_type)
+          let value = if acc.normalized {
+            normalize(raw, acc.component_type)
+          } else {
+            raw
+          }
+          values[element * acc.components + component] = value
+          component = component + 1
+        }
+        index = index + 1
+      }
+      values
+    }
+  }
+}
+
+///|
+fn sparse_view(views : Array[View], index : Int) -> View raise GltfError {
+  if index < 0 || index >= views.length() {
+    raise GltfError::Invalid("bufferView index")
+  }
+  views[index]
+}
+
+///|
+fn sparse_bin(bins : Array[Bin], view : View) -> Bin raise GltfError {
+  if view.buffer < 0 || view.buffer >= bins.length() {
+    raise GltfError::Invalid("buffer index")
+  }
+  bins[view.buffer]
+}
+
+///|
+fn load_sparse(obj : Map[String, Json]) -> SparseRef? raise GltfError {
+  match obj.get("sparse") {
+    None => None
+    Some(value) => {
+      let sparse = as_object(value)
+      let count = opt_f64(sparse, "count", -1.0).to_int()
+      if count < 0 {
+        raise GltfError::Invalid("sparse count")
+      }
+      let indices = match sparse.get("indices") {
+        None => raise GltfError::Invalid("sparse index")
+        Some(block) => as_object(block)
+      }
+      let values = match sparse.get("values") {
+        None => raise GltfError::Invalid("sparse values")
+        Some(block) => as_object(block)
+      }
+      let index_type = opt_f64(indices, "componentType", 0.0).to_int()
+      if index_type != 5121 && index_type != 5123 && index_type != 5125 {
+        raise GltfError::Invalid("sparse index")
+      }
+      Some({
+        count,
+        index_view: require_f64(indices, "bufferView").to_int(),
+        index_offset: opt_f64(indices, "byteOffset", 0.0).to_int(),
+        index_type,
+        value_view: require_f64(values, "bufferView").to_int(),
+        value_offset: opt_f64(values, "byteOffset", 0.0).to_int(),
+      })
+    }
+  }
 }
 
 ///|

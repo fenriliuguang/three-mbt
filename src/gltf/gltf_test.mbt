@@ -449,3 +449,32 @@ test "glTF color morph weights are baked into vertex colors" {
     }
   }
 }
+
+///|
+test "glTF sparse accessors replace indexed elements" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"moved","mesh":0},{"name":"zeros","mesh":1}],"meshes":[{"primitives":[{"attributes":{"POSITION":0}}]},{"primitives":[{"attributes":{"POSITION":1}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","sparse":{"count":1,"indices":{"bufferView":1,"componentType":5123},"values":{"bufferView":2}}},{"componentType":5126,"count":3,"type":"VEC3","sparse":{"count":1,"indices":{"bufferView":3,"componentType":5123},"values":{"bufferView":4}}}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":2},{"buffer":0,"byteOffset":38,"byteLength":12},{"buffer":0,"byteOffset":50,"byteLength":2},{"buffer":0,"byteOffset":52,"byteLength":12}],"buffers":[{"byteLength":64,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAQAAAIBAAACgQAAAwEAAAAAAAEEAAAAAAAAAAA=="}]}
+  let root = @gltf.parse(text).scene.node
+  match must(root, "moved").mesh {
+    None => panic()
+    Some(binding) => {
+      let position = binding.geometry.get_attribute("position").unwrap()
+      assert_eq(position.get_x(0), 0.0)
+      assert_eq(position.get_x(1), 4.0)
+      assert_eq(position.get_y(1), 5.0)
+      assert_eq(position.get_z(1), 6.0)
+      assert_eq(position.get_y(2), 1.0)
+      assert_eq(position.get_x(2), 0.0)
+    }
+  }
+  match must(root, "zeros").mesh {
+    None => panic()
+    Some(binding) => {
+      let position = binding.geometry.get_attribute("position").unwrap()
+      assert_eq(position.get_x(0), 8.0)
+      assert_eq(position.get_y(0), 0.0)
+      assert_eq(position.get_x(1), 0.0)
+      assert_eq(position.get_y(2), 0.0)
+    }
+  }
+}
