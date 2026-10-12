@@ -9,7 +9,7 @@ pub(all) enum MaterialKind {
 }
 
 ///|
-/// 材质的公共数据。改 `side` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// 材质的公共数据。`alpha_test` 大于片元 alpha 时丢弃该片元，默认 0。改 `side`、`alpha_test` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
 /// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19
 pub(all) struct Material {
   color : @math.Color
@@ -21,6 +21,7 @@ pub(all) struct Material {
   mut roughness : Double
   mut metalness : Double
   mut fog : Bool
+  mut alpha_test : Double
   kind : MaterialKind
 }
 
@@ -36,6 +37,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     roughness: 1.0,
     metalness: 0.0,
     fog: true,
+    alpha_test: 0.0,
     kind: Basic,
   }
 }
@@ -64,6 +66,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     roughness: 1.0,
     metalness: 0.0,
     fog: true,
+    alpha_test: 0.0,
     kind: Lambert,
   }
 }
@@ -98,6 +101,7 @@ pub fn Material::standard(
     roughness,
     metalness,
     fog: true,
+    alpha_test: 0.0,
     kind: Standard,
   }
 }

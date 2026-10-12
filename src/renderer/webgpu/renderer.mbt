@@ -3409,6 +3409,7 @@ fn WebGPURenderer::draw_meshes(
           haze.far,
           haze.density,
           haze.mode,
+          alpha_test=item.alpha_test,
         )
         ignore(
           self.device

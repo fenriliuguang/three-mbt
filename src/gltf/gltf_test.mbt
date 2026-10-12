@@ -478,3 +478,55 @@ test "glTF sparse accessors replace indexed elements" {
     }
   }
 }
+
+///|
+test "glTF mask and blend set alpha test and opacity" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2,3]}],"nodes":[{"name":"mask","mesh":0},{"name":"tight","mesh":1},{"name":"blend","mesh":2},{"name":"plain","mesh":3}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"material":0}]},{"primitives":[{"attributes":{"POSITION":0},"material":1}]},{"primitives":[{"attributes":{"POSITION":0},"material":2}]},{"primitives":[{"attributes":{"POSITION":0},"material":3}]}],"materials":[{"alphaMode":"MASK","pbrMetallicRoughness":{"baseColorFactor":[1,0,0,0.25]}},{"alphaMode":"MASK","alphaCutoff":0.2,"pbrMetallicRoughness":{"baseColorFactor":[0,1,0,0.8]}},{"alphaMode":"BLEND","pbrMetallicRoughness":{"baseColorFactor":[0,0,1,1]}},{"pbrMetallicRoughness":{"baseColorFactor":[1,1,1,0.2]}}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
+  let root = @gltf.parse(text).scene.node
+  match must(root, "mask").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.transparent, false)
+      assert_eq(binding.opacity, 0.25)
+      assert_eq(binding.alpha_test, 0.5)
+    }
+  }
+  match must(root, "tight").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.transparent, false)
+      assert_eq(binding.opacity, 0.8)
+      assert_eq(binding.alpha_test, 0.2)
+    }
+  }
+  match must(root, "blend").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.transparent, true)
+      assert_eq(binding.opacity, 1.0)
+      assert_eq(binding.alpha_test, 0.0)
+    }
+  }
+  match must(root, "plain").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.transparent, false)
+      assert_eq(binding.opacity, 1.0)
+      assert_eq(binding.alpha_test, 0.0)
+    }
+  }
+}
+
+///|
+test "glTF rejects an unknown alpha mode" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"material":0}]}],"materials":[{"alphaMode":"HASH"}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
+  let failed = try {
+    ignore(@gltf.parse(text).scene)
+    false
+  } catch {
+    @gltf.GltfError::Invalid(_) => true
+  }
+  assert_eq(failed, true)
+}

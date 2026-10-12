@@ -30,6 +30,7 @@ pub(all) struct Material {
   mut roughness : Double
   mut metalness : Double
   mut fog : Bool
+  mut alpha_test : Double
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

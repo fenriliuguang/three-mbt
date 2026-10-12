@@ -113,6 +113,8 @@ test "lines return the uniform color and points scale like r186" {
   )
   assert_eq(includes(line, "@location(0) position : vec3<f32>"), true)
   assert_eq(includes(line, "map_texture"), false)
+  assert_eq(includes(line, "color.a < (uniforms.surface).z"), true)
+  assert_eq(includes(line, "discard"), true)
   assert_eq(includes(@nodes.basic_wgsl(), "fn apply_fog("), true)
   assert_eq(includes(@nodes.lambert_wgsl(), "v_fog_depth"), true)
   let points = @nodes.points_wgsl()

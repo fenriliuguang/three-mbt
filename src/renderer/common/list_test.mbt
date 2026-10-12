@@ -213,6 +213,10 @@ test "packed vertices and uniforms are little-endian f32" {
   assert_eq(uniforms[277], b'\x00')
   assert_eq(uniforms[278], b'\x80')
   assert_eq(uniforms[279], b'\x3F')
+  assert_eq(uniforms[280], b'\x00')
+  assert_eq(uniforms[281], b'\x00')
+  assert_eq(uniforms[282], b'\x00')
+  assert_eq(uniforms[283], b'\x00')
   assert_eq(uniforms[288], b'\x00')
   assert_eq(uniforms[289], b'\x00')
   assert_eq(uniforms[290], b'\x00')
@@ -578,6 +582,61 @@ test "instanced wireframes stay in the wireframe list" {
     Some(data) => assert_eq(data.count, 2)
   }
   assert_eq(@common.collect_opaque(scene.node).length(), 1)
+}
+
+///|
+test "alpha test reaches the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshBasicMaterial::new()
+  material.material.alpha_test = 0.5
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(drawn[0].alpha_test, 0.5)
+}
+
+///|
+test "alpha test is packed into surface z" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let uniforms = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    alpha_test=0.5,
+  )
+  assert_eq(uniforms[280], b'\x00')
+  assert_eq(uniforms[281], b'\x00')
+  assert_eq(uniforms[282], b'\x00')
+  assert_eq(uniforms[283], b'\x3F')
 }
 
 ///|

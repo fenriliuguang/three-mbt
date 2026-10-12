@@ -52,6 +52,7 @@ priv struct Mat {
   transparent : Bool
   double_sided : Bool
   unlit : Bool
+  alpha_test : Double
 }
 
 ///|
@@ -124,7 +125,7 @@ pub(all) struct Gltf {
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0`、`COLOR_0` 和索引。
 /// 稀疏 accessor 按索引替换元素；没有 `bufferView` 时底数是 0。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
-/// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
+/// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
 /// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图和蒙皮先不读。动画通道里的 `weights` 仍跳过。
@@ -421,6 +422,7 @@ fn default_mat() -> Mat {
     transparent: false,
     double_sided: false,
     unlit: false,
+    alpha_test: 0.0,
   }
 }
 
@@ -455,9 +457,12 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
       metalness = opt_f64(pbr, "metallicFactor", 1.0)
     }
   }
-  let blend = opt_string(obj, "alphaMode", "OPAQUE") == "BLEND"
-  let transparent = blend && alpha < 1.0
-  let opacity = if transparent { alpha } else { 1.0 }
+  let mode = opt_string(obj, "alphaMode", "OPAQUE")
+  let (transparent, opacity, alpha_test) = alpha_coverage(
+    mode,
+    alpha,
+    opt_f64(obj, "alphaCutoff", 0.5),
+  )
   {
     r,
     g,
@@ -468,6 +473,24 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
     transparent,
     double_sided: opt_bool(obj, "doubleSided", false),
     unlit: material_unlit(obj),
+    alpha_test,
+  }
+}
+
+///|
+/// `OPAQUE` 忽略 alpha。`MASK` 把 `alphaCutoff` 写成 `alphaTest`，缺省 0.5。
+/// `BLEND` 进入透明队列，opacity 用 baseColor 的 alpha。
+/// r186: `alphaMode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3668
+fn alpha_coverage(
+  mode : String,
+  alpha : Double,
+  cutoff : Double,
+) -> (Bool, Double, Double) raise GltfError {
+  match mode {
+    "OPAQUE" => (false, 1.0, 0.0)
+    "MASK" => (false, alpha, cutoff)
+    "BLEND" => (true, alpha, 0.0)
+    _ => raise GltfError::Invalid("alpha mode")
   }
 }
 
@@ -1329,6 +1352,7 @@ fn mesh_from(
   ignore(material.color.set_rgb(prim.mat.r, prim.mat.g, prim.mat.b))
   material.opacity = prim.mat.opacity
   material.transparent = prim.mat.transparent
+  material.alpha_test = prim.mat.alpha_test
   let mesh = @objects.Mesh::new(geometry, material)
   if prim.mat.double_sided {
     mesh.set_side(@constants.Side::Double)

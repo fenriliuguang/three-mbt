@@ -15,6 +15,7 @@ pub(all) struct MeshBinding {
   roughness : Double
   metalness : Double
   fog : Bool
+  mut alpha_test : Double
   instances : InstanceData?
 }
 

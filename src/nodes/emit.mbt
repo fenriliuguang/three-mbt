@@ -63,7 +63,8 @@ fn emit_fields(
 
 ///|
 /// 把材质节点编成一段 WGSL。三种材质共用同一块 uniform。
-/// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
+/// 片元 alpha 小于 `surface.z` 时丢弃。`surface.z` 是材质的 `alphaTest`，默认 0。
+/// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297 ; `alphatest_fragment` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/alphatest_fragment.glsl.js#L11
 pub fn emit_wgsl(program : Program) -> String {
   let lines = []
   lines.push("struct Uniforms {\n")
@@ -117,8 +118,12 @@ pub fn emit_wgsl(program : Program) -> String {
     "  return output;\n}\n\n@fragment\nfn fs(input : VertexOutput) -> @location(0) vec4<f32> {\n",
   )
   lines.push(
-    "  return apply_fog(\{emit_expr(program.fragment_color)}, input.v_fog_depth);\n}\n",
+    "  let color = apply_fog(\{emit_expr(program.fragment_color)}, input.v_fog_depth);\n",
   )
+  lines.push("  if (color.a < (uniforms.surface).z) {\n")
+  lines.push("    discard;\n")
+  lines.push("  }\n")
+  lines.push("  return color;\n}\n")
   let mut wgsl = ""
   for line in lines {
     wgsl = wgsl + line

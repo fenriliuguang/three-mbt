@@ -220,6 +220,7 @@ pub fn pack_uniforms(
   fog_far : Double,
   fog_density : Double,
   fog_mode : Double,
+  alpha_test? : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -235,6 +236,7 @@ pub fn pack_uniforms(
   write_vec3(dst, 256, camera_position.x, camera_position.y, camera_position.z)
   write_f32(dst, 272, roughness)
   write_f32(dst, 276, metalness)
+  write_f32(dst, 280, alpha_test)
   write_f32(dst, 288, viewport_width)
   write_f32(dst, 292, viewport_height)
   write_f32(dst, 304, point_size)
