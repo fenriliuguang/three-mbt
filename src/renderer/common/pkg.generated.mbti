@@ -105,6 +105,7 @@ pub(all) struct PrimitiveItem {
   fog : Bool
   depth_write : Bool
   depth_test : Bool
+  depth_func : @constants.DepthFunc
 }
 
 pub(all) struct RenderItem {
@@ -122,6 +123,7 @@ pub(all) struct RenderItem {
   flat_shading : Bool
   depth_write : Bool
   depth_test : Bool
+  depth_func : @constants.DepthFunc
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?

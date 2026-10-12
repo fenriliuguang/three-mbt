@@ -6,9 +6,17 @@ pub let upstream_revision : String = "r186"
 
 ///|
 pub using @constants {
+  ALWAYS_DEPTH,
   BACK_SIDE,
   DOUBLE_SIDE,
+  EQUAL_DEPTH,
   FRONT_SIDE,
+  GREATER_DEPTH,
+  GREATER_EQUAL_DEPTH,
+  LESS_DEPTH,
+  LESS_EQUAL_DEPTH,
+  NEVER_DEPTH,
+  NOT_EQUAL_DEPTH,
   WEBGL_COORDINATE_SYSTEM,
   CLAMP_TO_EDGE_WRAPPING,
   INTERPOLATE_DISCRETE,
@@ -35,6 +43,7 @@ pub using @constants {
   REPEAT_WRAPPING,
   WEBGPU_COORDINATE_SYSTEM,
   type CoordinateSystem,
+  type DepthFunc,
   type Interpolation,
   type LoopMode,
   type Shading,

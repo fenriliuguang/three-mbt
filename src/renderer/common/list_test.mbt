@@ -1066,6 +1066,42 @@ test "depth test defaults on and can be turned off" {
 }
 
 ///|
+test "depth func defaults to less-equal and reaches the render list" {
+  assert_eq(@constants.NEVER_DEPTH, 0)
+  assert_eq(@constants.ALWAYS_DEPTH, 1)
+  assert_eq(@constants.LESS_DEPTH, 2)
+  assert_eq(@constants.LESS_EQUAL_DEPTH, 3)
+  assert_eq(@constants.EQUAL_DEPTH, 4)
+  assert_eq(@constants.GREATER_EQUAL_DEPTH, 5)
+  assert_eq(@constants.GREATER_DEPTH, 6)
+  assert_eq(@constants.NOT_EQUAL_DEPTH, 7)
+  assert_eq(@constants.DepthFunc::LessEqual.to_int(), 3)
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshStandardMaterial::new()
+  assert_eq(material.material.depth_func.to_int(), @constants.LESS_EQUAL_DEPTH)
+  material.material.depth_func = @constants.Greater
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn[0].depth_func.to_int(), @constants.GREATER_DEPTH)
+  assert_eq(drawn[0].depth_test, true)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  assert_eq(points_material.depth_func.to_int(), @constants.LESS_EQUAL_DEPTH)
+  points_material.depth_func = @constants.Equal
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  line_material.depth_func = @constants.NotEqual
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes[0].depth_func.to_int(), @constants.EQUAL_DEPTH)
+  assert_eq(strokes[1].depth_func.to_int(), @constants.NOT_EQUAL_DEPTH)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

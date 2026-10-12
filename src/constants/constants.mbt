@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -43,6 +43,66 @@ pub fn Side::to_int(self : Side) -> Int {
     Front => FRONT_SIDE
     Back => BACK_SIDE
     Double => DOUBLE_SIDE
+  }
+}
+
+///|
+/// 深度测试通过的条件。数值与 r186 `src/constants.js` 一致。默认是 `LessEqual`。
+/// r186: `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `LessEqualDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L359
+pub(all) enum DepthFunc {
+  Never
+  Always
+  Less
+  LessEqual
+  Equal
+  GreaterEqual
+  Greater
+  NotEqual
+}
+
+///|
+/// 深度测试永不通过。对齐 `NeverDepth`（0）。
+pub const NEVER_DEPTH : Int = 0
+
+///|
+/// 深度测试始终通过。对齐 `AlwaysDepth`（1）。
+pub const ALWAYS_DEPTH : Int = 1
+
+///|
+/// 新深度小于已有深度才通过。对齐 `LessDepth`（2）。
+pub const LESS_DEPTH : Int = 2
+
+///|
+/// 新深度小于或等于已有深度才通过。对齐 `LessEqualDepth`（3）。
+pub const LESS_EQUAL_DEPTH : Int = 3
+
+///|
+/// 深度相等才通过。对齐 `EqualDepth`（4）。
+pub const EQUAL_DEPTH : Int = 4
+
+///|
+/// 新深度大于或等于已有深度才通过。对齐 `GreaterEqualDepth`（5）。
+pub const GREATER_EQUAL_DEPTH : Int = 5
+
+///|
+/// 新深度大于已有深度才通过。对齐 `GreaterDepth`（6）。
+pub const GREATER_DEPTH : Int = 6
+
+///|
+/// 深度不相等才通过。对齐 `NotEqualDepth`（7）。
+pub const NOT_EQUAL_DEPTH : Int = 7
+
+///|
+pub fn DepthFunc::to_int(self : DepthFunc) -> Int {
+  match self {
+    Never => NEVER_DEPTH
+    Always => ALWAYS_DEPTH
+    Less => LESS_DEPTH
+    LessEqual => LESS_EQUAL_DEPTH
+    Equal => EQUAL_DEPTH
+    GreaterEqual => GREATER_EQUAL_DEPTH
+    Greater => GREATER_DEPTH
+    NotEqual => NOT_EQUAL_DEPTH
   }
 }
 
