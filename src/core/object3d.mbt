@@ -419,6 +419,26 @@ pub fn Object3D::look_at_vector(
 }
 
 ///|
+/// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L448
+pub fn Object3D::apply_matrix4(self : Object3D, matrix : @math.Matrix4) -> Unit {
+  if self.matrix_auto_update {
+    self.update_matrix()
+  }
+  ignore(self.matrix.premultiply(matrix))
+  ignore(self.matrix.decompose(self.position, self.quaternion, self.scale))
+}
+
+///|
+/// r186: `applyQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L464
+pub fn Object3D::apply_quaternion(
+  self : Object3D,
+  q : @math.Quaternion,
+) -> Object3D {
+  ignore(self.quaternion.premultiply(q))
+  self
+}
+
+///|
 /// 绕局部轴旋转。轴假定已归一化。
 /// r186: `rotateOnAxis` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L531
 pub fn Object3D::rotate_on_axis(

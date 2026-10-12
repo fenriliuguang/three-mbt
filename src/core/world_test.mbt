@@ -90,6 +90,41 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "apply matrix and quaternion update the local transform" {
+  let right_angle = 1.5707963267948966
+  let half = 0.7071067811865476
+  let object = @core.Object3D::new()
+  ignore(object.position.set(1.0, 0.0, 0.0))
+  let turn = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    right_angle,
+  )
+  let matrix = @math.Matrix4::new().make_rotation_from_quaternion(turn)
+  object.apply_matrix4(matrix)
+  assert_close(object.position.x, 0.0)
+  assert_close(object.position.y, 0.0)
+  assert_close(object.position.z, -1.0)
+  assert_close(object.quaternion.x, 0.0)
+  assert_close(object.quaternion.y, half)
+  assert_close(object.quaternion.z, 0.0)
+  assert_close(object.quaternion.w, half)
+  assert_close(object.scale.x, 1.0)
+  assert_close(object.scale.y, 1.0)
+  assert_close(object.scale.z, 1.0)
+  let spun = @core.Object3D::new()
+  ignore(spun.rotate_y(right_angle))
+  let pitch = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(x=1.0),
+    right_angle,
+  )
+  ignore(spun.apply_quaternion(pitch))
+  assert_close(spun.quaternion.x, 0.5)
+  assert_close(spun.quaternion.y, 0.5)
+  assert_close(spun.quaternion.z, 0.5)
+  assert_close(spun.quaternion.w, 0.5)
+}
+
+///|
 test "world rotation scale and direction follow the parent" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))
