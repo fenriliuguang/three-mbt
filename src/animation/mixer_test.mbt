@@ -172,3 +172,42 @@ test "weight blends the sample with the captured rest pose" {
   assert_eq(root.position.y, 0.0)
   assert_eq(action.playing, false)
 }
+
+///|
+test "glTF cubic spline uses the out tangent at mid time" {
+  let track = @animation.KeyframeTrack::cubic_vector(
+    "arm.position",
+    [0.0, 1.0],
+    [
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0,
+    ],
+  )
+  let root = @core.Object3D::new()
+  root.name = "arm"
+  let mixer = @animation.AnimationMixer::new(root)
+  let action = mixer.clip_action(@animation.AnimationClip::new("bend", [track]))
+  action.play()
+  mixer.update(0.5)
+  assert_eq(root.position.x, 0.5)
+  assert_eq(root.position.y, 0.0)
+  let spin = @animation.KeyframeTrack::cubic_quaternion(
+    ".quaternion",
+    [0.0, 1.0],
+    [
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 16.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    ],
+  )
+  let turned = @core.Object3D::new()
+  let spin_mixer = @animation.AnimationMixer::new(turned)
+  let spin_action = spin_mixer.clip_action(
+    @animation.AnimationClip::new("spin", [spin]),
+  )
+  spin_action.play()
+  spin_mixer.update(0.5)
+  assert_eq(turned.quaternion.x, 1.0)
+  assert_eq(turned.quaternion.y, 0.0)
+  assert_eq(turned.quaternion.z, 0.0)
+  assert_eq(turned.quaternion.w, 0.0)
+}

@@ -1,4 +1,4 @@
-// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16 ; `CubicInterpolant` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L13
+// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16 ; `CubicInterpolant` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L13 ; `GLTFCubicSplineInterpolant` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2128
 
 ///|
 using @core {type Object3D}
@@ -8,7 +8,8 @@ using @constants {type Interpolation, type LoopMode}
 
 ///|
 /// 一条关键帧。`value_size` 为 3 时按向量插值，为 4 时按四元数 slerp。
-/// 时间必须非递减。`Smooth` 对向量用三次样条，四元数没有这条工厂，仍走 slerp。
+/// 时间必须非递减。`Smooth` 对向量用零曲率三次样条，四元数没有这条工厂，仍走 slerp。
+/// `cubic_spline` 为真时，每个关键帧按 glTF 存切入切线、顶点、切出切线，四元数结果会归一化。
 /// r186: `KeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/KeyframeTrack.js#L19
 pub(all) struct KeyframeTrack {
   name : String
@@ -16,6 +17,18 @@ pub(all) struct KeyframeTrack {
   values : Array[Double]
   value_size : Int
   mut interpolation : Interpolation
+  cubic_spline : Bool
+}
+
+///|
+fn check_times(times : Array[Double]) -> Unit {
+  let mut previous = times[0]
+  for index in 1..<times.length() {
+    if times[index] < previous {
+      abort("keyframe times must be sorted")
+    }
+    previous = times[index]
+  }
 }
 
 ///|
@@ -27,13 +40,19 @@ fn check_track(
   if times.length() == 0 || values.length() != times.length() * size {
     abort("keyframe track size does not match its times")
   }
-  let mut previous = times[0]
-  for index in 1..<times.length() {
-    if times[index] < previous {
-      abort("keyframe times must be sorted")
-    }
-    previous = times[index]
+  check_times(times)
+}
+
+///|
+fn check_cubic(
+  times : Array[Double],
+  values : Array[Double],
+  size : Int,
+) -> Unit {
+  if times.length() == 0 || values.length() != times.length() * size * 3 {
+    abort("keyframe track size does not match its times")
   }
+  check_times(times)
 }
 
 ///|
@@ -45,7 +64,14 @@ pub fn KeyframeTrack::vector(
   values : Array[Double],
 ) -> KeyframeTrack {
   check_track(times, values, 3)
-  { name, times, values, value_size: 3, interpolation: Linear, }
+  {
+    name,
+    times,
+    values,
+    value_size: 3,
+    interpolation: Linear,
+    cubic_spline: false,
+  }
 }
 
 ///|
@@ -57,7 +83,52 @@ pub fn KeyframeTrack::quaternion(
   values : Array[Double],
 ) -> KeyframeTrack {
   check_track(times, values, 4)
-  { name, times, values, value_size: 4, interpolation: Linear, }
+  {
+    name,
+    times,
+    values,
+    value_size: 4,
+    interpolation: Linear,
+    cubic_spline: false,
+  }
+}
+
+///|
+/// glTF `CUBICSPLINE` 向量轨道。每个关键帧 9 个数：切入切线、顶点、切出切线。
+/// r186: `GLTFCubicSplineInterpolant` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2128
+pub fn KeyframeTrack::cubic_vector(
+  name : String,
+  times : Array[Double],
+  values : Array[Double],
+) -> KeyframeTrack {
+  check_cubic(times, values, 3)
+  {
+    name,
+    times,
+    values,
+    value_size: 3,
+    interpolation: Linear,
+    cubic_spline: true,
+  }
+}
+
+///|
+/// glTF `CUBICSPLINE` 四元数轨道。每个关键帧 12 个数，采样后归一化。
+/// r186: `GLTFCubicSplineQuaternionInterpolant` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2200
+pub fn KeyframeTrack::cubic_quaternion(
+  name : String,
+  times : Array[Double],
+  values : Array[Double],
+) -> KeyframeTrack {
+  check_cubic(times, values, 4)
+  {
+    name,
+    times,
+    values,
+    value_size: 4,
+    interpolation: Linear,
+    cubic_spline: true,
+  }
 }
 
 ///|
@@ -378,6 +449,78 @@ fn slerp_key(
 }
 
 ///|
+
+///|
+fn spline_or_key(
+  track : KeyframeTrack,
+  index : Int,
+) -> (Double, Double, Double, Double) {
+  if track.cubic_spline {
+    spline_vertex(track, index)
+  } else {
+    read_key(track, index)
+  }
+}
+
+///|
+fn spline_vertex(
+  track : KeyframeTrack,
+  index : Int,
+) -> (Double, Double, Double, Double) {
+  let stride = track.value_size
+  let base = index * stride * 3 + stride
+  let x = track.values[base]
+  let y = if stride > 1 { track.values[base + 1] } else { 0.0 }
+  let z = if stride > 2 { track.values[base + 2] } else { 0.0 }
+  let w = if stride > 3 { track.values[base + 3] } else { 1.0 }
+  (x, y, z, w)
+}
+
+///|
+/// 切线布局是切入、顶点、切出。`index` 是左边那个关键帧。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2156
+fn gltf_cubic(
+  track : KeyframeTrack,
+  index : Int,
+  time : Double,
+) -> (Double, Double, Double, Double) {
+  let t0 = track.times[index]
+  let t1 = track.times[index + 1]
+  let td = t1 - t0
+  if td == 0.0 {
+    return spline_vertex(track, index)
+  }
+  let p = (time - t0) / td
+  let pp = p * p
+  let ppp = pp * p
+  let s2 = -2.0 * ppp + 3.0 * pp
+  let s3 = ppp - pp
+  let s0 = 1.0 - s2
+  let s1 = s3 - pp + p
+  let stride = track.value_size
+  let offset0 = index * stride * 3
+  let offset1 = offset0 + stride * 3
+  fn component(i : Int) -> Double {
+    let p0 = track.values[offset0 + i + stride]
+    let m0 = track.values[offset0 + i + stride * 2] * td
+    let p1 = track.values[offset1 + i + stride]
+    let m1 = track.values[offset1 + i] * td
+    s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1
+  }
+  let x = component(0)
+  let y = if stride > 1 { component(1) } else { 0.0 }
+  let z = if stride > 2 { component(2) } else { 0.0 }
+  let w = if stride > 3 { component(3) } else { 0.0 }
+  if stride == 4 {
+    let rotation = @math.Quaternion::new(x~, y~, z~, w~)
+    ignore(rotation.normalize())
+    (rotation.x, rotation.y, rotation.z, rotation.w)
+  } else {
+    (x, y, z, w)
+  }
+}
+
+///|
 fn sample_track(
   track : KeyframeTrack,
   time : Double,
@@ -385,13 +528,19 @@ fn sample_track(
   let times = track.times
   let count = times.length()
   if time <= times[0] {
-    return read_key(track, 0)
+    return spline_or_key(track, 0)
   }
   let mut index = 0
   while index + 1 < count && times[index + 1] <= time {
     index = index + 1
   }
-  if index >= count - 1 || track.interpolation is Discrete {
+  if index >= count - 1 {
+    return spline_or_key(track, index)
+  }
+  if track.cubic_spline {
+    return gltf_cubic(track, index, time)
+  }
+  if track.interpolation is Discrete {
     return read_key(track, index)
   }
   let span = times[index + 1] - times[index]

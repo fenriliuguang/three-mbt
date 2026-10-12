@@ -239,16 +239,20 @@ test "glTF translation and scale become keyframe tracks" {
 }
 
 ///|
-test "a glTF cubic spline animation is rejected" {
+test "a glTF cubic spline follows the out tangent" {
   let text =
-    #|{"asset":{"version":"2.0"},"nodes":[{"name":"arm"}],"animations":[{"samplers":[{"input":0,"output":1,"interpolation":"CUBICSPLINE"}],"channels":[{"sampler":0,"target":{"node":0,"path":"rotation"}}]}]}
-  let failed = try {
-    ignore(@gltf.parse(text).scene)
-    false
-  } catch {
-    @gltf.GltfError::Invalid(_) => true
-  }
-  assert_eq(failed, true)
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"arm"}],"animations":[{"name":"bend","samplers":[{"input":0,"output":1,"interpolation":"CUBICSPLINE"}],"channels":[{"sampler":0,"target":{"node":0,"path":"translation"}}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":2,"type":"SCALAR"},{"bufferView":1,"componentType":5126,"count":6,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":8},{"buffer":0,"byteOffset":8,"byteLength":72}],"buffers":[{"byteLength":80,"uri":"data:application/octet-stream;base64,AAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}]}
+  let asset = @gltf.parse(text)
+  let track = asset.animations[0].tracks[0]
+  assert_eq(track.cubic_spline, true)
+  assert_eq(track.name, "arm.position")
+  let mixer = @animation.AnimationMixer::new(asset.scene.node)
+  let action = mixer.clip_action(asset.animations[0])
+  action.play()
+  mixer.update(0.5)
+  assert_eq(must(asset.scene.node, "arm").position.x, 0.5)
+  assert_eq(must(asset.scene.node, "arm").position.y, 0.0)
+  assert_eq(must(asset.scene.node, "arm").position.z, 0.0)
 }
 
 ///|

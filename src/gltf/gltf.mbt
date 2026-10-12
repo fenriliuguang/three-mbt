@@ -102,8 +102,8 @@ pub(all) struct Gltf {
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
 /// 再带上粗糙度、金属度和 `doubleSided`。
 /// 节点上的相机会建成透视或正交相机。
-/// 动画读取 `translation`、`rotation` 和 `scale`，插值是 `LINEAR` 与 `STEP`。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。点光、聚光、贴图、蒙皮、形变和三次样条先不读。
+/// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。点光、聚光、贴图、蒙皮和形变先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1177,13 +1177,18 @@ fn track_suffix(path : String) -> String raise GltfError {
 }
 
 ///|
-fn animation_interpolation(
-  name : String,
-) -> @constants.Interpolation raise GltfError {
+priv enum SamplerInterp {
+  Linear
+  Step
+  Cubic
+}
+
+///|
+fn animation_interpolation(name : String) -> SamplerInterp raise GltfError {
   match name {
-    "LINEAR" => @constants.Interpolation::Linear
-    "STEP" => @constants.Interpolation::Discrete
-    "CUBICSPLINE" => raise GltfError::Invalid("cubic spline animation")
+    "LINEAR" => Linear
+    "STEP" => Step
+    "CUBICSPLINE" => Cubic
     _ => raise GltfError::Invalid("animation interpolation")
   }
 }
@@ -1229,7 +1234,7 @@ fn load_animation(
             raise GltfError::Invalid("animation sampler")
           }
           let sampler = samplers[sampler_index]
-          let interpolation = animation_interpolation(
+          let kind = animation_interpolation(
             opt_string(sampler, "interpolation", "LINEAR"),
           )
           let times = read_values(
@@ -1247,23 +1252,48 @@ fn load_animation(
             require_f64(sampler, "output").to_int(),
             size,
           )
-          if times.length() == 0 || output.length() != times.length() * size {
+          let copies = match kind {
+            Cubic => 3
+            _ => 1
+          }
+          if times.length() == 0 ||
+            output.length() != times.length() * size * copies {
             raise GltfError::Invalid("animation output")
           }
-          let track = if path == "rotation" {
-            @animation.KeyframeTrack::quaternion(
-              node_name + "." + suffix,
-              times,
-              output,
-            )
-          } else {
-            @animation.KeyframeTrack::vector(
-              node_name + "." + suffix,
-              times,
-              output,
-            )
+          let track = match kind {
+            Cubic =>
+              if path == "rotation" {
+                @animation.KeyframeTrack::cubic_quaternion(
+                  node_name + "." + suffix,
+                  times,
+                  output,
+                )
+              } else {
+                @animation.KeyframeTrack::cubic_vector(
+                  node_name + "." + suffix,
+                  times,
+                  output,
+                )
+              }
+            _ =>
+              if path == "rotation" {
+                @animation.KeyframeTrack::quaternion(
+                  node_name + "." + suffix,
+                  times,
+                  output,
+                )
+              } else {
+                @animation.KeyframeTrack::vector(
+                  node_name + "." + suffix,
+                  times,
+                  output,
+                )
+              }
           }
-          track.interpolation = interpolation
+          match kind {
+            Step => track.interpolation = @constants.Interpolation::Discrete
+            _ => ()
+          }
           tracks.push(track)
         }
       }

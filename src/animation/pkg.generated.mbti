@@ -54,7 +54,10 @@ pub(all) struct KeyframeTrack {
   values : Array[Double]
   value_size : Int
   mut interpolation : @constants.Interpolation
+  cubic_spline : Bool
 }
+pub fn KeyframeTrack::cubic_quaternion(String, Array[Double], Array[Double]) -> Self
+pub fn KeyframeTrack::cubic_vector(String, Array[Double], Array[Double]) -> Self
 pub fn KeyframeTrack::quaternion(String, Array[Double], Array[Double]) -> Self
 pub fn KeyframeTrack::vector(String, Array[Double], Array[Double]) -> Self
 
