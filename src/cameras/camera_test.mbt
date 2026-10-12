@@ -144,6 +144,32 @@ test "perspective film offset shifts the frustum" {
 }
 
 ///|
+test "perspective focal length follows the film height" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  assert_eq(camera.film_width(), 35.0)
+  assert_eq(camera.film_height(), 19.6875)
+  assert_close(camera.focal_length(), 21.1099899988)
+  assert_close(camera.effective_fov(), 50.0)
+  camera.set_zoom(2.0)
+  assert_close(camera.effective_fov(), 26.2485362456)
+  camera.set_zoom(1.0)
+  camera.set_focal_length(50.0)
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => assert_close(state.fov, 22.2753333373)
+  }
+  assert_close(camera.focal_length(), 50.0)
+  camera.set_aspect(0.5)
+  assert_eq(camera.film_width(), 17.5)
+  assert_eq(camera.film_height(), 35.0)
+}
+
+///|
 test "orthographic projection matches r186 WebGPU" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

@@ -6,6 +6,7 @@ using @core {type Object3D, type CameraState}
 ///|
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
 /// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。两个设置都会重算投影。
+/// `film_gauge` 默认 35。横构图的胶片宽度等于它，高度按宽高比缩小；竖构图相反。`set_focal_length` 用胶片高度改 `fov` 并重算投影。
 /// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `zoom` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L63 ; `filmOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L129
 pub(all) struct PerspectiveCamera {
   node : Object3D
@@ -95,6 +96,54 @@ pub fn PerspectiveCamera::set_film_offset(
       camera.film_offset = film_offset
       camera.update_projection()
     }
+  }
+}
+
+///|
+/// r186: `getFilmWidth` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L206
+pub fn PerspectiveCamera::film_width(self : PerspectiveCamera) -> Double {
+  match self.node.camera {
+    None => 0.0
+    Some(camera) => camera.film_width()
+  }
+}
+
+///|
+/// r186: `getFilmHeight` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L219
+pub fn PerspectiveCamera::film_height(self : PerspectiveCamera) -> Double {
+  match self.node.camera {
+    None => 0.0
+    Some(camera) => camera.film_height()
+  }
+}
+
+///|
+/// r186: `getFocalLength` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L180
+pub fn PerspectiveCamera::focal_length(self : PerspectiveCamera) -> Double {
+  match self.node.camera {
+    None => 0.0
+    Some(camera) => camera.focal_length()
+  }
+}
+
+///|
+/// r186: `setFocalLength` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L164
+pub fn PerspectiveCamera::set_focal_length(
+  self : PerspectiveCamera,
+  focal_length : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => camera.set_focal_length(focal_length)
+  }
+}
+
+///|
+/// r186: `getEffectiveFOV` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L193
+pub fn PerspectiveCamera::effective_fov(self : PerspectiveCamera) -> Double {
+  match self.node.camera {
+    None => 0.0
+    Some(camera) => camera.effective_fov()
   }
 }
 

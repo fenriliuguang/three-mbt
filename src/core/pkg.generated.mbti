@@ -64,8 +64,13 @@ pub(all) struct CameraState {
   mut reversed_depth : Bool
   kind : ProjectionKind
 }
+pub fn CameraState::effective_fov(Self) -> Double
+pub fn CameraState::film_height(Self) -> Double
+pub fn CameraState::film_width(Self) -> Double
+pub fn CameraState::focal_length(Self) -> Double
 pub fn CameraState::orthographic(Double, Double, Double, Double, Double, Double) -> Self
 pub fn CameraState::perspective(Double, Double, Double, Double) -> Self
+pub fn CameraState::set_focal_length(Self, Double) -> Unit
 pub fn CameraState::update_projection(Self) -> Unit
 
 pub(all) struct GeometryGroup {

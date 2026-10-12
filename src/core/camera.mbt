@@ -82,8 +82,42 @@ pub fn CameraState::orthographic(
 }
 
 ///|
-fn film_width(gauge : Double, aspect : Double) -> Double {
-  gauge * aspect.min(1.0)
+/// 胶片成像宽度。横构图等于 `film_gauge`，竖构图按宽高比缩小。
+/// r186: `getFilmWidth` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L206
+pub fn CameraState::film_width(self : CameraState) -> Double {
+  self.film_gauge * self.aspect.min(1.0)
+}
+
+///|
+/// 胶片成像高度。竖构图等于 `film_gauge`，横构图按宽高比缩小。
+/// r186: `getFilmHeight` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L219
+pub fn CameraState::film_height(self : CameraState) -> Double {
+  self.film_gauge / self.aspect.max(1.0)
+}
+
+///|
+/// r186: `getFocalLength` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L180
+pub fn CameraState::focal_length(self : CameraState) -> Double {
+  let slope = @std.tan(@math.deg_to_rad(0.5 * self.fov))
+  0.5 * self.film_height() / slope
+}
+
+///|
+/// r186: `setFocalLength` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L164
+pub fn CameraState::set_focal_length(
+  self : CameraState,
+  focal_length : Double,
+) -> Unit {
+  let slope = 0.5 * self.film_height() / focal_length
+  self.fov = @math.rad_to_deg(2.0 * @std.atan(slope))
+  self.update_projection()
+}
+
+///|
+/// r186: `getEffectiveFOV` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L193
+pub fn CameraState::effective_fov(self : CameraState) -> Double {
+  let slope = @std.tan(@math.deg_to_rad(0.5 * self.fov)) / self.zoom
+  @math.rad_to_deg(2.0 * @std.atan(slope))
 }
 
 ///|
@@ -99,10 +133,7 @@ pub fn CameraState::update_projection(self : CameraState) -> Unit {
       let width = self.aspect * height
       let mut left = -0.5 * width
       if self.film_offset != 0.0 {
-        left = left +
-          self.near *
-          self.film_offset /
-          film_width(self.film_gauge, self.aspect)
+        left = left + self.near * self.film_offset / self.film_width()
       }
       ignore(
         self.projection.make_perspective(

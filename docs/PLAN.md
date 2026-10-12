@@ -239,6 +239,8 @@ Transparent meshes have landed. A mesh with `transparent` set is drawn after the
 
 Perspective `zoom` and `filmOffset` have landed. `zoom` defaults to 1 and divides the vertical field, so 2 doubles the projection scale. `filmOffset` defaults to 0. A nonzero value shifts the frustum horizontally by `near * filmOffset / filmWidth`, where `filmWidth` is `filmGauge * min(aspect, 1)` and `filmGauge` defaults to 35. Orthographic `zoom` was already applied. View offset stays out.
 
+Perspective focal length has landed. `filmGauge` still defaults to 35. Landscape film width is the gauge and the height is `gauge / aspect`. Portrait swaps that. `focalLength` is `0.5 * filmHeight / tan(fov / 2)`. `set_focal_length` writes `fov` from that and rebuilds the projection. `effectiveFOV` divides the half-angle tangent by `zoom`. View offset stays out.
+
 `shadowSide` has landed. It defaults to null. A null side flips the material side for the shadow pass: front draws back faces, back draws front faces, and double draws both. A set value is used as-is. The shadow map is not VSM, so that path's unflipped default stays out. Points and lines do not cast shadows.
 
 A hemisphere light has landed. The first visible one adds indirect diffuse on Lambert and Standard. Sky and ground colors are multiplied by intensity. The direction is the light's world position, normalized, and defaults to `(0, 1, 0)`. A zero-length position stays zero, so the mix weight is 0.5. The weight is `dot(normal, direction) * 0.5 + 0.5`, then `mix(ground, sky, weight)`. It does not add specular and does not cast shadows. A second hemisphere light is ignored. The uniform block grows by 48 bytes to 672. Basic materials, points, and lines do not sample it.
@@ -295,6 +297,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `colorWrite` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `premultipliedAlpha` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | perspective `zoom` and `filmOffset` | `cameras` |
+| planned | 7 | perspective focal length, film width, and film height | `cameras` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
 | planned | 7 | double-sided and back-sided shading normals | `nodes`, `renderer` |
 | planned | 7 | emissive maps on Lambert and Standard | `materials`, `renderer` |
