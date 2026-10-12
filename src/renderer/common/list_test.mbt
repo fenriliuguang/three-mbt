@@ -1076,6 +1076,38 @@ test "depth func defaults to less-equal and reaches the render list" {
   assert_eq(@constants.GREATER_DEPTH, 6)
   assert_eq(@constants.NOT_EQUAL_DEPTH, 7)
   assert_eq(@constants.DepthFunc::LessEqual.to_int(), 3)
+  assert_eq(
+    @constants.DepthFunc::Never.reversed().to_int(),
+    @constants.ALWAYS_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::Less.reversed().to_int(),
+    @constants.GREATER_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::Equal.reversed().to_int(),
+    @constants.NOT_EQUAL_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::LessEqual.reversed().to_int(),
+    @constants.GREATER_EQUAL_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::Always.reversed().to_int(),
+    @constants.NEVER_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::Greater.reversed().to_int(),
+    @constants.LESS_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::NotEqual.reversed().to_int(),
+    @constants.EQUAL_DEPTH,
+  )
+  assert_eq(
+    @constants.DepthFunc::GreaterEqual.reversed().to_int(),
+    @constants.LESS_EQUAL_DEPTH,
+  )
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()
   let material = @materials.MeshStandardMaterial::new()

@@ -93,6 +93,7 @@ pub(all) enum DepthFunc {
   Greater
   NotEqual
 }
+pub fn DepthFunc::reversed(Self) -> Self
 pub fn DepthFunc::to_int(Self) -> Int
 
 pub(all) enum Interpolation {

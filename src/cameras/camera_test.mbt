@@ -35,6 +35,56 @@ test "perspective projection matches r186 WebGPU" {
 }
 
 ///|
+test "reversed perspective projection matches r186 WebGPU" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  let expected = [
+    1.20628514279, 0.0, 0.0, 0.0, 0.0, 2.14450692051, 0.0, 0.0, 0.0, 0.0, 0.001001001001,
+    -1.0, 0.0, 0.0, 0.1001001001, 0.0,
+  ]
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      state.reversed_depth = true
+      state.update_projection()
+      for i in 0..<16 {
+        assert_close(state.projection.elements[i], expected[i])
+      }
+    }
+  }
+}
+
+///|
+test "reversed orthographic projection matches r186 WebGPU" {
+  let camera = @cameras.OrthographicCamera::new(
+    left=-2.0,
+    right=2.0,
+    top=1.0,
+    bottom=-1.0,
+    near=0.1,
+    far=10.0,
+  )
+  let expected = [
+    0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.10101010101, 0.0, 0.0, 0.0,
+    1.010101010101, 1.0,
+  ]
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      state.reversed_depth = true
+      state.update_projection()
+      for i in 0..<16 {
+        assert_close(state.projection.elements[i], expected[i])
+      }
+    }
+  }
+}
+
+///|
 test "orthographic projection matches r186 WebGPU" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

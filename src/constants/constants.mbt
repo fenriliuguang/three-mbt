@@ -107,6 +107,22 @@ pub fn DepthFunc::to_int(self : DepthFunc) -> Int {
 }
 
 ///|
+/// 反向深度缓冲下的比较函数。`Never` 对 `Always`，`Equal` 对 `NotEqual`，不等号反过来。
+/// r186: `ReversedDepthFuncs` https://github.com/mrdoob/three.js/blob/r186/src/utils.js#L481
+pub fn DepthFunc::reversed(self : DepthFunc) -> DepthFunc {
+  match self {
+    Never => Always
+    Less => Greater
+    Equal => NotEqual
+    LessEqual => GreaterEqual
+    Always => Never
+    Greater => Less
+    NotEqual => Equal
+    GreaterEqual => LessEqual
+  }
+}
+
+///|
 /// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
 /// r186: 没有同名枚举。`Basic` `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14 ; `Lambert` `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24 ; `Standard` `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) enum Shading {

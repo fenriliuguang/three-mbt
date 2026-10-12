@@ -219,7 +219,8 @@ fn[T] ColorModes::pick(
 
 ///|
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
-/// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。阴影通道始终用 `less` 并写深度，不看 `depth_func`，也没有颜色目标。
+/// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。
+/// `reversed_depth` 默认关闭。打开后颜色通道用 `ReversedDepthFuncs` 重映射比较，投影走反向深度，深度清成 0。阴影通道仍用正向深度和 `less`。
 /// 透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
@@ -302,6 +303,7 @@ pub struct WebGPURenderer {
   mut swap_width : UInt
   mut swap_height : UInt
   mut swapchain_dirty : Bool
+  mut reversed_depth : Bool
 }
 
 ///|
@@ -1772,6 +1774,29 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     swap_width: window.width(),
     swap_height: window.height(),
     swapchain_dirty: false,
+    reversed_depth: false,
+  }
+}
+
+///|
+/// 打开后颜色通道使用反向深度。默认关闭，近平面深度仍是 0。
+/// r186: `reversedDepthBuffer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L62
+pub fn WebGPURenderer::set_reversed_depth(
+  self : WebGPURenderer,
+  enabled : Bool,
+) -> Unit {
+  self.reversed_depth = enabled
+}
+
+///|
+fn WebGPURenderer::view_depth_func(
+  self : WebGPURenderer,
+  depth_func : @constants.DepthFunc,
+) -> @constants.DepthFunc {
+  if self.reversed_depth {
+    depth_func.reversed()
+  } else {
+    depth_func
   }
 }
 
@@ -2410,21 +2435,26 @@ fn WebGPURenderer::draw_lines(
 }
 
 ///|
-fn sync_aspect(camera : @core.Object3D, width : UInt, height : UInt) -> Unit {
-  if height == 0U {
-    return
-  }
+fn sync_camera(
+  camera : @core.Object3D,
+  width : UInt,
+  height : UInt,
+  reversed_depth : Bool,
+) -> Unit {
   match camera.camera {
     None => ()
-    Some(state) =>
-      match state.kind {
-        @core.Perspective => {
-          state.aspect = width.reinterpret_as_int().to_double() /
-            height.reinterpret_as_int().to_double()
-          state.update_projection()
+    Some(state) => {
+      state.reversed_depth = reversed_depth
+      if height != 0U {
+        match state.kind {
+          @core.Perspective =>
+            state.aspect = width.reinterpret_as_int().to_double() /
+              height.reinterpret_as_int().to_double()
+          @core.Orthographic => ()
         }
-        @core.Orthographic => ()
       }
+      state.update_projection()
+    }
   }
 }
 
@@ -4051,7 +4081,7 @@ fn WebGPURenderer::draw_meshes(
               batch is Some(_),
               item.depth_write,
               item.depth_test,
-              item.depth_func,
+              self.view_depth_func(item.depth_func),
               item.color_write,
             )
           } else {
@@ -4063,7 +4093,7 @@ fn WebGPURenderer::draw_meshes(
                   blend,
                   item.depth_write,
                   item.depth_test,
-                  item.depth_func,
+                  self.view_depth_func(item.depth_func),
                   item.color_write,
                 )
               None =>
@@ -4073,7 +4103,7 @@ fn WebGPURenderer::draw_meshes(
                   blend,
                   item.depth_write,
                   item.depth_test,
-                  item.depth_func,
+                  self.view_depth_func(item.depth_func),
                   item.color_write,
                 )
             }
@@ -4251,7 +4281,7 @@ fn WebGPURenderer::draw_strokes(
                   blend,
                   item.depth_write,
                   item.depth_test,
-                  item.depth_func,
+                  self.view_depth_func(item.depth_func),
                   item.color_write,
                 ),
               )
@@ -4273,7 +4303,7 @@ fn WebGPURenderer::draw_strokes(
                 blend,
                 item.depth_write,
                 item.depth_test,
-                item.depth_func,
+                self.view_depth_func(item.depth_func),
                 item.color_write,
               ),
               geometry,
@@ -4286,7 +4316,7 @@ fn WebGPURenderer::draw_strokes(
                 blend,
                 item.depth_write,
                 item.depth_test,
-                item.depth_func,
+                self.view_depth_func(item.depth_func),
                 item.color_write,
               ),
               geometry,
@@ -4380,7 +4410,7 @@ pub fn WebGPURenderer::render(
     Some(target) =>
       (extent(target.texture.width), extent(target.texture.height), false)
   }
-  sync_aspect(camera, width, height)
+  sync_camera(camera, width, height, self.reversed_depth)
   @common.update_frame(scene.node, camera)
   let state = match camera.camera {
     None => return
@@ -4420,7 +4450,13 @@ pub fn WebGPURenderer::render(
     ],
     depth_stencil_attachment: Some({
       view: depth,
-      depth_clear_value: Some(Float::from_int(1)),
+      depth_clear_value: Some(
+        if self.reversed_depth {
+          Float::from_int(0)
+        } else {
+          Float::from_int(1)
+        },
+      ),
       depth_load_op: Some(@gpu.CLEAR),
       depth_store_op: Some(@gpu.STORE),
       depth_read_only: Some(false),
