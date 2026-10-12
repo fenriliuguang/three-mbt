@@ -1,6 +1,19 @@
 // r186: `Camera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/Camera.js#L18
 
 ///|
+/// 透视相机在一块更大画面里的子矩形。`enabled` 为假时投影忽略它。
+/// r186: `view` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L111
+pub(all) struct ViewOffset {
+  mut enabled : Bool
+  mut full_width : Double
+  mut full_height : Double
+  mut offset_x : Double
+  mut offset_y : Double
+  mut width : Double
+  mut height : Double
+}
+
+///|
 /// 相机的投影和视图逆矩阵。透视与正交共用这一组字段。
 /// r186: `Camera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/Camera.js#L18
 pub(all) struct CameraState {
@@ -18,6 +31,7 @@ pub(all) struct CameraState {
   mut bottom : Double
   mut film_gauge : Double
   mut film_offset : Double
+  mut view : ViewOffset?
   mut coordinate_system : @constants.CoordinateSystem
   mut reversed_depth : Bool
   kind : ProjectionKind
@@ -45,6 +59,7 @@ pub fn CameraState::perspective(
     bottom: -1.0,
     film_gauge: 35.0,
     film_offset: 0.0,
+    view: None,
     coordinate_system: @constants.WebGPU,
     reversed_depth: false,
     kind: Perspective,
@@ -75,6 +90,7 @@ pub fn CameraState::orthographic(
     bottom,
     film_gauge: 35.0,
     film_offset: 0.0,
+    view: None,
     coordinate_system: @constants.WebGPU,
     reversed_depth: false,
     kind: Orthographic,
@@ -122,16 +138,26 @@ pub fn CameraState::effective_fov(self : CameraState) -> Double {
 
 ///|
 /// 按 r186 `PerspectiveCamera.updateProjectionMatrix` / `OrthographicCamera.updateProjectionMatrix` 重算投影。
-/// 不包含 `view` 偏移。
+/// 透视相机会吃 `view` 偏移。正交相机还没有这条路径。
 pub fn CameraState::update_projection(self : CameraState) -> Unit {
   match self.kind {
     Perspective => {
-      let top = self.near *
+      let mut top = self.near *
         @std.tan(@math.deg_to_rad(0.5 * self.fov)) /
         self.zoom
-      let height = 2.0 * top
-      let width = self.aspect * height
+      let mut height = 2.0 * top
+      let mut width = self.aspect * height
       let mut left = -0.5 * width
+      match self.view {
+        Some(view) =>
+          if view.enabled {
+            left = left + view.offset_x * width / view.full_width
+            top = top - view.offset_y * height / view.full_height
+            width = width * view.width / view.full_width
+            height = height * view.height / view.full_height
+          }
+        None => ()
+      }
       if self.film_offset != 0.0 {
         left = left + self.near * self.film_offset / self.film_width()
       }

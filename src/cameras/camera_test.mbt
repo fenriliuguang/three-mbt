@@ -194,6 +194,47 @@ test "perspective view bounds scale with distance and zoom" {
 }
 
 ///|
+test "perspective view offset takes the left half" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  camera.set_view_offset(1920.0, 1080.0, 0.0, 0.0, 960.0, 1080.0)
+  let expected = [
+    2.41257028557, 0.0, 0.0, 0.0, 0.0, 2.14450692051, 0.0, 0.0, -1.0, 0.0, -1.001001001,
+    -1.0, 0.0, 0.0, -0.1001001001, 0.0,
+  ]
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) =>
+      match state.view {
+        None => assert_eq(false, true)
+        Some(view) => {
+          assert_eq(view.enabled, true)
+          for i in 0..<16 {
+            assert_close(state.projection.elements[i], expected[i])
+          }
+        }
+      }
+  }
+  camera.clear_view_offset()
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) =>
+      match state.view {
+        None => assert_eq(false, true)
+        Some(view) => {
+          assert_eq(view.enabled, false)
+          assert_close(state.projection.elements[0], 1.20628514279)
+          assert_close(state.projection.elements[8], 0.0)
+        }
+      }
+  }
+}
+
+///|
 test "orthographic projection matches r186 WebGPU" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

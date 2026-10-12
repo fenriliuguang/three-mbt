@@ -23,6 +23,7 @@ pub impl @core.AsNode for OrthographicCamera
 pub(all) struct PerspectiveCamera {
   node : @core.Object3D
 }
+pub fn PerspectiveCamera::clear_view_offset(Self) -> Unit
 pub fn PerspectiveCamera::effective_fov(Self) -> Double
 pub fn PerspectiveCamera::film_height(Self) -> Double
 pub fn PerspectiveCamera::film_width(Self) -> Double
@@ -32,6 +33,7 @@ pub fn PerspectiveCamera::set_aspect(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_film_offset(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_focal_length(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_fov(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_view_offset(Self, Double, Double, Double, Double, Double, Double) -> Unit
 pub fn PerspectiveCamera::set_zoom(Self, Double) -> Unit
 pub fn PerspectiveCamera::to_node(Self) -> @core.Object3D
 pub fn PerspectiveCamera::update_projection(Self) -> Unit

@@ -60,6 +60,7 @@ pub(all) struct CameraState {
   mut bottom : Double
   mut film_gauge : Double
   mut film_offset : Double
+  mut view : ViewOffset?
   mut coordinate_system : @constants.CoordinateSystem
   mut reversed_depth : Bool
   kind : ProjectionKind
@@ -289,6 +290,16 @@ pub(all) struct SkinState {
   weights : Array[Double]
 }
 pub fn SkinState::write(Self, Object3D, BufferGeometry) -> Unit
+
+pub(all) struct ViewOffset {
+  mut enabled : Bool
+  mut full_width : Double
+  mut full_height : Double
+  mut offset_x : Double
+  mut offset_y : Double
+  mut width : Double
+  mut height : Double
+}
 
 // Type aliases
 

@@ -7,7 +7,7 @@ using @core {type Object3D, type CameraState}
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
 /// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。两个设置都会重算投影。
 /// `film_gauge` 默认 35。横构图的胶片宽度等于它，高度按宽高比缩小；竖构图相反。`set_focal_length` 用胶片高度改 `fov` 并重算投影。
-/// `view_bounds` 用投影逆矩阵给出某个距离上的可视矩形，`view_size` 是它的宽高。不包含 `view` 偏移。
+/// `view_bounds` 用投影逆矩阵给出某个距离上的可视矩形，`view_size` 是它的宽高。投影里的 `view` 偏移会算进去。
 /// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `zoom` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L63 ; `filmOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L129
 pub(all) struct PerspectiveCamera {
   node : Object3D
@@ -136,6 +136,61 @@ pub fn PerspectiveCamera::set_focal_length(
   match self.node.camera {
     None => ()
     Some(camera) => camera.set_focal_length(focal_length)
+  }
+}
+
+///|
+/// 把透视相机放进一块更大的画面。`aspect` 改成整幅宽高比，然后重算投影。
+/// r186: `setViewOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L304
+pub fn PerspectiveCamera::set_view_offset(
+  self : PerspectiveCamera,
+  full_width : Double,
+  full_height : Double,
+  offset_x : Double,
+  offset_y : Double,
+  width : Double,
+  height : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.aspect = full_width / full_height
+      camera.view = Some({
+        enabled: true,
+        full_width,
+        full_height,
+        offset_x,
+        offset_y,
+        width,
+        height,
+      })
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+/// 关掉子矩形偏移并重算投影。正交相机不使用它。
+/// r186: `clearViewOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L337
+pub fn PerspectiveCamera::clear_view_offset(self : PerspectiveCamera) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) =>
+      match camera.view {
+        None => ()
+        Some(view) => {
+          camera.view = Some({
+            enabled: false,
+            full_width: view.full_width,
+            full_height: view.full_height,
+            offset_x: view.offset_x,
+            offset_y: view.offset_y,
+            width: view.width,
+            height: view.height,
+          })
+          camera.update_projection()
+        }
+      }
   }
 }
 
