@@ -180,8 +180,37 @@ struct CullPipelines {
 }
 
 ///|
-/// 一帧里的网格。深度比较是 `less`，近平面为 0。透明网格用另一组开启混合的管线。
-/// `depth_write` 为假时改用不写深度的管线。阴影通道始终写深度。
+/// 颜色通道的四种深度状态：测试开且写、测试开且不写、测试关且写、测试关且不写。
+struct DepthModes[T] {
+  write : T
+  read : T
+  always : T
+  always_read : T
+}
+
+///|
+fn[T] DepthModes::pick(
+  self : DepthModes[T],
+  depth_write : Bool,
+  depth_test : Bool,
+) -> T {
+  if depth_test {
+    if depth_write {
+      self.write
+    } else {
+      self.read
+    }
+  } else if depth_write {
+    self.always
+  } else {
+    self.always_read
+  }
+}
+
+///|
+/// 一帧里的网格。深度测试打开时比较是 `less`，近平面为 0。关掉后比较改为 `always`。
+/// `depth_write` 为假时颜色通道不写深度。阴影通道始终用 `less` 并写深度。
+/// 透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
 pub struct WebGPURenderer {
@@ -197,54 +226,30 @@ pub struct WebGPURenderer {
   surface_metalness : Array[@textures.Texture?]
   surface_alpha : Array[@textures.Texture?]
   surface_groups : Array[GpuBindGroup]
-  basic : CullPipelines
-  basic_read : CullPipelines
-  lambert : CullPipelines
-  lambert_read : CullPipelines
-  standard : CullPipelines
-  standard_read : CullPipelines
-  basic_instanced : CullPipelines
-  basic_instanced_read : CullPipelines
-  lambert_instanced : CullPipelines
-  lambert_instanced_read : CullPipelines
-  standard_instanced : CullPipelines
-  standard_instanced_read : CullPipelines
-  basic_blend : CullPipelines
-  basic_blend_read : CullPipelines
-  lambert_blend : CullPipelines
-  lambert_blend_read : CullPipelines
-  standard_blend : CullPipelines
-  standard_blend_read : CullPipelines
-  basic_instanced_blend : CullPipelines
-  basic_instanced_blend_read : CullPipelines
-  lambert_instanced_blend : CullPipelines
-  lambert_instanced_blend_read : CullPipelines
-  standard_instanced_blend : CullPipelines
-  standard_instanced_blend_read : CullPipelines
-  basic_lines : GpuRenderPipeline
-  basic_lines_read : GpuRenderPipeline
-  lambert_lines : GpuRenderPipeline
-  lambert_lines_read : GpuRenderPipeline
-  standard_lines : GpuRenderPipeline
-  standard_lines_read : GpuRenderPipeline
-  basic_lines_instanced : GpuRenderPipeline
-  basic_lines_instanced_read : GpuRenderPipeline
-  lambert_lines_instanced : GpuRenderPipeline
-  lambert_lines_instanced_read : GpuRenderPipeline
-  standard_lines_instanced : GpuRenderPipeline
-  standard_lines_instanced_read : GpuRenderPipeline
-  line_list : GpuRenderPipeline
-  line_list_read : GpuRenderPipeline
-  line_strip : GpuRenderPipeline
-  line_strip_read : GpuRenderPipeline
-  points : GpuRenderPipeline
-  points_read : GpuRenderPipeline
-  line_list_blend : GpuRenderPipeline
-  line_list_blend_read : GpuRenderPipeline
-  line_strip_blend : GpuRenderPipeline
-  line_strip_blend_read : GpuRenderPipeline
-  points_blend : GpuRenderPipeline
-  points_blend_read : GpuRenderPipeline
+  basic : DepthModes[CullPipelines]
+  lambert : DepthModes[CullPipelines]
+  standard : DepthModes[CullPipelines]
+  basic_instanced : DepthModes[CullPipelines]
+  lambert_instanced : DepthModes[CullPipelines]
+  standard_instanced : DepthModes[CullPipelines]
+  basic_blend : DepthModes[CullPipelines]
+  lambert_blend : DepthModes[CullPipelines]
+  standard_blend : DepthModes[CullPipelines]
+  basic_instanced_blend : DepthModes[CullPipelines]
+  lambert_instanced_blend : DepthModes[CullPipelines]
+  standard_instanced_blend : DepthModes[CullPipelines]
+  basic_lines : DepthModes[GpuRenderPipeline]
+  lambert_lines : DepthModes[GpuRenderPipeline]
+  standard_lines : DepthModes[GpuRenderPipeline]
+  basic_lines_instanced : DepthModes[GpuRenderPipeline]
+  lambert_lines_instanced : DepthModes[GpuRenderPipeline]
+  standard_lines_instanced : DepthModes[GpuRenderPipeline]
+  line_list : DepthModes[GpuRenderPipeline]
+  line_strip : DepthModes[GpuRenderPipeline]
+  points : DepthModes[GpuRenderPipeline]
+  line_list_blend : DepthModes[GpuRenderPipeline]
+  line_strip_blend : DepthModes[GpuRenderPipeline]
+  points_blend : DepthModes[GpuRenderPipeline]
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
@@ -473,6 +478,7 @@ fn unlit_pipeline(
   blend? : Bool = false,
   lines? : Bool = false,
   depth_write? : Bool = true,
+  depth_test? : Bool = true,
 ) -> GpuRenderPipeline {
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
@@ -513,7 +519,13 @@ fn unlit_pipeline(
     depth_stencil: Some({
       format: @gpu.GpuTextureFormat::DEPTH24PLUS,
       depth_write_enabled: Some(depth_write),
-      depth_compare: Some(@gpu.GpuCompareFunction::LESS),
+      depth_compare: Some(
+        if depth_test {
+          @gpu.GpuCompareFunction::LESS
+        } else {
+          @gpu.GpuCompareFunction::ALWAYS
+        },
+      ),
       stencil_front: None,
       stencil_back: None,
       stencil_read_mask: None,
@@ -585,6 +597,7 @@ fn color_pipeline(
   instanced : Bool,
   blend? : Bool = false,
   depth_write? : Bool = true,
+  depth_test? : Bool = true,
 ) -> GpuRenderPipeline {
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
@@ -663,7 +676,13 @@ fn color_pipeline(
     depth_stencil: Some({
       format: @gpu.GpuTextureFormat::DEPTH24PLUS,
       depth_write_enabled: Some(depth_write),
-      depth_compare: Some(@gpu.GpuCompareFunction::LESS),
+      depth_compare: Some(
+        if depth_test {
+          @gpu.GpuCompareFunction::LESS
+        } else {
+          @gpu.GpuCompareFunction::ALWAYS
+        },
+      ),
       stencil_front: None,
       stencil_back: None,
       stencil_read_mask: None,
@@ -706,6 +725,7 @@ fn cull_pipelines(
   instanced? : Bool = false,
   blend? : Bool = false,
   depth_write? : Bool = true,
+  depth_test? : Bool = true,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -717,6 +737,7 @@ fn cull_pipelines(
       instanced~,
       blend~,
       depth_write~,
+      depth_test~,
     ),
     back: unlit_pipeline(
       device,
@@ -727,6 +748,7 @@ fn cull_pipelines(
       instanced~,
       blend~,
       depth_write~,
+      depth_test~,
     ),
     double: unlit_pipeline(
       device,
@@ -737,6 +759,162 @@ fn cull_pipelines(
       instanced~,
       blend~,
       depth_write~,
+      depth_test~,
+    ),
+  }
+}
+
+///|
+fn mesh_depth_modes(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+  instanced? : Bool = false,
+  blend? : Bool = false,
+) -> DepthModes[CullPipelines] {
+  {
+    write: cull_pipelines(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      instanced~,
+      blend~,
+    ),
+    read: cull_pipelines(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      instanced~,
+      blend~,
+      depth_write=false,
+    ),
+    always: cull_pipelines(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      instanced~,
+      blend~,
+      depth_test=false,
+    ),
+    always_read: cull_pipelines(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      instanced~,
+      blend~,
+      depth_write=false,
+      depth_test=false,
+    ),
+  }
+}
+
+///|
+fn wire_depth_modes(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+  instanced? : Bool = false,
+) -> DepthModes[GpuRenderPipeline] {
+  {
+    write: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced~,
+      lines=true,
+    ),
+    read: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced~,
+      lines=true,
+      depth_write=false,
+    ),
+    always: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced~,
+      lines=true,
+      depth_test=false,
+    ),
+    always_read: unlit_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced~,
+      lines=true,
+      depth_write=false,
+      depth_test=false,
+    ),
+  }
+}
+
+///|
+fn stroke_depth_modes(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+  topology : @gpu.GpuPrimitiveTopology,
+  instanced : Bool,
+  blend? : Bool = false,
+) -> DepthModes[GpuRenderPipeline] {
+  {
+    write: color_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      topology,
+      instanced,
+      blend~,
+    ),
+    read: color_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      topology,
+      instanced,
+      blend~,
+      depth_write=false,
+    ),
+    always: color_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      topology,
+      instanced,
+      blend~,
+      depth_test=false,
+    ),
+    always_read: color_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      topology,
+      instanced,
+      blend~,
+      depth_write=false,
+      depth_test=false,
     ),
   }
 }
@@ -1366,121 +1544,52 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     surface_metalness: [],
     surface_alpha: [],
     surface_groups: [],
-    basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
-    basic_read: cull_pipelines(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      depth_write=false,
-    ),
-    lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
-    lambert_read: cull_pipelines(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      depth_write=false,
-    ),
-    standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
-    standard_read: cull_pipelines(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      depth_write=false,
-    ),
-    basic_instanced: cull_pipelines(
+    basic: mesh_depth_modes(device, basic_shader, pipeline_layout, format),
+    lambert: mesh_depth_modes(device, lambert_shader, pipeline_layout, format),
+    standard: mesh_depth_modes(device, standard_shader, pipeline_layout, format),
+    basic_instanced: mesh_depth_modes(
       device,
       basic_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
     ),
-    basic_instanced_read: cull_pipelines(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      depth_write=false,
-    ),
-    lambert_instanced: cull_pipelines(
+    lambert_instanced: mesh_depth_modes(
       device,
       lambert_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
     ),
-    lambert_instanced_read: cull_pipelines(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      depth_write=false,
-    ),
-    standard_instanced: cull_pipelines(
+    standard_instanced: mesh_depth_modes(
       device,
       standard_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
     ),
-    standard_instanced_read: cull_pipelines(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      depth_write=false,
-    ),
-    basic_blend: cull_pipelines(
+    basic_blend: mesh_depth_modes(
       device,
       basic_shader,
       pipeline_layout,
       format,
       blend=true,
     ),
-    basic_blend_read: cull_pipelines(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      depth_write=false,
-    ),
-    lambert_blend: cull_pipelines(
+    lambert_blend: mesh_depth_modes(
       device,
       lambert_shader,
       pipeline_layout,
       format,
       blend=true,
     ),
-    lambert_blend_read: cull_pipelines(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      depth_write=false,
-    ),
-    standard_blend: cull_pipelines(
+    standard_blend: mesh_depth_modes(
       device,
       standard_shader,
       pipeline_layout,
       format,
       blend=true,
     ),
-    standard_blend_read: cull_pipelines(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      depth_write=false,
-    ),
-    basic_instanced_blend: cull_pipelines(
+    basic_instanced_blend: mesh_depth_modes(
       device,
       basic_instanced_shader,
       pipeline_layout,
@@ -1488,158 +1597,51 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
-    basic_instanced_blend_read: cull_pipelines(
+    lambert_instanced_blend: mesh_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    standard_instanced_blend: mesh_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    basic_lines: wire_depth_modes(device, basic_shader, pipeline_layout, format),
+    lambert_lines: wire_depth_modes(
+      device, lambert_shader, pipeline_layout, format,
+    ),
+    standard_lines: wire_depth_modes(
+      device, standard_shader, pipeline_layout, format,
+    ),
+    basic_lines_instanced: wire_depth_modes(
       device,
       basic_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
-      blend=true,
-      depth_write=false,
     ),
-    lambert_instanced_blend: cull_pipelines(
+    lambert_lines_instanced: wire_depth_modes(
       device,
       lambert_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
-      blend=true,
     ),
-    lambert_instanced_blend_read: cull_pipelines(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-      depth_write=false,
-    ),
-    standard_instanced_blend: cull_pipelines(
+    standard_lines_instanced: wire_depth_modes(
       device,
       standard_instanced_shader,
       pipeline_layout,
       format,
       instanced=true,
-      blend=true,
     ),
-    standard_instanced_blend_read: cull_pipelines(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-      depth_write=false,
-    ),
-    basic_lines: unlit_pipeline(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-    ),
-    basic_lines_read: unlit_pipeline(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-      depth_write=false,
-    ),
-    lambert_lines: unlit_pipeline(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-    ),
-    lambert_lines_read: unlit_pipeline(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-      depth_write=false,
-    ),
-    standard_lines: unlit_pipeline(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-    ),
-    standard_lines_read: unlit_pipeline(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      lines=true,
-      depth_write=false,
-    ),
-    basic_lines_instanced: unlit_pipeline(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-    ),
-    basic_lines_instanced_read: unlit_pipeline(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-      depth_write=false,
-    ),
-    lambert_lines_instanced: unlit_pipeline(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-    ),
-    lambert_lines_instanced_read: unlit_pipeline(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-      depth_write=false,
-    ),
-    standard_lines_instanced: unlit_pipeline(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-    ),
-    standard_lines_instanced_read: unlit_pipeline(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced=true,
-      lines=true,
-      depth_write=false,
-    ),
-    line_list: color_pipeline(
+    line_list: stroke_depth_modes(
       device,
       line_shader,
       color_layout,
@@ -1647,16 +1649,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::LINE_LIST,
       false,
     ),
-    line_list_read: color_pipeline(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_LIST,
-      false,
-      depth_write=false,
-    ),
-    line_strip: color_pipeline(
+    line_strip: stroke_depth_modes(
       device,
       line_shader,
       color_layout,
@@ -1664,16 +1657,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::LINE_STRIP,
       false,
     ),
-    line_strip_read: color_pipeline(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_STRIP,
-      false,
-      depth_write=false,
-    ),
-    points: color_pipeline(
+    points: stroke_depth_modes(
       device,
       points_shader,
       color_layout,
@@ -1681,16 +1665,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
     ),
-    points_read: color_pipeline(
-      device,
-      points_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
-      true,
-      depth_write=false,
-    ),
-    line_list_blend: color_pipeline(
+    line_list_blend: stroke_depth_modes(
       device,
       line_shader,
       color_layout,
@@ -1699,17 +1674,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
-    line_list_blend_read: color_pipeline(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_LIST,
-      false,
-      blend=true,
-      depth_write=false,
-    ),
-    line_strip_blend: color_pipeline(
+    line_strip_blend: stroke_depth_modes(
       device,
       line_shader,
       color_layout,
@@ -1718,17 +1683,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
-    line_strip_blend_read: color_pipeline(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_STRIP,
-      false,
-      blend=true,
-      depth_write=false,
-    ),
-    points_blend: color_pipeline(
+    points_blend: stroke_depth_modes(
       device,
       points_shader,
       color_layout,
@@ -1736,16 +1691,6 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
       blend=true,
-    ),
-    points_blend_read: color_pipeline(
-      device,
-      points_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
-      true,
-      blend=true,
-      depth_write=false,
     ),
     wave: wave.1,
     wave_layout: wave.0,
@@ -1806,34 +1751,22 @@ fn WebGPURenderer::wire_pipeline(
   shading : @constants.Shading,
   instanced : Bool,
   depth_write : Bool,
+  depth_test : Bool,
 ) -> GpuRenderPipeline {
-  if instanced {
-    if depth_write {
-      match shading {
-        @constants.Basic => self.basic_lines_instanced
-        @constants.Lambert => self.lambert_lines_instanced
-        @constants.Standard => self.standard_lines_instanced
-      }
-    } else {
-      match shading {
-        @constants.Basic => self.basic_lines_instanced_read
-        @constants.Lambert => self.lambert_lines_instanced_read
-        @constants.Standard => self.standard_lines_instanced_read
-      }
+  let modes = if instanced {
+    match shading {
+      @constants.Basic => self.basic_lines_instanced
+      @constants.Lambert => self.lambert_lines_instanced
+      @constants.Standard => self.standard_lines_instanced
     }
-  } else if depth_write {
+  } else {
     match shading {
       @constants.Basic => self.basic_lines
       @constants.Lambert => self.lambert_lines
       @constants.Standard => self.standard_lines
     }
-  } else {
-    match shading {
-      @constants.Basic => self.basic_lines_read
-      @constants.Lambert => self.lambert_lines_read
-      @constants.Standard => self.standard_lines_read
-    }
   }
+  modes.pick(depth_write, depth_test)
 }
 
 ///|
@@ -1872,8 +1805,9 @@ fn WebGPURenderer::pipeline(
   side : @constants.Side,
   blend : Bool,
   depth_write : Bool,
+  depth_test : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, false, blend, depth_write)
+  self.cull_group(shading, side, false, blend, depth_write, depth_test)
 }
 
 ///|
@@ -1883,8 +1817,9 @@ fn WebGPURenderer::instanced_pipeline(
   side : @constants.Side,
   blend : Bool,
   depth_write : Bool,
+  depth_test : Bool,
 ) -> GpuRenderPipeline {
-  self.cull_group(shading, side, true, blend, depth_write)
+  self.cull_group(shading, side, true, blend, depth_write, depth_test)
 }
 
 ///|
@@ -1895,51 +1830,65 @@ fn WebGPURenderer::cull_group(
   instanced : Bool,
   blend : Bool,
   depth_write : Bool,
+  depth_test : Bool,
 ) -> GpuRenderPipeline {
-  let group = if blend {
-    if depth_write {
-      match (shading, instanced) {
-        (@constants.Basic, false) => self.basic_blend
-        (@constants.Lambert, false) => self.lambert_blend
-        (@constants.Standard, false) => self.standard_blend
-        (@constants.Basic, true) => self.basic_instanced_blend
-        (@constants.Lambert, true) => self.lambert_instanced_blend
-        (@constants.Standard, true) => self.standard_instanced_blend
+  let modes = if blend {
+    if instanced {
+      match shading {
+        @constants.Basic => self.basic_instanced_blend
+        @constants.Lambert => self.lambert_instanced_blend
+        @constants.Standard => self.standard_instanced_blend
       }
     } else {
-      match (shading, instanced) {
-        (@constants.Basic, false) => self.basic_blend_read
-        (@constants.Lambert, false) => self.lambert_blend_read
-        (@constants.Standard, false) => self.standard_blend_read
-        (@constants.Basic, true) => self.basic_instanced_blend_read
-        (@constants.Lambert, true) => self.lambert_instanced_blend_read
-        (@constants.Standard, true) => self.standard_instanced_blend_read
+      match shading {
+        @constants.Basic => self.basic_blend
+        @constants.Lambert => self.lambert_blend
+        @constants.Standard => self.standard_blend
       }
     }
-  } else if depth_write {
-    match (shading, instanced) {
-      (@constants.Basic, false) => self.basic
-      (@constants.Lambert, false) => self.lambert
-      (@constants.Standard, false) => self.standard
-      (@constants.Basic, true) => self.basic_instanced
-      (@constants.Lambert, true) => self.lambert_instanced
-      (@constants.Standard, true) => self.standard_instanced
+  } else if instanced {
+    match shading {
+      @constants.Basic => self.basic_instanced
+      @constants.Lambert => self.lambert_instanced
+      @constants.Standard => self.standard_instanced
     }
   } else {
-    match (shading, instanced) {
-      (@constants.Basic, false) => self.basic_read
-      (@constants.Lambert, false) => self.lambert_read
-      (@constants.Standard, false) => self.standard_read
-      (@constants.Basic, true) => self.basic_instanced_read
-      (@constants.Lambert, true) => self.lambert_instanced_read
-      (@constants.Standard, true) => self.standard_instanced_read
+    match shading {
+      @constants.Basic => self.basic
+      @constants.Lambert => self.lambert
+      @constants.Standard => self.standard
     }
   }
+  let group = modes.pick(depth_write, depth_test)
   match side {
     @constants.Front => group.front
     @constants.Back => group.back
     @constants.Double => group.double
   }
+}
+
+///|
+fn WebGPURenderer::stroke_pipeline(
+  self : WebGPURenderer,
+  kind : @core.PrimitiveKind,
+  blend : Bool,
+  depth_write : Bool,
+  depth_test : Bool,
+) -> GpuRenderPipeline {
+  let modes = if blend {
+    match kind {
+      @core.PrimitiveKind::Points => self.points_blend
+      @core.PrimitiveKind::Line => self.line_strip_blend
+      @core.PrimitiveKind::LineSegments => self.line_list_blend
+    }
+  } else {
+    match kind {
+      @core.PrimitiveKind::Points => self.points
+      @core.PrimitiveKind::Line => self.line_strip
+      @core.PrimitiveKind::LineSegments => self.line_list
+    }
+  }
+  modes.pick(depth_write, depth_test)
 }
 
 ///|
@@ -4053,7 +4002,12 @@ fn WebGPURenderer::draw_meshes(
         }
         pass.set_pipeline(
           if lines {
-            self.wire_pipeline(item.shading, batch is Some(_), item.depth_write)
+            self.wire_pipeline(
+              item.shading,
+              batch is Some(_),
+              item.depth_write,
+              item.depth_test,
+            )
           } else {
             match batch {
               Some(_) =>
@@ -4062,9 +4016,16 @@ fn WebGPURenderer::draw_meshes(
                   item.side,
                   blend,
                   item.depth_write,
+                  item.depth_test,
                 )
               None =>
-                self.pipeline(item.shading, item.side, blend, item.depth_write)
+                self.pipeline(
+                  item.shading,
+                  item.side,
+                  blend,
+                  item.depth_write,
+                  item.depth_test,
+                )
             }
           },
         )
@@ -4235,17 +4196,12 @@ fn WebGPURenderer::draw_strokes(
             let instances = self.point_instances(geometry)
             if geometry.point_count > 0 {
               pass.set_pipeline(
-                if blend {
-                  if item.depth_write {
-                    self.points_blend
-                  } else {
-                    self.points_blend_read
-                  }
-                } else if item.depth_write {
-                  self.points
-                } else {
-                  self.points_read
-                },
+                self.stroke_pipeline(
+                  item.kind,
+                  blend,
+                  item.depth_write,
+                  item.depth_test,
+                ),
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
               pass.set_vertex_buffer(1U, Some(instances), None, None)
@@ -4260,33 +4216,23 @@ fn WebGPURenderer::draw_strokes(
           @core.PrimitiveKind::Line =>
             self.draw_lines(
               pass,
-              if blend {
-                if item.depth_write {
-                  self.line_strip_blend
-                } else {
-                  self.line_strip_blend_read
-                }
-              } else if item.depth_write {
-                self.line_strip
-              } else {
-                self.line_strip_read
-              },
+              self.stroke_pipeline(
+                item.kind,
+                blend,
+                item.depth_write,
+                item.depth_test,
+              ),
               geometry,
             )
           @core.PrimitiveKind::LineSegments =>
             self.draw_lines(
               pass,
-              if blend {
-                if item.depth_write {
-                  self.line_list_blend
-                } else {
-                  self.line_list_blend_read
-                }
-              } else if item.depth_write {
-                self.line_list
-              } else {
-                self.line_list_read
-              },
+              self.stroke_pipeline(
+                item.kind,
+                blend,
+                item.depth_write,
+                item.depth_test,
+              ),
               geometry,
             )
         }

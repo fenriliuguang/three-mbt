@@ -1024,6 +1024,48 @@ test "depth write defaults on and can be turned off" {
 }
 
 ///|
+test "depth test defaults on and can be turned off" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let kept = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(scene.add(kept))
+  let quiet = @materials.MeshLambertMaterial::new()
+  assert_eq(quiet.material.depth_test, true)
+  quiet.material.depth_test = false
+  let mesh = @objects.Mesh::new(box.geometry, quiet.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].depth_test, true)
+  assert_eq(drawn[0].depth_write, true)
+  assert_eq(drawn[1].depth_test, false)
+  assert_eq(drawn[1].depth_write, true)
+  quiet.material.wireframe = true
+  mesh.refresh()
+  let wires = @common.collect_wireframe(scene.node)
+  assert_eq(wires.length(), 1)
+  assert_eq(wires[0].depth_test, false)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  assert_eq(points_material.depth_test, true)
+  points_material.depth_test = false
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  assert_eq(line_material.depth_test, true)
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes.length(), 2)
+  assert_eq(strokes[0].depth_test, false)
+  assert_eq(strokes[0].depth_write, true)
+  assert_eq(strokes[1].depth_test, true)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

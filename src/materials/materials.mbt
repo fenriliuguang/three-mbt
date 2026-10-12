@@ -18,8 +18,9 @@ pub(all) enum MaterialKind {
 /// `alpha_map` 的绿色通道乘在片元 alpha 上，乘完再做 `alpha_test`。Basic、Lambert、Standard 都采样。没有贴图时绑白纹理。
 /// `flat_shading` 默认关闭。打开后 Lambert 和 Standard 忽略顶点法线，改用视图空间位置的屏幕导数。
 /// `depth_write` 默认打开。关掉后颜色通道不写深度，阴影通道仍写深度。
-/// 改 `side`、`alpha_test`、`flat_shading`、`depth_write`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
+/// `depth_test` 默认打开，颜色通道用 `less` 比较。关掉后比较改为 `always`，片段始终通过深度测试。`depth_write` 不跟着关。阴影通道仍用 `less` 并写深度。
+/// 改 `side`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -33,6 +34,7 @@ pub(all) struct Material {
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool
+  mut depth_test : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -57,6 +59,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     alpha_test: 0.0,
     flat_shading: false,
     depth_write: true,
+    depth_test: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -94,6 +97,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     alpha_test: 0.0,
     flat_shading: false,
     depth_write: true,
+    depth_test: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -137,6 +141,7 @@ pub fn Material::standard(
     alpha_test: 0.0,
     flat_shading: false,
     depth_write: true,
+    depth_test: true,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -183,6 +188,7 @@ pub(all) struct PointsMaterial {
   mut transparent : Bool
   mut fog : Bool
   mut depth_write : Bool
+  mut depth_test : Bool
 }
 
 ///|
@@ -199,6 +205,7 @@ pub fn PointsMaterial::new(
     transparent: false,
     fog: true,
     depth_write: true,
+    depth_test: true,
   }
 }
 
@@ -211,6 +218,7 @@ pub(all) struct LineBasicMaterial {
   mut transparent : Bool
   mut fog : Bool
   mut depth_write : Bool
+  mut depth_test : Bool
 }
 
 ///|
@@ -221,5 +229,6 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     transparent: false,
     fog: true,
     depth_write: true,
+    depth_test: true,
   }
 }
