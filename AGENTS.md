@@ -25,3 +25,7 @@ MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](
 ## 提交
 
 仓库尚未正式发版。云 Agent 在 `main` 上提交并 `git push origin main`，不建功能分支、不开 Pull Request。步骤见 [.cursor/skills/direct-to-main/SKILL.md](.cursor/skills/direct-to-main/SKILL.md)。
+
+## 定时推进
+
+用户指定截止时间后，没到点就开启下一刀，不判断这一刀能不能在截止前做完。规则见 [.cursor/skills/timed-advance/SKILL.md](.cursor/skills/timed-advance/SKILL.md)。
