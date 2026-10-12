@@ -40,6 +40,7 @@ priv struct Mat {
   opacity : Double
   transparent : Bool
   double_sided : Bool
+  unlit : Bool
 }
 
 ///|
@@ -100,7 +101,7 @@ pub(all) struct Gltf {
 /// 缓冲来自 `data:` URI 的 base64。第 0 个缓冲没有 URI 时，用 `bin` 填上。
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0` 和索引。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
-/// 再带上粗糙度、金属度和 `doubleSided`。
+/// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
 /// `KHR_lights_punctual` 的平行光会挂到节点上。点光、聚光、贴图、蒙皮和形变先不读。
@@ -391,6 +392,7 @@ fn default_mat() -> Mat {
     opacity: 1.0,
     transparent: false,
     double_sided: false,
+    unlit: false,
   }
 }
 
@@ -437,6 +439,16 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
     opacity,
     transparent,
     double_sided: opt_bool(obj, "doubleSided", false),
+    unlit: material_unlit(obj),
+  }
+}
+
+///|
+/// r186: `getMaterialType` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L808
+fn material_unlit(obj : Map[String, Json]) -> Bool raise GltfError {
+  match extension_block(obj, "KHR_materials_unlit") {
+    None => false
+    Some(_) => true
   }
 }
 
@@ -822,14 +834,18 @@ fn apply_transform(node : @core.Object3D, desc : NodeDesc) -> Unit {
 
 ///|
 fn mesh_from(prim : Prim) -> @objects.Mesh {
-  let standard = @materials.MeshStandardMaterial::new(
-    roughness=prim.mat.roughness,
-    metalness=prim.mat.metalness,
-  )
-  ignore(standard.material.color.set_rgb(prim.mat.r, prim.mat.g, prim.mat.b))
-  standard.material.opacity = prim.mat.opacity
-  standard.material.transparent = prim.mat.transparent
-  let mesh = @objects.Mesh::new(prim.geometry, standard.material)
+  let material = if prim.mat.unlit {
+    @materials.MeshBasicMaterial::new().material
+  } else {
+    @materials.MeshStandardMaterial::new(
+      roughness=prim.mat.roughness,
+      metalness=prim.mat.metalness,
+    ).material
+  }
+  ignore(material.color.set_rgb(prim.mat.r, prim.mat.g, prim.mat.b))
+  material.opacity = prim.mat.opacity
+  material.transparent = prim.mat.transparent
+  let mesh = @objects.Mesh::new(prim.geometry, material)
   if prim.mat.double_sided {
     mesh.set_side(@constants.Side::Double)
   }

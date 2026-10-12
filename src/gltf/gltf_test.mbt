@@ -312,3 +312,18 @@ test "a glTF point light is rejected" {
   }
   assert_eq(failed, true)
 }
+
+///|
+test "an unlit glTF material becomes a basic mesh" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"name":"flat","mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"material":0}]}],"materials":[{"extensions":{"KHR_materials_unlit":{}},"pbrMetallicRoughness":{"baseColorFactor":[0.5,0.25,0,1],"metallicFactor":1,"roughnessFactor":0}}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
+  match must(@gltf.parse(text).scene.node, "flat").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.shading is @constants.Shading::Basic, true)
+      assert_eq(binding.color.r, 0.5)
+      assert_eq(binding.color.g, 0.25)
+      assert_eq(binding.color.b, 0.0)
+    }
+  }
+}
