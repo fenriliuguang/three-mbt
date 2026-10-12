@@ -2529,6 +2529,7 @@ fn WebGPURenderer::bloom_color(
   self : WebGPURenderer,
   width : UInt,
   height : UInt,
+  format : GpuTextureFormat,
   label : String,
 ) -> (GpuTexture, GpuTextureView) {
   let texture = self.device.create_texture({
@@ -2536,7 +2537,7 @@ fn WebGPURenderer::bloom_color(
     mip_level_count: Some(1U),
     sample_count: Some(1U),
     dimension: Some(@gpu.GpuTextureDimension::D2),
-    format: self.format,
+    format,
     usage: flags_color(),
     view_formats: None,
     texture_binding_view_dimension: None,
@@ -2560,7 +2561,12 @@ fn WebGPURenderer::ensure_bloom(
       }
     None => ()
   }
-  let bright = self.bloom_color(width, height, "bloom-bright")
+  let bright = self.bloom_color(
+    width,
+    height,
+    @gpu.GpuTextureFormat::RGBA16FLOAT,
+    "bloom-bright",
+  )
   let levels : Array[BloomLevel] = []
   let mut level = 0
   let mut mip_w = width.reinterpret_as_int()
@@ -2574,8 +2580,18 @@ fn WebGPURenderer::ensure_bloom(
   while level < 5 {
     let wu = mip_w.reinterpret_as_uint()
     let hu = mip_h.reinterpret_as_uint()
-    let horizontal = self.bloom_color(wu, hu, "bloom-h")
-    let vertical = self.bloom_color(wu, hu, "bloom-v")
+    let horizontal = self.bloom_color(
+      wu,
+      hu,
+      @gpu.GpuTextureFormat::RGBA16FLOAT,
+      "bloom-h",
+    )
+    let vertical = self.bloom_color(
+      wu,
+      hu,
+      @gpu.GpuTextureFormat::RGBA16FLOAT,
+      "bloom-v",
+    )
     levels.push({
       width: wu,
       height: hu,
@@ -2594,8 +2610,18 @@ fn WebGPURenderer::ensure_bloom(
     }
     level = level + 1
   }
-  let acc = self.bloom_color(width, height, "bloom-acc")
-  let acc2 = self.bloom_color(width, height, "bloom-acc2")
+  let acc = self.bloom_color(
+    width,
+    height,
+    @gpu.GpuTextureFormat::RGBA16FLOAT,
+    "bloom-acc",
+  )
+  let acc2 = self.bloom_color(
+    width,
+    height,
+    @gpu.GpuTextureFormat::RGBA16FLOAT,
+    "bloom-acc2",
+  )
   let pyramid : BloomPyramid = {
     width,
     height,
@@ -2874,8 +2900,8 @@ fn WebGPURenderer::bloom_to(
 ///|
 /// 高通后做五级可分离模糊，核半径 6、10、14、18、22，再把光加回原图并 `present`。
 /// 第 0 级是全分辨率，之后每级对半。每次提交单独发生，采样目标和渲染目标分开。
-/// 窗口尺寸为 0 时什么也不做。半精度目标还没做。
-/// r186: `updateBefore` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L348 ; `luminosityHighPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L12
+/// 窗口尺寸为 0 时什么也不做。中间纹理是 `rgba16float`，场景和交换链仍用画布格式。
+/// r186: `updateBefore` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L348 ; `HalfFloatType` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L164
 pub fn WebGPURenderer::bloom(
   self : WebGPURenderer,
   source : @textures.RenderTarget,
@@ -2931,8 +2957,8 @@ fn WebGPURenderer::ensure_chain(
       }
     None => ()
   }
-  let a = self.bloom_color(width, height, "compose-a")
-  let b = self.bloom_color(width, height, "compose-b")
+  let a = self.bloom_color(width, height, self.format, "compose-a")
+  let b = self.bloom_color(width, height, self.format, "compose-b")
   let buffers : ChainBuffers = {
     width,
     height,

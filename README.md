@@ -148,7 +148,7 @@ sh scripts/build-tone.sh
 
 Copy `target/tone.component.wasm` to `examples/apps/tone/tone.component.wasm`, then `cargo xtask run-demo --name tone`. `moon run src/examples/tone/app` does not open a window.
 
-The bloom sample draws a Lambert cube into a color target, then adds a five-level glow at threshold 0.2. The smallest level is tinted `(0.5, 1, 0.25)`:
+The bloom sample draws a Lambert cube into a color target, then adds a five-level glow at threshold 0.2. Bloom intermediates are `rgba16float`. The smallest level is tinted `(0.5, 1, 0.25)`:
 
 ```sh
 sh scripts/build-bloom.sh

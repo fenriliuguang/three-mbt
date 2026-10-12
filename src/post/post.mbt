@@ -645,7 +645,7 @@ pub fn gaussian_coefficient(index : Int, kernel_radius : Int) -> Double {
 
 ///|
 /// 泛光。默认强度 1、半径 0、阈值 0、过渡 0.01，与 r186 `BloomNode` 相同。
-/// 五级核半径是 6、10、14、18、22。第 0 级用全分辨率，之后每级对半。每级染色默认白色。半精度目标还没做。
+/// 五级核半径是 6、10、14、18、22。第 0 级用全分辨率，之后每级对半。每级染色默认白色。中间结果用半精度浮点。
 /// r186: `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
 pub(all) struct BloomPass {
   mut strength : Double
