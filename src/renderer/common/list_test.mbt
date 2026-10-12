@@ -1102,6 +1102,39 @@ test "depth func defaults to less-equal and reaches the render list" {
 }
 
 ///|
+test "color write defaults on and can be turned off" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let kept = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(scene.add(kept))
+  let quiet = @materials.MeshLambertMaterial::new()
+  assert_eq(quiet.material.color_write, true)
+  quiet.material.color_write = false
+  let mesh = @objects.Mesh::new(box.geometry, quiet.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].color_write, true)
+  assert_eq(drawn[1].color_write, false)
+  assert_eq(drawn[1].depth_write, true)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  assert_eq(points_material.color_write, true)
+  points_material.color_write = false
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes[0].color_write, false)
+  assert_eq(strokes[1].color_write, true)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

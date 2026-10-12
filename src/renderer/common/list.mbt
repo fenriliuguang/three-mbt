@@ -22,6 +22,7 @@ pub(all) struct RenderItem {
   depth_write : Bool
   depth_test : Bool
   depth_func : @constants.DepthFunc
+  color_write : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -68,6 +69,7 @@ pub fn collect_opaque(
                 depth_write: binding.depth_write,
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
+                color_write: binding.color_write,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -114,6 +116,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 depth_write: binding.depth_write,
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
+                color_write: binding.color_write,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -165,6 +168,7 @@ pub fn collect_wireframe(
                 depth_write: binding.depth_write,
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
+                color_write: binding.color_write,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -238,6 +242,7 @@ pub(all) struct PrimitiveItem {
   depth_write : Bool
   depth_test : Bool
   depth_func : @constants.DepthFunc
+  color_write : Bool
 }
 
 ///|
@@ -269,6 +274,7 @@ pub fn collect_primitives(
             depth_write: binding.depth_write,
             depth_test: binding.depth_test,
             depth_func: binding.depth_func,
+            color_write: binding.color_write,
           })
         }
     }
@@ -304,6 +310,7 @@ pub fn collect_transparent_primitives(
             depth_write: binding.depth_write,
             depth_test: binding.depth_test,
             depth_func: binding.depth_func,
+            color_write: binding.color_write,
           })
         }
     }
@@ -529,6 +536,7 @@ pub fn collect_transparent(
                 depth_write: binding.depth_write,
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
+                color_write: binding.color_write,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,

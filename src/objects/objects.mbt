@@ -82,6 +82,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     depth_write: self.material.depth_write,
     depth_test: self.material.depth_test,
     depth_func: self.material.depth_func,
+    color_write: self.material.color_write,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
@@ -139,6 +140,7 @@ fn primitive_binding(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> @core.PrimitiveBinding {
   {
     geometry,
@@ -152,6 +154,7 @@ fn primitive_binding(
     depth_write,
     depth_test,
     depth_func,
+    color_write,
   }
 }
 
@@ -198,6 +201,7 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.depth_write,
       self.material.depth_test,
       self.material.depth_func,
+      self.material.color_write,
     ),
   )
 }
@@ -265,6 +269,7 @@ pub fn Line::refresh(self : Line) -> Unit {
       self.material.depth_write,
       self.material.depth_test,
       self.material.depth_func,
+      self.material.color_write,
     ),
   )
 }
@@ -332,6 +337,7 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.depth_write,
       self.material.depth_test,
       self.material.depth_func,
+      self.material.color_write,
     ),
   )
 }
@@ -474,6 +480,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     depth_write: self.material.depth_write,
     depth_test: self.material.depth_test,
     depth_func: self.material.depth_func,
+    color_write: self.material.color_write,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,

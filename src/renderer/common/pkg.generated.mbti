@@ -106,6 +106,7 @@ pub(all) struct PrimitiveItem {
   depth_write : Bool
   depth_test : Bool
   depth_func : @constants.DepthFunc
+  color_write : Bool
 }
 
 pub(all) struct RenderItem {
@@ -124,6 +125,7 @@ pub(all) struct RenderItem {
   depth_write : Bool
   depth_test : Bool
   depth_func : @constants.DepthFunc
+  color_write : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?

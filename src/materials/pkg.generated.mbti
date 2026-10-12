@@ -20,6 +20,7 @@ pub(all) struct LineBasicMaterial {
   mut depth_write : Bool
   mut depth_test : Bool
   mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
 }
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
 
@@ -38,6 +39,7 @@ pub(all) struct Material {
   mut depth_write : Bool
   mut depth_test : Bool
   mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -82,6 +84,7 @@ pub(all) struct PointsMaterial {
   mut depth_write : Bool
   mut depth_test : Bool
   mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
 }
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 

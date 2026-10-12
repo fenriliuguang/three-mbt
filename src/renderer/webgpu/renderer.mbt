@@ -182,7 +182,7 @@ struct CullPipelines {
 ///|
 /// 颜色通道的深度状态。前两项是测试关掉时的写与不写，比较固定为 `always`。
 /// 后面每项深度函数占两项，先写再不写，顺序与 `DepthFunc::to_int` 相同。
-struct DepthModes[T] {
+priv struct DepthModes[T] {
   modes : Array[T]
 }
 
@@ -199,8 +199,27 @@ fn[T] DepthModes::pick(
 }
 
 ///|
+/// 颜色写入打开和关掉各一套深度状态。关掉时片段写掩码为 0。
+struct ColorModes[T] {
+  write : DepthModes[T]
+  quiet : DepthModes[T]
+}
+
+///|
+fn[T] ColorModes::pick(
+  self : ColorModes[T],
+  depth_write : Bool,
+  depth_test : Bool,
+  depth_func : @constants.DepthFunc,
+  color_write : Bool,
+) -> T {
+  let modes = if color_write { self.write } else { self.quiet }
+  modes.pick(depth_write, depth_test, depth_func)
+}
+
+///|
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
-/// `depth_write` 为假时颜色通道不写深度。阴影通道始终用 `less` 并写深度，不看 `depth_func`。
+/// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。阴影通道始终用 `less` 并写深度，不看 `depth_func`，也没有颜色目标。
 /// 透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
@@ -217,30 +236,30 @@ pub struct WebGPURenderer {
   surface_metalness : Array[@textures.Texture?]
   surface_alpha : Array[@textures.Texture?]
   surface_groups : Array[GpuBindGroup]
-  basic : DepthModes[CullPipelines]
-  lambert : DepthModes[CullPipelines]
-  standard : DepthModes[CullPipelines]
-  basic_instanced : DepthModes[CullPipelines]
-  lambert_instanced : DepthModes[CullPipelines]
-  standard_instanced : DepthModes[CullPipelines]
-  basic_blend : DepthModes[CullPipelines]
-  lambert_blend : DepthModes[CullPipelines]
-  standard_blend : DepthModes[CullPipelines]
-  basic_instanced_blend : DepthModes[CullPipelines]
-  lambert_instanced_blend : DepthModes[CullPipelines]
-  standard_instanced_blend : DepthModes[CullPipelines]
-  basic_lines : DepthModes[GpuRenderPipeline]
-  lambert_lines : DepthModes[GpuRenderPipeline]
-  standard_lines : DepthModes[GpuRenderPipeline]
-  basic_lines_instanced : DepthModes[GpuRenderPipeline]
-  lambert_lines_instanced : DepthModes[GpuRenderPipeline]
-  standard_lines_instanced : DepthModes[GpuRenderPipeline]
-  line_list : DepthModes[GpuRenderPipeline]
-  line_strip : DepthModes[GpuRenderPipeline]
-  points : DepthModes[GpuRenderPipeline]
-  line_list_blend : DepthModes[GpuRenderPipeline]
-  line_strip_blend : DepthModes[GpuRenderPipeline]
-  points_blend : DepthModes[GpuRenderPipeline]
+  basic : ColorModes[CullPipelines]
+  lambert : ColorModes[CullPipelines]
+  standard : ColorModes[CullPipelines]
+  basic_instanced : ColorModes[CullPipelines]
+  lambert_instanced : ColorModes[CullPipelines]
+  standard_instanced : ColorModes[CullPipelines]
+  basic_blend : ColorModes[CullPipelines]
+  lambert_blend : ColorModes[CullPipelines]
+  standard_blend : ColorModes[CullPipelines]
+  basic_instanced_blend : ColorModes[CullPipelines]
+  lambert_instanced_blend : ColorModes[CullPipelines]
+  standard_instanced_blend : ColorModes[CullPipelines]
+  basic_lines : ColorModes[GpuRenderPipeline]
+  lambert_lines : ColorModes[GpuRenderPipeline]
+  standard_lines : ColorModes[GpuRenderPipeline]
+  basic_lines_instanced : ColorModes[GpuRenderPipeline]
+  lambert_lines_instanced : ColorModes[GpuRenderPipeline]
+  standard_lines_instanced : ColorModes[GpuRenderPipeline]
+  line_list : ColorModes[GpuRenderPipeline]
+  line_strip : ColorModes[GpuRenderPipeline]
+  points : ColorModes[GpuRenderPipeline]
+  line_list_blend : ColorModes[GpuRenderPipeline]
+  line_strip_blend : ColorModes[GpuRenderPipeline]
+  points_blend : ColorModes[GpuRenderPipeline]
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
@@ -470,7 +489,13 @@ fn unlit_pipeline(
   lines? : Bool = false,
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write? : Bool = true,
 ) -> GpuRenderPipeline {
+  let color_mask : @gpu.GpuColorWrite? = if color_write {
+    None
+  } else {
+    Some(@gpu.GpuColorWrite::default())
+  }
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
       color: {
@@ -521,7 +546,7 @@ fn unlit_pipeline(
     }),
     multisample: None,
     fragment: Some({
-      targets: [Some({ format, blend: blend_state, write_mask: None, })],
+      targets: [Some({ format, blend: blend_state, write_mask: color_mask, })],
       module_: shader,
       entry_point: Some("fs"),
       constants: None,
@@ -583,7 +608,13 @@ fn color_pipeline(
   blend? : Bool = false,
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write? : Bool = true,
 ) -> GpuRenderPipeline {
+  let color_mask : @gpu.GpuColorWrite? = if color_write {
+    None
+  } else {
+    Some(@gpu.GpuColorWrite::default())
+  }
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
       color: {
@@ -672,7 +703,7 @@ fn color_pipeline(
     }),
     multisample: None,
     fragment: Some({
-      targets: [Some({ format, blend: blend_state, write_mask: None, })],
+      targets: [Some({ format, blend: blend_state, write_mask: color_mask, })],
       module_: shader,
       entry_point: Some("fs"),
       constants: None,
@@ -705,6 +736,7 @@ fn cull_pipelines(
   blend? : Bool = false,
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write? : Bool = true,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -717,6 +749,7 @@ fn cull_pipelines(
       blend~,
       depth_write~,
       depth_compare~,
+      color_write~,
     ),
     back: unlit_pipeline(
       device,
@@ -728,6 +761,7 @@ fn cull_pipelines(
       blend~,
       depth_write~,
       depth_compare~,
+      color_write~,
     ),
     double: unlit_pipeline(
       device,
@@ -739,6 +773,7 @@ fn cull_pipelines(
       blend~,
       depth_write~,
       depth_compare~,
+      color_write~,
     ),
   }
 }
@@ -801,19 +836,35 @@ fn mesh_depth_modes(
   format : GpuTextureFormat,
   instanced? : Bool = false,
   blend? : Bool = false,
-) -> DepthModes[CullPipelines] {
-  fill_depth_modes(fn(depth_write, depth_compare) {
-    cull_pipelines(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      instanced~,
-      blend~,
-      depth_write~,
-      depth_compare~,
-    )
-  })
+) -> ColorModes[CullPipelines] {
+  {
+    write: fill_depth_modes(fn(depth_write, depth_compare) {
+      cull_pipelines(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        instanced~,
+        blend~,
+        depth_write~,
+        depth_compare~,
+        color_write=true,
+      )
+    }),
+    quiet: fill_depth_modes(fn(depth_write, depth_compare) {
+      cull_pipelines(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        instanced~,
+        blend~,
+        depth_write~,
+        depth_compare~,
+        color_write=false,
+      )
+    }),
+  }
 }
 
 ///|
@@ -823,20 +874,37 @@ fn wire_depth_modes(
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
   instanced? : Bool = false,
-) -> DepthModes[GpuRenderPipeline] {
-  fill_depth_modes(fn(depth_write, depth_compare) {
-    unlit_pipeline(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      GpuCullMode::NONE,
-      instanced~,
-      lines=true,
-      depth_write~,
-      depth_compare~,
-    )
-  })
+) -> ColorModes[GpuRenderPipeline] {
+  {
+    write: fill_depth_modes(fn(depth_write, depth_compare) {
+      unlit_pipeline(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        GpuCullMode::NONE,
+        instanced~,
+        lines=true,
+        depth_write~,
+        depth_compare~,
+        color_write=true,
+      )
+    }),
+    quiet: fill_depth_modes(fn(depth_write, depth_compare) {
+      unlit_pipeline(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        GpuCullMode::NONE,
+        instanced~,
+        lines=true,
+        depth_write~,
+        depth_compare~,
+        color_write=false,
+      )
+    }),
+  }
 }
 
 ///|
@@ -848,20 +916,37 @@ fn stroke_depth_modes(
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
   blend? : Bool = false,
-) -> DepthModes[GpuRenderPipeline] {
-  fill_depth_modes(fn(depth_write, depth_compare) {
-    color_pipeline(
-      device,
-      shader,
-      pipeline_layout,
-      format,
-      topology,
-      instanced,
-      blend~,
-      depth_write~,
-      depth_compare~,
-    )
-  })
+) -> ColorModes[GpuRenderPipeline] {
+  {
+    write: fill_depth_modes(fn(depth_write, depth_compare) {
+      color_pipeline(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        topology,
+        instanced,
+        blend~,
+        depth_write~,
+        depth_compare~,
+        color_write=true,
+      )
+    }),
+    quiet: fill_depth_modes(fn(depth_write, depth_compare) {
+      color_pipeline(
+        device,
+        shader,
+        pipeline_layout,
+        format,
+        topology,
+        instanced,
+        blend~,
+        depth_write~,
+        depth_compare~,
+        color_write=false,
+      )
+    }),
+  }
 }
 
 ///|
@@ -1698,6 +1783,7 @@ fn WebGPURenderer::wire_pipeline(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> GpuRenderPipeline {
   let modes = if instanced {
     match shading {
@@ -1712,7 +1798,7 @@ fn WebGPURenderer::wire_pipeline(
       @constants.Standard => self.standard_lines
     }
   }
-  modes.pick(depth_write, depth_test, depth_func)
+  modes.pick(depth_write, depth_test, depth_func, color_write)
 }
 
 ///|
@@ -1753,9 +1839,10 @@ fn WebGPURenderer::pipeline(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> GpuRenderPipeline {
   self.cull_group(
-    shading, side, false, blend, depth_write, depth_test, depth_func,
+    shading, side, false, blend, depth_write, depth_test, depth_func, color_write,
   )
 }
 
@@ -1768,9 +1855,10 @@ fn WebGPURenderer::instanced_pipeline(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> GpuRenderPipeline {
   self.cull_group(
-    shading, side, true, blend, depth_write, depth_test, depth_func,
+    shading, side, true, blend, depth_write, depth_test, depth_func, color_write,
   )
 }
 
@@ -1784,6 +1872,7 @@ fn WebGPURenderer::cull_group(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> GpuRenderPipeline {
   let modes = if blend {
     if instanced {
@@ -1812,7 +1901,7 @@ fn WebGPURenderer::cull_group(
       @constants.Standard => self.standard
     }
   }
-  let group = modes.pick(depth_write, depth_test, depth_func)
+  let group = modes.pick(depth_write, depth_test, depth_func, color_write)
   match side {
     @constants.Front => group.front
     @constants.Back => group.back
@@ -1828,6 +1917,7 @@ fn WebGPURenderer::stroke_pipeline(
   depth_write : Bool,
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
+  color_write : Bool,
 ) -> GpuRenderPipeline {
   let modes = if blend {
     match kind {
@@ -1842,7 +1932,7 @@ fn WebGPURenderer::stroke_pipeline(
       @core.PrimitiveKind::LineSegments => self.line_list
     }
   }
-  modes.pick(depth_write, depth_test, depth_func)
+  modes.pick(depth_write, depth_test, depth_func, color_write)
 }
 
 ///|
@@ -3962,6 +4052,7 @@ fn WebGPURenderer::draw_meshes(
               item.depth_write,
               item.depth_test,
               item.depth_func,
+              item.color_write,
             )
           } else {
             match batch {
@@ -3973,6 +4064,7 @@ fn WebGPURenderer::draw_meshes(
                   item.depth_write,
                   item.depth_test,
                   item.depth_func,
+                  item.color_write,
                 )
               None =>
                 self.pipeline(
@@ -3982,6 +4074,7 @@ fn WebGPURenderer::draw_meshes(
                   item.depth_write,
                   item.depth_test,
                   item.depth_func,
+                  item.color_write,
                 )
             }
           },
@@ -4159,6 +4252,7 @@ fn WebGPURenderer::draw_strokes(
                   item.depth_write,
                   item.depth_test,
                   item.depth_func,
+                  item.color_write,
                 ),
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
@@ -4180,6 +4274,7 @@ fn WebGPURenderer::draw_strokes(
                 item.depth_write,
                 item.depth_test,
                 item.depth_func,
+                item.color_write,
               ),
               geometry,
             )
@@ -4192,6 +4287,7 @@ fn WebGPURenderer::draw_strokes(
                 item.depth_write,
                 item.depth_test,
                 item.depth_func,
+                item.color_write,
               ),
               geometry,
             )
