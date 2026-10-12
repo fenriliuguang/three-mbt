@@ -7,6 +7,7 @@ using @core {type Object3D, type CameraState}
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
 /// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。两个设置都会重算投影。
 /// `film_gauge` 默认 35。横构图的胶片宽度等于它，高度按宽高比缩小；竖构图相反。`set_focal_length` 用胶片高度改 `fov` 并重算投影。
+/// `view_bounds` 用投影逆矩阵给出某个距离上的可视矩形，`view_size` 是它的宽高。不包含 `view` 偏移。
 /// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `zoom` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L63 ; `filmOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L129
 pub(all) struct PerspectiveCamera {
   node : Object3D
@@ -145,6 +146,46 @@ pub fn PerspectiveCamera::effective_fov(self : PerspectiveCamera) -> Double {
     None => 0.0
     Some(camera) => camera.effective_fov()
   }
+}
+
+///|
+/// 把 `distance` 处的可视矩形写进 `min_target` 和 `max_target`。左下是 min，右上是 max。
+/// r186: `getViewBounds` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L234
+pub fn PerspectiveCamera::view_bounds(
+  self : PerspectiveCamera,
+  distance : Double,
+  min_target : @math.Vector2,
+  max_target : @math.Vector2,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      let min_point = @math.Vector3::new(x=-1.0, y=-1.0, z=0.5).apply_matrix4(
+        camera.projection_inverse,
+      )
+      let min_scale = -distance / min_point.z
+      ignore(min_target.set(min_point.x * min_scale, min_point.y * min_scale))
+      let max_point = @math.Vector3::new(x=1.0, y=1.0, z=0.5).apply_matrix4(
+        camera.projection_inverse,
+      )
+      let max_scale = -distance / max_point.z
+      ignore(max_target.set(max_point.x * max_scale, max_point.y * max_scale))
+    }
+  }
+}
+
+///|
+/// `distance` 处可视矩形的宽高，写进 `target` 并返回它。
+/// r186: `getViewSize` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L253
+pub fn PerspectiveCamera::view_size(
+  self : PerspectiveCamera,
+  distance : Double,
+  target : @math.Vector2,
+) -> @math.Vector2 {
+  let min_target = @math.Vector2::new()
+  let max_target = @math.Vector2::new()
+  self.view_bounds(distance, min_target, max_target)
+  target.set(max_target.x - min_target.x, max_target.y - min_target.y)
 }
 
 ///|

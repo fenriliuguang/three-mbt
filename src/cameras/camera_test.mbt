@@ -170,6 +170,30 @@ test "perspective focal length follows the film height" {
 }
 
 ///|
+test "perspective view bounds scale with distance and zoom" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  let min_target = @math.Vector2::new()
+  let max_target = @math.Vector2::new()
+  camera.view_bounds(10.0, min_target, max_target)
+  assert_close(min_target.x, -8.2899139228)
+  assert_close(min_target.y, -4.6630765815)
+  assert_close(max_target.x, 8.2899139228)
+  assert_close(max_target.y, 4.6630765815)
+  let size = camera.view_size(10.0, @math.Vector2::new())
+  assert_close(size.x, 16.5798278455)
+  assert_close(size.y, 9.3261531631)
+  camera.set_zoom(2.0)
+  let zoomed = camera.view_size(10.0, @math.Vector2::new())
+  assert_close(zoomed.x, 8.2899139228)
+  assert_close(zoomed.y, 4.6630765815)
+}
+
+///|
 test "orthographic projection matches r186 WebGPU" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

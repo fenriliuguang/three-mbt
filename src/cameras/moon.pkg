@@ -1,4 +1,5 @@
 // 阶段 2。PerspectiveCamera、OrthographicCamera。
 import {
   "fenriliuguang/three-mbt/core",
+  "fenriliuguang/three-mbt/math",
 }
