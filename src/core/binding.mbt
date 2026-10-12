@@ -77,6 +77,7 @@ pub(all) struct ShadowState {
 /// r186: `Light` https://github.com/mrdoob/three.js/blob/r186/src/lights/Light.js#L11
 pub(all) struct LightState {
   color : @math.Color
+  ground_color : @math.Color
   mut intensity : Double
   mut distance : Double
   mut decay : Double

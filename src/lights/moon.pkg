@@ -1,4 +1,4 @@
-// 阶段 2 放灯光对象，阶段 4 起参与着色。点光和聚光不投射阴影。
+// 阶段 2 放灯光对象，阶段 4 起参与着色。点光、聚光和半球光不投射阴影。
 import {
   "fenriliuguang/three-mbt/cameras",
   "fenriliuguang/three-mbt/core",

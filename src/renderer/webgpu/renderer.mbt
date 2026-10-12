@@ -3752,6 +3752,16 @@ fn WebGPURenderer::draw_meshes(
           spot_cone_cos=lights.spot_cone_cos,
           spot_penumbra_cos=lights.spot_penumbra_cos,
           spot_enabled=lights.spot_enabled,
+          hemisphere_sky_r=lights.hemisphere_sky.x,
+          hemisphere_sky_g=lights.hemisphere_sky.y,
+          hemisphere_sky_b=lights.hemisphere_sky.z,
+          hemisphere_ground_r=lights.hemisphere_ground.x,
+          hemisphere_ground_g=lights.hemisphere_ground.y,
+          hemisphere_ground_b=lights.hemisphere_ground.z,
+          hemisphere_x=lights.hemisphere_direction.x,
+          hemisphere_y=lights.hemisphere_direction.y,
+          hemisphere_z=lights.hemisphere_direction.z,
+          hemisphere_enabled=lights.hemisphere_enabled,
         )
         ignore(
           self.device

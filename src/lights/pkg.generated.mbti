@@ -30,6 +30,13 @@ pub fn DirectionalLight::set_shadow_bounds(Self, Double, Double, Double, Double,
 pub fn DirectionalLight::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for DirectionalLight
 
+pub(all) struct HemisphereLight {
+  node : @core.Object3D
+}
+pub fn HemisphereLight::new(sky? : Int, ground? : Int, intensity? : Double) -> Self
+pub fn HemisphereLight::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for HemisphereLight
+
 pub(all) struct PointLight {
   node : @core.Object3D
 }

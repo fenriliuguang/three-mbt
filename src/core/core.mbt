@@ -14,6 +14,7 @@ pub(all) enum NodeKind {
   DirectionalLight
   PointLight
   SpotLight
+  HemisphereLight
   Points
   Line
   LineSegments
@@ -33,6 +34,7 @@ pub(all) enum LightKind {
   Directional
   Point
   Spot
+  Hemisphere
 }
 
 ///|

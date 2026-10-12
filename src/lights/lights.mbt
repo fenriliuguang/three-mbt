@@ -1,4 +1,4 @@
-// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15 ; `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32 ; `PointLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/PointLight.js#L19 ; `SpotLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/SpotLight.js#L39
+// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15 ; `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32 ; `PointLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/PointLight.js#L19 ; `SpotLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/SpotLight.js#L39 ; `HemisphereLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/HemisphereLight.js#L18
 
 ///|
 using @core {type Object3D, type NodeKind, type LightKind, type LightState}
@@ -13,10 +13,12 @@ fn make_light(
   decay? : Double = 2.0,
   angle? : Double = 0.0,
   penumbra? : Double = 0.0,
+  ground? : Int = 0xFFFFFF,
 ) -> Object3D {
   let node = Object3D::new(kind~)
   node.light = Some(LightState::{
     color: @math.Color::new().set_hex(hex),
+    ground_color: @math.Color::new().set_hex(ground),
     intensity,
     distance,
     decay,
@@ -224,3 +226,37 @@ pub impl @core.AsNode for SpotLight with fn to_node(self) {
 
 ///|
 pub extend SpotLight with @core.AsNode::{to_node}
+
+///|
+/// 半球光。天空色是灯光颜色，地面色默认白。位置默认 `(0, 1, 0)`，方向是世界坐标位置的归一化。
+/// 不投射阴影。
+/// r186: `HemisphereLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/HemisphereLight.js#L27
+pub(all) struct HemisphereLight {
+  node : Object3D
+}
+
+///|
+pub fn HemisphereLight::new(
+  sky? : Int = 0xFFFFFF,
+  ground? : Int = 0xFFFFFF,
+  intensity? : Double = 1.0,
+) -> HemisphereLight {
+  let node = make_light(
+    @core.HemisphereLight,
+    @core.Hemisphere,
+    sky,
+    intensity,
+    ground~,
+  )
+  ignore(node.position.set(0.0, 1.0, 0.0))
+  node.update_matrix()
+  { node, }
+}
+
+///|
+pub impl @core.AsNode for HemisphereLight with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend HemisphereLight with @core.AsNode::{to_node}

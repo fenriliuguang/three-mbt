@@ -4,13 +4,14 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 五块 `mat4x4<f32>` 和十九块 `vec4<f32>`。624 字节。
+/// 五块 `mat4x4<f32>` 和二十二块 `vec4<f32>`。672 字节。
 /// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
 /// `surface` 是 `(roughness, metalness, alphaTest, side)`。`side` 为 1 表示双面，-1 表示只画背面并翻转法线。
-/// 自发光 `rgb` 的 `w` 是平直着色开关：大于 0.5 时用法线导数，默认 0。不增加这 624 字节。
+/// 自发光 `rgb` 的 `w` 是平直着色开关：大于 0.5 时用法线导数，默认 0。
 /// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
 /// 再后面是聚光的位置、方向（`w` 为开关）、颜色，以及 `(distance, decay, coneCos, penumbraCos)`。
-pub let uniform_bytes : Int = 624
+/// 末尾 48 字节是半球光的天空色、地面色，以及方向（`w` 为开关）。没有半球光时是 0。
+pub let uniform_bytes : Int = 672
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
@@ -287,6 +288,16 @@ pub fn pack_uniforms(
   spot_penumbra_cos? : Double = 1.0,
   spot_enabled? : Double = 0.0,
   side? : Double = 0.0,
+  hemisphere_sky_r? : Double = 0.0,
+  hemisphere_sky_g? : Double = 0.0,
+  hemisphere_sky_b? : Double = 0.0,
+  hemisphere_ground_r? : Double = 0.0,
+  hemisphere_ground_g? : Double = 0.0,
+  hemisphere_ground_b? : Double = 0.0,
+  hemisphere_x? : Double = 0.0,
+  hemisphere_y? : Double = 0.0,
+  hemisphere_z? : Double = 0.0,
+  hemisphere_enabled? : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -349,6 +360,16 @@ pub fn pack_uniforms(
   write_f32(dst, 612, spot_decay)
   write_f32(dst, 616, spot_cone_cos)
   write_f32(dst, 620, spot_penumbra_cos)
+  write_f32(dst, 624, hemisphere_sky_r)
+  write_f32(dst, 628, hemisphere_sky_g)
+  write_f32(dst, 632, hemisphere_sky_b)
+  write_f32(dst, 640, hemisphere_ground_r)
+  write_f32(dst, 644, hemisphere_ground_g)
+  write_f32(dst, 648, hemisphere_ground_b)
+  write_f32(dst, 656, hemisphere_x)
+  write_f32(dst, 660, hemisphere_y)
+  write_f32(dst, 664, hemisphere_z)
+  write_f32(dst, 668, hemisphere_enabled)
   dst
 }
 

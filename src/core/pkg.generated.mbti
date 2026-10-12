@@ -99,10 +99,12 @@ pub(all) enum LightKind {
   Directional
   Point
   Spot
+  Hemisphere
 }
 
 pub(all) struct LightState {
   color : @math.Color
+  ground_color : @math.Color
   mut intensity : Double
   mut distance : Double
   mut decay : Double
@@ -163,6 +165,7 @@ pub(all) enum NodeKind {
   DirectionalLight
   PointLight
   SpotLight
+  HemisphereLight
   Points
   Line
   LineSegments

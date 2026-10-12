@@ -16,7 +16,7 @@ pub(all) struct ShadowFrame {
 }
 
 ///|
-/// 这一帧的环境光、第一盏平行光、第一盏点光和第一盏聚光。颜色已经乘上强度。
+/// 这一帧的环境光、第一盏平行光、第一盏点光、第一盏聚光和第一盏半球光。颜色已经乘上强度。
 /// r186: `Lighting` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Lighting.js#L14
 pub(all) struct LightFrame {
   ambient : @math.Vector3
@@ -36,6 +36,10 @@ pub(all) struct LightFrame {
   spot_cone_cos : Double
   spot_penumbra_cos : Double
   spot_enabled : Double
+  hemisphere_sky : @math.Vector3
+  hemisphere_ground : @math.Vector3
+  hemisphere_direction : @math.Vector3
+  hemisphere_enabled : Double
 }
 
 ///|
@@ -58,6 +62,10 @@ priv struct LightAccum {
   mut spot_cone_cos : Double
   mut spot_penumbra_cos : Double
   mut found_spot : Bool
+  hemisphere_sky : @math.Vector3
+  hemisphere_ground : @math.Vector3
+  hemisphere_direction : @math.Vector3
+  mut found_hemisphere : Bool
 }
 
 ///|
@@ -122,8 +130,8 @@ fn light_direction(node : @core.Object3D, light : LightState) -> @math.Vector3 {
 }
 
 ///|
-/// 遍历可见节点。多盏平行光、点光、聚光都只保留第一盏。传入相机时，层掩码不相交的灯跳过。
-/// 点光和聚光不产生阴影贴图。聚光方向从目标指向灯，并归一化。
+/// 遍历可见节点。多盏平行光、点光、聚光、半球光都只保留第一盏。传入相机时，层掩码不相交的灯跳过。
+/// 点光、聚光和半球光不产生阴影贴图。聚光方向从目标指向灯。半球光方向是世界坐标位置，长度为 0 时保持零向量。
 /// r186: `getDistanceAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_pars_begin.glsl.js#L56
 /// r186: `getSpotLightInfo` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_pars_begin.glsl.js#L163
 /// r186: `coneCos` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLLights.js#L367
@@ -150,6 +158,10 @@ pub fn collect_lights(
     spot_cone_cos: 1.0,
     spot_penumbra_cos: 1.0,
     found_spot: false,
+    hemisphere_sky: @math.Vector3::new(),
+    hemisphere_ground: @math.Vector3::new(),
+    hemisphere_direction: @math.Vector3::new(),
+    found_hemisphere: false,
   }
   root.traverse_visible(fn(node : @core.Object3D) {
     if on_camera_layer(node, camera) {
@@ -192,6 +204,15 @@ pub fn collect_lights(
                   light.angle * (1.0 - light.penumbra),
                 )
               }
+            @core.Hemisphere =>
+              if !accum.found_hemisphere {
+                accum.found_hemisphere = true
+                ignore(accum.hemisphere_sky.copy(scaled_color(light)))
+                ignore(accum.hemisphere_ground.copy(scaled_ground(light)))
+                ignore(
+                  accum.hemisphere_direction.copy(hemisphere_direction(node)),
+                )
+              }
           }
       }
     }
@@ -222,5 +243,36 @@ pub fn collect_lights(
     } else {
       0.0
     },
+    hemisphere_sky: accum.hemisphere_sky,
+    hemisphere_ground: accum.hemisphere_ground,
+    hemisphere_direction: accum.hemisphere_direction,
+    hemisphere_enabled: if accum.found_hemisphere {
+      1.0
+    } else {
+      0.0
+    },
+  }
+}
+
+///|
+fn scaled_ground(light : LightState) -> @math.Vector3 {
+  @math.Vector3::new(
+    x=light.ground_color.r * light.intensity,
+    y=light.ground_color.g * light.intensity,
+    z=light.ground_color.b * light.intensity,
+  )
+}
+
+///|
+/// 半球光的方向是世界坐标位置。长度为 0 时不归一化。
+/// r186: `lightDirectionNode` https://github.com/mrdoob/three.js/blob/r186/src/nodes/lighting/HemisphereLightNode.js#L44
+fn hemisphere_direction(node : @core.Object3D) -> @math.Vector3 {
+  let position = @math.Vector3::new()
+  ignore(node.get_world_position(position))
+  if position.length() == 0.0 {
+    position
+  } else {
+    ignore(position.normalize())
+    position
   }
 }

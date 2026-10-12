@@ -50,6 +50,7 @@ fn emit_expr(node : Node) -> String {
     PointTerm =>
       "point_term(input.v_world, facing_normal(input.v_normal, front))"
     SpotTerm => "spot_term(input.v_world, facing_normal(input.v_normal, front))"
+    HemisphereTerm => "hemisphere_term(facing_normal(input.v_normal, front))"
     FacingNormal => "facing_normal(input.v_normal, front)"
     EmissiveSample => "sample_emissive(input.v_uv)"
     AlphaSample => "textureSample(alpha_texture, alpha_sampler, input.v_uv)"

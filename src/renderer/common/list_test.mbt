@@ -392,6 +392,116 @@ test "frame lights keep the first spot light" {
 }
 
 ///|
+test "frame lights keep the first hemisphere light" {
+  let scene = @scenes.Scene::new()
+  let fresh = @lights.HemisphereLight::new()
+  assert_eq(fresh.node.position.y, 1.0)
+  assert_eq(fresh.node.position.x, 0.0)
+  let sky = @lights.HemisphereLight::new(
+    sky=0xFF0000,
+    ground=0x0000FF,
+    intensity=2.0,
+  )
+  ignore(scene.add(sky))
+  let other = @lights.HemisphereLight::new(sky=0x00FF00, intensity=9.0)
+  ignore(other.node.position.set(4.0, 0.0, 0.0))
+  ignore(scene.add(other))
+  @common.update_frame(scene.node, scene.node)
+  let lights = @common.collect_lights(scene.node)
+  assert_eq(lights.hemisphere_enabled, 1.0)
+  assert_eq(lights.hemisphere_sky.x, 2.0)
+  assert_eq(lights.hemisphere_sky.y, 0.0)
+  assert_eq(lights.hemisphere_sky.z, 0.0)
+  assert_eq(lights.hemisphere_ground.x, 0.0)
+  assert_eq(lights.hemisphere_ground.y, 0.0)
+  assert_eq(lights.hemisphere_ground.z, 2.0)
+  assert_eq(lights.hemisphere_direction.x, 0.0)
+  assert_eq(lights.hemisphere_direction.y, 1.0)
+  assert_eq(lights.hemisphere_direction.z, 0.0)
+  assert_eq(lights.ambient.x, 0.0)
+  ignore(sky.node.position.set(3.0, 0.0, 0.0))
+  @common.update_frame(scene.node, scene.node)
+  let moved = @common.collect_lights(scene.node)
+  assert_eq(moved.hemisphere_direction.x, 1.0)
+  assert_eq(moved.hemisphere_direction.y, 0.0)
+  assert_eq(moved.hemisphere_direction.z, 0.0)
+  ignore(sky.node.position.set(0.0, 0.0, 0.0))
+  @common.update_frame(scene.node, scene.node)
+  let origin = @common.collect_lights(scene.node)
+  assert_eq(origin.hemisphere_enabled, 1.0)
+  assert_eq(origin.hemisphere_direction.x, 0.0)
+  assert_eq(origin.hemisphere_direction.y, 0.0)
+  assert_eq(origin.hemisphere_direction.z, 0.0)
+  let camera = @cameras.PerspectiveCamera::new()
+  sky.node.layers.set(1)
+  other.node.layers.set(1)
+  let hidden = @common.collect_lights(scene.node, camera=camera.node)
+  assert_eq(hidden.hemisphere_enabled, 0.0)
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let packed = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    hemisphere_sky_r=lights.hemisphere_sky.x,
+    hemisphere_sky_g=lights.hemisphere_sky.y,
+    hemisphere_sky_b=lights.hemisphere_sky.z,
+    hemisphere_ground_r=lights.hemisphere_ground.x,
+    hemisphere_ground_g=lights.hemisphere_ground.y,
+    hemisphere_ground_b=lights.hemisphere_ground.z,
+    hemisphere_x=lights.hemisphere_direction.x,
+    hemisphere_y=lights.hemisphere_direction.y,
+    hemisphere_z=lights.hemisphere_direction.z,
+    hemisphere_enabled=lights.hemisphere_enabled,
+  )
+  assert_eq(packed.length(), 672)
+  assert_eq(packed[624], b'\x00')
+  assert_eq(packed[625], b'\x00')
+  assert_eq(packed[626], b'\x00')
+  assert_eq(packed[627], b'\x40')
+  assert_eq(packed[640], b'\x00')
+  assert_eq(packed[648], b'\x00')
+  assert_eq(packed[649], b'\x00')
+  assert_eq(packed[650], b'\x00')
+  assert_eq(packed[651], b'\x40')
+  assert_eq(packed[656], b'\x00')
+  assert_eq(packed[660], b'\x00')
+  assert_eq(packed[661], b'\x00')
+  assert_eq(packed[662], b'\x80')
+  assert_eq(packed[663], b'\x3F')
+  assert_eq(packed[668], b'\x00')
+  assert_eq(packed[669], b'\x00')
+  assert_eq(packed[670], b'\x80')
+  assert_eq(packed[671], b'\x3F')
+}
+
+///|
 test "a casting directional light builds a shadow matrix" {
   let bias = @common.shadow_matrix(@math.Matrix4::new(), @math.Matrix4::new())
   assert_eq(bias.elements[0], 0.5)

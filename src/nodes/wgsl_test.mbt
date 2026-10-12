@@ -53,7 +53,10 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
   assert_eq(includes(wgsl, "uniforms.model"), true)
   assert_eq(includes(wgsl, "uniforms.camera_position"), true)
   assert_eq(includes(wgsl, "@location(2) v_world : vec3<f32>"), true)
-  assert_eq(includes(wgsl, "(uniforms.ambient).xyz * diffuse"), true)
+  assert_eq(
+    includes(wgsl, "((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse"),
+    true,
+  )
   assert_eq(includes(wgsl, "sample_color(input.v_uv)"), true)
   assert_eq(includes(wgsl, "input.v_color"), true)
   assert_eq(includes(wgsl, "return vec4<f32>(direct + indirect, base.w)"), true)
@@ -220,6 +223,21 @@ test "lambert and standard add one point light" {
   )
   assert_eq(includes(basic, "fn spot_term("), false)
   assert_eq(includes(basic, "fn spot_standard("), false)
+  assert_eq(includes(lambert, "fn hemisphere_term("), true)
+  assert_eq(
+    includes(lambert, "hemisphere_term(facing_normal(input.v_normal, front))"),
+    true,
+  )
+  assert_eq(
+    includes(
+      lambert, "mix((uniforms.hemisphere_ground).xyz, (uniforms.hemisphere_sky).xyz, weight)",
+    ),
+    true,
+  )
+  assert_eq(includes(standard, "fn hemisphere_term("), true)
+  assert_eq(includes(basic, "fn hemisphere_term("), false)
+  let line = @nodes.line_wgsl()
+  assert_eq(includes(line, "fn hemisphere_term("), false)
 }
 
 ///|
@@ -274,7 +292,12 @@ test "lit materials sample a directional shadow map" {
   )
   assert_eq(includes(@nodes.basic_wgsl(), "shadow_map"), false)
   assert_eq(includes(standard, "direct_shadow(world, N)"), true)
-  assert_eq(includes(standard, "(uniforms.ambient).xyz * diffuse"), true)
+  assert_eq(
+    includes(
+      standard, "((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse",
+    ),
+    true,
+  )
   assert_eq(
     includes(
       @nodes.shadow_wgsl(),

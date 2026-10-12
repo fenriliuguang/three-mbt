@@ -31,6 +31,7 @@ pub(all) enum Node {
   DirectShadow
   PointTerm
   SpotTerm
+  HemisphereTerm
   FacingNormal
   EmissiveSample
   AlphaSample
@@ -81,6 +82,9 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("spot_direction", Vec4),
     ("spot_color", Vec4),
     ("spot_params", Vec4),
+    ("hemisphere_sky", Vec4),
+    ("hemisphere_ground", Vec4),
+    ("hemisphere_direction", Vec4),
   ]
 }
 
@@ -120,6 +124,14 @@ fn with_fog(
 /// r186: `getDistanceAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_pars_begin.glsl.js#L56
 fn point_preamble() -> String {
   "fn point_falloff(world : vec3<f32>) -> f32 {\n  if ((uniforms.point_params).z < 0.5) {\n    return 0.0;\n  }\n  let delta = (uniforms.point_position).xyz - world;\n  let dist = length(delta);\n  let decay = (uniforms.point_params).y;\n  var falloff = 1.0 / max(pow(dist, decay), 0.01);\n  let cutoff = (uniforms.point_params).x;\n  if (cutoff > 0.0) {\n    let ratio = dist / cutoff;\n    let edged = clamp(1.0 - ratio * ratio * ratio * ratio, 0.0, 1.0);\n    falloff = falloff * edged * edged;\n  }\n  return falloff;\n}\n\nfn point_direction(world : vec3<f32>) -> vec3<f32> {\n  let delta = (uniforms.point_position).xyz - world;\n  return delta / max(length(delta), 0.000001);\n}\n\nfn point_term(world : vec3<f32>, normal : vec3<f32>) -> vec3<f32> {\n  let falloff = point_falloff(world);\n  let L = point_direction(world);\n  let ndotl = max(dot(normalize(normal), L), 0.0);\n  return (uniforms.point_color).xyz * ndotl * falloff;\n}\n\n"
+}
+
+///|
+/// 半球光只进漫反射。权重是 `dot(N, L) * 0.5 + 0.5`，再从地面色混到天空色。
+/// r186: `hemiDiffuseWeight` https://github.com/mrdoob/three.js/blob/r186/src/nodes/lighting/HemisphereLightNode.js#L77
+/// r186: `mix` https://github.com/mrdoob/three.js/blob/r186/src/nodes/lighting/HemisphereLightNode.js#L79
+fn hemisphere_preamble() -> String {
+  "fn hemisphere_term(normal : vec3<f32>) -> vec3<f32> {\n  if ((uniforms.hemisphere_direction).w < 0.5) {\n    return vec3<f32>(0.0);\n  }\n  let weight = dot(normalize(normal), (uniforms.hemisphere_direction).xyz) * 0.5 + 0.5;\n  return mix((uniforms.hemisphere_ground).xyz, (uniforms.hemisphere_sky).xyz, weight);\n}\n\n"
 }
 
 ///|
@@ -168,8 +180,8 @@ fn standard_preamble() -> String {
     "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
     "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  var direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
     "  direct = direct + point_standard(N, V, world, diffuse, f0, alpha);\n", "  direct = direct + spot_standard(N, V, world, diffuse, f0, alpha);\n",
-    "  let indirect = (uniforms.ambient).xyz * diffuse;\n", "  return vec4<f32>(direct + indirect, base.w);\n",
-    "}\n\n",
+    "  let indirect = ((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse;\n",
+    "  return vec4<f32>(direct + indirect, base.w);\n", "}\n\n",
   ]
   let mut text = ""
   for line in lines {
@@ -368,7 +380,10 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     DirectShadow,
   )
   let lit = Add(
-    Add(Add(Swizzle(Uniform("ambient", Vec4), "xyz"), direct), PointTerm),
+    Add(
+      Add(Add(Swizzle(Uniform("ambient", Vec4), "xyz"), HemisphereTerm), direct),
+      PointTerm,
+    ),
     SpotTerm,
   )
   let sample = TextureSample(Varying("v_uv", Vec2))
@@ -423,9 +438,14 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
       facing_preamble() +
       shadow_preamble() +
       point_preamble() +
-      spot_preamble()
+      spot_preamble() +
+      hemisphere_preamble()
     } else {
-      facing_preamble() + shadow_preamble() + point_preamble() + spot_preamble()
+      facing_preamble() +
+      shadow_preamble() +
+      point_preamble() +
+      spot_preamble() +
+      hemisphere_preamble()
     },
   }
 }
@@ -485,12 +505,14 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
       shadow_preamble() +
       point_preamble() +
       spot_preamble() +
+      hemisphere_preamble() +
       standard_preamble()
     } else {
       facing_preamble() +
       shadow_preamble() +
       point_preamble() +
       spot_preamble() +
+      hemisphere_preamble() +
       standard_preamble()
     },
   }

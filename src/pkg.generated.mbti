@@ -172,6 +172,8 @@ pub using @post {type GrayscalePass}
 
 pub using @objects {type Group}
 
+pub using @lights {type HemisphereLight}
+
 pub using @objects {type InstancedMesh}
 
 pub using @constants {type Interpolation}

@@ -150,6 +150,7 @@ pub using @lights {
   type DirectionalLight,
   type PointLight,
   type SpotLight,
+  type HemisphereLight,
 }
 
 ///|
