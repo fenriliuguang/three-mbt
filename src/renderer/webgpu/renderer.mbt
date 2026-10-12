@@ -4214,6 +4214,7 @@ pub fn WebGPURenderer::compose(
 
 ///|
 /// 先画不透明网格，再按从远到近画透明网格。`blend` 为真时用 src-alpha 管线。
+/// 透明双面且 `force_single_pass` 关闭时，同一次绘制里先画背面再画正面。
 fn WebGPURenderer::draw_meshes(
   self : WebGPURenderer,
   pass : @gpu.GpuRenderPassEncoder,
@@ -4332,131 +4333,139 @@ fn WebGPURenderer::draw_meshes(
           Some(data) => Some(self.instance_gpu(data))
           None => None
         }
-        pass.set_pipeline(
-          if lines {
-            self.wire_pipeline(
-              item.shading,
-              batch is Some(_),
-              item.depth_write,
-              item.depth_test,
-              self.view_depth_func(item.depth_func),
-              item.color_write,
-            )
-          } else {
-            match batch {
-              Some(_) =>
-                self.instanced_pipeline(
-                  item.shading,
-                  item.side,
-                  blend,
-                  item.depth_write,
-                  item.depth_test,
-                  self.view_depth_func(item.depth_func),
-                  item.color_write,
-                  item.premultiplied_alpha,
-                )
-              None =>
-                self.pipeline(
-                  item.shading,
-                  item.side,
-                  blend,
-                  item.depth_write,
-                  item.depth_test,
-                  self.view_depth_func(item.depth_func),
-                  item.color_write,
-                  item.premultiplied_alpha,
-                )
-            }
-          },
+        let sides = @common.color_sides(
+          item.side,
+          blend,
+          lines,
+          item.force_single_pass,
         )
-        pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
-        let instance_count = match item.instances {
-          Some(data) => {
-            let capacity = data.matrices.count
-            if data.count < capacity {
-              data.count
+        for side in sides {
+          pass.set_pipeline(
+            if lines {
+              self.wire_pipeline(
+                item.shading,
+                batch is Some(_),
+                item.depth_write,
+                item.depth_test,
+                self.view_depth_func(item.depth_func),
+                item.color_write,
+              )
             } else {
-              capacity
+              match batch {
+                Some(_) =>
+                  self.instanced_pipeline(
+                    item.shading,
+                    side,
+                    blend,
+                    item.depth_write,
+                    item.depth_test,
+                    self.view_depth_func(item.depth_func),
+                    item.color_write,
+                    item.premultiplied_alpha,
+                  )
+                None =>
+                  self.pipeline(
+                    item.shading,
+                    side,
+                    blend,
+                    item.depth_write,
+                    item.depth_test,
+                    self.view_depth_func(item.depth_func),
+                    item.color_write,
+                    item.premultiplied_alpha,
+                  )
+              }
+            },
+          )
+          pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+          let instance_count = match item.instances {
+            Some(data) => {
+              let capacity = data.matrices.count
+              if data.count < capacity {
+                data.count
+              } else {
+                capacity
+              }
             }
+            None => 1
           }
-          None => 1
-        }
-        match batch {
-          None => ()
-          Some(batch) => {
-            pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
-            pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
-          }
-        }
-        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
-        ignore(
-          pass.set_bind_group(
-            1U,
-            Some(self.texture_group(item.map)),
-            None,
-            None,
-            None,
-          ),
-        )
-        ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
-        ignore(
-          pass.set_bind_group(
-            3U,
-            Some(
-              self.surface_group(
-                item.emissive_map,
-                item.roughness_map,
-                item.metalness_map,
-                item.alpha_map,
-              ),
-            ),
-            None,
-            None,
-            None,
-          ),
-        )
-        if lines {
-          match wire {
+          match batch {
             None => ()
-            Some(wire) => {
-              pass.set_index_buffer(
-                wire.indices,
-                @gpu.GpuIndexFormat::UINT32,
-                None,
-                None,
-              )
-              pass.draw_indexed(
-                wire.index_count.reinterpret_as_uint(),
-                Some(instance_count.reinterpret_as_uint()),
-                None,
-                None,
-                None,
-              )
+            Some(batch) => {
+              pass.set_vertex_buffer(1U, Some(batch.matrices), None, None)
+              pass.set_vertex_buffer(2U, Some(batch.colors), None, None)
             }
           }
-        } else {
-          match geometry.indices {
-            None =>
-              pass.draw(
-                geometry.vertex_count.reinterpret_as_uint(),
-                Some(instance_count.reinterpret_as_uint()),
-                None,
-                None,
-              )
-            Some(indices) => {
-              pass.set_index_buffer(
-                indices,
-                @gpu.GpuIndexFormat::UINT32,
-                None,
-                None,
-              )
-              pass.draw_indexed(
-                geometry.index_count.reinterpret_as_uint(),
-                Some(instance_count.reinterpret_as_uint()),
-                None,
-                None,
-                None,
-              )
+          ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+          ignore(
+            pass.set_bind_group(
+              1U,
+              Some(self.texture_group(item.map)),
+              None,
+              None,
+              None,
+            ),
+          )
+          ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
+          ignore(
+            pass.set_bind_group(
+              3U,
+              Some(
+                self.surface_group(
+                  item.emissive_map,
+                  item.roughness_map,
+                  item.metalness_map,
+                  item.alpha_map,
+                ),
+              ),
+              None,
+              None,
+              None,
+            ),
+          )
+          if lines {
+            match wire {
+              None => ()
+              Some(wire) => {
+                pass.set_index_buffer(
+                  wire.indices,
+                  @gpu.GpuIndexFormat::UINT32,
+                  None,
+                  None,
+                )
+                pass.draw_indexed(
+                  wire.index_count.reinterpret_as_uint(),
+                  Some(instance_count.reinterpret_as_uint()),
+                  None,
+                  None,
+                  None,
+                )
+              }
+            }
+          } else {
+            match geometry.indices {
+              None =>
+                pass.draw(
+                  geometry.vertex_count.reinterpret_as_uint(),
+                  Some(instance_count.reinterpret_as_uint()),
+                  None,
+                  None,
+                )
+              Some(indices) => {
+                pass.set_index_buffer(
+                  indices,
+                  @gpu.GpuIndexFormat::UINT32,
+                  None,
+                  None,
+                )
+                pass.draw_indexed(
+                  geometry.index_count.reinterpret_as_uint(),
+                  Some(instance_count.reinterpret_as_uint()),
+                  None,
+                  None,
+                  None,
+                )
+              }
             }
           }
         }

@@ -45,6 +45,7 @@ pub(all) struct Material {
   mut color_write : Bool
   mut premultiplied_alpha : Bool
   mut visible : Bool
+  mut force_single_pass : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?

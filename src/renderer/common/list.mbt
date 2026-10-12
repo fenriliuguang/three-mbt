@@ -25,6 +25,7 @@ pub(all) struct RenderItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  force_single_pass : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -75,6 +76,7 @@ pub fn collect_opaque(
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
                 premultiplied_alpha: binding.premultiplied_alpha,
+                force_single_pass: binding.force_single_pass,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -89,6 +91,23 @@ pub fn collect_opaque(
     }
   })
   by_render_order(items)
+}
+
+///|
+/// 颜色通道这一次要画的面。透明双面且没有 `force_single_pass` 时，先背面再正面。
+/// 线框和不透明网格仍按材质的 `side` 画一次。
+/// r186: two-pass double side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3783
+pub fn color_sides(
+  side : @constants.Side,
+  blend : Bool,
+  wire : Bool,
+  force_single_pass : Bool,
+) -> Array[@constants.Side] {
+  if blend && !wire && side is @constants.Double && !force_single_pass {
+    [@constants.Back, @constants.Front]
+  } else {
+    [side]
+  }
 }
 
 ///|
@@ -144,6 +163,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
                 premultiplied_alpha: binding.premultiplied_alpha,
+                force_single_pass: binding.force_single_pass,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -199,6 +219,7 @@ pub fn collect_wireframe(
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
                 premultiplied_alpha: binding.premultiplied_alpha,
+                force_single_pass: binding.force_single_pass,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -575,6 +596,7 @@ pub fn collect_transparent(
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
                 premultiplied_alpha: binding.premultiplied_alpha,
+                force_single_pass: binding.force_single_pass,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,

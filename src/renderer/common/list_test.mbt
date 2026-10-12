@@ -1333,6 +1333,51 @@ test "material visible defaults on and hides draws" {
 }
 
 ///|
+test "transparent double side draws back then front" {
+  assert_eq(
+    @common.color_sides(@constants.Front, true, false, false)[0].to_int(),
+    @constants.FRONT_SIDE,
+  )
+  let split = @common.color_sides(@constants.Double, true, false, false)
+  assert_eq(split.length(), 2)
+  assert_eq(split[0].to_int(), @constants.BACK_SIDE)
+  assert_eq(split[1].to_int(), @constants.FRONT_SIDE)
+  let single = @common.color_sides(@constants.Double, true, false, true)
+  assert_eq(single.length(), 1)
+  assert_eq(single[0].to_int(), @constants.DOUBLE_SIDE)
+  assert_eq(
+    @common.color_sides(@constants.Double, false, false, false).length(),
+    1,
+  )
+  assert_eq(
+    @common.color_sides(@constants.Double, true, true, false).length(),
+    1,
+  )
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let glass = @materials.MeshLambertMaterial::new()
+  assert_eq(glass.material.force_single_pass, false)
+  glass.material.transparent = true
+  glass.material.side = @constants.Double
+  let mesh = @objects.Mesh::new(box.geometry, glass.material)
+  ignore(scene.add(mesh))
+  let forced = @materials.MeshBasicMaterial::new()
+  forced.material.transparent = true
+  forced.material.side = @constants.Double
+  forced.material.force_single_pass = true
+  let once = @objects.Mesh::new(box.geometry, forced.material)
+  ignore(scene.add(once))
+  let camera = @cameras.PerspectiveCamera::new(fov=50.0, aspect=1.0)
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  @common.update_frame(scene.node, camera.node)
+  let drawn = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].force_single_pass, false)
+  assert_eq(drawn[0].side.to_int(), @constants.DOUBLE_SIDE)
+  assert_eq(drawn[1].force_single_pass, true)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

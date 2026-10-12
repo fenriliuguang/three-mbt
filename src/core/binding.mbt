@@ -24,6 +24,7 @@ pub(all) struct MeshBinding {
   color_write : Bool
   premultiplied_alpha : Bool
   mut visible : Bool
+  force_single_pass : Bool
   emissive : @math.Color
   mut emissive_intensity : Double
   emissive_map : @textures.Texture?
