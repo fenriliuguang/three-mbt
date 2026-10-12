@@ -678,6 +678,76 @@ test "alpha test is packed into surface z" {
 }
 
 ///|
+test "emissive reaches the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshLambertMaterial::new()
+  ignore(material.material.emissive.set_rgb(0.25, 0.5, 0.0))
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(drawn[0].emissive.r, 0.25)
+  assert_eq(drawn[0].emissive.g, 0.5)
+  assert_eq(drawn[0].emissive.b, 0.0)
+}
+
+///|
+test "emissive is packed after the fog parameters" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let uniforms = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    emissive_r=0.25,
+    emissive_g=0.5,
+    emissive_b=0.0,
+  )
+  assert_eq(uniforms.length(), @common.uniform_bytes)
+  assert_eq(uniforms[496], b'\x00')
+  assert_eq(uniforms[497], b'\x00')
+  assert_eq(uniforms[498], b'\x80')
+  assert_eq(uniforms[499], b'\x3E')
+  assert_eq(uniforms[500], b'\x00')
+  assert_eq(uniforms[501], b'\x00')
+  assert_eq(uniforms[502], b'\x00')
+  assert_eq(uniforms[503], b'\x3F')
+  assert_eq(uniforms[504], b'\x00')
+  assert_eq(uniforms[505], b'\x00')
+  assert_eq(uniforms[506], b'\x00')
+  assert_eq(uniforms[507], b'\x00')
+  assert_eq(uniforms[508], b'\x00')
+  assert_eq(uniforms[511], b'\x00')
+}
+
+///|
 fn point_at(z : Double) -> @core.BufferGeometry {
   let geometry = @core.BufferGeometry::new()
   ignore(

@@ -18,6 +18,7 @@ pub(all) struct RenderItem {
   metalness : Double
   fog : Bool
   alpha_test : Double
+  emissive : @math.Color
   instances : @core.InstanceData?
 }
 
@@ -52,6 +53,7 @@ pub fn collect_opaque(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                emissive: binding.emissive,
                 instances: binding.instances,
               })
             }
@@ -87,6 +89,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                emissive: binding.emissive,
                 instances: binding.instances,
               })
             }
@@ -127,6 +130,7 @@ pub fn collect_wireframe(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                emissive: binding.emissive,
                 instances: binding.instances,
               })
             }
@@ -386,6 +390,7 @@ pub fn collect_transparent(
                 metalness: binding.metalness,
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
+                emissive: binding.emissive,
                 instances: binding.instances,
               })
             }

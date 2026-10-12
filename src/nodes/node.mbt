@@ -64,6 +64,7 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("shadow", Vec4),
     ("fog", Vec4),
     ("fog_params", Vec4),
+    ("emissive", Vec4),
   ]
 }
 
@@ -202,6 +203,16 @@ fn tint_vertex(color : Node) -> Node {
 }
 
 ///|
+/// Lambert 和 Standard 在光照结果上加上自发光。不受阴影影响，也不乘顶点色。
+/// r186: `emissive` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L122 ; `emissive` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L162
+fn add_emissive(color : Node) -> Node {
+  Node::Vec4(
+    Add(Swizzle(color, "xyz"), Swizzle(Uniform("emissive", Vec4), "xyz")),
+    Swizzle(color, "w"),
+  )
+}
+
+///|
 fn with_vertex_color(
   varyings : Array[(String, ValueType)],
   assignments : Array[(String, Node)],
@@ -313,13 +324,15 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(position, instanced)),
     vertex_varyings: assignments,
-    fragment_color: tint_vertex(
-      tint_instance(
-        Vec4(
-          rgb,
-          Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+    fragment_color: add_emissive(
+      tint_vertex(
+        tint_instance(
+          Vec4(
+            rgb,
+            Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+          ),
+          instanced,
         ),
-        instanced,
       ),
     ),
     sampled: true,
@@ -372,7 +385,9 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), placed),
     vertex_varyings: assignments,
-    fragment_color: StandardLit(tint_instance(tint_vertex(base), instanced)),
+    fragment_color: add_emissive(
+      StandardLit(tint_instance(tint_vertex(base), instanced)),
+    ),
     sampled: true,
     shadowed: true,
     preamble: if instanced {

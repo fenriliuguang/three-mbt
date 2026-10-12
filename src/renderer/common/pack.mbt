@@ -4,9 +4,10 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 五块 `mat4x4<f32>` 和十一块 `vec4<f32>`。496 字节。
+/// 五块 `mat4x4<f32>` 和十二块 `vec4<f32>`。512 字节。
 /// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
-pub let uniform_bytes : Int = 496
+/// 最后一块是自发光的 `rgb`，`w` 留空。
+pub let uniform_bytes : Int = 512
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
@@ -252,6 +253,9 @@ pub fn pack_uniforms(
   fog_density : Double,
   fog_mode : Double,
   alpha_test? : Double = 0.0,
+  emissive_r? : Double = 0.0,
+  emissive_g? : Double = 0.0,
+  emissive_b? : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -286,6 +290,9 @@ pub fn pack_uniforms(
   write_f32(dst, 484, fog_far)
   write_f32(dst, 488, fog_density)
   write_f32(dst, 492, fog_mode)
+  write_f32(dst, 496, emissive_r)
+  write_f32(dst, 500, emissive_g)
+  write_f32(dst, 504, emissive_b)
   dst
 }
 

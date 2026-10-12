@@ -60,6 +60,18 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
     true,
   )
   assert_eq(includes(wgsl, "input.v_color"), true)
+  assert_eq(includes(wgsl, "return vec4<f32>(direct + indirect, base.w)"), true)
+}
+
+///|
+test "lambert and standard add emissive after lighting" {
+  let expr = "(uniforms.emissive).xyz"
+  assert_eq(includes(@nodes.lambert_wgsl(), expr), true)
+  assert_eq(includes(@nodes.standard_wgsl(), expr), true)
+  assert_eq(includes(@nodes.lambert_instanced_wgsl(), expr), true)
+  assert_eq(includes(@nodes.standard_instanced_wgsl(), expr), true)
+  assert_eq(includes(@nodes.basic_wgsl(), expr), false)
+  assert_eq(includes(@nodes.basic_instanced_wgsl(), expr), false)
 }
 
 ///|
