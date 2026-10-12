@@ -2468,7 +2468,7 @@ pub fn WebGPURenderer::tone_map(
     .write_buffer_with_copy(
       self.tone_uniform,
       0UL,
-      @post.pack_tone(pass.mapping, pass.exposure),
+      @post.pack_tone(pass.mapping, pass.exposure, srgb=pass.srgb),
       None,
       None,
     ),
@@ -3082,7 +3082,7 @@ fn WebGPURenderer::compose_effect(
         .write_buffer_with_copy(
           self.tone_uniform,
           0UL,
-          @post.pack_tone(pass.mapping, pass.exposure),
+          @post.pack_tone(pass.mapping, pass.exposure, srgb=pass.srgb),
           None,
           None,
         ),

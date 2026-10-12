@@ -140,7 +140,7 @@ sh scripts/build-blend.sh
 
 把 `target/blend.component.wasm` 复制到 `examples/apps/blend/blend.component.wasm`，然后 `cargo xtask run-demo --name blend`。`moon run src/examples/blend/app` 不会打开窗口。
 
-色调映射样本把 Lambert 立方体画进颜色目标，再按曝光 1 的 ACES 铺到窗口：
+色调映射样本把 Lambert 立方体画进颜色目标，再按曝光 1 的 ACES 铺到窗口，并把结果编成 sRGB：
 
 ```sh
 sh scripts/build-tone.sh

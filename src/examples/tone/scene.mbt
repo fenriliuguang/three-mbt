@@ -14,7 +14,7 @@ using @scenes {type Scene}
 using @textures {type RenderTarget}
 
 ///|
-/// 离屏场景是一盏光下的立方体。窗口由 ACES 全屏通道呈现，不另建屏幕网格。
+/// 离屏场景是一盏光下的立方体。窗口由 ACES 全屏通道呈现，曲线之后编成 sRGB。
 pub(all) struct ToneScene {
   scene : Scene
   camera : PerspectiveCamera
@@ -42,18 +42,13 @@ pub fn ToneScene::new() -> ToneScene {
   let camera = PerspectiveCamera::new(fov=50.0, aspect=1.0, near=0.1, far=100.0)
   ignore(camera.node.position.set(0.0, 0.8, 3.0))
   camera.node.look_at(0.0, 0.0, 0.0)
-  {
-    scene,
-    camera,
-    cube,
-    target,
-    pass: ToneMappingPass::new(mapping=@constants.ToneMapping::ACES),
-    angle: 0.0,
-  }
+  let pass = ToneMappingPass::new(mapping=@constants.ToneMapping::ACES)
+  pass.set_srgb(true)
+  { scene, camera, cube, target, pass, angle: 0.0, }
 }
 
 ///|
-/// 每帧让立方体绕 Y 轴转过 `delta` 弧度。映射保持 ACES，曝光保持 1。
+/// 每帧让立方体绕 Y 轴转过 `delta` 弧度。映射保持 ACES，曝光保持 1，输出编成 sRGB。
 pub fn ToneScene::spin(self : ToneScene, delta : Double) -> Unit {
   self.angle = self.angle + delta
   ignore(self.cube.node.rotation.set(0.35, self.angle, 0.0))

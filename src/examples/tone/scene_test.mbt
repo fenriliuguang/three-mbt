@@ -9,6 +9,7 @@ test "tone scene draws one cube into a color target" {
   assert_eq(world.target.texture.flip_y, false)
   assert_eq(world.pass.mapping is @constants.ToneMapping::ACES, true)
   assert_eq(world.pass.exposure, 1.0)
+  assert_eq(world.pass.srgb, true)
   let black = @post.tone_map(
     0.0,
     0.0,

@@ -103,7 +103,7 @@ pub fn rad_to_deg(Double) -> Double
 
 pub fn srgb_to_linear(Double) -> Double
 
-pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double) -> @math.Color
+pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double, srgb? : Bool) -> @math.Color
 
 pub let upstream_revision : String
 

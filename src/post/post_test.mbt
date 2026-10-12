@@ -82,6 +82,28 @@ test "linear and reinhard tone mapping match r186" {
   let pass = @post.ToneMappingPass::new()
   assert_eq(pass.mapping is @constants.ToneMapping::No, true)
   assert_eq(pass.exposure, 1.0)
+  assert_eq(pass.srgb, false)
+  let linear_kept = @post.tone_map(
+    0.5,
+    0.25,
+    0.0,
+    @constants.ToneMapping::Linear,
+    1.0,
+  )
+  assert_eq(linear_kept.r, 0.5)
+  assert_eq(linear_kept.g, 0.25)
+  assert_eq(linear_kept.b, 0.0)
+  let encoded = @post.tone_map(
+    0.5,
+    0.25,
+    0.0,
+    @constants.ToneMapping::Linear,
+    1.0,
+    srgb=true,
+  )
+  assert_eq(encoded.r, @math.linear_to_srgb(0.5))
+  assert_eq(encoded.g, @math.linear_to_srgb(0.25))
+  assert_eq(encoded.b, 0.0)
   pass.set_mapping(@constants.ToneMapping::Reinhard)
   pass.set_exposure(1.0)
   assert_eq(pass.mapping is @constants.ToneMapping::Reinhard, true)
@@ -101,6 +123,19 @@ test "linear and reinhard tone mapping match r186" {
   assert_eq(packed[5], b'\x00')
   assert_eq(packed[6], b'\x80')
   assert_eq(packed[7], b'\x3F')
+  assert_eq(packed[8], b'\x00')
+  assert_eq(packed[9], b'\x00')
+  assert_eq(packed[10], b'\x00')
+  assert_eq(packed[11], b'\x00')
+  let packed_srgb = @post.pack_tone(
+    @constants.ToneMapping::Reinhard,
+    1.0,
+    srgb=true,
+  )
+  assert_eq(packed_srgb[8], b'\x00')
+  assert_eq(packed_srgb[9], b'\x00')
+  assert_eq(packed_srgb[10], b'\x80')
+  assert_eq(packed_srgb[11], b'\x3F')
   let wgsl = @post.tone_wgsl()
   assert_eq(wgsl.contains("params.mapping < 0.5"), true)
   assert_eq(wgsl.contains("scaled / (scaled + vec3<f32>(1.0))"), true)
@@ -109,6 +144,8 @@ test "linear and reinhard tone mapping match r186" {
   assert_eq(wgsl.contains("aces_map"), true)
   assert_eq(wgsl.contains("agx_map"), true)
   assert_eq(wgsl.contains("neutral_map"), true)
+  assert_eq(wgsl.contains("0.0031308"), true)
+  assert_eq(wgsl.contains("12.92"), true)
 }
 
 ///|

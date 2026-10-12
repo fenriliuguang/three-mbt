@@ -35,9 +35,9 @@ pub fn pack_amount(Double) -> FixedArray[Byte]
 
 pub fn pack_bloom(BloomPass, Double, Double, Double, Double, Double, kernel? : Double, factor? : Double, tint_r? : Double, tint_g? : Double, tint_b? : Double) -> FixedArray[Byte]
 
-pub fn pack_tone(@constants.ToneMapping, Double) -> FixedArray[Byte]
+pub fn pack_tone(@constants.ToneMapping, Double, srgb? : Bool) -> FixedArray[Byte]
 
-pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double) -> @math.Color
+pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double, srgb? : Bool) -> @math.Color
 
 pub fn tone_wgsl() -> String
 
@@ -95,10 +95,12 @@ pub fn GrayscalePass::set_amount(Self, Double) -> Unit
 pub(all) struct ToneMappingPass {
   mut mapping : @constants.ToneMapping
   mut exposure : Double
+  mut srgb : Bool
 }
 pub fn ToneMappingPass::new(mapping? : @constants.ToneMapping, exposure? : Double) -> Self
 pub fn ToneMappingPass::set_exposure(Self, Double) -> Unit
 pub fn ToneMappingPass::set_mapping(Self, @constants.ToneMapping) -> Unit
+pub fn ToneMappingPass::set_srgb(Self, Bool) -> Unit
 
 // Type aliases
 

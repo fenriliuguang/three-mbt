@@ -140,7 +140,7 @@ sh scripts/build-blend.sh
 
 Copy `target/blend.component.wasm` to `examples/apps/blend/blend.component.wasm`, then `cargo xtask run-demo --name blend`. `moon run src/examples/blend/app` does not open a window.
 
-The tone-mapping sample draws a Lambert cube into a color target, then applies ACES Filmic at exposure 1:
+The tone-mapping sample draws a Lambert cube into a color target, then applies ACES Filmic at exposure 1 and encodes the result as sRGB:
 
 ```sh
 sh scripts/build-tone.sh

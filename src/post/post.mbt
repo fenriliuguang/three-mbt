@@ -1,4 +1,4 @@
-// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
+// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `LinearToSRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L211
 
 ///|
 const WEIGHT_R : Double = 0.25
@@ -333,6 +333,7 @@ fn neutral_color(
 pub(all) struct ToneMappingPass {
   mut mapping : @constants.ToneMapping
   mut exposure : Double
+  mut srgb : Bool
 }
 
 ///|
@@ -344,7 +345,14 @@ pub fn ToneMappingPass::new(
     None => @constants.ToneMapping::No
     Some(mapping) => mapping
   }
-  { mapping, exposure, }
+  { mapping, exposure, srgb: false, }
+}
+
+///|
+/// 曲线之后是否把线性分量编成 sRGB。默认关闭，所以已有曲线数值不变。
+/// r186: `LinearToSRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L211
+pub fn ToneMappingPass::set_srgb(self : ToneMappingPass, srgb : Bool) -> Unit {
+  self.srgb = srgb
 }
 
 ///|
@@ -364,7 +372,7 @@ pub fn ToneMappingPass::set_exposure(
 }
 
 ///|
-/// 与全屏着色器相同的曲线。`No` 原样返回，不看曝光。
+/// 与全屏着色器相同的曲线。`No` 原样返回，不看曝光。`srgb` 为真时再按 `LinearToSRGB` 编码。
 /// r186: `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208
 pub fn tone_map(
   r : Double,
@@ -372,8 +380,9 @@ pub fn tone_map(
   b : Double,
   mapping : @constants.ToneMapping,
   exposure : Double,
+  srgb? : Bool = false,
 ) -> @math.Color {
-  match mapping {
+  let mapped = match mapping {
     No => @math.Color::new(r~, g~, b~)
     Linear =>
       @math.Color::new(
@@ -406,17 +415,28 @@ pub fn tone_map(
       @math.Color::new(r=mapped.x, g=mapped.y, b=mapped.z)
     }
   }
+  if srgb {
+    @math.Color::new(
+      r=@math.linear_to_srgb(mapped.r),
+      g=@math.linear_to_srgb(mapped.g),
+      b=@math.linear_to_srgb(mapped.b),
+    )
+  } else {
+    mapped
+  }
 }
 
 ///|
-/// 16 字节 uniform。第一个 `f32` 是映射编号，第二个是曝光。
+/// 16 字节 uniform。第一个 `f32` 是映射编号，第二个是曝光，第三个是 sRGB 编码。
 pub fn pack_tone(
   mapping : @constants.ToneMapping,
   exposure : Double,
+  srgb? : Bool = false,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(16, b'\x00')
   write_f32(dst, 0, mapping.to_int().to_double())
   write_f32(dst, 4, exposure)
+  write_f32(dst, 8, if srgb { 1.0 } else { 0.0 })
   dst
 }
 
@@ -443,8 +463,19 @@ pub fn tone_wgsl() -> String {
     #|struct ToneParams {
     #|  mapping : f32,
     #|  exposure : f32,
-    #|  pad0 : f32,
+    #|  srgb : f32,
     #|  pad1 : f32,
+    #|}
+    #|
+    #|fn encode_srgb(c : vec3<f32>) -> vec3<f32> {
+    #|  let low = c * 12.92;
+    #|  let high = 1.055 * pow(max(c, vec3<f32>(0.0)), vec3<f32>(0.41666)) - 0.055;
+    #|  return select(high, low, c < vec3<f32>(0.0031308));
+    #|}
+    #|
+    #|fn finish(mapped : vec3<f32>, alpha : f32) -> vec4<f32> {
+    #|  let out = select(mapped, encode_srgb(mapped), params.srgb > 0.5);
+    #|  return vec4<f32>(out, alpha);
     #|}
     #|
     #|fn cineon_map(scaled : vec3<f32>) -> vec3<f32> {
@@ -532,7 +563,7 @@ pub fn tone_wgsl() -> String {
     #|fn fs(input : VertexOutput) -> @location(0) vec4<f32> {
     #|  let color = textureSample(color_tex, color_samp, input.uv);
     #|  if (params.mapping < 0.5 || (params.mapping > 4.5 && params.mapping < 5.5)) {
-    #|    return color;
+    #|    return finish(color.rgb, color.a);
     #|  }
     #|  let scaled = color.rgb * params.exposure;
     #|  var mapped = scaled;
@@ -549,7 +580,7 @@ pub fn tone_wgsl() -> String {
     #|  } else {
     #|    mapped = neutral_map(scaled);
     #|  }
-    #|  return vec4<f32>(mapped, color.a);
+    #|  return finish(mapped, color.a);
     #|}
   code
 }
