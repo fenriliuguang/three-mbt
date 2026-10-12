@@ -44,9 +44,18 @@ priv struct Mat {
 }
 
 ///|
+priv struct MorphTarget {
+  position : Array[Double]?
+  normal : Array[Double]?
+}
+
+///|
 priv struct Prim {
   geometry : @core.BufferGeometry
   mat : Mat
+  targets : Array[MorphTarget]
+  mesh_weights : Array[Double]
+  baked : @core.BufferGeometry
 }
 
 ///|
@@ -67,6 +76,7 @@ priv struct NodeDesc {
   matrix : Array[Double]?
   camera : Int?
   light : Int?
+  weights : Array[Double]?
 }
 
 ///|
@@ -104,7 +114,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`。点光、聚光、贴图、蒙皮、顶点色形变和节点权重先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图、蒙皮和顶点色形变先不读。动画通道里的 `weights` 仍跳过。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -690,26 +700,50 @@ fn load_primitive(
       materials[at]
     }
   }
-  match obj.get("targets") {
-    None => ()
-    Some(value) =>
-      apply_morph_targets(geometry, as_array(value), weights, bins, views, accs)
+  let targets = match obj.get("targets") {
+    None => []
+    Some(value) => read_morph_targets(as_array(value), bins, views, accs)
   }
-  { geometry, mat, }
+  let baked = baked_geometry(geometry, targets, weights)
+  { geometry, mat, targets, mesh_weights: weights, baked, }
 }
 
 ///|
-/// 按 `mesh.weights` 把 `POSITION` 和 `NORMAL` 增量加进已有属性。
-/// 没有法线属性时跳过 `NORMAL` 目标。顶点色形变和节点权重先不加。
-/// 这不是运行时的 `morphTargetInfluences`，只烘焙默认权重。上游把增量放进 `morphAttributes`。
-/// r186: `addMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2387 ; `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2474
-fn apply_morph_targets(
-  geometry : @core.BufferGeometry,
+fn read_morph_targets(
   targets : Array[Json],
-  weights : Array[Double],
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],
+) -> Array[MorphTarget] raise GltfError {
+  let out = []
+  let mut index = 0
+  while index < targets.length() {
+    let target = as_object(targets[index])
+    let position = match target.get("POSITION") {
+      None => None
+      Some(accessor) =>
+        Some(read_values(bins, views, accs, as_f64(accessor).to_int(), 3))
+    }
+    let normal = match target.get("NORMAL") {
+      None => None
+      Some(accessor) =>
+        Some(read_values(bins, views, accs, as_f64(accessor).to_int(), 3))
+    }
+    out.push({ position, normal, })
+    index = index + 1
+  }
+  out
+}
+
+///|
+/// 按权重把 `POSITION` 和 `NORMAL` 增量加进已有属性。
+/// 没有法线属性时跳过 `NORMAL` 目标。顶点色形变先不加。
+/// 这不是运行时的 `morphTargetInfluences`，只烘焙这一份权重。上游把增量放进 `morphAttributes`。
+/// r186: `addMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2387 ; `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2474
+fn apply_stored_morphs(
+  geometry : @core.BufferGeometry,
+  targets : Array[MorphTarget],
+  weights : Array[Double],
 ) -> Unit raise GltfError {
   let position = match geometry.get_attribute("position") {
     None => return
@@ -720,31 +754,173 @@ fn apply_morph_targets(
   while index < targets.length() {
     let weight = if index < weights.length() { weights[index] } else { 0.0 }
     if weight != 0.0 {
-      let target = as_object(targets[index])
-      match target.get("POSITION") {
+      match targets[index].position {
         None => ()
-        Some(accessor) =>
-          add_weighted_deltas(
-            position,
-            read_values(bins, views, accs, as_f64(accessor).to_int(), 3),
-            weight,
-          )
+        Some(deltas) => add_weighted_deltas(position, deltas, weight)
       }
       match normal {
         None => ()
         Some(attribute) =>
-          match target.get("NORMAL") {
+          match targets[index].normal {
             None => ()
-            Some(accessor) =>
-              add_weighted_deltas(
-                attribute,
-                read_values(bins, views, accs, as_f64(accessor).to_int(), 3),
-                weight,
-              )
+            Some(deltas) => add_weighted_deltas(attribute, deltas, weight)
           }
       }
     }
     index = index + 1
+  }
+}
+
+///|
+fn baked_geometry(
+  base : @core.BufferGeometry,
+  targets : Array[MorphTarget],
+  weights : Array[Double],
+) -> @core.BufferGeometry raise GltfError {
+  let resolved = resolve_weights(weights, None, targets.length())
+  if all_zero(resolved) {
+    base
+  } else {
+    let geometry = clone_geometry(base)
+    apply_stored_morphs(geometry, targets, resolved)
+    geometry
+  }
+}
+
+///|
+/// 节点 `weights` 按索引盖过 `mesh.weights`。更短的节点列表保留后面的网格权重。
+/// 和网格权重相同时共用烘焙结果；不同时从原始几何复制再烘焙，避免改到共享网格。
+/// 权重全是 0 时共用未烘焙的几何。动画通道里的 `weights` 仍不采样。
+/// r186: `createNodeMesh` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4213
+fn geometry_for(
+  prim : Prim,
+  node_weights : Array[Double]?,
+) -> @core.BufferGeometry raise GltfError {
+  match node_weights {
+    None => prim.baked
+    Some(_) => {
+      let weights = resolve_weights(
+        prim.mesh_weights,
+        node_weights,
+        prim.targets.length(),
+      )
+      let defaults = resolve_weights(
+        prim.mesh_weights,
+        None,
+        prim.targets.length(),
+      )
+      if same_numbers(weights, defaults) {
+        prim.baked
+      } else if all_zero(weights) {
+        prim.geometry
+      } else {
+        let geometry = clone_geometry(prim.geometry)
+        apply_stored_morphs(geometry, prim.targets, weights)
+        geometry
+      }
+    }
+  }
+}
+
+///|
+fn resolve_weights(
+  mesh_weights : Array[Double],
+  node_weights : Array[Double]?,
+  count : Int,
+) -> Array[Double] {
+  let out = []
+  let mut index = 0
+  while index < count {
+    let weight = match node_weights {
+      None =>
+        if index < mesh_weights.length() {
+          mesh_weights[index]
+        } else {
+          0.0
+        }
+      Some(overrides) =>
+        if index < overrides.length() {
+          overrides[index]
+        } else if index < mesh_weights.length() {
+          mesh_weights[index]
+        } else {
+          0.0
+        }
+    }
+    out.push(weight)
+    index = index + 1
+  }
+  out
+}
+
+///|
+fn same_numbers(left : Array[Double], right : Array[Double]) -> Bool {
+  if left.length() != right.length() {
+    return false
+  }
+  let mut index = 0
+  while index < left.length() {
+    if left[index] != right[index] {
+      return false
+    }
+    index = index + 1
+  }
+  true
+}
+
+///|
+fn all_zero(weights : Array[Double]) -> Bool {
+  let mut index = 0
+  while index < weights.length() {
+    if weights[index] != 0.0 {
+      return false
+    }
+    index = index + 1
+  }
+  true
+}
+
+///|
+fn clone_geometry(source : @core.BufferGeometry) -> @core.BufferGeometry {
+  let geometry = @core.BufferGeometry::new()
+  copy_named(source, geometry, "position")
+  copy_named(source, geometry, "normal")
+  copy_named(source, geometry, "uv")
+  match source.index {
+    None => ()
+    Some(index) =>
+      ignore(
+        geometry.set_index(
+          @core.BufferAttribute::new(
+            index.array.copy(),
+            index.item_size,
+            normalized=index.normalized,
+          ),
+        ),
+      )
+  }
+  geometry
+}
+
+///|
+fn copy_named(
+  source : @core.BufferGeometry,
+  geometry : @core.BufferGeometry,
+  name : String,
+) -> Unit {
+  match source.get_attribute(name) {
+    None => ()
+    Some(attribute) =>
+      ignore(
+        geometry.set_attribute(
+          name,
+          @core.BufferAttribute::new(
+            attribute.array.copy(),
+            attribute.item_size,
+            normalized=attribute.normalized,
+          ),
+        ),
+      )
   }
 }
 
@@ -868,6 +1044,10 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     None => []
     Some(value) => as_ints(value)
   }
+  let weights = match obj.get("weights") {
+    None => None
+    Some(value) => Some(as_doubles(value))
+  }
   {
     name: opt_string(obj, "name", ""),
     children,
@@ -885,6 +1065,7 @@ fn load_node(obj : Map[String, Json]) -> NodeDesc raise GltfError {
     sy,
     sz,
     matrix,
+    weights,
   }
 }
 
@@ -922,7 +1103,11 @@ fn apply_transform(node : @core.Object3D, desc : NodeDesc) -> Unit {
 }
 
 ///|
-fn mesh_from(prim : Prim) -> @objects.Mesh {
+fn mesh_from(
+  prim : Prim,
+  node_weights : Array[Double]?,
+) -> @objects.Mesh raise GltfError {
+  let geometry = geometry_for(prim, node_weights)
   let material = if prim.mat.unlit {
     @materials.MeshBasicMaterial::new().material
   } else {
@@ -934,7 +1119,7 @@ fn mesh_from(prim : Prim) -> @objects.Mesh {
   ignore(material.color.set_rgb(prim.mat.r, prim.mat.g, prim.mat.b))
   material.opacity = prim.mat.opacity
   material.transparent = prim.mat.transparent
-  let mesh = @objects.Mesh::new(prim.geometry, material)
+  let mesh = @objects.Mesh::new(geometry, material)
   if prim.mat.double_sided {
     mesh.set_side(@constants.Side::Double)
   }
@@ -1160,7 +1345,7 @@ fn build_nodes(
         let prims = meshes[index]
         let mut p = 0
         while p < prims.length() {
-          parts.push(mesh_from(prims[p]).node)
+          parts.push(mesh_from(prims[p], desc.weights).node)
           p = p + 1
         }
       }

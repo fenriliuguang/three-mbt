@@ -364,3 +364,45 @@ test "glTF normal morph weights are baked into normals" {
     }
   }
 }
+
+///|
+test "glTF node weights override mesh morph weights" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2,3,4,5]}],"nodes":[{"name":"heavy","mesh":0,"weights":[1,0]},{"name":"plain","mesh":0},{"name":"flat","mesh":0,"weights":[0,0]},{"name":"flat2","mesh":0,"weights":[0,0]},{"name":"partial","mesh":0,"weights":[1]},{"name":"copy","mesh":0,"weights":[0.5,0.25]}],"meshes":[{"weights":[0.5,0.25],"primitives":[{"attributes":{"POSITION":0},"targets":[{"POSITION":1},{"POSITION":2}]}]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":36}],"buffers":[{"byteLength":108,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAACAQAAAAAAAAAAAAACAQAAAAAAAAAAAAACAQAAAAAAAAAAA"}]}
+  let root = @gltf.parse(text).scene.node
+  fn position(name : String) -> @core.BufferAttribute {
+    match must(root, name).mesh {
+      None => panic()
+      Some(binding) => binding.geometry.get_attribute("position").unwrap()
+    }
+  }
+  fn geometry(name : String) -> @core.BufferGeometry {
+    match must(root, name).mesh {
+      None => panic()
+      Some(binding) => binding.geometry
+    }
+  }
+  let heavy = position("heavy")
+  assert_eq(heavy.get_y(0), 2.0)
+  assert_eq(heavy.get_y(2), 3.0)
+  assert_eq(heavy.get_x(0), 0.0)
+  assert_eq(heavy.get_x(1), 1.0)
+  let plain = position("plain")
+  assert_eq(plain.get_y(0), 1.0)
+  assert_eq(plain.get_y(2), 2.0)
+  assert_eq(plain.get_x(0), 1.0)
+  assert_eq(plain.get_x(1), 2.0)
+  let partial = position("partial")
+  assert_eq(partial.get_y(0), 2.0)
+  assert_eq(partial.get_x(0), 1.0)
+  assert_eq(partial.get_x(1), 2.0)
+  let flat = position("flat")
+  assert_eq(flat.get_y(0), 0.0)
+  assert_eq(flat.get_y(2), 1.0)
+  assert_eq(flat.get_x(1), 1.0)
+  assert_eq(physical_equal(geometry("plain"), geometry("copy")), true)
+  assert_eq(physical_equal(geometry("flat"), geometry("flat2")), true)
+  assert_eq(physical_equal(geometry("plain"), geometry("heavy")), false)
+  assert_eq(physical_equal(geometry("plain"), geometry("flat")), false)
+  assert_eq(physical_equal(geometry("plain"), geometry("partial")), false)
+}
