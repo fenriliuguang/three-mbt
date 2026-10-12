@@ -21,6 +21,7 @@ pub(all) struct MeshBinding {
   emissive_map : @textures.Texture?
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
+  alpha_map : @textures.Texture?
   instances : InstanceData?
 }
 

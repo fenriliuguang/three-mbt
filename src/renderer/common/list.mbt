@@ -23,6 +23,7 @@ pub(all) struct RenderItem {
   emissive_map : @textures.Texture?
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
+  alpha_map : @textures.Texture?
   instances : @core.InstanceData?
 }
 
@@ -62,6 +63,7 @@ pub fn collect_opaque(
                 emissive_map: binding.emissive_map,
                 roughness_map: binding.roughness_map,
                 metalness_map: binding.metalness_map,
+                alpha_map: binding.alpha_map,
                 instances: binding.instances,
               })
             }
@@ -102,6 +104,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 emissive_map: binding.emissive_map,
                 roughness_map: binding.roughness_map,
                 metalness_map: binding.metalness_map,
+                alpha_map: binding.alpha_map,
                 instances: binding.instances,
               })
             }
@@ -147,6 +150,7 @@ pub fn collect_wireframe(
                 emissive_map: binding.emissive_map,
                 roughness_map: binding.roughness_map,
                 metalness_map: binding.metalness_map,
+                alpha_map: binding.alpha_map,
                 instances: binding.instances,
               })
             }
@@ -411,6 +415,7 @@ pub fn collect_transparent(
                 emissive_map: binding.emissive_map,
                 roughness_map: binding.roughness_map,
                 metalness_map: binding.metalness_map,
+                alpha_map: binding.alpha_map,
                 instances: binding.instances,
               })
             }

@@ -952,6 +952,29 @@ test "a metalness map reaches the render list" {
 }
 
 ///|
+test "an alpha map reaches the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshBasicMaterial::new()
+  let map = @textures.Texture::checker(
+    width=2,
+    height=2,
+    cell=1,
+    first=0xFFFFFF,
+    second=0x000000,
+  )
+  material.material.alpha_map = Some(map)
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  match drawn[0].alpha_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, map), true)
+  }
+}
+
+///|
 test "emissive is packed after the fog parameters" {
   let mvp = @math.Matrix4::new()
   let zero = @math.Vector3::new()

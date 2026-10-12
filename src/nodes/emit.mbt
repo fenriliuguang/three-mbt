@@ -54,6 +54,7 @@ fn emit_expr(node : Node) -> String {
     FacingNormal => "facing_normal(input.v_normal, front)"
     EmissiveSample =>
       "textureSample(emissive_texture, emissive_sampler, input.v_uv)"
+    AlphaSample => "textureSample(alpha_texture, alpha_sampler, input.v_uv)"
   }
 }
 
@@ -104,6 +105,10 @@ pub fn emit_wgsl(program : Program) -> String {
       "@group(3) @binding(4) var metalness_texture : texture_2d<f32>;\n",
     )
     lines.push("@group(3) @binding(5) var metalness_sampler : sampler;\n")
+  }
+  if program.alpha {
+    lines.push("@group(3) @binding(6) var alpha_texture : texture_2d<f32>;\n")
+    lines.push("@group(3) @binding(7) var alpha_sampler : sampler;\n")
   }
   lines.push("\n")
   if program.preamble != "" {

@@ -124,6 +124,21 @@ test "standard multiplies metalness by the blue channel" {
 }
 
 ///|
+test "mesh materials multiply alpha by the green channel" {
+  let sample = "(textureSample(alpha_texture, alpha_sampler, input.v_uv)).g"
+  let binding = "@group(3) @binding(6) var alpha_texture"
+  assert_eq(includes(@nodes.basic_wgsl(), sample), true)
+  assert_eq(includes(@nodes.basic_instanced_wgsl(), sample), true)
+  assert_eq(includes(@nodes.lambert_wgsl(), sample), true)
+  assert_eq(includes(@nodes.lambert_instanced_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_instanced_wgsl(), sample), true)
+  assert_eq(includes(@nodes.basic_wgsl(), binding), true)
+  assert_eq(includes(@nodes.line_wgsl(), sample), false)
+  assert_eq(includes(@nodes.lambert_wgsl(), "metalness_texture"), false)
+}
+
+///|
 test "lambert and standard add one point light" {
   let lambert = @nodes.lambert_wgsl()
   let standard = @nodes.standard_wgsl()

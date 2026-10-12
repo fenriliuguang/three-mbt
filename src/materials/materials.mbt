@@ -15,8 +15,9 @@ pub(all) enum MaterialKind {
 /// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
 /// `roughness_map` 只进 Standard：绿色通道乘在粗糙度上，再取 0.0525 下限。没有贴图时同样绑白纹理。
 /// `metalness_map` 也只进 Standard：蓝色通道乘在金属度上，再夹到 0 和 1。没有贴图时绑白纹理。
-/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300
+/// `alpha_map` 的绿色通道乘在片元 alpha 上，乘完再做 `alpha_test`。Basic、Lambert、Standard 都采样。没有贴图时绑白纹理。
+/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -33,6 +34,7 @@ pub(all) struct Material {
   mut emissive_map : @textures.Texture?
   mut roughness_map : @textures.Texture?
   mut metalness_map : @textures.Texture?
+  mut alpha_map : @textures.Texture?
   kind : MaterialKind
 }
 
@@ -54,6 +56,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     emissive_map: None,
     roughness_map: None,
     metalness_map: None,
+    alpha_map: None,
     kind: Basic,
   }
 }
@@ -88,6 +91,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     emissive_map: None,
     roughness_map: None,
     metalness_map: None,
+    alpha_map: None,
     kind: Lambert,
   }
 }
@@ -128,6 +132,7 @@ pub fn Material::standard(
     emissive_map: None,
     roughness_map: None,
     metalness_map: None,
+    alpha_map: None,
     kind: Standard,
   }
 }

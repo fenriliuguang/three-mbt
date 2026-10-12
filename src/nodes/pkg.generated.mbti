@@ -55,6 +55,7 @@ pub(all) enum Node {
   SpotTerm
   FacingNormal
   EmissiveSample
+  AlphaSample
 }
 
 pub(all) struct Program {
@@ -69,6 +70,7 @@ pub(all) struct Program {
   emissive : Bool
   roughness : Bool
   metalness : Bool
+  alpha : Bool
   preamble : String
 }
 

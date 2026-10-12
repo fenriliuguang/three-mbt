@@ -194,6 +194,7 @@ pub struct WebGPURenderer {
   surface_emissive : Array[@textures.Texture?]
   surface_roughness : Array[@textures.Texture?]
   surface_metalness : Array[@textures.Texture?]
+  surface_alpha : Array[@textures.Texture?]
   surface_groups : Array[GpuBindGroup]
   basic : CullPipelines
   lambert : CullPipelines
@@ -1108,8 +1109,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("rgba8"),
   })
-  // 第 3 组六槽：0、1 是自发光，2、3 是粗糙度，4、5 是金属度。第 1 组仍是两槽颜色贴图。
-  // Lambert 和 Basic 的着色器不声明 2 到 5，绘制时仍按这个布局绑定。
+  // 第 3 组八槽：0、1 自发光，2、3 粗糙度，4、5 金属度，6、7 透明贴图。第 1 组仍是两槽颜色贴图。
+  // Lambert 和 Basic 不声明用不到的槽，绘制时仍按这个布局绑定。
   let surface_layout = device.create_bind_group_layout({
     entries: [
       {
@@ -1166,6 +1167,26 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       },
       {
         binding: 5U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 6U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 7U,
         visibility: fragment_visibility(),
         buffer: None,
         sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
@@ -1312,6 +1333,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     surface_emissive: [],
     surface_roughness: [],
     surface_metalness: [],
+    surface_alpha: [],
     surface_groups: [],
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
@@ -2358,17 +2380,23 @@ fn WebGPURenderer::drop_surface_groups(
       Some(stored) => physical_equal(stored, source)
       None => false
     }
-    if emissive_hit || roughness_hit || metalness_hit {
+    let alpha_hit = match self.surface_alpha[index] {
+      Some(stored) => physical_equal(stored, source)
+      None => false
+    }
+    if emissive_hit || roughness_hit || metalness_hit || alpha_hit {
       self.surface_groups[index].drop()
       let last = self.surface_groups.length() - 1
       self.surface_groups[index] = self.surface_groups[last]
       self.surface_emissive[index] = self.surface_emissive[last]
       self.surface_roughness[index] = self.surface_roughness[last]
       self.surface_metalness[index] = self.surface_metalness[last]
+      self.surface_alpha[index] = self.surface_alpha[last]
       ignore(self.surface_groups.pop())
       ignore(self.surface_emissive.pop())
       ignore(self.surface_roughness.pop())
       ignore(self.surface_metalness.pop())
+      ignore(self.surface_alpha.pop())
     } else {
       index = index + 1
     }
@@ -2421,23 +2449,26 @@ fn same_texture(left : @textures.Texture?, right : @textures.Texture?) -> Bool {
 }
 
 ///|
-/// 第 3 组同时绑定自发光、粗糙度和金属度。缺贴图时用 1×1 白纹理，通道为 1。
+/// 第 3 组同时绑定自发光、粗糙度、金属度和透明贴图。缺贴图时用 1×1 白纹理，通道为 1。
 /// 视图句柄与纹理缓存共用，这里只丢掉绑定组本身。
-/// r186: `roughnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl.js#L9 ; `metalnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/metalnessmap_fragment.glsl.js#L9
+/// r186: `roughnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl.js#L9 ; `metalnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/metalnessmap_fragment.glsl.js#L9 ; `diffuseColor.a` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/alphamap_fragment.glsl.js#L4
 fn WebGPURenderer::surface_group(
   self : WebGPURenderer,
   emissive : @textures.Texture?,
   roughness : @textures.Texture?,
   metalness : @textures.Texture?,
+  alpha : @textures.Texture?,
 ) -> GpuBindGroup {
   ignore(self.texture_group(emissive))
   ignore(self.texture_group(roughness))
   ignore(self.texture_group(metalness))
+  ignore(self.texture_group(alpha))
   let mut index = 0
   while index < self.surface_groups.length() {
     if same_texture(self.surface_emissive[index], emissive) &&
       same_texture(self.surface_roughness[index], roughness) &&
-      same_texture(self.surface_metalness[index], metalness) {
+      same_texture(self.surface_metalness[index], metalness) &&
+      same_texture(self.surface_alpha[index], alpha) {
       return self.surface_groups[index]
     }
     index = index + 1
@@ -2445,6 +2476,7 @@ fn WebGPURenderer::surface_group(
   let (emissive_view, emissive_sampler) = self.texture_views(emissive)
   let (roughness_view, roughness_sampler) = self.texture_views(roughness)
   let (metalness_view, metalness_sampler) = self.texture_views(metalness)
+  let (alpha_view, alpha_sampler) = self.texture_views(alpha)
   let group = self.device.create_bind_group({
     layout: self.surface_layout,
     entries: [
@@ -2472,12 +2504,21 @@ fn WebGPURenderer::surface_group(
         binding: 5U,
         resource: @gpu.GpuBindingResource::GpuSampler(metalness_sampler),
       },
+      {
+        binding: 6U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(alpha_view),
+      },
+      {
+        binding: 7U,
+        resource: @gpu.GpuBindingResource::GpuSampler(alpha_sampler),
+      },
     ],
     label: Some("surface"),
   })
   self.surface_emissive.push(emissive)
   self.surface_roughness.push(roughness)
   self.surface_metalness.push(metalness)
+  self.surface_alpha.push(alpha)
   self.surface_groups.push(group)
   group
 }
@@ -3768,6 +3809,7 @@ fn WebGPURenderer::draw_meshes(
                 item.emissive_map,
                 item.roughness_map,
                 item.metalness_map,
+                item.alpha_map,
               ),
             ),
             None,

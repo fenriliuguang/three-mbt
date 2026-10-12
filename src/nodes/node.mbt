@@ -33,6 +33,7 @@ pub(all) enum Node {
   SpotTerm
   FacingNormal
   EmissiveSample
+  AlphaSample
 }
 
 ///|
@@ -49,6 +50,7 @@ pub(all) struct Program {
   emissive : Bool
   roughness : Bool
   metalness : Bool
+  alpha : Bool
   preamble : String
 }
 
@@ -259,6 +261,16 @@ fn add_emissive(color : Node) -> Node {
 }
 
 ///|
+/// 绿色通道乘在已经乘过顶点色的 alpha 上。雾只改 rgb，所以裁切看到的是乘完的 alpha。
+/// r186: `diffuseColor.a` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/alphamap_fragment.glsl.js#L4
+fn scale_alpha(color : Node) -> Node {
+  Node::Vec4(
+    Swizzle(color, "xyz"),
+    Mul(Swizzle(color, "w"), Swizzle(AlphaSample, "g")),
+  )
+}
+
+///|
 fn with_vertex_color(
   varyings : Array[(String, ValueType)],
   assignments : Array[(String, Node)],
@@ -309,14 +321,15 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(shifted, instanced)),
     vertex_varyings: assignments,
-    fragment_color: tint_vertex(
-      tint_instance(Mul(Uniform("color", Vec4), sample), instanced),
+    fragment_color: scale_alpha(
+      tint_vertex(tint_instance(Mul(Uniform("color", Vec4), sample), instanced)),
     ),
     sampled: true,
     shadowed: false,
     emissive: false,
     roughness: false,
     metalness: false,
+    alpha: true,
     preamble: "",
   }
 }
@@ -384,14 +397,16 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(position, instanced)),
     vertex_varyings: assignments,
-    fragment_color: add_emissive(
-      tint_vertex(
-        tint_instance(
-          Vec4(
-            rgb,
-            Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+    fragment_color: scale_alpha(
+      add_emissive(
+        tint_vertex(
+          tint_instance(
+            Vec4(
+              rgb,
+              Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+            ),
+            instanced,
           ),
-          instanced,
         ),
       ),
     ),
@@ -400,6 +415,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     emissive: true,
     roughness: false,
     metalness: false,
+    alpha: true,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -452,14 +468,15 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), placed),
     vertex_varyings: assignments,
-    fragment_color: add_emissive(
-      StandardLit(tint_instance(tint_vertex(base), instanced)),
+    fragment_color: scale_alpha(
+      add_emissive(StandardLit(tint_instance(tint_vertex(base), instanced))),
     ),
     sampled: true,
     shadowed: true,
     emissive: true,
     roughness: true,
     metalness: true,
+    alpha: true,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -495,6 +512,7 @@ pub fn line_program() -> Program {
     emissive: false,
     roughness: false,
     metalness: false,
+    alpha: false,
     preamble: "",
   }
 }
