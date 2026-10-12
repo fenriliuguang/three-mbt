@@ -1186,6 +1186,50 @@ test "color write defaults on and can be turned off" {
 }
 
 ///|
+test "premultiplied alpha defaults off and reaches blended lists" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.premultiplied_alpha, false)
+  let kept = @objects.Mesh::new(box.geometry, basic.material)
+  ignore(scene.add(kept))
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.premultiplied_alpha, false)
+  lambert.material.premultiplied_alpha = true
+  let mesh = @objects.Mesh::new(box.geometry, lambert.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].premultiplied_alpha, false)
+  assert_eq(drawn[1].premultiplied_alpha, true)
+  assert_eq(drawn[1].depth_write, true)
+  let glass = @materials.MeshLambertMaterial::new()
+  glass.material.transparent = true
+  glass.material.premultiplied_alpha = true
+  let blended = @objects.Mesh::new(box.geometry, glass.material)
+  ignore(scene.add(blended))
+  let camera = @cameras.PerspectiveCamera::new(fov=50.0, aspect=1.0)
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  @common.update_frame(scene.node, camera.node)
+  let transparent = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(transparent.length(), 1)
+  assert_eq(transparent[0].premultiplied_alpha, true)
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  assert_eq(points_material.premultiplied_alpha, false)
+  points_material.premultiplied_alpha = true
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  assert_eq(line_material.premultiplied_alpha, false)
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes[0].premultiplied_alpha, true)
+  assert_eq(strokes[1].premultiplied_alpha, false)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

@@ -222,9 +222,9 @@ fn[T] ColorModes::pick(
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
 /// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。
 /// `reversed_depth` 默认关闭。打开后颜色通道和阴影通道都走反向深度：比较按 `ReversedDepthFuncs` 重映射，投影反转，深度清成 0。阴影采样比较从 `less` 换成 `greater`。
-/// 透明网格用另一组开启混合的管线。
+/// 透明网格用另一组开启混合的管线。`premultiplied_alpha` 打开后，颜色和 alpha 的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。关掉时源因子保持 `SrcAlpha`。不透明和线框不混合。阴影通道没有颜色混合。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
-/// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
+/// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
@@ -245,11 +245,17 @@ pub struct WebGPURenderer {
   lambert_instanced : ColorModes[CullPipelines]
   standard_instanced : ColorModes[CullPipelines]
   basic_blend : ColorModes[CullPipelines]
+  basic_blend_premul : ColorModes[CullPipelines]
   lambert_blend : ColorModes[CullPipelines]
+  lambert_blend_premul : ColorModes[CullPipelines]
   standard_blend : ColorModes[CullPipelines]
+  standard_blend_premul : ColorModes[CullPipelines]
   basic_instanced_blend : ColorModes[CullPipelines]
+  basic_instanced_blend_premul : ColorModes[CullPipelines]
   lambert_instanced_blend : ColorModes[CullPipelines]
+  lambert_instanced_blend_premul : ColorModes[CullPipelines]
   standard_instanced_blend : ColorModes[CullPipelines]
+  standard_instanced_blend_premul : ColorModes[CullPipelines]
   basic_lines : ColorModes[GpuRenderPipeline]
   lambert_lines : ColorModes[GpuRenderPipeline]
   standard_lines : ColorModes[GpuRenderPipeline]
@@ -260,8 +266,11 @@ pub struct WebGPURenderer {
   line_strip : ColorModes[GpuRenderPipeline]
   points : ColorModes[GpuRenderPipeline]
   line_list_blend : ColorModes[GpuRenderPipeline]
+  line_list_blend_premul : ColorModes[GpuRenderPipeline]
   line_strip_blend : ColorModes[GpuRenderPipeline]
+  line_strip_blend_premul : ColorModes[GpuRenderPipeline]
   points_blend : ColorModes[GpuRenderPipeline]
+  points_blend_premul : ColorModes[GpuRenderPipeline]
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
@@ -496,6 +505,7 @@ fn unlit_pipeline(
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write? : Bool = true,
+  premultiplied? : Bool = false,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -506,12 +516,24 @@ fn unlit_pipeline(
     Some({
       color: {
         operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        src_factor: Some(
+          if premultiplied {
+            @gpu.GpuBlendFactor::ONE
+          } else {
+            @gpu.GpuBlendFactor::SRC_ALPHA
+          },
+        ),
         dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
       },
       alpha: {
         operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        src_factor: Some(
+          if premultiplied {
+            @gpu.GpuBlendFactor::ONE
+          } else {
+            @gpu.GpuBlendFactor::SRC_ALPHA
+          },
+        ),
         dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
       },
     })
@@ -616,6 +638,7 @@ fn color_pipeline(
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write? : Bool = true,
+  premultiplied? : Bool = false,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -626,12 +649,24 @@ fn color_pipeline(
     Some({
       color: {
         operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        src_factor: Some(
+          if premultiplied {
+            @gpu.GpuBlendFactor::ONE
+          } else {
+            @gpu.GpuBlendFactor::SRC_ALPHA
+          },
+        ),
         dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
       },
       alpha: {
         operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        src_factor: Some(
+          if premultiplied {
+            @gpu.GpuBlendFactor::ONE
+          } else {
+            @gpu.GpuBlendFactor::SRC_ALPHA
+          },
+        ),
         dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
       },
     })
@@ -744,6 +779,7 @@ fn cull_pipelines(
   depth_write? : Bool = true,
   depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write? : Bool = true,
+  premultiplied? : Bool = false,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -757,6 +793,7 @@ fn cull_pipelines(
       depth_write~,
       depth_compare~,
       color_write~,
+      premultiplied~,
     ),
     back: unlit_pipeline(
       device,
@@ -769,6 +806,7 @@ fn cull_pipelines(
       depth_write~,
       depth_compare~,
       color_write~,
+      premultiplied~,
     ),
     double: unlit_pipeline(
       device,
@@ -781,6 +819,7 @@ fn cull_pipelines(
       depth_write~,
       depth_compare~,
       color_write~,
+      premultiplied~,
     ),
   }
 }
@@ -843,6 +882,7 @@ fn mesh_depth_modes(
   format : GpuTextureFormat,
   instanced? : Bool = false,
   blend? : Bool = false,
+  premultiplied? : Bool = false,
 ) -> ColorModes[CullPipelines] {
   {
     write: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -856,6 +896,7 @@ fn mesh_depth_modes(
         depth_write~,
         depth_compare~,
         color_write=true,
+        premultiplied~,
       )
     }),
     quiet: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -869,6 +910,7 @@ fn mesh_depth_modes(
         depth_write~,
         depth_compare~,
         color_write=false,
+        premultiplied~,
       )
     }),
   }
@@ -923,6 +965,7 @@ fn stroke_depth_modes(
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
   blend? : Bool = false,
+  premultiplied? : Bool = false,
 ) -> ColorModes[GpuRenderPipeline] {
   {
     write: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -937,6 +980,7 @@ fn stroke_depth_modes(
         depth_write~,
         depth_compare~,
         color_write=true,
+        premultiplied~,
       )
     }),
     quiet: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -951,6 +995,7 @@ fn stroke_depth_modes(
         depth_write~,
         depth_compare~,
         color_write=false,
+        premultiplied~,
       )
     }),
   }
@@ -1627,6 +1672,14 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       blend=true,
     ),
+    basic_blend_premul: mesh_depth_modes(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
+    ),
     lambert_blend: mesh_depth_modes(
       device,
       lambert_shader,
@@ -1634,12 +1687,28 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       blend=true,
     ),
+    lambert_blend_premul: mesh_depth_modes(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
+    ),
     standard_blend: mesh_depth_modes(
       device,
       standard_shader,
       pipeline_layout,
       format,
       blend=true,
+    ),
+    standard_blend_premul: mesh_depth_modes(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
     ),
     basic_instanced_blend: mesh_depth_modes(
       device,
@@ -1649,6 +1718,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
+    basic_instanced_blend_premul: mesh_depth_modes(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
+    ),
     lambert_instanced_blend: mesh_depth_modes(
       device,
       lambert_instanced_shader,
@@ -1657,6 +1735,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
+    lambert_instanced_blend_premul: mesh_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
+    ),
     standard_instanced_blend: mesh_depth_modes(
       device,
       standard_instanced_shader,
@@ -1664,6 +1751,15 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       instanced=true,
       blend=true,
+    ),
+    standard_instanced_blend_premul: mesh_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
     ),
     basic_lines: wire_depth_modes(device, basic_shader, pipeline_layout, format),
     lambert_lines: wire_depth_modes(
@@ -1726,6 +1822,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
+    line_list_blend_premul: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      blend=true,
+      premultiplied=true,
+    ),
     line_strip_blend: stroke_depth_modes(
       device,
       line_shader,
@@ -1735,6 +1841,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       false,
       blend=true,
     ),
+    line_strip_blend_premul: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      blend=true,
+      premultiplied=true,
+    ),
     points_blend: stroke_depth_modes(
       device,
       points_shader,
@@ -1743,6 +1859,16 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
       blend=true,
+    ),
+    points_blend_premul: stroke_depth_modes(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      blend=true,
+      premultiplied=true,
     ),
     wave: wave.1,
     wave_layout: wave.0,
@@ -1900,9 +2026,11 @@ fn WebGPURenderer::pipeline(
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
   color_write : Bool,
+  premultiplied : Bool,
 ) -> GpuRenderPipeline {
   self.cull_group(
     shading, side, false, blend, depth_write, depth_test, depth_func, color_write,
+    premultiplied,
   )
 }
 
@@ -1916,9 +2044,11 @@ fn WebGPURenderer::instanced_pipeline(
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
   color_write : Bool,
+  premultiplied : Bool,
 ) -> GpuRenderPipeline {
   self.cull_group(
     shading, side, true, blend, depth_write, depth_test, depth_func, color_write,
+    premultiplied,
   )
 }
 
@@ -1933,8 +2063,23 @@ fn WebGPURenderer::cull_group(
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
   color_write : Bool,
+  premultiplied : Bool,
 ) -> GpuRenderPipeline {
-  let modes = if blend {
+  let modes = if blend && premultiplied {
+    if instanced {
+      match shading {
+        @constants.Basic => self.basic_instanced_blend_premul
+        @constants.Lambert => self.lambert_instanced_blend_premul
+        @constants.Standard => self.standard_instanced_blend_premul
+      }
+    } else {
+      match shading {
+        @constants.Basic => self.basic_blend_premul
+        @constants.Lambert => self.lambert_blend_premul
+        @constants.Standard => self.standard_blend_premul
+      }
+    }
+  } else if blend {
     if instanced {
       match shading {
         @constants.Basic => self.basic_instanced_blend
@@ -1978,8 +2123,15 @@ fn WebGPURenderer::stroke_pipeline(
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
   color_write : Bool,
+  premultiplied : Bool,
 ) -> GpuRenderPipeline {
-  let modes = if blend {
+  let modes = if blend && premultiplied {
+    match kind {
+      @core.PrimitiveKind::Points => self.points_blend_premul
+      @core.PrimitiveKind::Line => self.line_strip_blend_premul
+      @core.PrimitiveKind::LineSegments => self.line_list_blend_premul
+    }
+  } else if blend {
     match kind {
       @core.PrimitiveKind::Points => self.points_blend
       @core.PrimitiveKind::Line => self.line_strip_blend
@@ -4150,6 +4302,7 @@ fn WebGPURenderer::draw_meshes(
                   item.depth_test,
                   self.view_depth_func(item.depth_func),
                   item.color_write,
+                  item.premultiplied_alpha,
                 )
               None =>
                 self.pipeline(
@@ -4160,6 +4313,7 @@ fn WebGPURenderer::draw_meshes(
                   item.depth_test,
                   self.view_depth_func(item.depth_func),
                   item.color_write,
+                  item.premultiplied_alpha,
                 )
             }
           },
@@ -4261,7 +4415,7 @@ fn WebGPURenderer::draw_meshes(
 }
 
 ///|
-/// 点和线。`blend` 为真时用 src-alpha 管线，深度写入仍然打开。
+/// 点和线。`blend` 为真时混合。`premultiplied_alpha` 打开后源因子是 `One`，否则是 `SrcAlpha`。目标都是 `OneMinusSrcAlpha`。
 fn WebGPURenderer::draw_strokes(
   self : WebGPURenderer,
   pass : @gpu.GpuRenderPassEncoder,
@@ -4338,6 +4492,7 @@ fn WebGPURenderer::draw_strokes(
                   item.depth_test,
                   self.view_depth_func(item.depth_func),
                   item.color_write,
+                  item.premultiplied_alpha,
                 ),
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
@@ -4360,6 +4515,7 @@ fn WebGPURenderer::draw_strokes(
                 item.depth_test,
                 self.view_depth_func(item.depth_func),
                 item.color_write,
+                item.premultiplied_alpha,
               ),
               geometry,
             )
@@ -4373,6 +4529,7 @@ fn WebGPURenderer::draw_strokes(
                 item.depth_test,
                 self.view_depth_func(item.depth_func),
                 item.color_write,
+                item.premultiplied_alpha,
               ),
               geometry,
             )

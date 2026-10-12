@@ -23,6 +23,7 @@ pub(all) struct RenderItem {
   depth_test : Bool
   depth_func : @constants.DepthFunc
   color_write : Bool
+  premultiplied_alpha : Bool
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?
@@ -70,6 +71,7 @@ pub fn collect_opaque(
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
+                premultiplied_alpha: binding.premultiplied_alpha,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -117,6 +119,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
+                premultiplied_alpha: binding.premultiplied_alpha,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -169,6 +172,7 @@ pub fn collect_wireframe(
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
+                premultiplied_alpha: binding.premultiplied_alpha,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
@@ -243,6 +247,7 @@ pub(all) struct PrimitiveItem {
   depth_test : Bool
   depth_func : @constants.DepthFunc
   color_write : Bool
+  premultiplied_alpha : Bool
 }
 
 ///|
@@ -275,6 +280,7 @@ pub fn collect_primitives(
             depth_test: binding.depth_test,
             depth_func: binding.depth_func,
             color_write: binding.color_write,
+            premultiplied_alpha: binding.premultiplied_alpha,
           })
         }
     }
@@ -311,6 +317,7 @@ pub fn collect_transparent_primitives(
             depth_test: binding.depth_test,
             depth_func: binding.depth_func,
             color_write: binding.color_write,
+            premultiplied_alpha: binding.premultiplied_alpha,
           })
         }
     }
@@ -537,6 +544,7 @@ pub fn collect_transparent(
                 depth_test: binding.depth_test,
                 depth_func: binding.depth_func,
                 color_write: binding.color_write,
+                premultiplied_alpha: binding.premultiplied_alpha,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
