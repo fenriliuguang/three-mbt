@@ -28,6 +28,7 @@ pub fn LineBasicMaterial::new(hex? : Int) -> Self
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
+  mut shadow_side : @constants.Side?
   mut opacity : Double
   mut transparent : Bool
   mut wireframe : Bool

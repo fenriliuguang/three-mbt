@@ -19,6 +19,13 @@ using @gpu {
 }
 
 ///|
+struct ShadowPipelines {
+  back : GpuRenderPipeline
+  front : GpuRenderPipeline
+  double : GpuRenderPipeline
+}
+
+///|
 struct DepthTarget {
   texture : GpuTexture
   view : GpuTextureView
@@ -222,9 +229,10 @@ fn[T] ColorModes::pick(
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
 /// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。
 /// `reversed_depth` 默认关闭。打开后颜色通道和阴影通道都走反向深度：比较按 `ReversedDepthFuncs` 重映射，投影反转，深度清成 0。阴影采样比较从 `less` 换成 `greater`。
+/// `shadow_side` 为空时，正面材质的阴影画背面，背面材质画正面，双面画两面。设了值就按那个面投射。
 /// 透明网格用另一组开启混合的管线。`premultiplied_alpha` 打开后，颜色和 alpha 的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。关掉时源因子保持 `SrcAlpha`。不透明和线框不混合。阴影通道没有颜色混合。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
-/// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552
+/// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3767
 pub struct WebGPURenderer {
   device : GpuDevice
   window : @surface.Surface
@@ -298,10 +306,10 @@ pub struct WebGPURenderer {
   shadow_sampler : GpuSampler
   shadow_sampler_reversed : GpuSampler
   shadow_dummy : GpuBindGroup
-  shadow_depth : GpuRenderPipeline
-  shadow_depth_instanced : GpuRenderPipeline
-  shadow_depth_reversed : GpuRenderPipeline
-  shadow_depth_instanced_reversed : GpuRenderPipeline
+  shadow_depth : ShadowPipelines
+  shadow_depth_instanced : ShadowPipelines
+  shadow_depth_reversed : ShadowPipelines
+  shadow_depth_instanced_reversed : ShadowPipelines
   mut shadow_map : ShadowMap?
   mut depth : DepthTarget?
   mut output : @textures.RenderTarget?
@@ -585,12 +593,13 @@ fn unlit_pipeline(
 }
 
 ///|
-/// 只写深度。剔除正面，让背面写入阴影贴图，减轻自阴影 acne。
+/// 只写深度。`cull` 决定阴影贴图留下哪一面。
 fn depth_pipeline(
   device : GpuDevice,
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   instanced : Bool,
+  cull : GpuCullMode,
   compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
 ) -> GpuRenderPipeline {
   device.create_render_pipeline({
@@ -604,7 +613,7 @@ fn depth_pipeline(
       topology: Some(@gpu.GpuPrimitiveTopology::TRIANGLE_LIST),
       strip_index_format: None,
       front_face: Some(@gpu.GpuFrontFace::CCW),
-      cull_mode: Some(GpuCullMode::FRONT),
+      cull_mode: Some(cull),
       unclipped_depth: None,
     }),
     depth_stencil: Some({
@@ -624,6 +633,43 @@ fn depth_pipeline(
     layout: @gpu.Specific(pipeline_layout),
     label: Some("shadow"),
   })
+}
+
+///|
+/// 背面投射剔除正面，正面投射剔除背面，双面不剔除。
+fn shadow_pipelines(
+  device : GpuDevice,
+  shader : GpuShaderModule,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  instanced : Bool,
+  compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
+) -> ShadowPipelines {
+  {
+    back: depth_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      instanced,
+      GpuCullMode::FRONT,
+      compare~,
+    ),
+    front: depth_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      instanced,
+      GpuCullMode::BACK,
+      compare~,
+    ),
+    double: depth_pipeline(
+      device,
+      shader,
+      pipeline_layout,
+      instanced,
+      GpuCullMode::NONE,
+      compare~,
+    ),
+  }
 }
 
 ///|
@@ -1903,18 +1949,18 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     shadow_sampler,
     shadow_sampler_reversed,
     shadow_dummy,
-    shadow_depth: depth_pipeline(device, shadow_shader, color_layout, false),
-    shadow_depth_instanced: depth_pipeline(
+    shadow_depth: shadow_pipelines(device, shadow_shader, color_layout, false),
+    shadow_depth_instanced: shadow_pipelines(
       device, shadow_instanced_shader, color_layout, true,
     ),
-    shadow_depth_reversed: depth_pipeline(
+    shadow_depth_reversed: shadow_pipelines(
       device,
       shadow_shader,
       color_layout,
       false,
       compare=@gpu.GpuCompareFunction::GREATER,
     ),
-    shadow_depth_instanced_reversed: depth_pipeline(
+    shadow_depth_instanced_reversed: shadow_pipelines(
       device,
       shadow_instanced_shader,
       color_layout,
@@ -3229,17 +3275,22 @@ fn WebGPURenderer::draw_shadow(
           Some(data) => Some(self.instance_gpu(data))
           None => None
         }
+        let shadow_group = if self.reversed_depth {
+          match batch {
+            Some(_) => self.shadow_depth_instanced_reversed
+            None => self.shadow_depth_reversed
+          }
+        } else {
+          match batch {
+            Some(_) => self.shadow_depth_instanced
+            None => self.shadow_depth
+          }
+        }
         pass.set_pipeline(
-          if self.reversed_depth {
-            match batch {
-              Some(_) => self.shadow_depth_instanced_reversed
-              None => self.shadow_depth_reversed
-            }
-          } else {
-            match batch {
-              Some(_) => self.shadow_depth_instanced
-              None => self.shadow_depth
-            }
+          match @common.shadow_cast_side(item.side, item.shadow_side) {
+            @constants.Back => shadow_group.back
+            @constants.Front => shadow_group.front
+            @constants.Double => shadow_group.double
           },
         )
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)

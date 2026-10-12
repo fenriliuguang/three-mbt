@@ -12,6 +12,7 @@ pub(all) struct RenderItem {
   color : @math.Color
   shading : @constants.Shading
   side : @constants.Side
+  shadow_side : @constants.Side?
   opacity : Double
   map : @textures.Texture?
   roughness : Double
@@ -60,6 +61,7 @@ pub fn collect_opaque(
                 color: binding.color,
                 shading: binding.shading,
                 side: binding.side,
+                shadow_side: binding.shadow_side,
                 opacity: binding.opacity,
                 map: binding.map,
                 roughness: binding.roughness,
@@ -89,6 +91,25 @@ pub fn collect_opaque(
 }
 
 ///|
+/// 阴影通道实际绘制的面。`shadow_side` 有值时直接用它。
+/// 否则正面材质画背面，背面材质画正面，双面仍画双面。没有 VSM，所以不走那条不翻转的路径。
+/// r186: `_shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L50 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3767
+pub fn shadow_cast_side(
+  side : @constants.Side,
+  shadow_side : @constants.Side?,
+) -> @constants.Side {
+  match shadow_side {
+    Some(explicit) => explicit
+    None =>
+      match side {
+        @constants.Front => @constants.Back
+        @constants.Back => @constants.Front
+        @constants.Double => @constants.Double
+      }
+  }
+}
+
+///|
 /// 阴影投射体。线框也包含在内，几何仍是三角形，边列表只给颜色通道。
 /// 不按 `render_order` 排，保持遍历顺序。
 pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] {
@@ -108,6 +129,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 color: binding.color,
                 shading: binding.shading,
                 side: binding.side,
+                shadow_side: binding.shadow_side,
                 opacity: binding.opacity,
                 map: binding.map,
                 roughness: binding.roughness,
@@ -161,6 +183,7 @@ pub fn collect_wireframe(
                 color: binding.color,
                 shading: binding.shading,
                 side: binding.side,
+                shadow_side: binding.shadow_side,
                 opacity: binding.opacity,
                 map: binding.map,
                 roughness: binding.roughness,
@@ -533,6 +556,7 @@ pub fn collect_transparent(
                 color: binding.color,
                 shading: binding.shading,
                 side: binding.side,
+                shadow_side: binding.shadow_side,
                 opacity: binding.opacity,
                 map: binding.map,
                 roughness: binding.roughness,

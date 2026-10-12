@@ -55,6 +55,8 @@ pub fn point_quad_bytes() -> FixedArray[Byte]
 
 pub let position_stride : Int
 
+pub fn shadow_cast_side(@constants.Side, @constants.Side?) -> @constants.Side
+
 pub fn shadow_matrix(@math.Matrix4, @math.Matrix4) -> @math.Matrix4
 
 pub let uniform_bytes : Int
@@ -116,6 +118,7 @@ pub(all) struct RenderItem {
   color : @math.Color
   shading : @constants.Shading
   side : @constants.Side
+  shadow_side : @constants.Side?
   opacity : Double
   map : @textures.Texture?
   roughness : Double

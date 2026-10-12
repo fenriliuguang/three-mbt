@@ -8,6 +8,7 @@ pub(all) struct MeshBinding {
   color : @math.Color
   shading : @constants.Shading
   mut side : @constants.Side
+  mut shadow_side : @constants.Side?
   mut opacity : Double
   mut transparent : Bool
   mut wireframe : Bool

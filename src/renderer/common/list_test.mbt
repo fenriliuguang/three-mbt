@@ -1230,6 +1230,56 @@ test "premultiplied alpha defaults off and reaches blended lists" {
 }
 
 ///|
+test "shadow side flips the material side unless set" {
+  assert_eq(
+    @common.shadow_cast_side(@constants.Front, None).to_int(),
+    @constants.BACK_SIDE,
+  )
+  assert_eq(
+    @common.shadow_cast_side(@constants.Back, None).to_int(),
+    @constants.FRONT_SIDE,
+  )
+  assert_eq(
+    @common.shadow_cast_side(@constants.Double, None).to_int(),
+    @constants.DOUBLE_SIDE,
+  )
+  assert_eq(
+    @common.shadow_cast_side(@constants.Front, Some(@constants.Front)).to_int(),
+    @constants.FRONT_SIDE,
+  )
+  assert_eq(
+    @common.shadow_cast_side(@constants.Back, Some(@constants.Double)).to_int(),
+    @constants.DOUBLE_SIDE,
+  )
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let plain = @materials.MeshLambertMaterial::new()
+  assert_eq(plain.material.shadow_side is None, true)
+  let kept = @objects.Mesh::new(box.geometry, plain.material)
+  kept.node.cast_shadow = true
+  ignore(scene.add(kept))
+  let explicit = @materials.MeshBasicMaterial::new()
+  explicit.material.side = @constants.Back
+  explicit.material.shadow_side = Some(@constants.Front)
+  let mesh = @objects.Mesh::new(box.geometry, explicit.material)
+  mesh.node.cast_shadow = true
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_shadow(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].shadow_side is None, true)
+  assert_eq(drawn[0].side.to_int(), @constants.FRONT_SIDE)
+  assert_eq(
+    @common.shadow_cast_side(drawn[0].side, drawn[0].shadow_side).to_int(),
+    @constants.BACK_SIDE,
+  )
+  match drawn[1].shadow_side {
+    None => assert_eq(false, true)
+    Some(side) => assert_eq(side.to_int(), @constants.FRONT_SIDE)
+  }
+  assert_eq(drawn[1].side.to_int(), @constants.BACK_SIDE)
+}
+
+///|
 test "emissive intensity reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()
