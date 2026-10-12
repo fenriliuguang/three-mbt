@@ -2662,10 +2662,18 @@ fn WebGPURenderer::bloom_submit(
   mode : Double,
   kernel : Double,
   factor : Double,
+  tint_level : Int,
   color : GpuTextureView,
   glow : GpuTextureView,
   target : GpuTextureView,
 ) -> Unit {
+  let tint_index = if tint_level < 0 {
+    0
+  } else if tint_level > 4 {
+    4
+  } else {
+    tint_level
+  }
   ignore(
     self.device
     .queue()
@@ -2681,6 +2689,9 @@ fn WebGPURenderer::bloom_submit(
         mode,
         kernel~,
         factor~,
+        tint_r=pass.tint_r[tint_index],
+        tint_g=pass.tint_g[tint_index],
+        tint_b=pass.tint_b[tint_index],
       ),
       None,
       None,
@@ -2733,6 +2744,7 @@ fn WebGPURenderer::bloom_prepare(
     0.0,
     6.0,
     1.0,
+    0,
     source,
     source,
     pyramid.bright_view,
@@ -2753,6 +2765,7 @@ fn WebGPURenderer::bloom_prepare(
       1.0,
       kernel,
       1.0,
+      0,
       input,
       input,
       mip.h_view,
@@ -2766,6 +2779,7 @@ fn WebGPURenderer::bloom_prepare(
       1.0,
       kernel,
       1.0,
+      0,
       mip.h_view,
       mip.h_view,
       mip.v_view,
@@ -2791,6 +2805,7 @@ fn WebGPURenderer::bloom_prepare(
     3.0,
     6.0,
     factor(0),
+    0,
     pyramid.levels[0].v_view,
     pyramid.levels[0].v_view,
     pyramid.acc_view,
@@ -2809,6 +2824,7 @@ fn WebGPURenderer::bloom_prepare(
         4.0,
         6.0,
         factor(level),
+        level,
         pyramid.acc_view,
         glow,
         pyramid.acc2_view,
@@ -2823,6 +2839,7 @@ fn WebGPURenderer::bloom_prepare(
         4.0,
         6.0,
         factor(level),
+        level,
         pyramid.acc2_view,
         glow,
         pyramid.acc_view,
@@ -2850,7 +2867,7 @@ fn WebGPURenderer::bloom_to(
 ) -> Unit {
   let glow = self.bloom_prepare(source, width, height, pass)
   self.bloom_submit(
-    pass, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 1.0, source, glow, target,
+    pass, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 1.0, 0, source, glow, target,
   )
 }
 
@@ -2883,6 +2900,7 @@ pub fn WebGPURenderer::bloom(
     5.0,
     6.0,
     1.0,
+    0,
     frame.view,
     glow,
     screen,

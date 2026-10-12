@@ -645,13 +645,16 @@ pub fn gaussian_coefficient(index : Int, kernel_radius : Int) -> Double {
 
 ///|
 /// 泛光。默认强度 1、半径 0、阈值 0、过渡 0.01，与 r186 `BloomNode` 相同。
-/// 五级核半径是 6、10、14、18、22。第 0 级用全分辨率，之后每级对半。半精度目标和染色还没做。
+/// 五级核半径是 6、10、14、18、22。第 0 级用全分辨率，之后每级对半。每级染色默认白色。半精度目标还没做。
 /// r186: `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54
 pub(all) struct BloomPass {
   mut strength : Double
   mut radius : Double
   mut threshold : Double
   mut smooth_width : Double
+  mut tint_r : Array[Double]
+  mut tint_g : Array[Double]
+  mut tint_b : Array[Double]
 }
 
 ///|
@@ -660,7 +663,32 @@ pub fn BloomPass::new(
   radius? : Double = 0.0,
   threshold? : Double = 0.0,
 ) -> BloomPass {
-  { strength, radius: clamp_radius(radius), threshold, smooth_width: 0.01, }
+  {
+    strength,
+    radius: clamp_radius(radius),
+    threshold,
+    smooth_width: 0.01,
+    tint_r: [1.0, 1.0, 1.0, 1.0, 1.0],
+    tint_g: [1.0, 1.0, 1.0, 1.0, 1.0],
+    tint_b: [1.0, 1.0, 1.0, 1.0, 1.0],
+  }
+}
+
+///|
+/// 设置第 `level` 级的染色。越界下标不改。默认五级都是白。
+/// r186: `bloomTintColors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L116
+pub fn BloomPass::set_tint(
+  self : BloomPass,
+  level : Int,
+  r : Double,
+  g : Double,
+  b : Double,
+) -> Unit {
+  if level >= 0 && level < 5 {
+    self.tint_r[level] = r
+    self.tint_g[level] = g
+    self.tint_b[level] = b
+  }
 }
 
 ///|
@@ -687,7 +715,7 @@ pub fn BloomPass::set_smooth_width(
 }
 
 ///|
-/// 48 字节 uniform。依次是阈值、过渡、强度、半径、纹素、方向、模式、核半径和该级系数。
+/// 64 字节 uniform。依次是阈值、过渡、强度、半径、纹素、方向、模式、核半径、该级系数和染色。
 pub fn pack_bloom(
   pass : BloomPass,
   texel_x : Double,
@@ -697,8 +725,11 @@ pub fn pack_bloom(
   mode : Double,
   kernel? : Double = 6.0,
   factor? : Double = 1.0,
+  tint_r? : Double = 1.0,
+  tint_g? : Double = 1.0,
+  tint_b? : Double = 1.0,
 ) -> FixedArray[Byte] {
-  let dst = FixedArray::make(48, b'\x00')
+  let dst = FixedArray::make(64, b'\x00')
   write_f32(dst, 0, pass.threshold)
   write_f32(dst, 4, pass.smooth_width)
   write_f32(dst, 8, pass.strength)
@@ -710,7 +741,25 @@ pub fn pack_bloom(
   write_f32(dst, 32, mode)
   write_f32(dst, 36, kernel)
   write_f32(dst, 40, factor)
+  write_f32(dst, 44, tint_r)
+  write_f32(dst, 48, tint_g)
+  write_f32(dst, 52, tint_b)
   dst
+}
+
+///|
+/// 把一级染色乘上该级权重。白染色时结果就是权重本身。
+/// r186: `bloomTintColors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L116
+pub fn bloom_tinted(
+  level : Int,
+  tint_r : Double,
+  tint_g : Double,
+  tint_b : Double,
+  strength : Double,
+  radius : Double,
+) -> @math.Color {
+  let weight = bloom_level_weight(level, strength, radius)
+  @math.Color::new(r=tint_r * weight, g=tint_g * weight, b=tint_b * weight)
 }
 
 ///|
@@ -795,7 +844,10 @@ pub fn bloom_wgsl() -> String {
     #|  mode : f32,
     #|  kernel : f32,
     #|  factor : f32,
-    #|  pad2 : f32,
+    #|  tint_r : f32,
+    #|  tint_g : f32,
+    #|  tint_b : f32,
+    #|  pad3 : f32,
     #|}
     #|
     #|@group(0) @binding(0) var color_tex : texture_2d<f32>;
@@ -845,15 +897,15 @@ pub fn bloom_wgsl() -> String {
     #|    return vec4<f32>(blur(input.uv), 1.0);
     #|  }
     #|  let glow = textureSample(glow_tex, glow_samp, input.uv);
-    #|  let weight = bloom_weight();
+    #|  let weighted = glow.rgb * bloom_weight() * vec3<f32>(params.tint_r, params.tint_g, params.tint_b);
     #|  if (params.mode < 2.5) {
-    #|    return vec4<f32>(color.rgb + glow.rgb * weight, color.a);
+    #|    return vec4<f32>(color.rgb + weighted, color.a);
     #|  }
     #|  if (params.mode < 3.5) {
-    #|    return vec4<f32>(glow.rgb * weight, 1.0);
+    #|    return vec4<f32>(weighted, 1.0);
     #|  }
     #|  if (params.mode < 4.5) {
-    #|    return vec4<f32>(color.rgb + glow.rgb * weight, 1.0);
+    #|    return vec4<f32>(color.rgb + weighted, 1.0);
     #|  }
     #|  return vec4<f32>(color.rgb + glow.rgb, color.a);
     #|}

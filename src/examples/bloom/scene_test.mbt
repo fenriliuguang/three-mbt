@@ -11,6 +11,9 @@ test "bloom scene draws one cube into a color target" {
   assert_eq(world.pass.radius, 0.0)
   assert_eq(world.pass.threshold, 0.2)
   assert_eq(world.pass.smooth_width, 0.01)
+  assert_eq(world.pass.tint_r[4], 0.5)
+  assert_eq(world.pass.tint_g[4], 1.0)
+  assert_eq(world.pass.tint_b[4], 0.25)
   let kept = @post.high_pass(
     1.0,
     1.0,

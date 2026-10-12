@@ -15,6 +15,8 @@ pub fn bloom_mip_size(Int, Int) -> Int
 
 pub fn bloom_mix(Double, Double, Double, Double, Double, Double, Double, Double) -> @math.Color
 
+pub fn bloom_tinted(Int, Double, Double, Double, Double, Double) -> @math.Color
+
 pub fn bloom_wgsl() -> String
 
 pub fn gaussian_coefficient(Int, Int) -> Double
@@ -29,7 +31,7 @@ pub fn luminance(Double, Double, Double) -> Double
 
 pub fn pack_amount(Double) -> FixedArray[Byte]
 
-pub fn pack_bloom(BloomPass, Double, Double, Double, Double, Double, kernel? : Double, factor? : Double) -> FixedArray[Byte]
+pub fn pack_bloom(BloomPass, Double, Double, Double, Double, Double, kernel? : Double, factor? : Double, tint_r? : Double, tint_g? : Double, tint_b? : Double) -> FixedArray[Byte]
 
 pub fn pack_tone(@constants.ToneMapping, Double) -> FixedArray[Byte]
 
@@ -45,12 +47,16 @@ pub(all) struct BloomPass {
   mut radius : Double
   mut threshold : Double
   mut smooth_width : Double
+  mut tint_r : Array[Double]
+  mut tint_g : Array[Double]
+  mut tint_b : Array[Double]
 }
 pub fn BloomPass::new(strength? : Double, radius? : Double, threshold? : Double) -> Self
 pub fn BloomPass::set_radius(Self, Double) -> Unit
 pub fn BloomPass::set_smooth_width(Self, Double) -> Unit
 pub fn BloomPass::set_strength(Self, Double) -> Unit
 pub fn BloomPass::set_threshold(Self, Double) -> Unit
+pub fn BloomPass::set_tint(Self, Int, Double, Double, Double) -> Unit
 
 pub(all) enum ComposerEffect {
   Grayscale(GrayscalePass)

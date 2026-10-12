@@ -148,7 +148,7 @@ sh scripts/build-tone.sh
 
 把 `target/tone.component.wasm` 复制到 `examples/apps/tone/tone.component.wasm`，然后 `cargo xtask run-demo --name tone`。`moon run src/examples/tone/app` 不会打开窗口。
 
-泛光样本把 Lambert 立方体画进颜色目标，再以阈值 0.2 加上五级光晕：
+泛光样本把 Lambert 立方体画进颜色目标，再以阈值 0.2 加上五级光晕。最小一级染成 `(0.5, 1, 0.25)`：
 
 ```sh
 sh scripts/build-bloom.sh

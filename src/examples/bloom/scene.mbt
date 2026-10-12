@@ -42,14 +42,9 @@ pub fn BloomScene::new() -> BloomScene {
   let camera = PerspectiveCamera::new(fov=50.0, aspect=1.0, near=0.1, far=100.0)
   ignore(camera.node.position.set(0.0, 0.8, 3.0))
   camera.node.look_at(0.0, 0.0, 0.0)
-  {
-    scene,
-    camera,
-    cube,
-    target,
-    pass: BloomPass::new(threshold=0.2),
-    angle: 0.0,
-  }
+  let pass = BloomPass::new(threshold=0.2)
+  pass.set_tint(4, 0.5, 1.0, 0.25)
+  { scene, camera, cube, target, pass, angle: 0.0, }
 }
 
 ///|
