@@ -1,4 +1,4 @@
-// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
 
 ///|
 using @core {type BufferGeometry, type Object3D}
@@ -58,6 +58,87 @@ pub fn collect_opaque(
     }
   })
   items
+}
+
+///|
+/// 线框网格。透明与不透明都收集。实例化线框不在这里。
+/// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
+pub fn collect_wireframe(
+  root : Object3D,
+  frustum? : @math.Frustum,
+  camera? : Object3D,
+) -> Array[RenderItem] {
+  let items = []
+  root.traverse_visible(fn(node) {
+    match node.kind {
+      @core.Mesh =>
+        match node.mesh {
+          None => ()
+          Some(binding) =>
+            if binding.wireframe &&
+              binding.instances is None &&
+              on_camera_layer(node, camera) &&
+              kept_by_frustum(node, binding.geometry, frustum) {
+              items.push({
+                node,
+                geometry: binding.geometry,
+                color: binding.color,
+                shading: binding.shading,
+                side: binding.side,
+                opacity: binding.opacity,
+                map: binding.map,
+                roughness: binding.roughness,
+                metalness: binding.metalness,
+                fog: binding.fog,
+                instances: None,
+              })
+            }
+        }
+      _ => ()
+    }
+  })
+  items
+}
+
+///|
+/// 每个三角形展开成三条边：`a b`、`b c`、`c a`。不成三角形的尾部丢掉。
+/// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
+pub fn wireframe_line_indices(geometry : BufferGeometry) -> Array[Int] {
+  let lines = []
+  match geometry.index {
+    Some(index) => {
+      let mut cursor = 0
+      while cursor + 2 < index.count {
+        let a = index.get_x(cursor).to_int()
+        let b = index.get_x(cursor + 1).to_int()
+        let c = index.get_x(cursor + 2).to_int()
+        lines.push(a)
+        lines.push(b)
+        lines.push(b)
+        lines.push(c)
+        lines.push(c)
+        lines.push(a)
+        cursor = cursor + 3
+      }
+    }
+    None =>
+      match geometry.get_attribute("position") {
+        None => ()
+        Some(position) => {
+          let mut cursor = 0
+          while cursor + 2 < position.count {
+            lines.push(cursor)
+            lines.push(cursor + 1)
+            lines.push(cursor + 1)
+            lines.push(cursor + 2)
+            lines.push(cursor + 2)
+            lines.push(cursor)
+            cursor = cursor + 3
+          }
+        }
+      }
+  }
+  lines
 }
 
 ///|

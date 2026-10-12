@@ -483,3 +483,53 @@ test "camera layers hide meshes and lights" {
   assert_eq(shown.ambient.y, 0.25)
   assert_eq(shown.ambient.z, 0.25)
 }
+
+///|
+test "wireframe expands each triangle into three edges" {
+  let box = @geometries.BoxGeometry::new()
+  let lines = @common.wireframe_line_indices(box.geometry)
+  match box.geometry.index {
+    None => assert_eq(false, true)
+    Some(index) => {
+      assert_eq(lines.length(), index.count * 2)
+      assert_eq(lines[0], index.get_x(0).to_int())
+      assert_eq(lines[1], index.get_x(1).to_int())
+      assert_eq(lines[2], index.get_x(1).to_int())
+      assert_eq(lines[3], index.get_x(2).to_int())
+      assert_eq(lines[4], index.get_x(2).to_int())
+      assert_eq(lines[5], index.get_x(0).to_int())
+    }
+  }
+  let bare = @core.BufferGeometry::new()
+  ignore(
+    bare.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let open = @common.wireframe_line_indices(bare)
+  assert_eq(open.length(), 6)
+  assert_eq(open[0], 0)
+  assert_eq(open[1], 1)
+  assert_eq(open[2], 1)
+  assert_eq(open[3], 2)
+  assert_eq(open[4], 2)
+  assert_eq(open[5], 0)
+  let scene = @scenes.Scene::new()
+  let wire = @materials.MeshBasicMaterial::new()
+  wire.material.wireframe = true
+  let mesh = @objects.Mesh::new(box.geometry, wire.material)
+  ignore(scene.add(mesh))
+  let solid = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(scene.add(solid))
+  let drawn = @common.collect_wireframe(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(physical_equal(drawn[0].node, mesh.node), true)
+  assert_eq(@common.collect_opaque(scene.node).length(), 1)
+}

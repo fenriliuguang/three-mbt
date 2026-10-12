@@ -100,6 +100,16 @@ pub fn pack_u32_indices(index : BufferAttribute) -> FixedArray[Byte] {
 }
 
 ///|
+/// 整数索引进小端 `u32`。
+pub fn pack_index_array(indices : Array[Int]) -> FixedArray[Byte] {
+  let dst = FixedArray::make(indices.length() * 4, b'\x00')
+  for item in 0..<indices.length() {
+    write_u32(dst, item * 4, indices[item])
+  }
+  dst
+}
+
+///|
 /// 位置、法线和 uv 交错存放，每个顶点 32 字节。缺少法线时写成 `(0, 0, 1)`，缺少 uv 时写成 `(0, 0)`。
 pub fn pack_position_normal_uv(
   position : BufferAttribute,

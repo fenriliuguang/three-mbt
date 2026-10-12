@@ -1,4 +1,4 @@
-// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
 
 ///|
 using @gpu {
@@ -33,6 +33,13 @@ struct GeometryGpu {
   indices : GpuBuffer?
   index_count : Int
   vertex_count : Int
+}
+
+///|
+struct WireGpu {
+  geometry : @core.BufferGeometry
+  indices : GpuBuffer
+  index_count : Int
 }
 
 ///|
@@ -194,6 +201,9 @@ pub struct WebGPURenderer {
   basic_instanced_blend : CullPipelines
   lambert_instanced_blend : CullPipelines
   standard_instanced_blend : CullPipelines
+  basic_lines : GpuRenderPipeline
+  lambert_lines : GpuRenderPipeline
+  standard_lines : GpuRenderPipeline
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
@@ -230,6 +240,7 @@ pub struct WebGPURenderer {
   mut output : @textures.RenderTarget?
   color_targets : Array[ColorTarget]
   geometries : Array[GeometryGpu]
+  wireframes : Array[WireGpu]
   positions : Array[PositionGpu]
   instances : Array[InstanceGpu]
   storages : Array[StorageGpu]
@@ -417,6 +428,7 @@ fn unlit_pipeline(
   cull : GpuCullMode,
   instanced? : Bool = false,
   blend? : Bool = false,
+  lines? : Bool = false,
 ) -> GpuRenderPipeline {
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
@@ -442,10 +454,16 @@ fn unlit_pipeline(
       constants: None,
     },
     primitive: Some({
-      topology: Some(@gpu.GpuPrimitiveTopology::TRIANGLE_LIST),
+      topology: Some(
+        if lines {
+          @gpu.GpuPrimitiveTopology::LINE_LIST
+        } else {
+          @gpu.GpuPrimitiveTopology::TRIANGLE_LIST
+        },
+      ),
       strip_index_format: None,
       front_face: Some(@gpu.GpuFrontFace::CCW),
-      cull_mode: Some(cull),
+      cull_mode: Some(if lines { GpuCullMode::NONE } else { cull }),
       unclipped_depth: None,
     }),
     depth_stencil: Some({
@@ -468,7 +486,7 @@ fn unlit_pipeline(
       constants: None,
     }),
     layout: @gpu.Specific(pipeline_layout),
-    label: Some(if blend { "blend" } else { "unlit" }),
+    label: Some(if lines { "wire" } else if blend { "blend" } else { "unlit" }),
   })
 }
 
@@ -1257,6 +1275,30 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       instanced=true,
       blend=true,
     ),
+    basic_lines: unlit_pipeline(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+    ),
+    lambert_lines: unlit_pipeline(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+    ),
+    standard_lines: unlit_pipeline(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+    ),
     line_list: color_pipeline(
       device,
       line_shader,
@@ -1322,6 +1364,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     output: None,
     color_targets: [],
     geometries: [],
+    wireframes: [],
     positions: [],
     instances: [],
     storages: [],
@@ -1331,6 +1374,47 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     swap_height: window.height(),
     swapchain_dirty: false,
   }
+}
+
+///|
+fn WebGPURenderer::wire_pipeline(
+  self : WebGPURenderer,
+  shading : @constants.Shading,
+) -> GpuRenderPipeline {
+  match shading {
+    @constants.Basic => self.basic_lines
+    @constants.Lambert => self.lambert_lines
+    @constants.Standard => self.standard_lines
+  }
+}
+
+///|
+fn WebGPURenderer::ensure_wire(
+  self : WebGPURenderer,
+  geometry : @core.BufferGeometry,
+) -> WireGpu? {
+  for cached in self.wireframes {
+    if physical_equal(cached.geometry, geometry) {
+      return Some(cached)
+    }
+  }
+  let lines = @common.wireframe_line_indices(geometry)
+  if lines.length() < 2 {
+    return None
+  }
+  let cached = {
+    geometry,
+    indices: pack_buffer(
+      self.device,
+      @common.pack_index_array(lines),
+      vertex=false,
+      index=true,
+      uniform=false,
+    ),
+    index_count: lines.length(),
+  }
+  self.wireframes.push(cached)
+  Some(cached)
 }
 
 ///|
@@ -3187,13 +3271,18 @@ fn WebGPURenderer::draw_meshes(
   height : UInt,
   shadow_group : GpuBindGroup,
   blend : Bool,
+  lines? : Bool = false,
 ) -> Unit {
   for item in items {
     let draw_mesh = match item.instances {
       Some(data) => data.count > 0
       None => true
     }
-    if !draw_mesh {
+    if !draw_mesh || (lines && item.instances is Some(_)) {
+      continue
+    }
+    let wire = if lines { self.ensure_wire(item.geometry) } else { None }
+    if lines && wire is None {
       continue
     }
     match self.geometry_gpu(item.geometry) {
@@ -3245,9 +3334,13 @@ fn WebGPURenderer::draw_meshes(
           None => None
         }
         pass.set_pipeline(
-          match batch {
-            Some(_) => self.instanced_pipeline(item.shading, item.side, blend)
-            None => self.pipeline(item.shading, item.side, blend)
+          if lines {
+            self.wire_pipeline(item.shading)
+          } else {
+            match batch {
+              Some(_) => self.instanced_pipeline(item.shading, item.side, blend)
+              None => self.pipeline(item.shading, item.side, blend)
+            }
           },
         )
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
@@ -3280,28 +3373,49 @@ fn WebGPURenderer::draw_meshes(
           ),
         )
         ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
-        match geometry.indices {
-          None =>
-            pass.draw(
-              geometry.vertex_count.reinterpret_as_uint(),
-              Some(instance_count.reinterpret_as_uint()),
-              None,
-              None,
-            )
-          Some(indices) => {
-            pass.set_index_buffer(
-              indices,
-              @gpu.GpuIndexFormat::UINT32,
-              None,
-              None,
-            )
-            pass.draw_indexed(
-              geometry.index_count.reinterpret_as_uint(),
-              Some(instance_count.reinterpret_as_uint()),
-              None,
-              None,
-              None,
-            )
+        if lines {
+          match wire {
+            None => ()
+            Some(wire) => {
+              pass.set_index_buffer(
+                wire.indices,
+                @gpu.GpuIndexFormat::UINT32,
+                None,
+                None,
+              )
+              pass.draw_indexed(
+                wire.index_count.reinterpret_as_uint(),
+                Some(1U),
+                None,
+                None,
+                None,
+              )
+            }
+          }
+        } else {
+          match geometry.indices {
+            None =>
+              pass.draw(
+                geometry.vertex_count.reinterpret_as_uint(),
+                Some(instance_count.reinterpret_as_uint()),
+                None,
+                None,
+              )
+            Some(indices) => {
+              pass.set_index_buffer(
+                indices,
+                @gpu.GpuIndexFormat::UINT32,
+                None,
+                None,
+              )
+              pass.draw_indexed(
+                geometry.index_count.reinterpret_as_uint(),
+                Some(instance_count.reinterpret_as_uint()),
+                None,
+                None,
+                None,
+              )
+            }
           }
         }
       }
@@ -3310,8 +3424,8 @@ fn WebGPURenderer::draw_meshes(
 }
 
 ///|
-/// 更新矩阵，清屏，先画不透明网格，再画透明网格。窗口目标会 `present`，颜色目标不会。
-/// 颜色通道按相机视锥和层掩码裁剪。阴影通道仍画出全部投射体，但只保留阴影相机看得到的层。
+/// 更新矩阵，清屏，先画不透明网格，再画线框，然后画透明网格。窗口目标会 `present`，颜色目标不会。
+/// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边，不投射阴影。阴影通道仍画出全部投射体，但只保留阴影相机看得到的层。
 /// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,
@@ -3402,6 +3516,19 @@ pub fn WebGPURenderer::render(
     height,
     shadow_group,
     false,
+  )
+  self.draw_meshes(
+    pass,
+    @common.collect_wireframe(scene.node, frustum=view, camera~),
+    camera,
+    state,
+    lights,
+    scene.fog,
+    width,
+    height,
+    shadow_group,
+    false,
+    lines=true,
   )
   self.draw_meshes(
     pass,

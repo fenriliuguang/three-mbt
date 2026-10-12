@@ -19,6 +19,8 @@ pub fn collect_primitives(@core.Object3D, frustum? : @math.Frustum, camera? : @c
 
 pub fn collect_transparent(@core.Object3D, @core.Object3D, frustum? : @math.Frustum) -> Array[RenderItem]
 
+pub fn collect_wireframe(@core.Object3D, frustum? : @math.Frustum, camera? : @core.Object3D) -> Array[RenderItem]
+
 pub fn copy_bytes_per_row(Int) -> Int
 
 pub let instance_color_stride : Int
@@ -30,6 +32,8 @@ pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
 pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
 pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
+
+pub fn pack_index_array(Array[Int]) -> FixedArray[Byte]
 
 pub fn pack_instance_colors(@core.BufferAttribute?, Int) -> FixedArray[Byte]
 
@@ -56,6 +60,8 @@ pub fn update_frame(@core.Object3D, @core.Object3D) -> Unit
 pub let vertex_stride : Int
 
 pub fn view_depth(@core.Object3D, @core.Object3D) -> Double
+
+pub fn wireframe_line_indices(@core.BufferGeometry) -> Array[Int]
 
 // Errors
 
