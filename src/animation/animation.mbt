@@ -1,4 +1,4 @@
-// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16
+// r186: `AnimationMixer` https://github.com/mrdoob/three.js/blob/r186/src/animation/AnimationMixer.js#L16 ; `CubicInterpolant` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L13
 
 ///|
 using @core {type Object3D}
@@ -7,8 +7,8 @@ using @core {type Object3D}
 using @constants {type Interpolation, type LoopMode}
 
 ///|
-/// 一条关键帧。`value_size` 为 3 时按向量线性插值，为 4 时按四元数 slerp。
-/// 时间必须非递减。三次样条不在这一阶段。
+/// 一条关键帧。`value_size` 为 3 时按向量插值，为 4 时按四元数 slerp。
+/// 时间必须非递减。`Smooth` 对向量用三次样条，四元数没有这条工厂，仍走 slerp。
 /// r186: `KeyframeTrack` https://github.com/mrdoob/three.js/blob/r186/src/animation/KeyframeTrack.js#L19
 pub(all) struct KeyframeTrack {
   name : String
@@ -400,6 +400,17 @@ fn sample_track(
   let (x1, y1, z1, w1) = read_key(track, index + 1)
   if track.value_size == 4 {
     slerp_key(x0, y0, z0, w0, x1, y1, z1, w1, alpha)
+  } else if track.interpolation is Smooth {
+    match smooth_vector(track, index, alpha) {
+      Some(sampled) => sampled
+      None =>
+        (
+          x0 + (x1 - x0) * alpha,
+          y0 + (y1 - y0) * alpha,
+          z0 + (z1 - z0) * alpha,
+          0.0,
+        )
+    }
   } else {
     (
       x0 + (x1 - x0) * alpha,
@@ -408,6 +419,76 @@ fn sample_track(
       0.0,
     )
   }
+}
+
+///|
+/// 零曲率端点的三次样条。相邻时间相同则返回 `None`，调用方改走线性。
+/// 四元数轨道不走这里。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L120
+fn smooth_vector(
+  track : KeyframeTrack,
+  index : Int,
+  p : Double,
+) -> (Double, Double, Double, Double)? {
+  let t0 = track.times[index]
+  let t1 = track.times[index + 1]
+  let span = t1 - t0
+  if span == 0.0 {
+    return None
+  }
+  let half = span * 0.5
+  let (weight_prev, prev) = if index == 0 {
+    (half / (t0 - t1), index + 1)
+  } else {
+    let denom = t0 - track.times[index - 1]
+    if denom == 0.0 {
+      return None
+    }
+    (half / denom, index - 1)
+  }
+  let (weight_next, next) = if index + 2 >= track.times.length() {
+    (half / (t0 - t1), index)
+  } else {
+    let denom = track.times[index + 2] - t1
+    if denom == 0.0 {
+      return None
+    }
+    (half / denom, index + 2)
+  }
+  let (px, py, pz, _) = read_key(track, prev)
+  let (x0, y0, z0, _) = read_key(track, index)
+  let (x1, y1, z1, _) = read_key(track, index + 1)
+  let (nx, ny, nz, _) = read_key(track, next)
+  Some(
+    (
+      cubic_channel(px, x0, x1, nx, weight_prev, weight_next, p),
+      cubic_channel(py, y0, y1, ny, weight_prev, weight_next, p),
+      cubic_channel(pz, z0, z1, nz, weight_prev, weight_next, p),
+      0.0,
+    ),
+  )
+}
+
+///|
+fn cubic_channel(
+  prev : Double,
+  v0 : Double,
+  v1 : Double,
+  next : Double,
+  weight_prev : Double,
+  weight_next : Double,
+  p : Double,
+) -> Double {
+  let pp = p * p
+  let ppp = pp * p
+  let s_prev = -weight_prev * ppp + 2.0 * weight_prev * pp - weight_prev * p
+  let s0 = (1.0 + weight_prev) * ppp +
+    (-1.5 - 2.0 * weight_prev) * pp +
+    (-0.5 + weight_prev) * p +
+    1.0
+  let s1 = (-1.0 - weight_next) * ppp + (1.5 + weight_next) * pp + 0.5 * p
+  let s_next = weight_next * ppp - weight_next * pp
+  s_prev * prev + s0 * v0 + s1 * v1 + s_next * next
 }
 
 ///|

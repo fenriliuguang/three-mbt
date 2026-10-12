@@ -70,6 +70,7 @@ pub fn CoordinateSystem::to_int(Self) -> Int
 pub(all) enum Interpolation {
   Discrete
   Linear
+  Smooth
 }
 pub fn Interpolation::to_int(Self) -> Int
 

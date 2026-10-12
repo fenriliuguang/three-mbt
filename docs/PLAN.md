@@ -215,7 +215,7 @@ Render targets have landed. `RenderTarget` is a color texture plus a private `de
 
 Fog has landed. `Fog` is linear, with `near` and `far` in view-space depth, and `FogExp2` is `1 - exp(-density² depth²)`. The factor is the same smoothstep r186 uses for linear fog. A material with `fog` set to false keeps its own color. `examples/fog` is three Lambert cubes fading into the background. The window sample is `scripts/build-fog.sh`. Host playback stays out of this pass.
 
-The animation mixer has landed. `AnimationClip` holds vector and quaternion tracks. Sampling is linear, or discrete; quaternion tracks use slerp. `LoopRepeat`, `LoopOnce`, and `LoopPingPong` match the r186 numbers. A weight below 1 blends with the pose captured on the first update. `InterpolateSmooth` stays later. `examples/animate` bobs and turns a Lambert cube. The window sample is `scripts/build-animate.sh`. Host playback stays out of this pass.
+The animation mixer has landed. `AnimationClip` holds vector and quaternion tracks. Sampling is linear, discrete, or smooth. Quaternion tracks use slerp. `Smooth` on a quaternion track still slerps, because that track has no smooth factory. Vector `Smooth` is the cubic spline with zero-curvature ends. `LoopRepeat`, `LoopOnce`, and `LoopPingPong` match the r186 numbers. A weight below 1 blends with the pose captured on the first update. `examples/animate` bobs and turns a Lambert cube. The window sample is `scripts/build-animate.sh`. Host playback stays out of this pass.
 
 A glTF 2.0 subset has landed. `parse` reads one JSON document. Buffer bytes come from a base64 `data:` URI, or from the caller when buffer 0 has no URI. Triangle primitives become meshes with `POSITION`, `NORMAL`, `TEXCOORD_0`, and indices. `baseColorFactor` is written as linear RGB, with `roughnessFactor`, `metallicFactor`, and `doubleSided`. A node `matrix` replaces translation, rotation, and scale. Images, skins, morph targets, animations, cameras, and punctual lights stay later. `examples/gltf` draws that unit box under a directional light. The window sample is `scripts/build-gltf.sh`. Host playback stays out of this pass.
 
@@ -259,7 +259,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Directional light shadows | `lights`, `renderer` |
 | planned | 7 | RenderTarget | `textures`, `renderer` |
 | planned | 7 | Fog, FogExp2 | `scenes`, `materials`, `renderer` |
-| planned | 7 | AnimationClip, AnimationMixer | `animation` |
+| planned | 7 | AnimationClip, AnimationMixer, cubic smooth on vector tracks | `animation` |
 | planned | 7 | a glTF loader subset | `gltf` |
 | planned | 7 | a compute shader for point positions | `compute`, `renderer` |
 | planned | 7 | a grayscale post pass | `post`, `renderer` |

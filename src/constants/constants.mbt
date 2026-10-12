@@ -183,7 +183,7 @@ pub const INTERPOLATE_DISCRETE : Int = 2300
 pub const INTERPOLATE_LINEAR : Int = 2301
 
 ///|
-/// 三次样条。对齐 `InterpolateSmooth`（2302）。这一阶段还不采样它。
+/// 三次样条。对齐 `InterpolateSmooth`（2302）。向量轨道会采样它。
 pub const INTERPOLATE_SMOOTH : Int = 2302
 
 ///|
@@ -196,11 +196,12 @@ pub(all) enum LoopMode {
 }
 
 ///|
-/// 关键帧插值。`Smooth` 的数值留在常量里，采样只用离散和线性。
+/// 关键帧插值。向量轨道的 `Smooth` 是零曲率端点的三次样条。四元数没有这条工厂。
 /// r186: `InterpolateDiscrete` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1151 ; `InterpolateLinear` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1159 ; `InterpolateSmooth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1167
 pub(all) enum Interpolation {
   Discrete
   Linear
+  Smooth
 }
 
 ///|
@@ -217,6 +218,7 @@ pub fn Interpolation::to_int(self : Interpolation) -> Int {
   match self {
     Discrete => INTERPOLATE_DISCRETE
     Linear => INTERPOLATE_LINEAR
+    Smooth => INTERPOLATE_SMOOTH
   }
 }
 
