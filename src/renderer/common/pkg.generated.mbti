@@ -17,6 +17,8 @@ pub fn collect_opaque(@core.Object3D, frustum? : @math.Frustum, camera? : @core.
 
 pub fn collect_primitives(@core.Object3D, frustum? : @math.Frustum, camera? : @core.Object3D) -> Array[PrimitiveItem]
 
+pub fn collect_shadow(@core.Object3D, camera? : @core.Object3D) -> Array[RenderItem]
+
 pub fn collect_transparent(@core.Object3D, @core.Object3D, frustum? : @math.Frustum) -> Array[RenderItem]
 
 pub fn collect_transparent_primitives(@core.Object3D, @core.Object3D, frustum? : @math.Frustum) -> Array[PrimitiveItem]

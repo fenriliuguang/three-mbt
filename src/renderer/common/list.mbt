@@ -61,6 +61,40 @@ pub fn collect_opaque(
 }
 
 ///|
+/// 阴影投射体。线框也包含在内，几何仍是三角形，边列表只给颜色通道。
+pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] {
+  let items = []
+  root.traverse_visible(fn(node) {
+    match node.kind {
+      @core.Mesh =>
+        match node.mesh {
+          None => ()
+          Some(binding) =>
+            if !binding.transparent &&
+              on_camera_layer(node, camera) &&
+              kept_by_frustum(node, binding.geometry, None) {
+              items.push({
+                node,
+                geometry: binding.geometry,
+                color: binding.color,
+                shading: binding.shading,
+                side: binding.side,
+                opacity: binding.opacity,
+                map: binding.map,
+                roughness: binding.roughness,
+                metalness: binding.metalness,
+                fog: binding.fog,
+                instances: binding.instances,
+              })
+            }
+        }
+      _ => ()
+    }
+  })
+  items
+}
+
+///|
 /// 线框网格。透明与不透明都收集。实例化线框不在这里。
 /// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
 pub fn collect_wireframe(

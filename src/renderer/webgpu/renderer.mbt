@@ -2322,7 +2322,7 @@ fn WebGPURenderer::draw_shadow(
     enabled: 0.0,
     texel: 0.0,
   }
-  let items = @common.collect_opaque(scene.node, camera=shadow.camera)
+  let items = @common.collect_shadow(scene.node, camera=shadow.camera)
   for item in items {
     if !item.node.cast_shadow {
       continue
@@ -3645,7 +3645,7 @@ fn WebGPURenderer::draw_transparent(
 
 ///|
 /// 更新矩阵，清屏，先画不透明网格，再画线框，然后画不透明的点和线，最后按从远到近画透明物体。窗口目标会 `present`，颜色目标不会。
-/// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边，不投射阴影。阴影通道仍画出全部投射体，但只保留阴影相机看得到的层。
+/// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边。阴影通道用三角形投射，包含线框，但只保留阴影相机看得到的层。
 /// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
   self : WebGPURenderer,

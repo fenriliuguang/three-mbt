@@ -535,6 +535,28 @@ test "wireframe expands each triangle into three edges" {
 }
 
 ///|
+test "wireframe meshes stay in the shadow list as triangles" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let wire = @materials.MeshBasicMaterial::new()
+  wire.material.wireframe = true
+  let mesh = @objects.Mesh::new(box.geometry, wire.material)
+  mesh.node.cast_shadow = true
+  ignore(scene.add(mesh))
+  let glass = @materials.MeshBasicMaterial::new()
+  glass.material.wireframe = true
+  glass.material.transparent = true
+  let clear = @objects.Mesh::new(box.geometry, glass.material)
+  clear.node.cast_shadow = true
+  ignore(scene.add(clear))
+  let casters = @common.collect_shadow(scene.node)
+  assert_eq(casters.length(), 1)
+  assert_eq(physical_equal(casters[0].node, mesh.node), true)
+  assert_eq(@common.collect_opaque(scene.node).length(), 0)
+  assert_eq(@common.collect_wireframe(scene.node).length(), 2)
+}
+
+///|
 fn point_at(z : Double) -> @core.BufferGeometry {
   let geometry = @core.BufferGeometry::new()
   ignore(
