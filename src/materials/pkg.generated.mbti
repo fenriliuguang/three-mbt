@@ -33,6 +33,7 @@ pub(all) struct Material {
   mut alpha_test : Double
   emissive : @math.Color
   mut emissive_intensity : Double
+  mut emissive_map : @textures.Texture?
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

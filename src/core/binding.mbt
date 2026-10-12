@@ -18,6 +18,7 @@ pub(all) struct MeshBinding {
   mut alpha_test : Double
   emissive : @math.Color
   mut emissive_intensity : Double
+  emissive_map : @textures.Texture?
   instances : InstanceData?
 }
 

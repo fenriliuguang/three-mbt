@@ -80,6 +80,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     alpha_test: self.material.alpha_test,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
+    emissive_map: self.material.emissive_map,
     instances: None,
   })
 }
@@ -440,6 +441,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     alpha_test: self.material.alpha_test,
     emissive: self.material.emissive,
     emissive_intensity: self.material.emissive_intensity,
+    emissive_map: self.material.emissive_map,
     instances: Some(self.instances),
   })
 }

@@ -20,6 +20,7 @@ pub(all) struct RenderItem {
   alpha_test : Double
   emissive : @math.Color
   emissive_intensity : Double
+  emissive_map : @textures.Texture?
   instances : @core.InstanceData?
 }
 
@@ -56,6 +57,7 @@ pub fn collect_opaque(
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
+                emissive_map: binding.emissive_map,
                 instances: binding.instances,
               })
             }
@@ -93,6 +95,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
+                emissive_map: binding.emissive_map,
                 instances: binding.instances,
               })
             }
@@ -135,6 +138,7 @@ pub fn collect_wireframe(
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
+                emissive_map: binding.emissive_map,
                 instances: binding.instances,
               })
             }
@@ -396,6 +400,7 @@ pub fn collect_transparent(
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
+                emissive_map: binding.emissive_map,
                 instances: binding.instances,
               })
             }

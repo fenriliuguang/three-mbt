@@ -32,6 +32,7 @@ pub(all) enum Node {
   PointTerm
   SpotTerm
   FacingNormal
+  EmissiveSample
 }
 
 ///|
@@ -45,6 +46,7 @@ pub(all) struct Program {
   fragment_color : Node
   sampled : Bool
   shadowed : Bool
+  emissive : Bool
   preamble : String
 }
 
@@ -241,13 +243,16 @@ fn tint_vertex(color : Node) -> Node {
 }
 
 ///|
-/// Lambert 和 Standard 在光照结果上加上自发光。不受阴影影响，也不乘顶点色。
+/// Lambert 和 Standard 在光照结果上加上自发光，再乘自发光贴图。不受阴影影响，也不乘顶点色。
+/// 没有贴图时渲染器绑一张白纹理，乘上去不变。
 /// r186: `emissive` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L122 ; `emissive` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L162
+/// r186: `emissiveMap` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/emissivemap_fragment.glsl.js#L4
 fn add_emissive(color : Node) -> Node {
-  Node::Vec4(
-    Add(Swizzle(color, "xyz"), Swizzle(Uniform("emissive", Vec4), "xyz")),
-    Swizzle(color, "w"),
+  let glow = Mul(
+    Swizzle(Uniform("emissive", Vec4), "xyz"),
+    Swizzle(EmissiveSample, "xyz"),
   )
+  Node::Vec4(Add(Swizzle(color, "xyz"), glow), Swizzle(color, "w"))
 }
 
 ///|
@@ -306,6 +311,7 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
     ),
     sampled: true,
     shadowed: false,
+    emissive: false,
     preamble: "",
   }
 }
@@ -386,6 +392,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     ),
     sampled: true,
     shadowed: true,
+    emissive: true,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -443,6 +450,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     ),
     sampled: true,
     shadowed: true,
+    emissive: true,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -475,6 +483,7 @@ pub fn line_program() -> Program {
     fragment_color: Uniform("color", Vec4),
     sampled: false,
     shadowed: false,
+    emissive: false,
     preamble: "",
   }
 }

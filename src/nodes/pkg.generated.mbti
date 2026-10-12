@@ -54,6 +54,7 @@ pub(all) enum Node {
   PointTerm
   SpotTerm
   FacingNormal
+  EmissiveSample
 }
 
 pub(all) struct Program {
@@ -65,6 +66,7 @@ pub(all) struct Program {
   fragment_color : Node
   sampled : Bool
   shadowed : Bool
+  emissive : Bool
   preamble : String
 }
 

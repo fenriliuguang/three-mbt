@@ -1133,6 +1133,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       Some(layout),
       Some(texture_layout),
       Some(shadow_layout),
+      Some(texture_layout),
     ],
     immediate_size: None,
     label: Some("frame"),
@@ -3533,6 +3534,15 @@ fn WebGPURenderer::draw_meshes(
           ),
         )
         ignore(pass.set_bind_group(2U, Some(shadow_group), None, None, None))
+        ignore(
+          pass.set_bind_group(
+            3U,
+            Some(self.texture_group(item.emissive_map)),
+            None,
+            None,
+            None,
+          ),
+        )
         if lines {
           match wire {
             None => ()

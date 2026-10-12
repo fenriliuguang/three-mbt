@@ -12,7 +12,8 @@ pub(all) enum MaterialKind {
 /// 材质的公共数据。`alpha_test` 大于片元 alpha 时丢弃该片元，默认 0。
 /// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
 /// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
-/// 改 `side`、`alpha_test`、`emissive_intensity` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
+/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
 /// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170
 pub(all) struct Material {
   color : @math.Color
@@ -27,6 +28,7 @@ pub(all) struct Material {
   mut alpha_test : Double
   emissive : @math.Color
   mut emissive_intensity : Double
+  mut emissive_map : @textures.Texture?
   kind : MaterialKind
 }
 
@@ -45,6 +47,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     alpha_test: 0.0,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
+    emissive_map: None,
     kind: Basic,
   }
 }
@@ -76,6 +79,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     alpha_test: 0.0,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
+    emissive_map: None,
     kind: Lambert,
   }
 }
@@ -113,6 +117,7 @@ pub fn Material::standard(
     alpha_test: 0.0,
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
+    emissive_map: None,
     kind: Standard,
   }
 }

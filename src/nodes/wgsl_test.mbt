@@ -72,6 +72,17 @@ test "lambert and standard add emissive after lighting" {
   assert_eq(includes(@nodes.standard_instanced_wgsl(), expr), true)
   assert_eq(includes(@nodes.basic_wgsl(), expr), false)
   assert_eq(includes(@nodes.basic_instanced_wgsl(), expr), false)
+  let sample = "textureSample(emissive_texture, emissive_sampler, input.v_uv)"
+  assert_eq(includes(@nodes.lambert_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_wgsl(), sample), true)
+  assert_eq(includes(@nodes.basic_wgsl(), sample), false)
+  assert_eq(
+    includes(
+      @nodes.lambert_wgsl(),
+      "@group(3) @binding(0) var emissive_texture",
+    ),
+    true,
+  )
 }
 
 ///|

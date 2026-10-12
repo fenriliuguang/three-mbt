@@ -52,6 +52,8 @@ fn emit_expr(node : Node) -> String {
       "point_term(input.v_world, facing_normal(input.v_normal, front))"
     SpotTerm => "spot_term(input.v_world, facing_normal(input.v_normal, front))"
     FacingNormal => "facing_normal(input.v_normal, front)"
+    EmissiveSample =>
+      "textureSample(emissive_texture, emissive_sampler, input.v_uv)"
   }
 }
 
@@ -84,6 +86,12 @@ pub fn emit_wgsl(program : Program) -> String {
     lines.push(
       "@group(2) @binding(1) var shadow_sampler : sampler_comparison;\n",
     )
+  }
+  if program.emissive {
+    lines.push(
+      "@group(3) @binding(0) var emissive_texture : texture_2d<f32>;\n",
+    )
+    lines.push("@group(3) @binding(1) var emissive_sampler : sampler;\n")
   }
   lines.push("\n")
   if program.preamble != "" {
