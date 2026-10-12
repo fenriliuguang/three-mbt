@@ -35,6 +35,7 @@ pub(all) struct Material {
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
   mut roughness_map : @textures.Texture?
+  mut metalness_map : @textures.Texture?
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

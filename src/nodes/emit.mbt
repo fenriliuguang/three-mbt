@@ -99,6 +99,12 @@ pub fn emit_wgsl(program : Program) -> String {
     )
     lines.push("@group(3) @binding(3) var roughness_sampler : sampler;\n")
   }
+  if program.metalness {
+    lines.push(
+      "@group(3) @binding(4) var metalness_texture : texture_2d<f32>;\n",
+    )
+    lines.push("@group(3) @binding(5) var metalness_sampler : sampler;\n")
+  }
   lines.push("\n")
   if program.preamble != "" {
     lines.push(program.preamble)

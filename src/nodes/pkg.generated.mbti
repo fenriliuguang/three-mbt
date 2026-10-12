@@ -68,6 +68,7 @@ pub(all) struct Program {
   shadowed : Bool
   emissive : Bool
   roughness : Bool
+  metalness : Bool
   preamble : String
 }
 

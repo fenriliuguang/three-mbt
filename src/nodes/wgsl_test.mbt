@@ -104,6 +104,26 @@ test "standard multiplies roughness by the green channel" {
 }
 
 ///|
+test "standard multiplies metalness by the blue channel" {
+  let sample = "textureSample(metalness_texture, metalness_sampler, input.v_uv).b"
+  let binding = "@group(3) @binding(4) var metalness_texture"
+  assert_eq(includes(@nodes.standard_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_instanced_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_wgsl(), binding), true)
+  assert_eq(
+    includes(
+      @nodes.standard_wgsl(),
+      "clamp((uniforms.surface).y * textureSample(metalness_texture, metalness_sampler, input.v_uv).b, 0.0, 1.0)",
+    ),
+    true,
+  )
+  assert_eq(includes(@nodes.lambert_wgsl(), sample), false)
+  assert_eq(includes(@nodes.lambert_instanced_wgsl(), sample), false)
+  assert_eq(includes(@nodes.basic_wgsl(), sample), false)
+  assert_eq(includes(@nodes.basic_instanced_wgsl(), "metalness_texture"), false)
+}
+
+///|
 test "lambert and standard add one point light" {
   let lambert = @nodes.lambert_wgsl()
   let standard = @nodes.standard_wgsl()

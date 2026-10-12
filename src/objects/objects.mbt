@@ -63,7 +63,7 @@ pub impl @core.AsNode for Mesh with fn to_node(self) {
 pub extend Mesh with @core.AsNode::{to_node}
 
 ///|
-/// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。
+/// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、金属度贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。
 pub fn Mesh::refresh(self : Mesh) -> Unit {
   self.node.mesh = Some(MeshBinding::{
     geometry: self.geometry,
@@ -82,6 +82,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
     roughness_map: self.material.roughness_map,
+    metalness_map: self.material.metalness_map,
     instances: None,
   })
 }
@@ -444,6 +445,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     emissive_intensity: self.material.emissive_intensity,
     emissive_map: self.material.emissive_map,
     roughness_map: self.material.roughness_map,
+    metalness_map: self.material.metalness_map,
     instances: Some(self.instances),
   })
 }
