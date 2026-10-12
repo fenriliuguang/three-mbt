@@ -135,7 +135,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。`JOINTS_2` 和 `WEIGHTS_2` 只在第二组成对出现后再加四个，缺第二组时忽略第三组。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1804,7 +1804,7 @@ fn identity_matrices(count : Int) -> Array[@math.Matrix4] {
 
 ///|
 /// 先读 `JOINTS_0` 和 `WEIGHTS_0`。缺一则不蒙皮。
-/// r186 的属性表没有 `JOINTS_1`，第二组按 `JOINTS_0` 的同一套规则再读四个影响。
+/// r186 的属性表没有 `JOINTS_1` 和 `JOINTS_2`。后一组只有在前一组两个属性都在时才按同样的规则再读四个影响。
 /// r186: `JOINTS_0` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2287
 fn read_skin_attributes(
   attrs : Map[String, Json],
@@ -1829,7 +1829,7 @@ fn read_skin_attributes(
         weight_values.length() != count * 4 {
         raise GltfError::Invalid("skin attributes")
       }
-      let (packed_joints, packed_weights) = match
+      let (packed_joints, packed_weights, second) = match
         (attrs.get("JOINTS_1"), attrs.get("WEIGHTS_1")) {
         (Some(extra_joints), Some(extra_weights)) => {
           let more_joints = read_joints(
@@ -1853,11 +1853,43 @@ fn read_skin_attributes(
           (
             interleave_ints(joint_values, more_joints, count),
             interleave_doubles(weight_values, more_weights, count),
+            true,
           )
         }
-        _ => (joint_values, weight_values)
+        _ => (joint_values, weight_values, false)
       }
-      (Some(packed_joints), Some(packed_weights))
+      let (final_joints, final_weights) = if second {
+        match (attrs.get("JOINTS_2"), attrs.get("WEIGHTS_2")) {
+          (Some(third_joints), Some(third_weights)) => {
+            let more_joints = read_joints(
+              bins,
+              views,
+              accs,
+              as_f64(third_joints).to_int(),
+              "JOINTS_2",
+            )
+            let more_weights = read_weights(
+              bins,
+              views,
+              accs,
+              as_f64(third_weights).to_int(),
+              "WEIGHTS_2",
+            )
+            if more_joints.length() != count * 4 ||
+              more_weights.length() != count * 4 {
+              raise GltfError::Invalid("skin attributes")
+            }
+            (
+              append_ints(packed_joints, more_joints, count, 8),
+              append_doubles(packed_weights, more_weights, count, 8),
+            )
+          }
+          _ => (packed_joints, packed_weights)
+        }
+      } else {
+        (packed_joints, packed_weights)
+      }
+      (Some(final_joints), Some(final_weights))
     }
     _ => (None, None)
   }
@@ -2100,6 +2132,56 @@ fn interleave_doubles(
     influence = 0
     while influence < 4 {
       out.push(second[vertex * 4 + influence])
+      influence = influence + 1
+    }
+    vertex = vertex + 1
+  }
+  out
+}
+
+///|
+fn append_ints(
+  base : Array[Int],
+  extra : Array[Int],
+  count : Int,
+  width : Int,
+) -> Array[Int] {
+  let out = []
+  let mut vertex = 0
+  while vertex < count {
+    let mut influence = 0
+    while influence < width {
+      out.push(base[vertex * width + influence])
+      influence = influence + 1
+    }
+    influence = 0
+    while influence < 4 {
+      out.push(extra[vertex * 4 + influence])
+      influence = influence + 1
+    }
+    vertex = vertex + 1
+  }
+  out
+}
+
+///|
+fn append_doubles(
+  base : Array[Double],
+  extra : Array[Double],
+  count : Int,
+  width : Int,
+) -> Array[Double] {
+  let out = []
+  let mut vertex = 0
+  while vertex < count {
+    let mut influence = 0
+    while influence < width {
+      out.push(base[vertex * width + influence])
+      influence = influence + 1
+    }
+    influence = 0
+    while influence < 4 {
+      out.push(extra[vertex * 4 + influence])
       influence = influence + 1
     }
     vertex = vertex + 1
