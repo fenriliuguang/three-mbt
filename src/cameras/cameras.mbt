@@ -251,7 +251,7 @@ pub fn PerspectiveCamera::view_size(
 
 ///|
 /// 正交相机。`left` / `right` / `top` / `bottom` 是相机空间里的视锥边界。
-/// `set_view_offset` 在这块视锥里取子矩形，不改 `aspect`。`set_near` 和 `set_far` 只改深度项。
+/// `set_view_offset` 在这块视锥里取子矩形，不改 `aspect`。`set_left`、`set_right`、`set_top`、`set_bottom` 改视锥边界。`set_near` 和 `set_far` 只改深度项。
 /// r186: `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17
 pub(all) struct OrthographicCamera {
   node : Object3D
@@ -287,6 +287,62 @@ pub fn OrthographicCamera::update_projection(self : OrthographicCamera) -> Unit 
   match self.node.camera {
     None => ()
     Some(camera) => camera.update_projection()
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_left(
+  self : OrthographicCamera,
+  left : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.left = left
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_right(
+  self : OrthographicCamera,
+  right : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.right = right
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_top(
+  self : OrthographicCamera,
+  top : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.top = top
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn OrthographicCamera::set_bottom(
+  self : OrthographicCamera,
+  bottom : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.bottom = bottom
+      camera.update_projection()
+    }
   }
 }
 
