@@ -267,6 +267,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `attach` has landed. It adds the object as a child while keeping the world transform. The new local matrix is the new parent's inverse world matrix times the old parent's world matrix, applied with `applyMatrix4`. Non-uniform parent scale stays unsupported. A child at local x `1` under a parent at x `10`, attached to a parent at x `3`, keeps world x `11` and becomes local x `8`. A child at local `(0, 0, 4)` under a parent shifted by 10 and yawed by 0.5 keeps world `(11.9177021544, 0, 3.51033024756)` and takes that parent's quaternion when the new parent is the identity.
 
+`traverseAncestors` has landed. It visits the parent first, then that parent's parent, and stops at the root. The node itself is not visited. A child under `parent` under `root` yields `parent`, then `root`. A node with no parent yields nothing. Changing the scene graph inside the callback stays unsupported.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -341,6 +343,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D `applyMatrix4` and `applyQuaternion` | `core` |
 | planned | 7 | Object3D `setRotationFromAxisAngle`, `setRotationFromEuler`, `setRotationFromMatrix`, and `setRotationFromQuaternion` | `core` |
 | planned | 7 | Object3D `attach` | `core` |
+| planned | 7 | Object3D `traverseAncestors` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

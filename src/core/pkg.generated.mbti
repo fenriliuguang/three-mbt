@@ -254,6 +254,7 @@ pub fn Object3D::translate_x(Self, Double) -> Self
 pub fn Object3D::translate_y(Self, Double) -> Self
 pub fn Object3D::translate_z(Self, Double) -> Self
 pub fn Object3D::traverse(Self, (Self) -> Unit) -> Unit
+pub fn Object3D::traverse_ancestors(Self, (Self) -> Unit) -> Unit
 pub fn Object3D::traverse_visible(Self, (Self) -> Unit) -> Unit
 pub fn Object3D::update_matrix(Self) -> Unit
 pub fn Object3D::update_matrix_world(Self, force? : Bool) -> Unit

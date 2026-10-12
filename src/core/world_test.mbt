@@ -90,6 +90,25 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "traverse ancestors visits parents toward the root" {
+  let root = @core.Object3D::new()
+  root.name = "root"
+  let parent = @core.Object3D::new()
+  parent.name = "parent"
+  let child = @core.Object3D::new()
+  ignore(root.add(parent))
+  ignore(parent.add(child))
+  let names = []
+  child.traverse_ancestors(fn(node) { names.push(node.name) })
+  assert_eq(names.length(), 2)
+  assert_eq(names[0], "parent")
+  assert_eq(names[1], "root")
+  let alone = []
+  root.traverse_ancestors(fn(node) { alone.push(node.name) })
+  assert_eq(alone.length(), 0)
+}
+
+///|
 test "attach keeps the world position and rotation" {
   let source = @core.Object3D::new()
   ignore(source.position.set(10.0, 0.0, 0.0))

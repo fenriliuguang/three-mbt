@@ -669,3 +669,19 @@ pub fn Object3D::traverse_visible(
     index = index + 1
   }
 }
+
+///|
+/// 从父节点开始，一直走到根。回调里改场景图不受支持。
+/// r186: `traverseAncestors` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1126
+pub fn Object3D::traverse_ancestors(
+  self : Object3D,
+  visit : (Object3D) -> Unit,
+) -> Unit {
+  match self.parent {
+    None => ()
+    Some(parent) => {
+      visit(parent)
+      parent.traverse_ancestors(visit)
+    }
+  }
+}
