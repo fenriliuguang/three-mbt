@@ -1,4 +1,4 @@
-// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 
 ///|
 using @core {
@@ -180,6 +180,20 @@ pub fn Points::set_fog(self : Points, enabled : Bool) -> Unit {
 }
 
 ///|
+/// `enabled` 为真时进入透明队列，并按 `opacity` 做 src-alpha 混合。
+/// 直接改 `material.transparent` 不会更新绑定。
+/// r186: `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19
+pub fn Points::set_transparent(
+  self : Points,
+  enabled : Bool,
+  opacity? : Double = 1.0,
+) -> Unit {
+  self.material.transparent = enabled
+  self.material.opacity = opacity
+  self.refresh()
+}
+
+///|
 /// 折线，对应 r186 的 `Line`。
 /// r186: `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41
 pub(all) struct Line {
@@ -230,6 +244,20 @@ pub fn Line::set_fog(self : Line, enabled : Bool) -> Unit {
 }
 
 ///|
+/// `enabled` 为真时进入透明队列，并按 `opacity` 做 src-alpha 混合。
+/// 直接改 `material.transparent` 不会更新绑定。
+/// r186: `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41
+pub fn Line::set_transparent(
+  self : Line,
+  enabled : Bool,
+  opacity? : Double = 1.0,
+) -> Unit {
+  self.material.transparent = enabled
+  self.material.opacity = opacity
+  self.refresh()
+}
+
+///|
 /// 成对线段，对应 r186 的 `LineSegments`。
 /// r186: `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14
 pub(all) struct LineSegments {
@@ -276,6 +304,20 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
 ///|
 pub fn LineSegments::set_fog(self : LineSegments, enabled : Bool) -> Unit {
   self.material.fog = enabled
+  self.refresh()
+}
+
+///|
+/// `enabled` 为真时进入透明队列，并按 `opacity` 做 src-alpha 混合。
+/// 直接改 `material.transparent` 不会更新绑定。
+/// r186: `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14
+pub fn LineSegments::set_transparent(
+  self : LineSegments,
+  enabled : Bool,
+  opacity? : Double = 1.0,
+) -> Unit {
+  self.material.transparent = enabled
+  self.material.opacity = opacity
   self.refresh()
 }
 

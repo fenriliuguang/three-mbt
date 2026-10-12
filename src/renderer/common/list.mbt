@@ -188,8 +188,62 @@ pub fn collect_primitives(
 }
 
 ///|
+/// 透明的点和线，从远到近。深度相同则保持遍历顺序。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L14
+pub fn collect_transparent_primitives(
+  root : Object3D,
+  camera : Object3D,
+  frustum? : @math.Frustum,
+) -> Array[PrimitiveItem] {
+  let items = []
+  root.traverse_visible(fn(node) {
+    match node.primitive {
+      None => ()
+      Some(binding) =>
+        if binding.transparent &&
+          on_camera_layer(node, Some(camera)) &&
+          kept_by_frustum(node, binding.geometry, frustum) {
+          items.push({
+            node,
+            geometry: binding.geometry,
+            color: binding.color,
+            kind: binding.kind,
+            size: binding.size,
+            size_attenuation: binding.size_attenuation,
+            opacity: binding.opacity,
+            fog: binding.fog,
+          })
+        }
+    }
+  })
+  let ranked = []
+  let mut order = 0
+  for item in items {
+    ranked.push(PrimitiveDepth::{
+      item,
+      depth: view_depth(camera, item.node),
+      order,
+    })
+    order = order + 1
+  }
+  sort_primitives_far_to_near(ranked)
+  let sorted = []
+  for entry in ranked {
+    sorted.push(entry.item)
+  }
+  sorted
+}
+
+///|
 priv struct DepthItem {
   item : RenderItem
+  depth : Double
+  order : Int
+}
+
+///|
+priv struct PrimitiveDepth {
+  item : PrimitiveItem
   depth : Double
   order : Int
 }
@@ -213,6 +267,32 @@ fn sort_far_to_near(items : Array[DepthItem]) -> Unit {
     let current = items[index]
     let mut hole = index
     while hole > 0 && farther(current, items[hole - 1]) {
+      items[hole] = items[hole - 1]
+      hole = hole - 1
+    }
+    items[hole] = current
+    index = index + 1
+  }
+}
+
+///|
+fn primitive_farther(left : PrimitiveDepth, right : PrimitiveDepth) -> Bool {
+  if left.depth < right.depth {
+    true
+  } else if left.depth > right.depth {
+    false
+  } else {
+    left.order < right.order
+  }
+}
+
+///|
+fn sort_primitives_far_to_near(items : Array[PrimitiveDepth]) -> Unit {
+  let mut index = 1
+  while index < items.length() {
+    let current = items[index]
+    let mut hole = index
+    while hole > 0 && primitive_farther(current, items[hole - 1]) {
       items[hole] = items[hole - 1]
       hole = hole - 1
     }
@@ -278,7 +358,11 @@ pub fn collect_transparent(
   let ranked = []
   let mut order = 0
   for item in items {
-    ranked.push({ item, depth: view_depth(camera, item.node), order, })
+    ranked.push(DepthItem::{
+      item,
+      depth: view_depth(camera, item.node),
+      order,
+    })
     order = order + 1
   }
   sort_far_to_near(ranked)

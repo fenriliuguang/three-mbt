@@ -533,3 +533,65 @@ test "wireframe expands each triangle into three edges" {
   assert_eq(physical_equal(drawn[0].node, mesh.node), true)
   assert_eq(@common.collect_opaque(scene.node).length(), 1)
 }
+
+///|
+fn point_at(z : Double) -> @core.BufferGeometry {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, z], 3),
+    ),
+  )
+  geometry
+}
+
+///|
+test "transparent points and lines sort far to near" {
+  let scene = @scenes.Scene::new()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  let spot = point_at(0.0)
+  let far = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  far.set_transparent(true, opacity=0.25)
+  ignore(scene.add(far))
+  let near = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  near.set_transparent(true, opacity=0.5)
+  ignore(near.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(near))
+  let line = @objects.Line::new(spot, @materials.LineBasicMaterial::new())
+  line.set_transparent(true, opacity=0.75)
+  ignore(line.node.position.set(0.0, 0.0, -1.0))
+  ignore(scene.add(line))
+  let segments = @objects.LineSegments::new(
+    spot,
+    @materials.LineBasicMaterial::new(),
+  )
+  segments.set_transparent(true, opacity=0.4)
+  ignore(segments.node.position.set(0.0, 0.0, -2.0))
+  ignore(scene.add(segments))
+  let solid = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  ignore(solid.node.position.set(0.0, 0.0, 1.0))
+  ignore(scene.add(solid))
+  @common.update_frame(scene.node, camera.node)
+  let clear = @common.collect_transparent_primitives(scene.node, camera.node)
+  assert_eq(clear.length(), 4)
+  assert_eq(physical_equal(clear[0].node, segments.node), true)
+  assert_eq(clear[0].opacity, 0.4)
+  assert_eq(physical_equal(clear[1].node, line.node), true)
+  assert_eq(clear[1].opacity, 0.75)
+  assert_eq(physical_equal(clear[2].node, far.node), true)
+  assert_eq(clear[2].opacity, 0.25)
+  assert_eq(physical_equal(clear[3].node, near.node), true)
+  assert_eq(clear[3].opacity, 0.5)
+  assert_eq(@common.view_depth(camera.node, segments.node), -7.0)
+  assert_eq(@common.view_depth(camera.node, line.node), -6.0)
+  assert_eq(@common.view_depth(camera.node, far.node), -5.0)
+  assert_eq(@common.view_depth(camera.node, near.node), -3.0)
+  assert_eq(@common.collect_primitives(scene.node).length(), 1)
+}

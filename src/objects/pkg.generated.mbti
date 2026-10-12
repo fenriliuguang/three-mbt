@@ -52,6 +52,7 @@ pub(all) struct Line {
 pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn Line::refresh(Self) -> Unit
 pub fn Line::set_fog(Self, Bool) -> Unit
+pub fn Line::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Line::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Line
 
@@ -63,6 +64,7 @@ pub(all) struct LineSegments {
 pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineSegments::refresh(Self) -> Unit
 pub fn LineSegments::set_fog(Self, Bool) -> Unit
+pub fn LineSegments::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn LineSegments::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for LineSegments
 
@@ -88,6 +90,7 @@ pub(all) struct Points {
 pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
 pub fn Points::refresh(Self) -> Unit
 pub fn Points::set_fog(Self, Bool) -> Unit
+pub fn Points::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Points::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Points
 

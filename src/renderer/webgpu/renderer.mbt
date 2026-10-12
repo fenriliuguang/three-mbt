@@ -207,6 +207,9 @@ pub struct WebGPURenderer {
   line_list : GpuRenderPipeline
   line_strip : GpuRenderPipeline
   points : GpuRenderPipeline
+  line_list_blend : GpuRenderPipeline
+  line_strip_blend : GpuRenderPipeline
+  points_blend : GpuRenderPipeline
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
@@ -539,7 +542,24 @@ fn color_pipeline(
   format : GpuTextureFormat,
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
+  blend? : Bool = false,
 ) -> GpuRenderPipeline {
+  let blend_state : @gpu.GpuBlendState? = if blend {
+    Some({
+      color: {
+        operation: Some(@gpu.GpuBlendOperation::ADD),
+        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+      },
+      alpha: {
+        operation: Some(@gpu.GpuBlendOperation::ADD),
+        src_factor: Some(@gpu.GpuBlendFactor::SRC_ALPHA),
+        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+      },
+    })
+  } else {
+    None
+  }
   let buffers : Array[@gpu.GpuVertexBufferLayout?] = if instanced {
     [
       Some({
@@ -612,13 +632,13 @@ fn color_pipeline(
     }),
     multisample: None,
     fragment: Some({
-      targets: [Some({ format, blend: None, write_mask: None, })],
+      targets: [Some({ format, blend: blend_state, write_mask: None, })],
       module_: shader,
       entry_point: Some("fs"),
       constants: None,
     }),
     layout: @gpu.Specific(pipeline_layout),
-    label: Some("color"),
+    label: Some(if blend { "color-blend" } else { "color" }),
   })
 }
 
@@ -1322,6 +1342,33 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       format,
       @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
       true,
+    ),
+    line_list_blend: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      blend=true,
+    ),
+    line_strip_blend: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      blend=true,
+    ),
+    points_blend: color_pipeline(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      blend=true,
     ),
     wave: wave.1,
     wave_layout: wave.0,
@@ -3424,7 +3471,180 @@ fn WebGPURenderer::draw_meshes(
 }
 
 ///|
-/// 更新矩阵，清屏，先画不透明网格，再画线框，然后画透明网格。窗口目标会 `present`，颜色目标不会。
+/// 点和线。`blend` 为真时用 src-alpha 管线，深度写入仍然打开。
+fn WebGPURenderer::draw_strokes(
+  self : WebGPURenderer,
+  pass : @gpu.GpuRenderPassEncoder,
+  items : Array[@common.PrimitiveItem],
+  camera : @core.Object3D,
+  state : @core.CameraState,
+  lights : @common.LightFrame,
+  fog : @scenes.Fog?,
+  viewport_width : Double,
+  viewport_height : Double,
+  blend : Bool,
+) -> Unit {
+  for item in items {
+    match self.position_gpu(item.geometry) {
+      None => ()
+      Some(geometry) => {
+        let mvp = @common.model_view_projection(state, item.node)
+        let gpu = self.object_gpu(item.node)
+        let attenuation = if item.size_attenuation &&
+          state.kind is @core.Perspective {
+          1.0
+        } else {
+          0.0
+        }
+        let eye = camera.matrix_world.elements
+        let shade = shadow_pack(lights, false)
+        let haze = fog_pack(fog, item.fog)
+        let uniforms = @common.pack_uniforms(
+          mvp,
+          @common.normal_matrix(item.node.matrix_world),
+          item.color,
+          item.opacity,
+          lights.ambient,
+          lights.color,
+          lights.direction,
+          item.node.matrix_world,
+          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
+          1.0,
+          0.0,
+          state.matrix_world_inverse,
+          viewport_width,
+          viewport_height,
+          item.size,
+          attenuation,
+          shade.matrix,
+          shade.bias,
+          shade.normal_bias,
+          shade.enabled,
+          shade.texel,
+          haze.r,
+          haze.g,
+          haze.b,
+          haze.enabled,
+          haze.near,
+          haze.far,
+          haze.density,
+          haze.mode,
+        )
+        ignore(
+          self.device
+          .queue()
+          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
+        )
+        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        match item.kind {
+          @core.PrimitiveKind::Points => {
+            let instances = self.point_instances(geometry)
+            if geometry.point_count > 0 {
+              pass.set_pipeline(
+                if blend {
+                  self.points_blend
+                } else {
+                  self.points
+                },
+              )
+              pass.set_vertex_buffer(0U, Some(self.quad), None, None)
+              pass.set_vertex_buffer(1U, Some(instances), None, None)
+              pass.draw(
+                6U,
+                Some(geometry.point_count.reinterpret_as_uint()),
+                None,
+                None,
+              )
+            }
+          }
+          @core.PrimitiveKind::Line =>
+            self.draw_lines(
+              pass,
+              if blend {
+                self.line_strip_blend
+              } else {
+                self.line_strip
+              },
+              geometry,
+            )
+          @core.PrimitiveKind::LineSegments =>
+            self.draw_lines(
+              pass,
+              if blend {
+                self.line_list_blend
+              } else {
+                self.line_list
+              },
+              geometry,
+            )
+        }
+      }
+    }
+  }
+}
+
+///|
+/// 透明网格和透明的点、线按视图深度从远到近穿插。深度相同先画网格。
+fn WebGPURenderer::draw_transparent(
+  self : WebGPURenderer,
+  pass : @gpu.GpuRenderPassEncoder,
+  meshes : Array[@common.RenderItem],
+  strokes : Array[@common.PrimitiveItem],
+  camera : @core.Object3D,
+  state : @core.CameraState,
+  lights : @common.LightFrame,
+  fog : @scenes.Fog?,
+  width : UInt,
+  height : UInt,
+  shadow_group : GpuBindGroup,
+  viewport_width : Double,
+  viewport_height : Double,
+) -> Unit {
+  let mut mesh_index = 0
+  let mut stroke_index = 0
+  while mesh_index < meshes.length() || stroke_index < strokes.length() {
+    let mesh_first = if stroke_index >= strokes.length() {
+      true
+    } else if mesh_index >= meshes.length() {
+      false
+    } else {
+      let mesh_depth = @common.view_depth(camera, meshes[mesh_index].node)
+      let stroke_depth = @common.view_depth(camera, strokes[stroke_index].node)
+      mesh_depth <= stroke_depth
+    }
+    if mesh_first {
+      self.draw_meshes(
+        pass,
+        [meshes[mesh_index]],
+        camera,
+        state,
+        lights,
+        fog,
+        width,
+        height,
+        shadow_group,
+        true,
+      )
+      mesh_index = mesh_index + 1
+    } else {
+      self.draw_strokes(
+        pass,
+        [strokes[stroke_index]],
+        camera,
+        state,
+        lights,
+        fog,
+        viewport_width,
+        viewport_height,
+        true,
+      )
+      stroke_index = stroke_index + 1
+    }
+  }
+}
+
+///|
+/// 更新矩阵，清屏，先画不透明网格，再画线框，然后画不透明的点和线，最后按从远到近画透明物体。窗口目标会 `present`，颜色目标不会。
 /// 颜色通道按相机视锥和层掩码裁剪。线框把每个三角形画成三条边，不投射阴影。阴影通道仍画出全部投射体，但只保留阴影相机看得到的层。
 /// r186: `render` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L1496
 pub fn WebGPURenderer::render(
@@ -3530,9 +3750,23 @@ pub fn WebGPURenderer::render(
     false,
     lines=true,
   )
-  self.draw_meshes(
+  let viewport_width = width.reinterpret_as_int().to_double()
+  let viewport_height = height.reinterpret_as_int().to_double()
+  self.draw_strokes(
+    pass,
+    @common.collect_primitives(scene.node, frustum=view, camera~),
+    camera,
+    state,
+    lights,
+    scene.fog,
+    viewport_width,
+    viewport_height,
+    false,
+  )
+  self.draw_transparent(
     pass,
     @common.collect_transparent(scene.node, camera, frustum=view),
+    @common.collect_transparent_primitives(scene.node, camera, frustum=view),
     camera,
     state,
     lights,
@@ -3540,86 +3774,9 @@ pub fn WebGPURenderer::render(
     width,
     height,
     shadow_group,
-    true,
+    viewport_width,
+    viewport_height,
   )
-  let strokes = @common.collect_primitives(scene.node, frustum=view, camera~)
-  let viewport_width = width.reinterpret_as_int().to_double()
-  let viewport_height = height.reinterpret_as_int().to_double()
-  for item in strokes {
-    match self.position_gpu(item.geometry) {
-      None => ()
-      Some(geometry) => {
-        let mvp = @common.model_view_projection(state, item.node)
-        let gpu = self.object_gpu(item.node)
-        let attenuation = if item.size_attenuation &&
-          state.kind is @core.Perspective {
-          1.0
-        } else {
-          0.0
-        }
-        let eye = camera.matrix_world.elements
-        let shade = shadow_pack(lights, false)
-        let haze = fog_pack(scene.fog, item.fog)
-        let uniforms = @common.pack_uniforms(
-          mvp,
-          @common.normal_matrix(item.node.matrix_world),
-          item.color,
-          item.opacity,
-          lights.ambient,
-          lights.color,
-          lights.direction,
-          item.node.matrix_world,
-          @math.Vector3::new(x=eye[12], y=eye[13], z=eye[14]),
-          1.0,
-          0.0,
-          state.matrix_world_inverse,
-          viewport_width,
-          viewport_height,
-          item.size,
-          attenuation,
-          shade.matrix,
-          shade.bias,
-          shade.normal_bias,
-          shade.enabled,
-          shade.texel,
-          haze.r,
-          haze.g,
-          haze.b,
-          haze.enabled,
-          haze.near,
-          haze.far,
-          haze.density,
-          haze.mode,
-        )
-        ignore(
-          self.device
-          .queue()
-          .write_buffer_with_copy(gpu.buffer, 0UL, uniforms, None, None),
-        )
-        ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
-        match item.kind {
-          @core.PrimitiveKind::Points => {
-            let instances = self.point_instances(geometry)
-            if geometry.point_count > 0 {
-              pass.set_pipeline(self.points)
-              pass.set_vertex_buffer(0U, Some(self.quad), None, None)
-              pass.set_vertex_buffer(1U, Some(instances), None, None)
-              pass.draw(
-                6U,
-                Some(geometry.point_count.reinterpret_as_uint()),
-                None,
-                None,
-              )
-            }
-          }
-          @core.PrimitiveKind::Line =>
-            self.draw_lines(pass, self.line_strip, geometry)
-          @core.PrimitiveKind::LineSegments =>
-            self.draw_lines(pass, self.line_list, geometry)
-        }
-      }
-    }
-  }
   pass.end()
   self.device.queue().submit([encoder.finish(None)])
   if to_screen {
