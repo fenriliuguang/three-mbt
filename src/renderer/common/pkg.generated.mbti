@@ -11,7 +11,7 @@ import {
 // Values
 pub fn camera_frustum(@core.CameraState) -> @math.Frustum
 
-pub fn collect_lights(@core.Object3D, camera? : @core.Object3D) -> LightFrame
+pub fn collect_lights(@core.Object3D, camera? : @core.Object3D, reversed_depth? : Bool) -> LightFrame
 
 pub fn collect_opaque(@core.Object3D, frustum? : @math.Frustum, camera? : @core.Object3D) -> Array[RenderItem]
 

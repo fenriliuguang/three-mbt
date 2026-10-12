@@ -530,7 +530,26 @@ test "a casting directional light builds a shadow matrix" {
       assert_eq(shadow.matrix.elements[13] < 0.51, true)
       assert_eq(shadow.matrix.elements[14] > 0.0, true)
       assert_eq(shadow.matrix.elements[14] < 1.0, true)
+      match shadow.camera.camera {
+        None => panic()
+        Some(state) => {
+          assert_eq(state.reversed_depth, false)
+          assert_eq(state.projection.elements[10] < 0.0, true)
+        }
+      }
     }
+  }
+  let reversed = @common.collect_lights(scene.node, reversed_depth=true)
+  match reversed.shadow {
+    None => panic()
+    Some(shadow) =>
+      match shadow.camera.camera {
+        None => panic()
+        Some(state) => {
+          assert_eq(state.reversed_depth, true)
+          assert_eq(state.projection.elements[10] > 0.0, true)
+        }
+      }
   }
 }
 

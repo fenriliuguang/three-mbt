@@ -126,6 +126,7 @@ struct ShadowMap {
   view : GpuTextureView
   group : GpuBindGroup
   size : UInt
+  reversed : Bool
 }
 
 ///|
@@ -220,7 +221,7 @@ fn[T] ColorModes::pick(
 ///|
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
 /// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。
-/// `reversed_depth` 默认关闭。打开后颜色通道用 `ReversedDepthFuncs` 重映射比较，投影走反向深度，深度清成 0。阴影通道仍用正向深度和 `less`。
+/// `reversed_depth` 默认关闭。打开后颜色通道和阴影通道都走反向深度：比较按 `ReversedDepthFuncs` 重映射，投影反转，深度清成 0。阴影采样比较从 `less` 换成 `greater`。
 /// 透明网格用另一组开启混合的管线。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28
@@ -286,9 +287,12 @@ pub struct WebGPURenderer {
   white : TextureGpu
   shadow_layout : GpuBindGroupLayout
   shadow_sampler : GpuSampler
+  shadow_sampler_reversed : GpuSampler
   shadow_dummy : GpuBindGroup
   shadow_depth : GpuRenderPipeline
   shadow_depth_instanced : GpuRenderPipeline
+  shadow_depth_reversed : GpuRenderPipeline
+  shadow_depth_instanced_reversed : GpuRenderPipeline
   mut shadow_map : ShadowMap?
   mut depth : DepthTarget?
   mut output : @textures.RenderTarget?
@@ -565,6 +569,7 @@ fn depth_pipeline(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   instanced : Bool,
+  compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
 ) -> GpuRenderPipeline {
   device.create_render_pipeline({
     vertex: {
@@ -583,7 +588,7 @@ fn depth_pipeline(
     depth_stencil: Some({
       format: @gpu.GpuTextureFormat::DEPTH32FLOAT,
       depth_write_enabled: Some(true),
-      depth_compare: Some(@gpu.GpuCompareFunction::LESS),
+      depth_compare: Some(compare),
       stencil_front: None,
       stencil_back: None,
       stencil_read_mask: None,
@@ -1500,6 +1505,21 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       label: Some("shadow"),
     }),
   )
+  let shadow_sampler_reversed = device.create_sampler(
+    Some({
+      address_mode_u: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_v: Some(@gpu.GpuAddressMode::CLAMP_TO_EDGE),
+      address_mode_w: None,
+      mag_filter: Some(@gpu.GpuFilterMode::NEAREST),
+      min_filter: Some(@gpu.GpuFilterMode::NEAREST),
+      mipmap_filter: Some(@gpu.GpuMipmapFilterMode::NEAREST),
+      lod_min_clamp: None,
+      lod_max_clamp: None,
+      compare: Some(@gpu.GpuCompareFunction::GREATER),
+      max_anisotropy: None,
+      label: Some("shadow-reversed"),
+    }),
+  )
   let shadow_dummy_texture = device.create_texture({
     size: { width: 1U, height: Some(1U), depth_or_array_layers: Some(1U), },
     mip_level_count: Some(1U),
@@ -1755,10 +1775,25 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     white,
     shadow_layout,
     shadow_sampler,
+    shadow_sampler_reversed,
     shadow_dummy,
     shadow_depth: depth_pipeline(device, shadow_shader, color_layout, false),
     shadow_depth_instanced: depth_pipeline(
       device, shadow_instanced_shader, color_layout, true,
+    ),
+    shadow_depth_reversed: depth_pipeline(
+      device,
+      shadow_shader,
+      color_layout,
+      false,
+      compare=@gpu.GpuCompareFunction::GREATER,
+    ),
+    shadow_depth_instanced_reversed: depth_pipeline(
+      device,
+      shadow_instanced_shader,
+      color_layout,
+      true,
+      compare=@gpu.GpuCompareFunction::GREATER,
     ),
     shadow_map: None,
     depth: None,
@@ -2892,9 +2927,10 @@ fn WebGPURenderer::ensure_shadow(
   size : Int,
 ) -> ShadowMap {
   let extent = if size < 1 { 1U } else { size.reinterpret_as_uint() }
+  let reversed = self.reversed_depth
   match self.shadow_map {
     Some(map) =>
-      if map.size == extent {
+      if map.size == extent && map.reversed == reversed {
         return map
       } else {
         map.group.drop()
@@ -2925,12 +2961,18 @@ fn WebGPURenderer::ensure_shadow(
       { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
       {
         binding: 1U,
-        resource: @gpu.GpuBindingResource::GpuSampler(self.shadow_sampler),
+        resource: @gpu.GpuBindingResource::GpuSampler(
+          if reversed {
+            self.shadow_sampler_reversed
+          } else {
+            self.shadow_sampler
+          },
+        ),
       },
     ],
     label: Some("shadow"),
   })
-  let map = { texture, view, group, size: extent, }
+  let map = { texture, view, group, size: extent, reversed, }
   self.shadow_map = Some(map)
   map
 }
@@ -2951,7 +2993,13 @@ fn WebGPURenderer::draw_shadow(
     color_attachments: [],
     depth_stencil_attachment: Some({
       view: map.view,
-      depth_clear_value: Some(Float::from_int(1)),
+      depth_clear_value: Some(
+        if self.reversed_depth {
+          Float::from_int(0)
+        } else {
+          Float::from_int(1)
+        },
+      ),
       depth_load_op: Some(@gpu.CLEAR),
       depth_store_op: Some(@gpu.STORE),
       depth_read_only: Some(false),
@@ -3030,9 +3078,16 @@ fn WebGPURenderer::draw_shadow(
           None => None
         }
         pass.set_pipeline(
-          match batch {
-            Some(_) => self.shadow_depth_instanced
-            None => self.shadow_depth
+          if self.reversed_depth {
+            match batch {
+              Some(_) => self.shadow_depth_instanced_reversed
+              None => self.shadow_depth_reversed
+            }
+          } else {
+            match batch {
+              Some(_) => self.shadow_depth_instanced
+              None => self.shadow_depth
+            }
           },
         )
         pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
@@ -4431,7 +4486,11 @@ pub fn WebGPURenderer::render(
     None => (0.0, 0.0, 0.0)
     Some(background) => (background.r, background.g, background.b)
   }
-  let lights = @common.collect_lights(scene.node, camera~)
+  let lights = @common.collect_lights(
+    scene.node,
+    camera~,
+    reversed_depth=self.reversed_depth,
+  )
   match lights.shadow {
     None => ()
     Some(shadow) => self.draw_shadow(scene, shadow)

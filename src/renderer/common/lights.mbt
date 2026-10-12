@@ -82,6 +82,7 @@ fn place_shadow(
   node : @core.Object3D,
   light : LightState,
   shadow : @core.ShadowState,
+  reversed_depth : Bool,
 ) -> ShadowFrame {
   let from = @math.Vector3::new()
   ignore(node.get_world_position(from))
@@ -96,6 +97,7 @@ fn place_shadow(
   let (projection, view) = match shadow.camera.camera {
     None => (@math.Matrix4::new(), @math.Matrix4::new())
     Some(state) => {
+      state.reversed_depth = reversed_depth
       state.update_projection()
       (state.projection, state.matrix_world_inverse)
     }
@@ -138,6 +140,7 @@ fn light_direction(node : @core.Object3D, light : LightState) -> @math.Vector3 {
 pub fn collect_lights(
   root : @core.Object3D,
   camera? : @core.Object3D,
+  reversed_depth? : Bool = false,
 ) -> LightFrame {
   let accum = {
     ambient: @math.Vector3::new(),
@@ -179,7 +182,9 @@ pub fn collect_lights(
                   match light.shadow {
                     None => ()
                     Some(shadow) =>
-                      accum.shadow = Some(place_shadow(node, light, shadow))
+                      accum.shadow = Some(
+                        place_shadow(node, light, shadow, reversed_depth),
+                      )
                   }
                 }
               }
