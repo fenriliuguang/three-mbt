@@ -190,6 +190,10 @@ pub struct WebGPURenderer {
   format : GpuTextureFormat
   layout : GpuBindGroupLayout
   texture_layout : GpuBindGroupLayout
+  surface_layout : GpuBindGroupLayout
+  surface_emissive : Array[@textures.Texture?]
+  surface_roughness : Array[@textures.Texture?]
+  surface_groups : Array[GpuBindGroup]
   basic : CullPipelines
   lambert : CullPipelines
   standard : CullPipelines
@@ -1103,6 +1107,53 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("rgba8"),
   })
+  // 第 3 组四槽：0、1 是自发光，2、3 是粗糙度。第 1 组仍是两槽颜色贴图。
+  // Lambert 和 Basic 的着色器不声明 2、3，绘制时仍按这个布局绑定。
+  let surface_layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 2U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 3U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("surface"),
+  })
   let shadow_layout = device.create_bind_group_layout({
     entries: [
       {
@@ -1133,7 +1184,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       Some(layout),
       Some(texture_layout),
       Some(shadow_layout),
-      Some(texture_layout),
+      Some(surface_layout),
     ],
     immediate_size: None,
     label: Some("frame"),
@@ -1236,6 +1287,10 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     format,
     layout,
     texture_layout,
+    surface_layout,
+    surface_emissive: [],
+    surface_roughness: [],
+    surface_groups: [],
     basic: cull_pipelines(device, basic_shader, pipeline_layout, format),
     lambert: cull_pipelines(device, lambert_shader, pipeline_layout, format),
     standard: cull_pipelines(device, standard_shader, pipeline_layout, format),
@@ -2131,6 +2186,7 @@ fn WebGPURenderer::color_target(
       cached.version == version {
       return cached
     }
+    self.drop_surface_groups(source)
     drop_color_target(cached)
   }
   let texture = self.device.create_texture({
@@ -2231,6 +2287,10 @@ fn WebGPURenderer::texture_group(
         return self.textures[found].group
       }
       if found >= 0 {
+        match self.textures[found].source {
+          Some(cached) => self.drop_surface_groups(cached)
+          None => ()
+        }
         drop_texture(self.textures[found])
       }
       let uploaded = upload_texture(
@@ -2254,6 +2314,131 @@ fn WebGPURenderer::texture_group(
       uploaded.group
     }
   }
+}
+
+///|
+/// 纹理重建前丢掉仍引用它的第 3 组。白纹理没有来源，不进这个列表。
+fn WebGPURenderer::drop_surface_groups(
+  self : WebGPURenderer,
+  source : @textures.Texture,
+) -> Unit {
+  let mut index = 0
+  while index < self.surface_groups.length() {
+    let emissive_hit = match self.surface_emissive[index] {
+      Some(stored) => physical_equal(stored, source)
+      None => false
+    }
+    let roughness_hit = match self.surface_roughness[index] {
+      Some(stored) => physical_equal(stored, source)
+      None => false
+    }
+    if emissive_hit || roughness_hit {
+      self.surface_groups[index].drop()
+      let last = self.surface_groups.length() - 1
+      self.surface_groups[index] = self.surface_groups[last]
+      self.surface_emissive[index] = self.surface_emissive[last]
+      self.surface_roughness[index] = self.surface_roughness[last]
+      ignore(self.surface_groups.pop())
+      ignore(self.surface_emissive.pop())
+      ignore(self.surface_roughness.pop())
+    } else {
+      index = index + 1
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::texture_views(
+  self : WebGPURenderer,
+  map : @textures.Texture?,
+) -> (GpuTextureView, GpuSampler) {
+  match map {
+    None => (self.white.view, self.white.sampler)
+    Some(source) => {
+      if source.attachment {
+        match self.output {
+          Some(current) =>
+            if physical_equal(current.texture, source) {
+              return (self.white.view, self.white.sampler)
+            }
+          None => ()
+        }
+        let target = self.color_target(source)
+        return (target.view, target.sampler)
+      }
+      let mut found = -1
+      let mut index = 0
+      while index < self.textures.length() {
+        match self.textures[index].source {
+          Some(cached) => if physical_equal(cached, source) { found = index }
+          None => ()
+        }
+        index = index + 1
+      }
+      if found < 0 {
+        return (self.white.view, self.white.sampler)
+      }
+      (self.textures[found].view, self.textures[found].sampler)
+    }
+  }
+}
+
+///|
+fn same_texture(left : @textures.Texture?, right : @textures.Texture?) -> Bool {
+  match (left, right) {
+    (None, None) => true
+    (Some(left), Some(right)) => physical_equal(left, right)
+    _ => false
+  }
+}
+
+///|
+/// 第 3 组同时绑定自发光和粗糙度。缺贴图时用 1×1 白纹理，绿色通道为 1。
+/// 视图句柄与纹理缓存共用，这里只丢掉绑定组本身。
+/// r186: `roughnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl.js#L9
+fn WebGPURenderer::surface_group(
+  self : WebGPURenderer,
+  emissive : @textures.Texture?,
+  roughness : @textures.Texture?,
+) -> GpuBindGroup {
+  ignore(self.texture_group(emissive))
+  ignore(self.texture_group(roughness))
+  let mut index = 0
+  while index < self.surface_groups.length() {
+    if same_texture(self.surface_emissive[index], emissive) &&
+      same_texture(self.surface_roughness[index], roughness) {
+      return self.surface_groups[index]
+    }
+    index = index + 1
+  }
+  let (emissive_view, emissive_sampler) = self.texture_views(emissive)
+  let (roughness_view, roughness_sampler) = self.texture_views(roughness)
+  let group = self.device.create_bind_group({
+    layout: self.surface_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(emissive_view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(emissive_sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(roughness_view),
+      },
+      {
+        binding: 3U,
+        resource: @gpu.GpuBindingResource::GpuSampler(roughness_sampler),
+      },
+    ],
+    label: Some("surface"),
+  })
+  self.surface_emissive.push(emissive)
+  self.surface_roughness.push(roughness)
+  self.surface_groups.push(group)
+  group
 }
 
 ///|
@@ -3537,7 +3722,7 @@ fn WebGPURenderer::draw_meshes(
         ignore(
           pass.set_bind_group(
             3U,
-            Some(self.texture_group(item.emissive_map)),
+            Some(self.surface_group(item.emissive_map, item.roughness_map)),
             None,
             None,
             None,

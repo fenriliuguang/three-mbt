@@ -21,6 +21,7 @@ pub(all) struct RenderItem {
   emissive : @math.Color
   emissive_intensity : Double
   emissive_map : @textures.Texture?
+  roughness_map : @textures.Texture?
   instances : @core.InstanceData?
 }
 
@@ -58,6 +59,7 @@ pub fn collect_opaque(
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
+                roughness_map: binding.roughness_map,
                 instances: binding.instances,
               })
             }
@@ -96,6 +98,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
+                roughness_map: binding.roughness_map,
                 instances: binding.instances,
               })
             }
@@ -139,6 +142,7 @@ pub fn collect_wireframe(
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
+                roughness_map: binding.roughness_map,
                 instances: binding.instances,
               })
             }
@@ -401,6 +405,7 @@ pub fn collect_transparent(
                 emissive: binding.emissive,
                 emissive_intensity: binding.emissive_intensity,
                 emissive_map: binding.emissive_map,
+                roughness_map: binding.roughness_map,
                 instances: binding.instances,
               })
             }

@@ -67,6 +67,7 @@ pub(all) struct Program {
   sampled : Bool
   shadowed : Bool
   emissive : Bool
+  roughness : Bool
   preamble : String
 }
 

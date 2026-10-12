@@ -47,6 +47,7 @@ pub(all) struct Program {
   sampled : Bool
   shadowed : Bool
   emissive : Bool
+  roughness : Bool
   preamble : String
 }
 
@@ -133,9 +134,9 @@ fn shadow_preamble() -> String {
 }
 
 ///|
-/// 直接光的 Cook-Torrance。粗糙度下限 0.0525，电介质 F0 为 0.04，与 r186 的物理光照一致。
+/// 直接光的 Cook-Torrance。粗糙度先乘贴图绿色通道，再取下限 0.0525。电介质 F0 为 0.04，与 r186 的物理光照一致。
 /// 环境光只乘漫反射。没有环境贴图，所以金属在背光处是黑的。
-/// r186: `D_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/D_GGX.js#L6 ; `V_GGX_SmithCorrelated` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/V_GGX_SmithCorrelated.js#L7 ; `F_Schlick` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/F_Schlick.js#L3 ; `BRDF_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/BRDF_GGX.js#L12
+/// r186: `D_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/D_GGX.js#L6 ; `V_GGX_SmithCorrelated` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/V_GGX_SmithCorrelated.js#L7 ; `F_Schlick` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/F_Schlick.js#L3 ; `BRDF_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/BRDF_GGX.js#L12 ; `roughnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl.js#L9
 fn standard_preamble() -> String {
   let lines = [
     "fn D_GGX(alpha : f32, NoH : f32) -> f32 {\n", "  let a2 = alpha * alpha;\n",
@@ -155,12 +156,13 @@ fn standard_preamble() -> String {
     "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
     "  return (diffuse + specular) * (uniforms.spot_color).xyz * NoL * falloff;\n",
     "}\n\n", "fn standard_lit(base : vec4<f32>, normal : vec3<f32>, world : vec3<f32>) -> vec4<f32> {\n",
-    "  let roughness = max((uniforms.surface).x, 0.0525);\n", "  let metalness = clamp((uniforms.surface).y, 0.0, 1.0);\n",
-    "  let alpha = roughness * roughness;\n", "  let diffuse_color = base.xyz * (1.0 - metalness);\n",
-    "  let f0 = mix(vec3<f32>(0.04), base.xyz, metalness);\n", "  let N = normalize(normal);\n",
-    "  let V = normalize((uniforms.camera_position).xyz - world);\n", "  let L = normalize((uniforms.light_direction).xyz);\n",
-    "  let H = normalize(V + L);\n", "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n",
-    "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
+    "  let roughness = max((uniforms.surface).x * textureSample(roughness_texture, roughness_sampler, input.v_uv).g, 0.0525);\n",
+    "  let metalness = clamp((uniforms.surface).y, 0.0, 1.0);\n", "  let alpha = roughness * roughness;\n",
+    "  let diffuse_color = base.xyz * (1.0 - metalness);\n", "  let f0 = mix(vec3<f32>(0.04), base.xyz, metalness);\n",
+    "  let N = normalize(normal);\n", "  let V = normalize((uniforms.camera_position).xyz - world);\n",
+    "  let L = normalize((uniforms.light_direction).xyz);\n", "  let H = normalize(V + L);\n",
+    "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n", "  let NoH = max(dot(N, H), 0.0);\n",
+    "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
     "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  var direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
     "  direct = direct + point_standard(N, V, world, diffuse, f0, alpha);\n", "  direct = direct + spot_standard(N, V, world, diffuse, f0, alpha);\n",
     "  let indirect = (uniforms.ambient).xyz * diffuse;\n", "  return vec4<f32>(direct + indirect, base.w);\n",
@@ -312,6 +314,7 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
     sampled: true,
     shadowed: false,
     emissive: false,
+    roughness: false,
     preamble: "",
   }
 }
@@ -393,6 +396,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     sampled: true,
     shadowed: true,
     emissive: true,
+    roughness: false,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -451,6 +455,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     sampled: true,
     shadowed: true,
     emissive: true,
+    roughness: true,
     preamble: if instanced {
       instance_preamble() +
       facing_preamble() +
@@ -484,6 +489,7 @@ pub fn line_program() -> Program {
     sampled: false,
     shadowed: false,
     emissive: false,
+    roughness: false,
     preamble: "",
   }
 }

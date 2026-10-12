@@ -48,7 +48,12 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
   assert_eq(includes(wgsl, "fn D_GGX("), true)
   assert_eq(includes(wgsl, "fn V_GGX_SmithCorrelated("), true)
   assert_eq(includes(wgsl, "fn F_Schlick("), true)
-  assert_eq(includes(wgsl, "max((uniforms.surface).x, 0.0525)"), true)
+  assert_eq(
+    includes(
+      wgsl, "max((uniforms.surface).x * textureSample(roughness_texture, roughness_sampler, input.v_uv).g, 0.0525)",
+    ),
+    true,
+  )
   assert_eq(includes(wgsl, "mix(vec3<f32>(0.04), base.xyz, metalness)"), true)
   assert_eq(includes(wgsl, "exp2((-5.55473 * VoH - 6.98316) * VoH)"), true)
   assert_eq(includes(wgsl, "uniforms.model"), true)
@@ -83,6 +88,19 @@ test "lambert and standard add emissive after lighting" {
     ),
     true,
   )
+}
+
+///|
+test "standard multiplies roughness by the green channel" {
+  let sample = "textureSample(roughness_texture, roughness_sampler, input.v_uv).g"
+  let binding = "@group(3) @binding(2) var roughness_texture"
+  assert_eq(includes(@nodes.standard_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_instanced_wgsl(), sample), true)
+  assert_eq(includes(@nodes.standard_wgsl(), binding), true)
+  assert_eq(includes(@nodes.lambert_wgsl(), sample), false)
+  assert_eq(includes(@nodes.lambert_instanced_wgsl(), sample), false)
+  assert_eq(includes(@nodes.basic_wgsl(), sample), false)
+  assert_eq(includes(@nodes.basic_instanced_wgsl(), "roughness_texture"), false)
 }
 
 ///|

@@ -13,8 +13,9 @@ pub(all) enum MaterialKind {
 /// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
 /// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
 /// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
-/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170
+/// `roughness_map` 只进 Standard：绿色通道乘在粗糙度上，再取 0.0525 下限。没有贴图时同样绑白纹理。
+/// 改 `side`、`alpha_test`、`emissive_intensity`、`emissive_map`、`roughness_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -29,6 +30,7 @@ pub(all) struct Material {
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
+  mut roughness_map : @textures.Texture?
   kind : MaterialKind
 }
 
@@ -48,6 +50,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
+    roughness_map: None,
     kind: Basic,
   }
 }
@@ -80,6 +83,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
+    roughness_map: None,
     kind: Lambert,
   }
 }
@@ -118,6 +122,7 @@ pub fn Material::standard(
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
+    roughness_map: None,
     kind: Standard,
   }
 }

@@ -19,6 +19,7 @@ pub(all) struct MeshBinding {
   emissive : @math.Color
   mut emissive_intensity : Double
   emissive_map : @textures.Texture?
+  roughness_map : @textures.Texture?
   instances : InstanceData?
 }
 
