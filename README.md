@@ -156,7 +156,7 @@ sh scripts/build-bloom.sh
 
 Copy `target/bloom.component.wasm` to `examples/apps/bloom/bloom.component.wasm`, then `cargo xtask run-demo --name bloom`. `moon run src/examples/bloom/app` does not open a window.
 
-The compose sample draws a Lambert cube into a color target, then runs grayscale at amount 0.5 and ACES at exposure 1:
+The compose sample draws a Lambert cube into a color target, then runs grayscale at amount 0.5 and ACES at exposure 1. A copy pass can also scale every channel by `opacity`; this sample does not use it:
 
 ```sh
 sh scripts/build-compose.sh

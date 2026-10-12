@@ -156,7 +156,7 @@ sh scripts/build-bloom.sh
 
 把 `target/bloom.component.wasm` 复制到 `examples/apps/bloom/bloom.component.wasm`，然后 `cargo xtask run-demo --name bloom`。`moon run src/examples/bloom/app` 不会打开窗口。
 
-合成样本把 Lambert 立方体画进颜色目标，再先按 0.5 混进灰度，然后用曝光 1 的 ACES 铺到窗口：
+合成样本把 Lambert 立方体画进颜色目标，再先按 0.5 混进灰度，然后用曝光 1 的 ACES 铺到窗口。复制通道可以按 `opacity` 缩放四个通道，这个样本没有用它：
 
 ```sh
 sh scripts/build-compose.sh

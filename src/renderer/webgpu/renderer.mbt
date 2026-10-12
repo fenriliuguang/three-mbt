@@ -1,4 +1,4 @@
-// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12
 
 ///|
 using @gpu {
@@ -207,6 +207,9 @@ pub struct WebGPURenderer {
   tone_layout : GpuBindGroupLayout
   tone_uniform : GpuBuffer
   mut tone_group : PostGroup?
+  copy : GpuRenderPipeline
+  copy_layout : GpuBindGroupLayout
+  copy_uniform : GpuBuffer
   bloom : GpuRenderPipeline
   bloom_layout : GpuBindGroupLayout
   bloom_uniform : GpuBuffer
@@ -1157,6 +1160,13 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     "tone",
     @post.pack_tone(@constants.ToneMapping::No, 1.0),
   )
+  let copy = fullscreen_pipeline(
+    device,
+    format,
+    @post.copy_wgsl(),
+    "copy",
+    @post.pack_opacity(1.0),
+  )
   let bloom = bloom_pipeline(device, format)
   let white = upload_texture(
     device,
@@ -1281,6 +1291,9 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     tone_layout: tone.0,
     tone_uniform: tone.2,
     tone_group: None,
+    copy: copy.1,
+    copy_layout: copy.0,
+    copy_uniform: copy.2,
     bloom: bloom.1,
     bloom_layout: bloom.0,
     bloom_uniform: bloom.2,
@@ -3089,6 +3102,21 @@ fn WebGPURenderer::compose_effect(
       )
       let group = self.compose_group(self.tone_layout, self.tone_uniform, read)
       self.submit_fullscreen(self.tone, group, target, "compose")
+    }
+    @post.Copy(pass) => {
+      ignore(
+        self.device
+        .queue()
+        .write_buffer_with_copy(
+          self.copy_uniform,
+          0UL,
+          @post.pack_opacity(pass.opacity),
+          None,
+          None,
+        ),
+      )
+      let group = self.compose_group(self.copy_layout, self.copy_uniform, read)
+      self.submit_fullscreen(self.copy, group, target, "compose")
     }
     @post.Bloom(pass) => self.bloom_to(read, width, height, pass, target)
   }

@@ -1,4 +1,4 @@
-// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `LinearToSRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L211
+// r186: 没有同名灰度通道。输出路径 `PostProcessing` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/PostProcessing.js#L9 ; 全屏通道形状 `ShaderPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/ShaderPass.js#L20 ; `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `LinearToSRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L211 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12
 
 ///|
 const WEIGHT_R : Double = 0.25
@@ -110,6 +110,83 @@ pub fn grayscale_wgsl() -> String {
     #|  let gray = dot(color.rgb, vec3<f32>(0.25, 0.5, 0.25));
     #|  let rgb = mix(color.rgb, vec3<f32>(gray), params.amount);
     #|  return vec4<f32>(rgb, color.a);
+    #|}
+  code
+}
+
+///|
+/// 全屏复制。`opacity` 默认 1，四个通道都乘它，不夹取。
+/// r186: `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12
+pub(all) struct CopyPass {
+  mut opacity : Double
+}
+
+///|
+pub fn CopyPass::new(opacity? : Double = 1.0) -> CopyPass {
+  { opacity, }
+}
+
+///|
+pub fn CopyPass::set_opacity(self : CopyPass, opacity : Double) -> Unit {
+  self.opacity = opacity
+}
+
+///|
+/// 与 `CopyShader` 相同，四个通道都乘 `opacity`。
+/// r186: `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L45
+pub fn copy_color(
+  r : Double,
+  g : Double,
+  b : Double,
+  a : Double,
+  opacity : Double,
+) -> (Double, Double, Double, Double) {
+  (r * opacity, g * opacity, b * opacity, a * opacity)
+}
+
+///|
+/// 16 字节 uniform，`opacity` 在第一个 `f32`。
+pub fn pack_opacity(opacity : Double) -> FixedArray[Byte] {
+  let dst = FixedArray::make(16, b'\x00')
+  write_f32(dst, 0, opacity)
+  dst
+}
+
+///|
+/// 全屏三角形，片段着色器是 `opacity * texel`。
+/// r186: `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L45
+pub fn copy_wgsl() -> String {
+  let code =
+    #|struct VertexOutput {
+    #|  @builtin(position) clip : vec4<f32>,
+    #|  @location(0) uv : vec2<f32>,
+    #|}
+    #|
+    #|@vertex
+    #|fn vs(@builtin(vertex_index) id : u32) -> VertexOutput {
+    #|  let x = select(-1.0, 3.0, id == 1u);
+    #|  let y = select(-1.0, 3.0, id == 2u);
+    #|  var output : VertexOutput;
+    #|  output.clip = vec4<f32>(x, y, 0.0, 1.0);
+    #|  output.uv = vec2<f32>(x * 0.5 + 0.5, 0.5 - y * 0.5);
+    #|  return output;
+    #|}
+    #|
+    #|struct CopyParams {
+    #|  opacity : f32,
+    #|  pad0 : f32,
+    #|  pad1 : f32,
+    #|  pad2 : f32,
+    #|}
+    #|
+    #|@group(0) @binding(0) var color_tex : texture_2d<f32>;
+    #|@group(0) @binding(1) var color_samp : sampler;
+    #|@group(0) @binding(2) var<uniform> params : CopyParams;
+    #|
+    #|@fragment
+    #|fn fs(input : VertexOutput) -> @location(0) vec4<f32> {
+    #|  let texel = textureSample(color_tex, color_samp, input.uv);
+    #|  return params.opacity * texel;
     #|}
   code
 }
@@ -972,6 +1049,7 @@ pub(all) enum ComposerEffect {
   Grayscale(GrayscalePass)
   Tone(ToneMappingPass)
   Bloom(BloomPass)
+  Copy(CopyPass)
 }
 
 ///|
@@ -984,7 +1062,7 @@ pub(all) struct ComposerPass {
 
 ///|
 /// 按加入顺序执行的后处理链。WebGPU 的节点管线仍是 `RenderPipeline`，这里只做通道顺序。
-/// 半精度目标、蒙版和复制通道还没做。每条通道都会写出新图像。
+/// 半精度目标和蒙版还没做。复制通道按 `opacity` 缩放四个通道。每条通道都会写出新图像。
 /// r186: `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42
 pub(all) struct EffectComposer {
   mut passes : Array[ComposerPass]
@@ -1026,6 +1104,11 @@ pub fn EffectComposer::add_bloom(
   pass : BloomPass,
 ) -> Unit {
   self.add_pass(Bloom(pass))
+}
+
+///|
+pub fn EffectComposer::add_copy(self : EffectComposer, pass : CopyPass) -> Unit {
+  self.add_pass(Copy(pass))
 }
 
 ///|
