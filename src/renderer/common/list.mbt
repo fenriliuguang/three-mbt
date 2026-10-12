@@ -29,8 +29,10 @@ pub(all) struct RenderItem {
 }
 
 ///|
-/// 收集当前可见的不透明网格。传入视锥时按包围球裁剪，不排序。
-/// r186: `reversePainterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L45
+/// 收集当前可见的不透明网格。传入视锥时按包围球裁剪。
+/// 只按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
+/// 没有 `groupOrder`。r186 还会比较 z，这里不比较。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20
 pub fn collect_opaque(
   root : Object3D,
   frustum? : @math.Frustum,
@@ -73,11 +75,12 @@ pub fn collect_opaque(
       _ => ()
     }
   })
-  items
+  by_render_order(items)
 }
 
 ///|
 /// 阴影投射体。线框也包含在内，几何仍是三角形，边列表只给颜色通道。
+/// 不按 `render_order` 排，保持遍历顺序。
 pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
@@ -120,7 +123,8 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
 
 ///|
 /// 线框网格。透明与不透明、普通与实例化都收集。
-/// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
+/// 彼此按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 pub fn collect_wireframe(
   root : Object3D,
   frustum? : @math.Frustum,
@@ -162,7 +166,7 @@ pub fn collect_wireframe(
       _ => ()
     }
   })
-  items
+  by_render_order(items)
 }
 
 ///|
@@ -222,7 +226,9 @@ pub(all) struct PrimitiveItem {
 }
 
 ///|
-/// 收集当前可见的点和线。传入视锥时按包围球裁剪。
+/// 收集当前可见的不透明点和线。传入视锥时按包围球裁剪。
+/// 只按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
+/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20
 pub fn collect_primitives(
   root : Object3D,
   frustum? : @math.Frustum,
@@ -249,12 +255,12 @@ pub fn collect_primitives(
         }
     }
   })
-  items
+  primitives_by_render_order(items)
 }
 
 ///|
-/// 透明的点和线，从远到近。深度相同则保持遍历顺序。
-/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L14
+/// 透明的点和线。先比 `render_order`，再从远到近。都相同则保持遍历顺序。
+/// r186: `reversePainterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L51
 pub fn collect_transparent_primitives(
   root : Object3D,
   camera : Object3D,
@@ -287,11 +293,12 @@ pub fn collect_transparent_primitives(
     ranked.push(PrimitiveDepth::{
       item,
       depth: view_depth(camera, item.node),
+      render_order: item.node.render_order,
       order,
     })
     order = order + 1
   }
-  sort_primitives_far_to_near(ranked)
+  sort_ranked_primitives(ranked, primitive_farther)
   let sorted = []
   for entry in ranked {
     sorted.push(entry.item)
@@ -303,6 +310,7 @@ pub fn collect_transparent_primitives(
 priv struct DepthItem {
   item : RenderItem
   depth : Double
+  render_order : Int
   order : Int
 }
 
@@ -310,13 +318,18 @@ priv struct DepthItem {
 priv struct PrimitiveDepth {
   item : PrimitiveItem
   depth : Double
+  render_order : Int
   order : Int
 }
 
 ///|
-/// 相机前方的视图空间 z 为负。更小的值更远。
+/// `render_order` 更小的先画。相同则视图空间 z 更小（更远）的先画，再保持遍历顺序。
 fn farther(left : DepthItem, right : DepthItem) -> Bool {
-  if left.depth < right.depth {
+  if left.render_order < right.render_order {
+    true
+  } else if left.render_order > right.render_order {
+    false
+  } else if left.depth < right.depth {
     true
   } else if left.depth > right.depth {
     false
@@ -326,23 +339,63 @@ fn farther(left : DepthItem, right : DepthItem) -> Bool {
 }
 
 ///|
-fn sort_far_to_near(items : Array[DepthItem]) -> Unit {
+/// 只比 `render_order`。相同则保持遍历顺序，不看深度。
+fn earlier(left : DepthItem, right : DepthItem) -> Bool {
+  if left.render_order < right.render_order {
+    true
+  } else if left.render_order > right.render_order {
+    false
+  } else {
+    left.order < right.order
+  }
+}
+
+///|
+fn sort_ranked(
+  items : Array[DepthItem],
+  before : (DepthItem, DepthItem) -> Bool,
+) -> Unit {
   let mut index = 1
   while index < items.length() {
     let current = items[index]
     let mut hole = index
-    while hole > 0 && farther(current, items[hole - 1]) {
+    while hole > 0 && before(current, items[hole - 1]) {
       items[hole] = items[hole - 1]
       hole = hole - 1
     }
     items[hole] = current
     index = index + 1
   }
+}
+
+///|
+fn by_render_order(items : Array[RenderItem]) -> Array[RenderItem] {
+  let ranked = []
+  let mut order = 0
+  for item in items {
+    ranked.push(DepthItem::{
+      item,
+      depth: 0.0,
+      render_order: item.node.render_order,
+      order,
+    })
+    order = order + 1
+  }
+  sort_ranked(ranked, earlier)
+  let sorted = []
+  for entry in ranked {
+    sorted.push(entry.item)
+  }
+  sorted
 }
 
 ///|
 fn primitive_farther(left : PrimitiveDepth, right : PrimitiveDepth) -> Bool {
-  if left.depth < right.depth {
+  if left.render_order < right.render_order {
+    true
+  } else if left.render_order > right.render_order {
+    false
+  } else if left.depth < right.depth {
     true
   } else if left.depth > right.depth {
     false
@@ -352,18 +405,55 @@ fn primitive_farther(left : PrimitiveDepth, right : PrimitiveDepth) -> Bool {
 }
 
 ///|
-fn sort_primitives_far_to_near(items : Array[PrimitiveDepth]) -> Unit {
+fn primitive_earlier(left : PrimitiveDepth, right : PrimitiveDepth) -> Bool {
+  if left.render_order < right.render_order {
+    true
+  } else if left.render_order > right.render_order {
+    false
+  } else {
+    left.order < right.order
+  }
+}
+
+///|
+fn sort_ranked_primitives(
+  items : Array[PrimitiveDepth],
+  before : (PrimitiveDepth, PrimitiveDepth) -> Bool,
+) -> Unit {
   let mut index = 1
   while index < items.length() {
     let current = items[index]
     let mut hole = index
-    while hole > 0 && primitive_farther(current, items[hole - 1]) {
+    while hole > 0 && before(current, items[hole - 1]) {
       items[hole] = items[hole - 1]
       hole = hole - 1
     }
     items[hole] = current
     index = index + 1
   }
+}
+
+///|
+fn primitives_by_render_order(
+  items : Array[PrimitiveItem],
+) -> Array[PrimitiveItem] {
+  let ranked = []
+  let mut order = 0
+  for item in items {
+    ranked.push(PrimitiveDepth::{
+      item,
+      depth: 0.0,
+      render_order: item.node.render_order,
+      order,
+    })
+    order = order + 1
+  }
+  sort_ranked_primitives(ranked, primitive_earlier)
+  let sorted = []
+  for entry in ranked {
+    sorted.push(entry.item)
+  }
+  sorted
 }
 
 ///|
@@ -384,8 +474,8 @@ pub fn view_depth(camera : Object3D, object : Object3D) -> Double {
 }
 
 ///|
-/// 透明网格，从远到近。深度相同则保持遍历顺序。线框不在此列。
-/// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L14
+/// 透明网格。先比 `render_order`，再从远到近。都相同则保持遍历顺序。线框不在此列。
+/// r186: `reversePainterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L51
 pub fn collect_transparent(
   root : Object3D,
   camera : Object3D,
@@ -434,11 +524,12 @@ pub fn collect_transparent(
     ranked.push(DepthItem::{
       item,
       depth: view_depth(camera, item.node),
+      render_order: item.node.render_order,
       order,
     })
     order = order + 1
   }
-  sort_far_to_near(ranked)
+  sort_ranked(ranked, farther)
   let sorted = []
   for entry in ranked {
     sorted.push(entry.item)

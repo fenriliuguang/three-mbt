@@ -1408,3 +1408,150 @@ test "update_frame skins a mesh from its bind pose" {
       )
   }
 }
+
+///|
+test "render order draws lower values first and leaves shadows unsorted" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  let far_mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  far_mesh.node.render_order = 0
+  far_mesh.node.cast_shadow = true
+  ignore(far_mesh.node.position.set(0.0, 0.0, 0.0))
+  ignore(scene.add(far_mesh))
+  let near_mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  near_mesh.node.render_order = 0
+  near_mesh.node.cast_shadow = true
+  ignore(near_mesh.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(near_mesh))
+  @common.update_frame(scene.node, camera.node)
+  let depth_tied = @common.collect_opaque(scene.node)
+  assert_eq(depth_tied.length(), 2)
+  assert_eq(physical_equal(depth_tied[0].node, far_mesh.node), true)
+  assert_eq(physical_equal(depth_tied[1].node, near_mesh.node), true)
+  let early = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  early.node.render_order = -1
+  early.node.cast_shadow = true
+  ignore(early.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(early))
+  let late = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  late.node.render_order = 2
+  ignore(scene.add(late))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 4)
+  assert_eq(physical_equal(drawn[0].node, early.node), true)
+  assert_eq(physical_equal(drawn[1].node, far_mesh.node), true)
+  assert_eq(physical_equal(drawn[2].node, near_mesh.node), true)
+  assert_eq(physical_equal(drawn[3].node, late.node), true)
+  let casters = @common.collect_shadow(scene.node)
+  assert_eq(casters.length(), 4)
+  assert_eq(physical_equal(casters[0].node, far_mesh.node), true)
+  assert_eq(physical_equal(casters[1].node, near_mesh.node), true)
+  assert_eq(physical_equal(casters[2].node, early.node), true)
+  assert_eq(physical_equal(casters[3].node, late.node), true)
+  let wire_late = @materials.MeshBasicMaterial::new()
+  wire_late.material.wireframe = true
+  let back = @objects.Mesh::new(box.geometry, wire_late.material)
+  back.node.render_order = 4
+  ignore(scene.add(back))
+  let wire_early = @materials.MeshBasicMaterial::new()
+  wire_early.material.wireframe = true
+  let front = @objects.Mesh::new(box.geometry, wire_early.material)
+  front.node.render_order = 1
+  ignore(scene.add(front))
+  let wires = @common.collect_wireframe(scene.node)
+  assert_eq(wires.length(), 2)
+  assert_eq(physical_equal(wires[0].node, front.node), true)
+  assert_eq(physical_equal(wires[1].node, back.node), true)
+}
+
+///|
+test "transparent render order precedes view depth" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  ignore(camera.node.position.set(0.0, 0.0, 5.0))
+  let far_mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  far_mesh.set_transparent(true, opacity=0.25)
+  far_mesh.node.render_order = 1
+  ignore(far_mesh.node.position.set(0.0, 0.0, 0.0))
+  ignore(scene.add(far_mesh))
+  let near_mesh = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  near_mesh.set_transparent(true, opacity=0.5)
+  near_mesh.node.render_order = 0
+  ignore(near_mesh.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(near_mesh))
+  @common.update_frame(scene.node, camera.node)
+  let glass = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(glass.length(), 2)
+  assert_eq(physical_equal(glass[0].node, near_mesh.node), true)
+  assert_eq(physical_equal(glass[1].node, far_mesh.node), true)
+  let tied = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  tied.set_transparent(true, opacity=1.0)
+  tied.node.render_order = 0
+  ignore(tied.node.position.set(0.0, 0.0, 0.0))
+  ignore(scene.add(tied))
+  @common.update_frame(scene.node, camera.node)
+  let same = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(same.length(), 3)
+  assert_eq(physical_equal(same[0].node, tied.node), true)
+  assert_eq(physical_equal(same[1].node, near_mesh.node), true)
+  assert_eq(physical_equal(same[2].node, far_mesh.node), true)
+  let spot = point_at(0.0)
+  let far_point = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  far_point.set_transparent(true, opacity=0.2)
+  far_point.node.render_order = 3
+  ignore(scene.add(far_point))
+  let near_point = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  near_point.set_transparent(true, opacity=0.8)
+  near_point.node.render_order = -2
+  ignore(near_point.node.position.set(0.0, 0.0, 2.0))
+  ignore(scene.add(near_point))
+  let solid = @objects.Points::new(spot, @materials.PointsMaterial::new())
+  solid.node.render_order = 5
+  ignore(scene.add(solid))
+  let sooner = @objects.Line::new(spot, @materials.LineBasicMaterial::new())
+  sooner.node.render_order = -1
+  ignore(scene.add(sooner))
+  @common.update_frame(scene.node, camera.node)
+  let clear = @common.collect_transparent_primitives(scene.node, camera.node)
+  assert_eq(clear.length(), 2)
+  assert_eq(physical_equal(clear[0].node, near_point.node), true)
+  assert_eq(physical_equal(clear[1].node, far_point.node), true)
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes.length(), 2)
+  assert_eq(physical_equal(strokes[0].node, sooner.node), true)
+  assert_eq(physical_equal(strokes[1].node, solid.node), true)
+}
