@@ -5,7 +5,8 @@ using @core {type Object3D, type CameraState}
 
 ///|
 /// 透视相机。投影默认使用 WebGPU 坐标系，近平面深度为 0。
-/// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23
+/// `zoom` 默认 1，除在垂直视场上。`film_offset` 默认 0，非 0 时按胶片宽度把视锥水平平移。两个设置都会重算投影。
+/// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `zoom` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L63 ; `filmOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L129
 pub(all) struct PerspectiveCamera {
   node : Object3D
 }
@@ -64,6 +65,34 @@ pub fn PerspectiveCamera::set_aspect(
     None => ()
     Some(camera) => {
       camera.aspect = aspect
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn PerspectiveCamera::set_zoom(
+  self : PerspectiveCamera,
+  zoom : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.zoom = zoom
+      camera.update_projection()
+    }
+  }
+}
+
+///|
+pub fn PerspectiveCamera::set_film_offset(
+  self : PerspectiveCamera,
+  film_offset : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => {
+      camera.film_offset = film_offset
       camera.update_projection()
     }
   }

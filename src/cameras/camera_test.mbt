@@ -85,6 +85,65 @@ test "reversed orthographic projection matches r186 WebGPU" {
 }
 
 ///|
+test "perspective zoom doubles the projection scale" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => assert_eq(state.zoom, 1.0)
+  }
+  camera.set_zoom(2.0)
+  let expected = [
+    2.41257028557, 0.0, 0.0, 0.0, 0.0, 4.28901384102, 0.0, 0.0, 0.0, 0.0, -1.001001001,
+    -1.0, 0.0, 0.0, -0.1001001001, 0.0,
+  ]
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.zoom, 2.0)
+      for i in 0..<16 {
+        assert_close(state.projection.elements[i], expected[i])
+      }
+    }
+  }
+}
+
+///|
+test "perspective film offset shifts the frustum" {
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=16.0 / 9.0,
+    near=0.1,
+    far=100.0,
+  )
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.film_offset, 0.0)
+      assert_eq(state.film_gauge, 35.0)
+    }
+  }
+  camera.set_film_offset(3.5)
+  let expected = [
+    1.20628514279, 0.0, 0.0, 0.0, 0.0, 2.14450692051, 0.0, 0.0, 0.120628514279, 0.0,
+    -1.001001001, -1.0, 0.0, 0.0, -0.1001001001, 0.0,
+  ]
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.film_offset, 3.5)
+      for i in 0..<16 {
+        assert_close(state.projection.elements[i], expected[i])
+      }
+    }
+  }
+}
+
+///|
 test "orthographic projection matches r186 WebGPU" {
   let camera = @cameras.OrthographicCamera::new(
     left=-2.0,

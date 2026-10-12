@@ -24,7 +24,9 @@ pub(all) struct PerspectiveCamera {
 }
 pub fn PerspectiveCamera::new(fov? : Double, aspect? : Double, near? : Double, far? : Double) -> Self
 pub fn PerspectiveCamera::set_aspect(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_film_offset(Self, Double) -> Unit
 pub fn PerspectiveCamera::set_fov(Self, Double) -> Unit
+pub fn PerspectiveCamera::set_zoom(Self, Double) -> Unit
 pub fn PerspectiveCamera::to_node(Self) -> @core.Object3D
 pub fn PerspectiveCamera::update_projection(Self) -> Unit
 pub impl @core.AsNode for PerspectiveCamera
