@@ -134,7 +134,12 @@ fn standard_preamble() -> String {
 
 ///|
 fn position_attributes() -> Array[(String, Int, ValueType)] {
-  [("position", 0, Vec3), ("normal", 1, Vec3), ("uv", 2, Vec2)]
+  [
+    ("position", 0, Vec3),
+    ("normal", 1, Vec3),
+    ("uv", 2, Vec2),
+    ("color", 8, Vec4),
+  ]
 }
 
 ///|
@@ -186,6 +191,27 @@ fn tint_instance(color : Node, instanced : Bool) -> Node {
 }
 
 ///|
+/// 顶点色乘进底色，包含 alpha。没有该属性时打包成白色，乘上去不变。
+/// r186: `color_vertex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js#L10 ; `color_fragment` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js#L4
+fn tint_vertex(color : Node) -> Node {
+  let vertex = Varying("v_color", Vec4)
+  Node::Vec4(
+    Mul(Swizzle(color, "xyz"), Swizzle(vertex, "xyz")),
+    Mul(Swizzle(color, "w"), Swizzle(vertex, "w")),
+  )
+}
+
+///|
+fn with_vertex_color(
+  varyings : Array[(String, ValueType)],
+  assignments : Array[(String, Node)],
+) -> (Array[(String, ValueType)], Array[(String, Node)]) {
+  varyings.push(("v_color", Vec4))
+  assignments.push(("v_color", Attribute("color", 8, Vec4)))
+  (varyings, assignments)
+}
+
+///|
 fn with_instance_color(
   varyings : Array[(String, ValueType)],
   assignments : Array[(String, Node)],
@@ -207,10 +233,13 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
   let normal = Attribute("normal", 1, Vec3)
   let shifted = Add(position, Mul(normal, Float(0.0)))
   let sample = TextureSample(Varying("v_uv", Vec2))
-  let (colored_varyings, colored_assignments) = with_instance_color(
+  let (instanced_varyings, instanced_assignments) = with_instance_color(
     [("v_uv", Vec2)],
     [("v_uv", Attribute("uv", 2, Vec2))],
     instanced,
+  )
+  let (colored_varyings, colored_assignments) = with_vertex_color(
+    instanced_varyings, instanced_assignments,
   )
   let (varyings, assignments) = with_fog(
     colored_varyings,
@@ -223,9 +252,8 @@ pub fn basic_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(shifted, instanced)),
     vertex_varyings: assignments,
-    fragment_color: tint_instance(
-      Mul(Uniform("color", Vec4), sample),
-      instanced,
+    fragment_color: tint_vertex(
+      tint_instance(Mul(Uniform("color", Vec4), sample), instanced),
     ),
     sampled: true,
     shadowed: false,
@@ -262,7 +290,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
     Swizzle(sample, "xyz"),
   )
-  let (colored_varyings, colored_assignments) = with_instance_color(
+  let (instanced_varyings, instanced_assignments) = with_instance_color(
     [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
     [
       ("v_normal", world_normal),
@@ -270,6 +298,9 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
       ("v_world", world),
     ],
     instanced,
+  )
+  let (colored_varyings, colored_assignments) = with_vertex_color(
+    instanced_varyings, instanced_assignments,
   )
   let (varyings, assignments) = with_fog(
     colored_varyings,
@@ -282,9 +313,14 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(position, instanced)),
     vertex_varyings: assignments,
-    fragment_color: tint_instance(
-      Vec4(rgb, Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w"))),
-      instanced,
+    fragment_color: tint_vertex(
+      tint_instance(
+        Vec4(
+          rgb,
+          Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
+        ),
+        instanced,
+      ),
     ),
     sampled: true,
     shadowed: true,
@@ -313,7 +349,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), Swizzle(sample, "xyz")),
     Mul(Swizzle(Uniform("color", Vec4), "w"), Swizzle(sample, "w")),
   )
-  let (colored_varyings, colored_assignments) = with_instance_color(
+  let (instanced_varyings, instanced_assignments) = with_instance_color(
     [("v_normal", Vec3), ("v_uv", Vec2), ("v_world", Vec3)],
     [
       ("v_normal", world_normal),
@@ -321,6 +357,9 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
       ("v_world", world),
     ],
     instanced,
+  )
+  let (colored_varyings, colored_assignments) = with_vertex_color(
+    instanced_varyings, instanced_assignments,
   )
   let (varyings, assignments) = with_fog(
     colored_varyings,
@@ -333,7 +372,7 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     varyings,
     vertex_clip: Mul(Uniform("mvp", Mat4), placed),
     vertex_varyings: assignments,
-    fragment_color: StandardLit(tint_instance(base, instanced)),
+    fragment_color: StandardLit(tint_instance(tint_vertex(base), instanced)),
     sampled: true,
     shadowed: true,
     preamble: if instanced {

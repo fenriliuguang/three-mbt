@@ -377,6 +377,11 @@ fn mesh_vertex_buffers(instanced : Bool) -> Array[@gpu.GpuVertexBufferLayout?] {
         offset: 24UL,
         shader_location: 2U,
       },
+      {
+        format: @gpu.GpuVertexFormat::FLOAT32X4,
+        offset: 32UL,
+        shader_location: 8U,
+      },
     ],
   })
   if !instanced {
@@ -1611,6 +1616,7 @@ fn WebGPURenderer::geometry_gpu(
             position,
             geometry.get_attribute("normal"),
             geometry.get_attribute("uv"),
+            color=geometry.get_attribute("color"),
           ),
           vertex=true,
           index=false,

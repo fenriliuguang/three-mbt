@@ -15,6 +15,8 @@ test "basic material ignores lights" {
   assert_eq(includes(wgsl, "@location(0) position : vec3<f32>"), true)
   assert_eq(includes(wgsl, "@location(1) normal : vec3<f32>"), true)
   assert_eq(includes(wgsl, "@location(2) uv : vec2<f32>"), true)
+  assert_eq(includes(wgsl, "@location(8) color : vec4<f32>"), true)
+  assert_eq(includes(wgsl, "input.v_color"), true)
   assert_eq(includes(wgsl, "@group(1) @binding(0) var map_texture"), true)
   assert_eq(includes(wgsl, "normalize("), false)
 }
@@ -37,6 +39,7 @@ test "lambert material uses ambient and one directional light" {
     includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
     true,
   )
+  assert_eq(includes(wgsl, "input.v_color"), true)
 }
 
 ///|
@@ -56,6 +59,7 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
     includes(wgsl, "textureSample(map_texture, map_sampler, input.v_uv)"),
     true,
   )
+  assert_eq(includes(wgsl, "input.v_color"), true)
 }
 
 ///|
@@ -69,6 +73,7 @@ test "instanced meshes multiply instance matrix and color" {
   assert_eq(includes(basic, "@location(7) instance_color : vec3<f32>"), true)
   assert_eq(includes(basic, matrix), true)
   assert_eq(includes(basic, "input.v_instance_color"), true)
+  assert_eq(includes(basic, "input.v_color"), true)
   assert_eq(includes(@nodes.basic_wgsl(), "instance_matrix"), false)
   assert_eq(includes(lambert, "instance_normal("), true)
   assert_eq(includes(lambert, matrix), true)

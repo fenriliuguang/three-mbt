@@ -21,8 +21,8 @@ pub let instance_matrix_stride : Int = 64
 pub let instance_color_stride : Int = 12
 
 ///|
-/// 位置、法线、uv 交错存放时每个顶点的字节数。
-pub let vertex_stride : Int = 32
+/// 位置、法线、uv 和顶点色交错存放，每个顶点 48 字节。
+pub let vertex_stride : Int = 48
 
 ///|
 /// WebGPU 要求 `bytesPerRow` 是 256 的倍数。
@@ -110,11 +110,14 @@ pub fn pack_index_array(indices : Array[Int]) -> FixedArray[Byte] {
 }
 
 ///|
-/// 位置、法线和 uv 交错存放，每个顶点 32 字节。缺少法线时写成 `(0, 0, 1)`，缺少 uv 时写成 `(0, 0)`。
+/// 位置、法线、uv 和顶点色交错存放，每个顶点 48 字节。
+/// 缺少法线时写成 `(0, 0, 1)`，缺少 uv 时写成 `(0, 0)`。
+/// 缺少顶点色时写成白色；只有 rgb 时 alpha 写成 1。
 pub fn pack_position_normal_uv(
   position : BufferAttribute,
   normal : BufferAttribute?,
   uv : BufferAttribute?,
+  color? : BufferAttribute? = None,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(position.count * vertex_stride, b'\x00')
   for index in 0..<position.count {
@@ -144,8 +147,36 @@ pub fn pack_position_normal_uv(
       }
       _ => ()
     }
+    write_vertex_color(dst, base + 32, color, index)
   }
   dst
+}
+
+///|
+fn write_vertex_color(
+  dst : FixedArray[Byte],
+  offset : Int,
+  color : BufferAttribute?,
+  index : Int,
+) -> Unit {
+  match color {
+    Some(color) if index < color.count => {
+      write_f32(dst, offset, color.get_x(index))
+      write_f32(dst, offset + 4, color.get_y(index))
+      write_f32(dst, offset + 8, color.get_z(index))
+      if color.item_size >= 4 {
+        write_f32(dst, offset + 12, color.get_component(index, 3))
+      } else {
+        write_f32(dst, offset + 12, 1.0)
+      }
+    }
+    _ => {
+      write_f32(dst, offset, 1.0)
+      write_f32(dst, offset + 4, 1.0)
+      write_f32(dst, offset + 8, 1.0)
+      write_f32(dst, offset + 12, 1.0)
+    }
+  }
 }
 
 ///|

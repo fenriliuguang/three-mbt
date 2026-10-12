@@ -43,7 +43,7 @@ pub fn pack_instance_colors(@core.BufferAttribute?, Int) -> FixedArray[Byte]
 
 pub fn pack_point_positions(@core.BufferAttribute, @core.BufferAttribute?) -> FixedArray[Byte]
 
-pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @core.BufferAttribute?) -> FixedArray[Byte]
+pub fn pack_position_normal_uv(@core.BufferAttribute, @core.BufferAttribute?, @core.BufferAttribute?, color? : @core.BufferAttribute?) -> FixedArray[Byte]
 
 pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 

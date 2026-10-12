@@ -378,6 +378,44 @@ test "vertices pack uv and texture rows pad to 256" {
   assert_eq(packed[29], b'\x00')
   assert_eq(packed[30], b'\x80')
   assert_eq(packed[31], b'\x3E')
+  assert_eq(packed[32], b'\x00')
+  assert_eq(packed[33], b'\x00')
+  assert_eq(packed[34], b'\x80')
+  assert_eq(packed[35], b'\x3F')
+  assert_eq(packed[44], b'\x00')
+  assert_eq(packed[45], b'\x00')
+  assert_eq(packed[46], b'\x80')
+  assert_eq(packed[47], b'\x3F')
+  let rgb = @core.BufferAttribute::new([2.0, 0.0, 0.0], 3)
+  let rgba = @core.BufferAttribute::new([0.0, 1.0, 0.0, 0.5], 4)
+  let packed_rgb = @common.pack_position_normal_uv(
+    position,
+    None,
+    None,
+    color=Some(rgb),
+  )
+  assert_eq(packed_rgb[32], b'\x00')
+  assert_eq(packed_rgb[33], b'\x00')
+  assert_eq(packed_rgb[34], b'\x00')
+  assert_eq(packed_rgb[35], b'\x40')
+  assert_eq(packed_rgb[44], b'\x00')
+  assert_eq(packed_rgb[45], b'\x00')
+  assert_eq(packed_rgb[46], b'\x80')
+  assert_eq(packed_rgb[47], b'\x3F')
+  let packed_rgba = @common.pack_position_normal_uv(
+    position,
+    None,
+    None,
+    color=Some(rgba),
+  )
+  assert_eq(packed_rgba[36], b'\x00')
+  assert_eq(packed_rgba[37], b'\x00')
+  assert_eq(packed_rgba[38], b'\x80')
+  assert_eq(packed_rgba[39], b'\x3F')
+  assert_eq(packed_rgba[44], b'\x00')
+  assert_eq(packed_rgba[45], b'\x00')
+  assert_eq(packed_rgba[46], b'\x00')
+  assert_eq(packed_rgba[47], b'\x3F')
   let pixels = FixedArray::make(8, b'\x11')
   let (rows, stride) = @common.pad_texture_rows(pixels, 1, 2)
   assert_eq(@common.copy_bytes_per_row(4), 256)
