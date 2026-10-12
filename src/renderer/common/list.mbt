@@ -1,4 +1,4 @@
-// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
 
 ///|
 using @core {type BufferGeometry, type Object3D}
@@ -21,9 +21,12 @@ pub(all) struct RenderItem {
 }
 
 ///|
-/// 收集当前可见的不透明网格。不做视锥裁剪，也不排序。
+/// 收集当前可见的不透明网格。传入视锥时按包围球裁剪，不排序。
 /// r186: `reversePainterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L45
-pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
+pub fn collect_opaque(
+  root : Object3D,
+  frustum? : @math.Frustum,
+) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
     match node.kind {
@@ -31,7 +34,9 @@ pub fn collect_opaque(root : Object3D) -> Array[RenderItem] {
         match node.mesh {
           None => ()
           Some(binding) =>
-            if !binding.transparent && !binding.wireframe {
+            if !binding.transparent &&
+              !binding.wireframe &&
+              kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
                 node,
                 geometry: binding.geometry,
@@ -69,14 +74,18 @@ pub(all) struct PrimitiveItem {
 }
 
 ///|
-/// 收集当前可见的点和线。
-pub fn collect_primitives(root : Object3D) -> Array[PrimitiveItem] {
+/// 收集当前可见的点和线。传入视锥时按包围球裁剪。
+pub fn collect_primitives(
+  root : Object3D,
+  frustum? : @math.Frustum,
+) -> Array[PrimitiveItem] {
   let items = []
   root.traverse_visible(fn(node) {
     match node.primitive {
       None => ()
       Some(binding) =>
-        if !binding.transparent {
+        if !binding.transparent &&
+          kept_by_frustum(node, binding.geometry, frustum) {
           items.push({
             node,
             geometry: binding.geometry,
@@ -150,6 +159,7 @@ pub fn view_depth(camera : Object3D, object : Object3D) -> Double {
 pub fn collect_transparent(
   root : Object3D,
   camera : Object3D,
+  frustum? : @math.Frustum,
 ) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
@@ -158,7 +168,9 @@ pub fn collect_transparent(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.transparent && !binding.wireframe {
+            if binding.transparent &&
+              !binding.wireframe &&
+              kept_by_frustum(node, binding.geometry, frustum) {
               items.push({
                 node,
                 geometry: binding.geometry,
@@ -189,6 +201,51 @@ pub fn collect_transparent(
     sorted.push(entry.item)
   }
   sorted
+}
+
+///|
+/// `projection * matrixWorldInverse`。坐标和反向深度跟相机走。
+/// r186: `setFromProjectionMatrix` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L979
+pub fn camera_frustum(state : @core.CameraState) -> @math.Frustum {
+  let view = @math.Matrix4::new().multiply_matrices(
+    state.projection,
+    state.matrix_world_inverse,
+  )
+  @math.Frustum::new().set_from_projection_matrix(
+    view,
+    coordinate_system=state.coordinate_system,
+    reversed_depth=state.reversed_depth,
+  )
+}
+
+///|
+/// 没传视锥，或 `frustum_culled` 为假时保留。否则用世界空间包围球。
+/// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
+fn kept_by_frustum(
+  node : Object3D,
+  geometry : BufferGeometry,
+  frustum : @math.Frustum?,
+) -> Bool {
+  match frustum {
+    None => true
+    Some(frustum) =>
+      if !node.frustum_culled {
+        true
+      } else {
+        if geometry.bounding_sphere is None {
+          geometry.compute_bounding_sphere()
+        }
+        match geometry.bounding_sphere {
+          None => true
+          Some(sphere) => {
+            let world = @math.Sphere::new()
+              .copy(sphere)
+              .apply_matrix4(node.matrix_world)
+            frustum.intersects_sphere(world)
+          }
+        }
+      }
+  }
 }
 
 ///|

@@ -384,3 +384,67 @@ test "vertices pack uv and texture rows pad to 256" {
   assert_eq(rows[4], b'\x00')
   assert_eq(rows[256], b'\x11')
 }
+
+///|
+test "frustum drops spheres behind the camera" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let front = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(front.node.position.set(0.0, 0.0, -5.0))
+  ignore(scene.add(front))
+  let behind = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(behind.node.position.set(0.0, 0.0, 5.0))
+  ignore(scene.add(behind))
+  let aside = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(aside.node.position.set(20.0, 0.0, -2.0))
+  ignore(scene.add(aside))
+  let kept = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(kept.node.position.set(0.0, 0.0, 5.0))
+  kept.node.frustum_culled = false
+  ignore(scene.add(kept))
+  let glass = @materials.MeshBasicMaterial::new()
+  glass.material.transparent = true
+  let glass_front = @objects.Mesh::new(box.geometry, glass.material)
+  ignore(glass_front.node.position.set(0.0, 0.0, -4.0))
+  ignore(scene.add(glass_front))
+  let glass_behind = @objects.Mesh::new(box.geometry, glass.material)
+  ignore(glass_behind.node.position.set(0.0, 0.0, 4.0))
+  ignore(scene.add(glass_behind))
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  @common.update_frame(scene.node, camera.node)
+  match camera.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      let view = @common.camera_frustum(state)
+      let drawn = @common.collect_opaque(scene.node, frustum=view)
+      assert_eq(drawn.length(), 2)
+      assert_eq(physical_equal(drawn[0].node, front.node), true)
+      assert_eq(physical_equal(drawn[1].node, kept.node), true)
+      assert_eq(@common.collect_opaque(scene.node).length(), 4)
+      let clear = @common.collect_transparent(
+        scene.node,
+        camera.node,
+        frustum=view,
+      )
+      assert_eq(clear.length(), 1)
+      assert_eq(physical_equal(clear[0].node, glass_front.node), true)
+    }
+  }
+}

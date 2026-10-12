@@ -9,13 +9,15 @@ import {
 }
 
 // Values
+pub fn camera_frustum(@core.CameraState) -> @math.Frustum
+
 pub fn collect_lights(@core.Object3D) -> LightFrame
 
-pub fn collect_opaque(@core.Object3D) -> Array[RenderItem]
+pub fn collect_opaque(@core.Object3D, frustum? : @math.Frustum) -> Array[RenderItem]
 
-pub fn collect_primitives(@core.Object3D) -> Array[PrimitiveItem]
+pub fn collect_primitives(@core.Object3D, frustum? : @math.Frustum) -> Array[PrimitiveItem]
 
-pub fn collect_transparent(@core.Object3D, @core.Object3D) -> Array[RenderItem]
+pub fn collect_transparent(@core.Object3D, @core.Object3D, frustum? : @math.Frustum) -> Array[RenderItem]
 
 pub fn copy_bytes_per_row(Int) -> Int
 
