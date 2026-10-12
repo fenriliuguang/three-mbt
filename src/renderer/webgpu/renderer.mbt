@@ -3419,6 +3419,7 @@ fn WebGPURenderer::draw_meshes(
           emissive_r=item.emissive.r,
           emissive_g=item.emissive.g,
           emissive_b=item.emissive.b,
+          emissive_intensity=item.emissive_intensity,
         )
         ignore(
           self.device

@@ -222,6 +222,8 @@ pub fn normal_matrix(model : @math.Matrix4) -> @math.Matrix4 {
 
 ///|
 /// `mvp`、法线矩阵、颜色、环境光、平行光，然后是模型矩阵、相机位置、粗糙度和金属度。
+/// 自发光通道先乘 `emissive_intensity`，默认 1。`0` 会把自发光写成黑。
+/// r186: `emissive` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLMaterials.js#L150
 pub fn pack_uniforms(
   mvp : @math.Matrix4,
   normals : @math.Matrix4,
@@ -256,6 +258,7 @@ pub fn pack_uniforms(
   emissive_r? : Double = 0.0,
   emissive_g? : Double = 0.0,
   emissive_b? : Double = 0.0,
+  emissive_intensity? : Double = 1.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -290,9 +293,9 @@ pub fn pack_uniforms(
   write_f32(dst, 484, fog_far)
   write_f32(dst, 488, fog_density)
   write_f32(dst, 492, fog_mode)
-  write_f32(dst, 496, emissive_r)
-  write_f32(dst, 500, emissive_g)
-  write_f32(dst, 504, emissive_b)
+  write_f32(dst, 496, emissive_r * emissive_intensity)
+  write_f32(dst, 500, emissive_g * emissive_intensity)
+  write_f32(dst, 504, emissive_b * emissive_intensity)
   dst
 }
 

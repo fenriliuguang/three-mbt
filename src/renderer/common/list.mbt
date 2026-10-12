@@ -19,6 +19,7 @@ pub(all) struct RenderItem {
   fog : Bool
   alpha_test : Double
   emissive : @math.Color
+  emissive_intensity : Double
   instances : @core.InstanceData?
 }
 
@@ -54,6 +55,7 @@ pub fn collect_opaque(
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
+                emissive_intensity: binding.emissive_intensity,
                 instances: binding.instances,
               })
             }
@@ -90,6 +92,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
+                emissive_intensity: binding.emissive_intensity,
                 instances: binding.instances,
               })
             }
@@ -131,6 +134,7 @@ pub fn collect_wireframe(
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
+                emissive_intensity: binding.emissive_intensity,
                 instances: binding.instances,
               })
             }
@@ -391,6 +395,7 @@ pub fn collect_transparent(
                 fog: binding.fog,
                 alpha_test: binding.alpha_test,
                 emissive: binding.emissive,
+                emissive_intensity: binding.emissive_intensity,
                 instances: binding.instances,
               })
             }

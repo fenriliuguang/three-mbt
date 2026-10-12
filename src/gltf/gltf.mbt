@@ -56,6 +56,7 @@ priv struct Mat {
   er : Double
   eg : Double
   eb : Double
+  emissive_intensity : Double
 }
 
 ///|
@@ -128,7 +129,7 @@ pub(all) struct Gltf {
 /// 只建 `TRIANGLES` 网格：`POSITION`、`NORMAL`、`TEXCOORD_0`、`COLOR_0` 和索引。
 /// 稀疏 accessor 按索引替换元素；没有 `bufferView` 时底数是 0。
 /// 材质写成 `MeshStandardMaterial`，`baseColorFactor` 按线性通道写入，
-/// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。
+/// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
 /// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。点光、聚光、贴图和蒙皮先不读。动画通道里的 `weights` 仍跳过。
@@ -429,6 +430,7 @@ fn default_mat() -> Mat {
     er: 0.0,
     eg: 0.0,
     eb: 0.0,
+    emissive_intensity: 1.0,
   }
 }
 
@@ -484,11 +486,12 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
     er,
     eg,
     eb,
+    emissive_intensity: emissive_strength(obj),
   }
 }
 
 ///|
-/// 缺省是黑色。`0` 是有效值，不按缺失处理。贴图和 `emissiveIntensity` 先不读。
+/// 缺省是黑色。`0` 是有效值，不按缺失处理。自发光贴图先不读。
 /// r186: `emissiveFactor` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3719
 fn emissive_factor(
   obj : Map[String, Json],
@@ -502,6 +505,16 @@ fn emissive_factor(
       }
       (nums[0], nums[1], nums[2])
     }
+  }
+}
+
+///|
+/// 缺省是 1。`0` 是有效值。unlit 材质不使用这份强度。
+/// r186: `emissiveStrength` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L872
+fn emissive_strength(obj : Map[String, Json]) -> Double raise GltfError {
+  match extension_block(obj, "KHR_materials_emissive_strength") {
+    None => 1.0
+    Some(block) => opt_f64(block, "emissiveStrength", 1.0)
   }
 }
 
@@ -1383,6 +1396,7 @@ fn mesh_from(
   material.alpha_test = prim.mat.alpha_test
   if prim.mat.unlit == false {
     ignore(material.emissive.set_rgb(prim.mat.er, prim.mat.eg, prim.mat.eb))
+    material.emissive_intensity = prim.mat.emissive_intensity
   }
   let mesh = @objects.Mesh::new(geometry, material)
   if prim.mat.double_sided {

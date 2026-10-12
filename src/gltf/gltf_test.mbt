@@ -550,6 +550,40 @@ test "glTF emissiveFactor is linear and unlit ignores it" {
 }
 
 ///|
+test "glTF emissive strength scales intensity and unlit ignores it" {
+  let text =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2,3]}],"nodes":[{"name":"glow","mesh":0},{"name":"zero","mesh":1},{"name":"flat","mesh":2},{"name":"plain","mesh":3}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"material":0}]},{"primitives":[{"attributes":{"POSITION":0},"material":1}]},{"primitives":[{"attributes":{"POSITION":0},"material":2}]},{"primitives":[{"attributes":{"POSITION":0},"material":3}]}],"materials":[{"emissiveFactor":[0.5,0.25,0],"extensions":{"KHR_materials_emissive_strength":{"emissiveStrength":2}}},{"emissiveFactor":[1,0,0],"extensions":{"KHR_materials_emissive_strength":{"emissiveStrength":0}}},{"extensions":{"KHR_materials_unlit":{},"KHR_materials_emissive_strength":{"emissiveStrength":4}},"emissiveFactor":[1,0,0]},{"pbrMetallicRoughness":{"baseColorFactor":[0,0,1,1]}}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}
+  let root = @gltf.parse(text).scene.node
+  match must(root, "glow").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.emissive.r, 0.5)
+      assert_eq(binding.emissive.g, 0.25)
+      assert_eq(binding.emissive.b, 0.0)
+      assert_eq(binding.emissive_intensity, 2.0)
+    }
+  }
+  match must(root, "zero").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.emissive.r, 1.0)
+      assert_eq(binding.emissive_intensity, 0.0)
+    }
+  }
+  match must(root, "flat").mesh {
+    None => panic()
+    Some(binding) => {
+      assert_eq(binding.emissive.r, 0.0)
+      assert_eq(binding.emissive_intensity, 1.0)
+    }
+  }
+  match must(root, "plain").mesh {
+    None => panic()
+    Some(binding) => assert_eq(binding.emissive_intensity, 1.0)
+  }
+}
+
+///|
 test "glTF rejects a short emissiveFactor" {
   let text =
     #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"material":0}]}],"materials":[{"emissiveFactor":[1,0]}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}],"bufferViews":[{"buffer":0,"byteLength":36}],"buffers":[{"byteLength":36,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA"}]}

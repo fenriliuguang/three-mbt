@@ -17,6 +17,7 @@ pub(all) struct MeshBinding {
   fog : Bool
   mut alpha_test : Double
   emissive : @math.Color
+  mut emissive_intensity : Double
   instances : InstanceData?
 }
 

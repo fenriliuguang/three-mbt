@@ -79,6 +79,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     fog: self.material.fog,
     alpha_test: self.material.alpha_test,
     emissive: self.material.emissive,
+    emissive_intensity: self.material.emissive_intensity,
     instances: None,
   })
 }
@@ -438,6 +439,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     fog: self.material.fog,
     alpha_test: self.material.alpha_test,
     emissive: self.material.emissive,
+    emissive_intensity: self.material.emissive_intensity,
     instances: Some(self.instances),
   })
 }
