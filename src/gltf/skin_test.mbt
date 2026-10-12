@@ -223,3 +223,26 @@ test "glTF rejects a bad skin, a bad joint, and bad skin accessors" {
   assert_eq(failed_parse(float_joints), true)
   assert_eq(failed_parse(raw_weights), true)
 }
+
+///|
+test "glTF JOINTS_1 adds four influences and normalizes with the first set" {
+  let blend =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2]}],"nodes":[{"name":"a"},{"name":"b"},{"name":"mesh","mesh":0,"skin":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0,"JOINTS_0":1,"WEIGHTS_0":2,"JOINTS_1":3,"WEIGHTS_1":4}}]}],"skins":[{"joints":[0,1],"inverseBindMatrices":5}],"accessors":[{"bufferView":0,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":1,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":3,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":4,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":5,"componentType":5126,"count":2,"type":"MAT4"}],"bufferViews":[{"buffer":0,"byteLength":12},{"buffer":0,"byteOffset":12,"byteLength":4},{"buffer":0,"byteOffset":16,"byteLength":16},{"buffer":0,"byteOffset":32,"byteLength":4},{"buffer":0,"byteOffset":36,"byteLength":16},{"buffer":0,"byteOffset":52,"byteLength":128}],"buffers":[{"byteLength":180,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAAAAAAAAgD4AAAAAAAAAAAAAAAABAAAAAABAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/"}]}
+  let root = @gltf.parse(blend).scene.node
+  ignore(skin_node(root, "a").position.set(4.0, 0.0, 0.0))
+  pose_skin(root)
+  assert_eq(position_x(skin_node(root, "mesh")), 1.0)
+  let scaled =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1,2]}],"nodes":[{"name":"a"},{"name":"b"},{"name":"mesh","mesh":0,"skin":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0,"JOINTS_0":1,"WEIGHTS_0":2,"JOINTS_1":3,"WEIGHTS_1":4}}]}],"skins":[{"joints":[0,1],"inverseBindMatrices":5}],"accessors":[{"bufferView":0,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":1,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":3,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":4,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":5,"componentType":5126,"count":2,"type":"MAT4"}],"bufferViews":[{"buffer":0,"byteLength":12},{"buffer":0,"byteOffset":12,"byteLength":4},{"buffer":0,"byteOffset":16,"byteLength":16},{"buffer":0,"byteOffset":32,"byteLength":4},{"buffer":0,"byteOffset":36,"byteLength":16},{"buffer":0,"byteOffset":52,"byteLength":128}],"buffers":[{"byteLength":180,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAABAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/"}]}
+  let posed = @gltf.parse(scaled).scene.node
+  ignore(skin_node(posed, "a").position.set(2.0, 0.0, 0.0))
+  ignore(skin_node(posed, "b").position.set(6.0, 0.0, 0.0))
+  pose_skin(posed)
+  assert_eq(position_x(skin_node(posed, "mesh")), 4.0)
+  let lone =
+    #|{"asset":{"version":"2.0"},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"bone"},{"name":"mesh","mesh":0,"skin":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0,"JOINTS_0":1,"WEIGHTS_0":2,"JOINTS_1":3}}]}],"skins":[{"joints":[0],"inverseBindMatrices":4}],"accessors":[{"bufferView":0,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":1,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC4"},{"bufferView":3,"componentType":5121,"count":1,"type":"VEC4"},{"bufferView":4,"componentType":5126,"count":1,"type":"MAT4"}],"bufferViews":[{"buffer":0,"byteLength":12},{"buffer":0,"byteOffset":12,"byteLength":4},{"buffer":0,"byteOffset":16,"byteLength":16},{"buffer":0,"byteOffset":32,"byteLength":4},{"buffer":0,"byteOffset":36,"byteLength":64}],"buffers":[{"byteLength":100,"uri":"data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAABAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPw=="}]}
+  let single = @gltf.parse(lone).scene.node
+  ignore(skin_node(single, "bone").position.set(2.0, 0.0, 0.0))
+  pose_skin(single)
+  assert_eq(position_x(skin_node(single, "mesh")), 2.0)
+}

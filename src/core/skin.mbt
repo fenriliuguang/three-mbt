@@ -152,6 +152,7 @@ fn write_skinned(
     None => ()
     Some(attribute) => {
       let count = bind.length() / 3
+      let stride = influence_stride(count, skin.weights.length())
       let mut vertex = 0
       while vertex < count {
         let base = vertex * 3
@@ -164,6 +165,7 @@ fn write_skinned(
             skin.indices,
             skin.weights,
             vertex,
+            stride,
             bind[base],
             bind[base + 1],
             bind[base + 2],
@@ -188,11 +190,26 @@ fn write_skinned(
 }
 
 ///|
+fn influence_stride(vertices : Int, weight_len : Int) -> Int {
+  if vertices <= 0 {
+    4
+  } else {
+    let width = weight_len / vertices
+    if width <= 0 {
+      4
+    } else {
+      width
+    }
+  }
+}
+
+///|
 fn skin_vertex(
   bones : Array[@math.Matrix4],
   indices : Array[Int],
   weights : Array[Double],
   vertex : Int,
+  stride : Int,
   x : Double,
   y : Double,
   z : Double,
@@ -200,8 +217,8 @@ fn skin_vertex(
 ) -> @math.Vector4 {
   let acc = @math.Vector4::new(w=0.0)
   let mut influence = 0
-  while influence < 4 {
-    let at = vertex * 4 + influence
+  while influence < stride {
+    let at = vertex * stride + influence
     if at < weights.length() && at < indices.length() {
       let weight = weights[at]
       if weight != 0.0 {

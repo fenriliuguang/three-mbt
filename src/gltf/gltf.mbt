@@ -135,7 +135,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1803,7 +1803,9 @@ fn identity_matrices(count : Int) -> Array[@math.Matrix4] {
 }
 
 ///|
-/// 只读 `JOINTS_0` 和 `WEIGHTS_0`。缺一则不蒙皮。`JOINTS_1` 先不读。
+/// 先读 `JOINTS_0` 和 `WEIGHTS_0`。缺一则不蒙皮。
+/// r186 的属性表没有 `JOINTS_1`，第二组按 `JOINTS_0` 的同一套规则再读四个影响。
+/// r186: `JOINTS_0` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2287
 fn read_skin_attributes(
   attrs : Map[String, Json],
   bins : Array[Bin],
@@ -1815,8 +1817,10 @@ fn read_skin_attributes(
     (Some(joints), Some(weights)) => {
       let joint_index = as_f64(joints).to_int()
       let weight_index = as_f64(weights).to_int()
-      let joint_values = read_joints(bins, views, accs, joint_index)
-      let weight_values = read_weights(bins, views, accs, weight_index)
+      let joint_values = read_joints(bins, views, accs, joint_index, "JOINTS_0")
+      let weight_values = read_weights(
+        bins, views, accs, weight_index, "WEIGHTS_0",
+      )
       let count = match geometry.get_attribute("position") {
         None => 0
         Some(attribute) => attribute.count
@@ -1825,7 +1829,35 @@ fn read_skin_attributes(
         weight_values.length() != count * 4 {
         raise GltfError::Invalid("skin attributes")
       }
-      (Some(joint_values), Some(weight_values))
+      let (packed_joints, packed_weights) = match
+        (attrs.get("JOINTS_1"), attrs.get("WEIGHTS_1")) {
+        (Some(extra_joints), Some(extra_weights)) => {
+          let more_joints = read_joints(
+            bins,
+            views,
+            accs,
+            as_f64(extra_joints).to_int(),
+            "JOINTS_1",
+          )
+          let more_weights = read_weights(
+            bins,
+            views,
+            accs,
+            as_f64(extra_weights).to_int(),
+            "WEIGHTS_1",
+          )
+          if more_joints.length() != count * 4 ||
+            more_weights.length() != count * 4 {
+            raise GltfError::Invalid("skin attributes")
+          }
+          (
+            interleave_ints(joint_values, more_joints, count),
+            interleave_doubles(weight_values, more_weights, count),
+          )
+        }
+        _ => (joint_values, weight_values)
+      }
+      (Some(packed_joints), Some(packed_weights))
     }
     _ => (None, None)
   }
@@ -1845,11 +1877,12 @@ fn read_joints(
   views : Array[View],
   accs : Array[Acc],
   index : Int,
+  name : String,
 ) -> Array[Int] raise GltfError {
   let acc = accessor_at(accs, index)
   if acc.normalized ||
     (acc.component_type != 5121 && acc.component_type != 5123) {
-    raise GltfError::Invalid("JOINTS_0")
+    raise GltfError::Invalid(name)
   }
   let values = read_values(bins, views, accs, index, 4)
   let out = []
@@ -1867,13 +1900,14 @@ fn read_weights(
   views : Array[View],
   accs : Array[Acc],
   index : Int,
+  name : String,
 ) -> Array[Double] raise GltfError {
   let acc = accessor_at(accs, index)
   let float_weights = acc.component_type == 5126 && !acc.normalized
   let byte_weights = (acc.component_type == 5121 || acc.component_type == 5123) &&
     acc.normalized
   if !float_weights && !byte_weights {
-    raise GltfError::Invalid("WEIGHTS_0")
+    raise GltfError::Invalid(name)
   }
   read_values(bins, views, accs, index, 4)
 }
@@ -1977,36 +2011,96 @@ fn bind_skin(
 }
 
 ///|
-/// 四个权重按绝对值之和缩放到 1。全是 0 时写成 `(1, 0, 0, 0)`。
+/// 每个顶点的全部影响按绝对值之和缩放到 1。全是 0 时第一个写成 1，其余写成 0。
 /// r186: `normalizeSkinWeights` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L262
 fn normalized_skin_weights(
   weights : Array[Double],
   count : Int,
 ) -> Array[Double] {
   let out = weights.copy()
+  let stride = if count <= 0 {
+    4
+  } else {
+    let width = out.length() / count
+    if width <= 0 {
+      4
+    } else {
+      width
+    }
+  }
   let mut vertex = 0
   while vertex < count {
     let mut sum = 0.0
     let mut influence = 0
-    while influence < 4 {
-      let weight = out[vertex * 4 + influence]
+    while influence < stride {
+      let weight = out[vertex * stride + influence]
       let absolute = if weight < 0.0 { -weight } else { weight }
       sum = sum + absolute
       influence = influence + 1
     }
     if sum == 0.0 {
-      out[vertex * 4] = 1.0
-      out[vertex * 4 + 1] = 0.0
-      out[vertex * 4 + 2] = 0.0
-      out[vertex * 4 + 3] = 0.0
+      influence = 0
+      while influence < stride {
+        let at = vertex * stride + influence
+        out[at] = if influence == 0 { 1.0 } else { 0.0 }
+        influence = influence + 1
+      }
     } else {
       let scale = 1.0 / sum
       influence = 0
-      while influence < 4 {
-        let at = vertex * 4 + influence
+      while influence < stride {
+        let at = vertex * stride + influence
         out[at] = out[at] * scale
         influence = influence + 1
       }
+    }
+    vertex = vertex + 1
+  }
+  out
+}
+
+///|
+fn interleave_ints(
+  first : Array[Int],
+  second : Array[Int],
+  count : Int,
+) -> Array[Int] {
+  let out = []
+  let mut vertex = 0
+  while vertex < count {
+    let mut influence = 0
+    while influence < 4 {
+      out.push(first[vertex * 4 + influence])
+      influence = influence + 1
+    }
+    influence = 0
+    while influence < 4 {
+      out.push(second[vertex * 4 + influence])
+      influence = influence + 1
+    }
+    vertex = vertex + 1
+  }
+  out
+}
+
+///|
+fn interleave_doubles(
+  first : Array[Double],
+  second : Array[Double],
+  count : Int,
+) -> Array[Double] {
+  let out = []
+  let mut vertex = 0
+  while vertex < count {
+    let mut influence = 0
+    while influence < 4 {
+      out.push(first[vertex * 4 + influence])
+      influence = influence + 1
+    }
+    influence = 0
+    while influence < 4 {
+      out.push(second[vertex * 4 + influence])
+      influence = influence + 1
     }
     vertex = vertex + 1
   }
