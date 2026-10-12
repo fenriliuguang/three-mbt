@@ -232,7 +232,15 @@ pub fn Object3D::new(kind? : NodeKind) -> Self
 pub fn Object3D::remove(Self, Self) -> Self
 pub fn Object3D::remove_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
 pub fn Object3D::remove_from_parent(Self) -> Self
+pub fn Object3D::rotate_on_axis(Self, @math.Vector3, Double) -> Self
+pub fn Object3D::rotate_x(Self, Double) -> Self
+pub fn Object3D::rotate_y(Self, Double) -> Self
+pub fn Object3D::rotate_z(Self, Double) -> Self
 pub fn Object3D::to_node(Self) -> Self
+pub fn Object3D::translate_on_axis(Self, @math.Vector3, Double) -> Self
+pub fn Object3D::translate_x(Self, Double) -> Self
+pub fn Object3D::translate_y(Self, Double) -> Self
+pub fn Object3D::translate_z(Self, Double) -> Self
 pub fn Object3D::traverse(Self, (Self) -> Unit) -> Unit
 pub fn Object3D::traverse_visible(Self, (Self) -> Unit) -> Unit
 pub fn Object3D::update_matrix(Self) -> Unit

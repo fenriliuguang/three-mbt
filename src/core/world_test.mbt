@@ -32,6 +32,45 @@ test "child world matrix matches r186" {
 }
 
 ///|
+test "local rotate and translate match r186" {
+  let half = 0.7071067811865476
+  let right_angle = 1.5707963267948966
+  let object = @core.Object3D::new()
+  ignore(object.rotate_y(right_angle))
+  assert_close(object.quaternion.x, 0.0)
+  assert_close(object.quaternion.y, half)
+  assert_close(object.quaternion.z, 0.0)
+  assert_close(object.quaternion.w, half)
+  assert_close(object.rotation.y, right_angle)
+  ignore(object.translate_x(2.0))
+  assert_close(object.position.x, 0.0)
+  assert_close(object.position.y, 0.0)
+  assert_close(object.position.z, -2.0)
+  let identity = @core.Object3D::new()
+  let axis = @math.Vector3::new(x=1.0)
+  ignore(identity.translate_on_axis(axis, 2.0))
+  assert_eq(identity.position.x, 2.0)
+  assert_eq(identity.position.y, 0.0)
+  assert_eq(identity.position.z, 0.0)
+  assert_eq(axis.x, 1.0)
+  assert_eq(axis.y, 0.0)
+  assert_eq(axis.z, 0.0)
+  ignore(identity.translate_y(3.0))
+  ignore(identity.translate_z(-1.0))
+  assert_eq(identity.position.x, 2.0)
+  assert_eq(identity.position.y, 3.0)
+  assert_eq(identity.position.z, -1.0)
+  let pitched = @core.Object3D::new()
+  ignore(pitched.rotate_x(right_angle))
+  assert_close(pitched.quaternion.x, half)
+  assert_close(pitched.quaternion.w, half)
+  let rolled = @core.Object3D::new()
+  ignore(rolled.rotate_z(right_angle))
+  assert_close(rolled.quaternion.z, half)
+  assert_close(rolled.quaternion.w, half)
+}
+
+///|
 test "lookAt matches r186 quaternion" {
   let looker = @core.Object3D::new()
   ignore(looker.position.set(0.0, 0.0, 5.0))

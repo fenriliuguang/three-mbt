@@ -361,6 +361,68 @@ pub fn Object3D::look_at_vector(
 }
 
 ///|
+/// 绕局部轴旋转。轴假定已归一化。
+/// r186: `rotateOnAxis` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L531
+pub fn Object3D::rotate_on_axis(
+  self : Object3D,
+  axis : @math.Vector3,
+  angle : Double,
+) -> Object3D {
+  let turn = @math.Quaternion::new().set_from_axis_angle(axis, angle)
+  ignore(self.quaternion.multiply(turn))
+  self
+}
+
+///|
+/// r186: `rotateX` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L571
+pub fn Object3D::rotate_x(self : Object3D, angle : Double) -> Object3D {
+  self.rotate_on_axis(@math.Vector3::new(x=1.0), angle)
+}
+
+///|
+/// r186: `rotateY` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L583
+pub fn Object3D::rotate_y(self : Object3D, angle : Double) -> Object3D {
+  self.rotate_on_axis(@math.Vector3::new(y=1.0), angle)
+}
+
+///|
+/// r186: `rotateZ` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L595
+pub fn Object3D::rotate_z(self : Object3D, angle : Double) -> Object3D {
+  self.rotate_on_axis(@math.Vector3::new(z=1.0), angle)
+}
+
+///|
+/// 沿局部轴平移。轴假定已归一化，调用方的轴不会被改写。
+/// r186: `translateOnAxis` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L608
+pub fn Object3D::translate_on_axis(
+  self : Object3D,
+  axis : @math.Vector3,
+  distance : Double,
+) -> Object3D {
+  let offset = @math.Vector3::new().copy(axis).apply_quaternion(self.quaternion)
+  ignore(self.position.add(offset.multiply_scalar(distance)))
+  self
+}
+
+///|
+/// r186: `translateX` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L627
+pub fn Object3D::translate_x(self : Object3D, distance : Double) -> Object3D {
+  self.translate_on_axis(@math.Vector3::new(x=1.0), distance)
+}
+
+///|
+/// r186: `translateY` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L639
+pub fn Object3D::translate_y(self : Object3D, distance : Double) -> Object3D {
+  self.translate_on_axis(@math.Vector3::new(y=1.0), distance)
+}
+
+///|
+/// r186: `translateZ` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L651
+pub fn Object3D::translate_z(self : Object3D, distance : Double) -> Object3D {
+  self.translate_on_axis(@math.Vector3::new(z=1.0), distance)
+}
+
+///|
 pub fn Object3D::add(self : Object3D, object : Object3D) -> Object3D {
   if physical_equal(object, self) {
     return self

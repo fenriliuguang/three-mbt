@@ -49,6 +49,19 @@ test "matrix compose and decompose match r186" {
 }
 
 ///|
+test "applyQuaternion rotates a unit axis" {
+  let axis = @math.Vector3::new(x=1.0)
+  let turn = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    1.5707963267948966,
+  )
+  ignore(axis.apply_quaternion(turn))
+  assert_close(axis.x, 0.0)
+  assert_close(axis.y, 0.0)
+  assert_close(axis.z, -1.0)
+}
+
+///|
 test "color hex follows r186 linear working space" {
   let green = @math.Color::new().set_hex(0x00FF00)
   assert_eq(green.r, 0.0)

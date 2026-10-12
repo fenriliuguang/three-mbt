@@ -197,6 +197,26 @@ pub fn Vector3::apply_matrix4(self : Vector3, m : Matrix4) -> Vector3 {
 }
 
 ///|
+/// 四元数假定为单位长度。
+/// r186: `applyQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L471
+pub fn Vector3::apply_quaternion(self : Vector3, q : Quaternion) -> Vector3 {
+  let vx = self.x
+  let vy = self.y
+  let vz = self.z
+  let qx = q.x
+  let qy = q.y
+  let qz = q.z
+  let qw = q.w
+  let tx = 2.0 * (qy * vz - qz * vy)
+  let ty = 2.0 * (qz * vx - qx * vz)
+  let tz = 2.0 * (qx * vy - qy * vx)
+  self.x = vx + qw * tx + qy * tz - qz * ty
+  self.y = vy + qw * ty + qz * tx - qx * tz
+  self.z = vz + qw * tz + qx * ty - qy * tx
+  self
+}
+
+///|
 pub fn Vector3::set_from_matrix_position(
   self : Vector3,
   m : Matrix4,
