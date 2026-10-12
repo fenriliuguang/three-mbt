@@ -183,6 +183,12 @@ pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// r186: `distanceTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L953
+pub fn Vector3::distance_to(self : Vector3, v : Vector3) -> Double {
+  self.distance_to_squared(v).sqrt()
+}
+
+///|
 /// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L933
 pub fn Vector3::angle_to(self : Vector3, v : Vector3) -> Double {
   let denominator = (self.length_sq() * v.length_sq()).sqrt()

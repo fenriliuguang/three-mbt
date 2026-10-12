@@ -49,6 +49,17 @@ test "matrix compose and decompose match r186" {
 }
 
 ///|
+test "distanceTo is the square root of the squared distance" {
+  let origin = @math.Vector3::new()
+  let point = @math.Vector3::new(x=3.0, y=4.0)
+  assert_eq(origin.distance_to(point), 5.0)
+  assert_eq(point.distance_to(point), 0.0)
+  assert_eq(point.x, 3.0)
+  assert_eq(point.y, 4.0)
+  assert_eq(point.z, 0.0)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

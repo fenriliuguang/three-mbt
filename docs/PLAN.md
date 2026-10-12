@@ -279,6 +279,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.angleTo` has landed. It is the inverse cosine of the normalized dot product, clamped to [-1, 1]. A vector against itself is 0. `(1, 0, 0)` against `(0, 0, -1)` is a right angle, against `(-1, 0, 0)` is π, and against `(1, 1, 0)` is π/4. A zero-length vector returns π/2. The vectors are not modified.
 
+`Vector3.distanceTo` has landed. It is the square root of `distanceToSquared`. The distance from the origin to `(3, 4, 0)` is 5. A vector's distance to itself is 0. Neither vector is modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -359,6 +361,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D `dispose` | `core` |
 | planned | 7 | `Vector3.transformDirection` | `math` |
 | planned | 7 | `Vector3.angleTo` | `math` |
+| planned | 7 | `Vector3.distanceTo` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
