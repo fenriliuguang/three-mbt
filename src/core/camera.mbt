@@ -130,6 +130,49 @@ pub fn CameraState::set_focal_length(
 }
 
 ///|
+/// 写入子矩形并重算投影。调用方决定要不要改 `aspect`。
+pub fn CameraState::write_view(
+  self : CameraState,
+  full_width : Double,
+  full_height : Double,
+  offset_x : Double,
+  offset_y : Double,
+  width : Double,
+  height : Double,
+) -> Unit {
+  self.view = Some({
+    enabled: true,
+    full_width,
+    full_height,
+    offset_x,
+    offset_y,
+    width,
+    height,
+  })
+  self.update_projection()
+}
+
+///|
+/// 关掉子矩形并重算投影。没有偏移时什么也不做。
+pub fn CameraState::clear_view(self : CameraState) -> Unit {
+  match self.view {
+    None => ()
+    Some(view) => {
+      self.view = Some({
+        enabled: false,
+        full_width: view.full_width,
+        full_height: view.full_height,
+        offset_x: view.offset_x,
+        offset_y: view.offset_y,
+        width: view.width,
+        height: view.height,
+      })
+      self.update_projection()
+    }
+  }
+}
+
+///|
 /// r186: `getEffectiveFOV` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L193
 pub fn CameraState::effective_fov(self : CameraState) -> Double {
   let slope = @std.tan(@math.deg_to_rad(0.5 * self.fov)) / self.zoom
@@ -138,7 +181,7 @@ pub fn CameraState::effective_fov(self : CameraState) -> Double {
 
 ///|
 /// 按 r186 `PerspectiveCamera.updateProjectionMatrix` / `OrthographicCamera.updateProjectionMatrix` 重算投影。
-/// 透视相机会吃 `view` 偏移。正交相机还没有这条路径。
+/// 透视和正交都会吃 `view` 偏移。正交不改 `aspect`。
 pub fn CameraState::update_projection(self : CameraState) -> Unit {
   match self.kind {
     Perspective => {
@@ -179,12 +222,30 @@ pub fn CameraState::update_projection(self : CameraState) -> Unit {
       let dy = (self.top - self.bottom) / (2.0 * self.zoom)
       let cx = (self.right + self.left) / 2.0
       let cy = (self.top + self.bottom) / 2.0
+      let mut left = cx - dx
+      let mut right = cx + dx
+      let mut top = cy + dy
+      let mut bottom = cy - dy
+      match self.view {
+        Some(view) =>
+          if view.enabled {
+            let scale_w = (self.right - self.left) / view.full_width / self.zoom
+            let scale_h = (self.top - self.bottom) /
+              view.full_height /
+              self.zoom
+            left = left + scale_w * view.offset_x
+            right = left + scale_w * view.width
+            top = top - scale_h * view.offset_y
+            bottom = top - scale_h * view.height
+          }
+        None => ()
+      }
       ignore(
         self.projection.make_orthographic(
-          cx - dx,
-          cx + dx,
-          cy + dy,
-          cy - dy,
+          left,
+          right,
+          top,
+          bottom,
           self.near,
           self.far,
           coordinate_system=self.coordinate_system,

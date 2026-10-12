@@ -155,42 +155,20 @@ pub fn PerspectiveCamera::set_view_offset(
     None => ()
     Some(camera) => {
       camera.aspect = full_width / full_height
-      camera.view = Some({
-        enabled: true,
-        full_width,
-        full_height,
-        offset_x,
-        offset_y,
-        width,
-        height,
-      })
-      camera.update_projection()
+      camera.write_view(
+        full_width, full_height, offset_x, offset_y, width, height,
+      )
     }
   }
 }
 
 ///|
-/// 关掉子矩形偏移并重算投影。正交相机不使用它。
+/// 关掉子矩形偏移并重算投影。
 /// r186: `clearViewOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L337
 pub fn PerspectiveCamera::clear_view_offset(self : PerspectiveCamera) -> Unit {
   match self.node.camera {
     None => ()
-    Some(camera) =>
-      match camera.view {
-        None => ()
-        Some(view) => {
-          camera.view = Some({
-            enabled: false,
-            full_width: view.full_width,
-            full_height: view.full_height,
-            offset_x: view.offset_x,
-            offset_y: view.offset_y,
-            width: view.width,
-            height: view.height,
-          })
-          camera.update_projection()
-        }
-      }
+    Some(camera) => camera.clear_view()
   }
 }
 
@@ -245,6 +223,7 @@ pub fn PerspectiveCamera::view_size(
 
 ///|
 /// 正交相机。`left` / `right` / `top` / `bottom` 是相机空间里的视锥边界。
+/// `set_view_offset` 在这块视锥里取子矩形，不改 `aspect`。
 /// r186: `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17
 pub(all) struct OrthographicCamera {
   node : Object3D
@@ -294,5 +273,36 @@ pub fn OrthographicCamera::set_zoom(
       camera.zoom = zoom
       camera.update_projection()
     }
+  }
+}
+
+///|
+/// 在正交视锥里取一块子矩形。不改 `aspect`。
+/// r186: `setViewOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L148
+pub fn OrthographicCamera::set_view_offset(
+  self : OrthographicCamera,
+  full_width : Double,
+  full_height : Double,
+  offset_x : Double,
+  offset_y : Double,
+  width : Double,
+  height : Double,
+) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) =>
+      camera.write_view(
+        full_width, full_height, offset_x, offset_y, width, height,
+      )
+  }
+}
+
+///|
+/// 关掉子矩形偏移并重算投影。
+/// r186: `clearViewOffset` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L179
+pub fn OrthographicCamera::clear_view_offset(self : OrthographicCamera) -> Unit {
+  match self.node.camera {
+    None => ()
+    Some(camera) => camera.clear_view()
   }
 }

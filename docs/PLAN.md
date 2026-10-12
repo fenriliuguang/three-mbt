@@ -243,7 +243,9 @@ Perspective focal length has landed. `filmGauge` still defaults to 35. Landscape
 
 Perspective `getViewBounds` and `getViewSize` have landed. At a distance along the view direction, the bounds are the NDC corners `(-1, -1, 0.5)` and `(1, 1, 0.5)` through the inverse projection, then scaled by `-distance / z`. The size is the width and height of that rectangle. `zoom` 2 halves both. A perspective view offset already in the projection is included.
 
-Perspective `setViewOffset` has landed. It sets `aspect` to `fullWidth / fullHeight`, then shifts and scales the frustum by the sub-rectangle. The left half of a 16:9 frame doubles the horizontal scale and puts `-1` in the x offset term. `clearViewOffset` turns that sub-rectangle off and rebuilds the full frustum. Film offset is applied after the sub-rectangle. Orthographic view offset stays out.
+Perspective `setViewOffset` has landed. It sets `aspect` to `fullWidth / fullHeight`, then shifts and scales the frustum by the sub-rectangle. The left half of a 16:9 frame doubles the horizontal scale and puts `-1` in the x offset term. `clearViewOffset` turns that sub-rectangle off and rebuilds the full frustum. Film offset is applied after the sub-rectangle.
+
+Orthographic `setViewOffset` has landed. It does not change `aspect`. The scale is the frustum width and height divided by the full frame and by `zoom`. The left half of a frustum from `-2` to `2` and `-1` to `1` becomes `-2` to `0`, and the x translation term becomes `1`. `clearViewOffset` restores the full frustum.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -308,6 +310,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | perspective focal length, film width, and film height | `cameras` |
 | planned | 7 | perspective view bounds and view size | `cameras` |
 | planned | 7 | perspective `setViewOffset` and `clearViewOffset` | `cameras` |
+| planned | 7 | orthographic `setViewOffset` and `clearViewOffset` | `cameras` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

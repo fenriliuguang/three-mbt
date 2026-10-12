@@ -14,7 +14,9 @@ import {
 pub(all) struct OrthographicCamera {
   node : @core.Object3D
 }
+pub fn OrthographicCamera::clear_view_offset(Self) -> Unit
 pub fn OrthographicCamera::new(left? : Double, right? : Double, top? : Double, bottom? : Double, near? : Double, far? : Double) -> Self
+pub fn OrthographicCamera::set_view_offset(Self, Double, Double, Double, Double, Double, Double) -> Unit
 pub fn OrthographicCamera::set_zoom(Self, Double) -> Unit
 pub fn OrthographicCamera::to_node(Self) -> @core.Object3D
 pub fn OrthographicCamera::update_projection(Self) -> Unit
