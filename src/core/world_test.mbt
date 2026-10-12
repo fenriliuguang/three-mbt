@@ -90,6 +90,44 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "rotation setters write the quaternion and the bound euler" {
+  let right_angle = 1.5707963267948966
+  let half = 0.7071067811865476
+  let yawed = @core.Object3D::new()
+  yawed.set_rotation_from_axis_angle(@math.Vector3::new(y=1.0), right_angle)
+  assert_close(yawed.quaternion.x, 0.0)
+  assert_close(yawed.quaternion.y, half)
+  assert_close(yawed.quaternion.z, 0.0)
+  assert_close(yawed.quaternion.w, half)
+  assert_close(yawed.rotation.y, right_angle)
+  let tilted = @core.Object3D::new()
+  tilted.set_rotation_from_euler(@math.Euler::new(x=0.2, y=-0.4, z=0.6))
+  assert_close(tilted.quaternion.x, 0.0350558732382)
+  assert_close(tilted.quaternion.y, -0.21776257154)
+  assert_close(tilted.quaternion.z, 0.269234547391)
+  assert_close(tilted.quaternion.w, 0.937477096616)
+  assert_close(tilted.rotation.x, 0.2)
+  assert_close(tilted.rotation.y, -0.4)
+  assert_close(tilted.rotation.z, 0.6)
+  let from_matrix = @core.Object3D::new()
+  let matrix = @math.Matrix4::new().make_rotation_from_quaternion(
+    yawed.quaternion,
+  )
+  from_matrix.set_rotation_from_matrix(matrix)
+  assert_close(from_matrix.quaternion.y, half)
+  assert_close(from_matrix.quaternion.w, half)
+  let copied = @core.Object3D::new()
+  copied.set_rotation_from_quaternion(tilted.quaternion)
+  assert_close(copied.quaternion.x, 0.0350558732382)
+  assert_close(copied.quaternion.y, -0.21776257154)
+  assert_close(copied.quaternion.z, 0.269234547391)
+  assert_close(copied.quaternion.w, 0.937477096616)
+  assert_close(copied.rotation.x, 0.2)
+  assert_close(copied.rotation.y, -0.4)
+  assert_close(copied.rotation.z, 0.6)
+}
+
+///|
 test "apply matrix and quaternion update the local transform" {
   let right_angle = 1.5707963267948966
   let half = 0.7071067811865476

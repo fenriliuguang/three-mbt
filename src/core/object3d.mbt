@@ -439,6 +439,46 @@ pub fn Object3D::apply_quaternion(
 }
 
 ///|
+/// 轴假定已归一化。
+/// r186: `setRotationFromAxisAngle` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L478
+pub fn Object3D::set_rotation_from_axis_angle(
+  self : Object3D,
+  axis : @math.Vector3,
+  angle : Double,
+) -> Unit {
+  ignore(self.quaternion.set_from_axis_angle(axis, angle))
+}
+
+///|
+/// r186: `setRotationFromEuler` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L491
+pub fn Object3D::set_rotation_from_euler(
+  self : Object3D,
+  euler : @math.Euler,
+) -> Unit {
+  ignore(self.quaternion.set_from_euler(euler, update=true))
+}
+
+///|
+/// 矩阵左上 3×3 假定是纯旋转。
+/// r186: `setRotationFromMatrix` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L503
+pub fn Object3D::set_rotation_from_matrix(
+  self : Object3D,
+  m : @math.Matrix4,
+) -> Unit {
+  ignore(self.quaternion.set_from_rotation_matrix(m))
+}
+
+///|
+/// 四元数假定已归一化。
+/// r186: `setRotationFromQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L516
+pub fn Object3D::set_rotation_from_quaternion(
+  self : Object3D,
+  q : @math.Quaternion,
+) -> Unit {
+  ignore(self.quaternion.copy(q))
+}
+
+///|
 /// 绕局部轴旋转。轴假定已归一化。
 /// r186: `rotateOnAxis` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L531
 pub fn Object3D::rotate_on_axis(

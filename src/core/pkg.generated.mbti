@@ -243,6 +243,10 @@ pub fn Object3D::rotate_on_world_axis(Self, @math.Vector3, Double) -> Self
 pub fn Object3D::rotate_x(Self, Double) -> Self
 pub fn Object3D::rotate_y(Self, Double) -> Self
 pub fn Object3D::rotate_z(Self, Double) -> Self
+pub fn Object3D::set_rotation_from_axis_angle(Self, @math.Vector3, Double) -> Unit
+pub fn Object3D::set_rotation_from_euler(Self, @math.Euler) -> Unit
+pub fn Object3D::set_rotation_from_matrix(Self, @math.Matrix4) -> Unit
+pub fn Object3D::set_rotation_from_quaternion(Self, @math.Quaternion) -> Unit
 pub fn Object3D::to_node(Self) -> Self
 pub fn Object3D::translate_on_axis(Self, @math.Vector3, Double) -> Self
 pub fn Object3D::translate_x(Self, Double) -> Self
