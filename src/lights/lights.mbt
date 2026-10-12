@@ -1,4 +1,4 @@
-// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15 ; `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32 ; `PointLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/PointLight.js#L19
+// r186: `AmbientLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/AmbientLight.js#L15 ; `DirectionalLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLight.js#L32 ; `PointLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/PointLight.js#L19 ; `SpotLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/SpotLight.js#L39
 
 ///|
 using @core {type Object3D, type NodeKind, type LightKind, type LightState}
@@ -11,6 +11,8 @@ fn make_light(
   intensity : Double,
   distance? : Double = 0.0,
   decay? : Double = 2.0,
+  angle? : Double = 0.0,
+  penumbra? : Double = 0.0,
 ) -> Object3D {
   let node = Object3D::new(kind~)
   node.light = Some(LightState::{
@@ -18,6 +20,8 @@ fn make_light(
     intensity,
     distance,
     decay,
+    angle,
+    penumbra,
     target: None,
     kind: light_kind,
     shadow: None,
@@ -174,3 +178,49 @@ pub impl @core.AsNode for PointLight with fn to_node(self) {
 
 ///|
 pub extend PointLight with @core.AsNode::{to_node}
+
+///|
+/// 聚光。从自身位置指向 `target`，默认位置是 `(0, 1, 0)`。
+/// `angle` 默认 `π/3`，`penumbra` 默认 0。这一阶段不投射阴影。
+/// r186: `SpotLight` https://github.com/mrdoob/three.js/blob/r186/src/lights/SpotLight.js#L39
+pub(all) struct SpotLight {
+  node : Object3D
+  target : Object3D
+}
+
+///|
+pub fn SpotLight::new(
+  hex? : Int = 0xFFFFFF,
+  intensity? : Double = 1.0,
+  distance? : Double = 0.0,
+  angle? : Double = @std.PI / 3.0,
+  penumbra? : Double = 0.0,
+  decay? : Double = 2.0,
+) -> SpotLight {
+  let node = make_light(
+    @core.SpotLight,
+    @core.Spot,
+    hex,
+    intensity,
+    distance~,
+    decay~,
+    angle~,
+    penumbra~,
+  )
+  let target = Object3D::new()
+  match node.light {
+    None => ()
+    Some(light) => light.target = Some(target)
+  }
+  ignore(node.position.set(0.0, 1.0, 0.0))
+  node.update_matrix()
+  { node, target, }
+}
+
+///|
+pub impl @core.AsNode for SpotLight with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend SpotLight with @core.AsNode::{to_node}

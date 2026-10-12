@@ -132,7 +132,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光、贴图和蒙皮先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图和蒙皮先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1530,6 +1530,7 @@ fn camera_object(cam : Cam) -> @core.Object3D {
 priv enum PunctualKind {
   Directional
   Point
+  Spot
 }
 
 ///|
@@ -1540,6 +1541,8 @@ priv struct Punctual {
   b : Double
   intensity : Double
   distance : Double
+  angle : Double
+  penumbra : Double
   name : String
 }
 
@@ -1573,8 +1576,8 @@ fn node_light(obj : Map[String, Json]) -> Int? raise GltfError {
 }
 
 ///|
-/// 平行光的目标在本地 `(0, 0, -1)`，位置先归零，再套节点变换。
-/// 点光用节点位置，`range` 缺省是 0，表示不截断。聚光仍拒绝。
+/// 平行光和聚光的目标在本地 `(0, 0, -1)`，位置先归零，再套节点变换。
+/// 点光和聚光用 `range`，缺省是 0，表示不截断。聚光的外角缺省是 `π/4`。
 /// r186: `_loadLight` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L695
 fn load_punctual(
   obj : Map[String, Json],
@@ -1583,11 +1586,26 @@ fn load_punctual(
   let kind = match opt_string(obj, "type", "") {
     "directional" => Directional
     "point" => Point
+    "spot" => Spot
     _ => raise GltfError::Invalid("punctual light type")
   }
   let distance = match kind {
-    Point => opt_f64(obj, "range", 0.0)
+    Point | Spot => opt_f64(obj, "range", 0.0)
     Directional => 0.0
+  }
+  let (angle, penumbra) = match kind {
+    Spot =>
+      match obj.get("spot") {
+        None => (@std.PI / 4.0, 1.0)
+        Some(value) => {
+          let spot = as_object(value)
+          let inner = opt_f64(spot, "innerConeAngle", 0.0)
+          let outer = opt_f64(spot, "outerConeAngle", @std.PI / 4.0)
+          let softness = if outer == 0.0 { 0.0 } else { 1.0 - inner / outer }
+          (outer, softness)
+        }
+      }
+    _ => (@std.PI / 3.0, 0.0)
   }
   let (r, g, b) = match obj.get("color") {
     None => (1.0, 1.0, 1.0)
@@ -1601,7 +1619,17 @@ fn load_punctual(
   }
   let given = opt_string(obj, "name", "")
   let name = if given == "" { "light_\{index}" } else { given }
-  { kind, r, g, b, intensity: opt_f64(obj, "intensity", 1.0), distance, name, }
+  {
+    kind,
+    r,
+    g,
+    b,
+    intensity: opt_f64(obj, "intensity", 1.0),
+    distance,
+    angle,
+    penumbra,
+    name,
+  }
 }
 
 ///|
@@ -1646,6 +1674,23 @@ fn light_object(light : Punctual) -> @core.Object3D {
       }
       bulb.node.name = light.name
       bulb.node
+    }
+    Spot => {
+      let lamp = @lights.SpotLight::new(
+        intensity=light.intensity,
+        distance=light.distance,
+        angle=light.angle,
+        penumbra=light.penumbra,
+      )
+      ignore(lamp.node.position.set(0.0, 0.0, 0.0))
+      match lamp.node.light {
+        None => ()
+        Some(state) => ignore(state.color.set_rgb(light.r, light.g, light.b))
+      }
+      ignore(lamp.target.position.set(0.0, 0.0, -1.0))
+      ignore(lamp.node.add(lamp.target))
+      lamp.node.name = light.name
+      lamp.node
     }
   }
 }

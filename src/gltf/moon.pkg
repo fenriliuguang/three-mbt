@@ -1,4 +1,4 @@
-// 阶段 7。glTF 2.0 的几何、PBR 因子、自发光和强度、相机、关键帧、平行光、点光、静态形变、节点权重、形变动画、顶点色形变和稀疏 accessor。不读贴图、蒙皮和聚光。
+// 阶段 7。glTF 2.0 的几何、PBR 因子、自发光和强度、相机、关键帧、平行光、点光、聚光、静态形变、节点权重、形变动画、顶点色形变和稀疏 accessor。不读贴图和蒙皮。
 import {
   "fenriliuguang/three-mbt/animation",
   "fenriliuguang/three-mbt/cameras",
@@ -10,6 +10,7 @@ import {
   "fenriliuguang/three-mbt/objects",
   "moonbitlang/core/encoding/base64",
   "moonbitlang/core/json",
+  "moonbitlang/core/math" @std,
 }
 
 import {

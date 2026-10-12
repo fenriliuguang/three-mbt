@@ -37,6 +37,14 @@ pub fn PointLight::new(hex? : Int, intensity? : Double, distance? : Double, deca
 pub fn PointLight::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for PointLight
 
+pub(all) struct SpotLight {
+  node : @core.Object3D
+  target : @core.Object3D
+}
+pub fn SpotLight::new(hex? : Int, intensity? : Double, distance? : Double, angle? : Double, penumbra? : Double, decay? : Double) -> Self
+pub fn SpotLight::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for SpotLight
+
 // Type aliases
 
 // Traits

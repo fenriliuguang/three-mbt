@@ -52,6 +52,7 @@ pub(all) enum Node {
   InstanceNormal(Node)
   DirectShadow
   PointTerm
+  SpotTerm
 }
 
 pub(all) struct Program {

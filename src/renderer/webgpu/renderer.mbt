@@ -3464,6 +3464,20 @@ fn WebGPURenderer::draw_meshes(
           point_distance=lights.point_distance,
           point_decay=lights.point_decay,
           point_enabled=lights.point_enabled,
+          spot_x=lights.spot_position.x,
+          spot_y=lights.spot_position.y,
+          spot_z=lights.spot_position.z,
+          spot_dx=lights.spot_direction.x,
+          spot_dy=lights.spot_direction.y,
+          spot_dz=lights.spot_direction.z,
+          spot_r=lights.spot_color.x,
+          spot_g=lights.spot_color.y,
+          spot_b=lights.spot_color.z,
+          spot_distance=lights.spot_distance,
+          spot_decay=lights.spot_decay,
+          spot_cone_cos=lights.spot_cone_cos,
+          spot_penumbra_cos=lights.spot_penumbra_cos,
+          spot_enabled=lights.spot_enabled,
         )
         ignore(
           self.device

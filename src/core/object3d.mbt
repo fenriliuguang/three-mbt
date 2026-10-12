@@ -23,8 +23,11 @@ fn bind_rotation(euler : @math.Euler, quaternion : @math.Quaternion) -> Unit {
 ///|
 fn faces_negative_z(kind : NodeKind) -> Bool {
   match kind {
-    PerspectiveCamera | OrthographicCamera | AmbientLight | DirectionalLight =>
-      true
+    PerspectiveCamera
+    | OrthographicCamera
+    | AmbientLight
+    | DirectionalLight
+    | SpotLight => true
     _ => false
   }
 }

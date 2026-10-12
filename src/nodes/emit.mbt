@@ -48,6 +48,7 @@ fn emit_expr(node : Node) -> String {
       "instance_normal(\{emit_expr(normal)}, input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2)"
     DirectShadow => "direct_shadow(input.v_world, input.v_normal)"
     PointTerm => "point_term(input.v_world, input.v_normal)"
+    SpotTerm => "spot_term(input.v_world, input.v_normal)"
   }
 }
 

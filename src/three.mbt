@@ -145,7 +145,12 @@ pub using @materials {
 }
 
 ///|
-pub using @lights {type AmbientLight, type DirectionalLight, type PointLight}
+pub using @lights {
+  type AmbientLight,
+  type DirectionalLight,
+  type PointLight,
+  type SpotLight,
+}
 
 ///|
 pub using @textures {type RenderTarget, type Texture}

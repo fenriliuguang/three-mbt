@@ -326,6 +326,7 @@ test "frame lights sum ambient and the first directional" {
   assert_eq(lights.direction.z, 0.0)
   assert_eq(lights.shadow is None, true)
   assert_eq(lights.point_enabled, 0.0)
+  assert_eq(lights.spot_enabled, 0.0)
 }
 
 ///|
@@ -351,6 +352,43 @@ test "frame lights keep the first point light" {
   assert_eq(lights.point_color.y, 0.0)
   assert_eq(lights.point_distance, 4.0)
   assert_eq(lights.point_decay, 2.0)
+  assert_eq(lights.spot_enabled, 0.0)
+}
+
+///|
+test "frame lights keep the first spot light" {
+  let scene = @scenes.Scene::new()
+  let fresh = @lights.SpotLight::new()
+  assert_eq(fresh.node.position.y, 1.0)
+  assert_eq(fresh.node.position.x, 0.0)
+  let lamp = @lights.SpotLight::new(
+    hex=0xFF0000,
+    intensity=2.0,
+    distance=4.0,
+    angle=@std.PI / 3.0,
+    penumbra=0.0,
+    decay=2.0,
+  )
+  ignore(lamp.node.position.set(0.0, 4.0, 0.0))
+  ignore(scene.add(lamp))
+  let other = @lights.SpotLight::new(intensity=9.0, distance=1.0)
+  ignore(other.node.position.set(8.0, 0.0, 0.0))
+  ignore(scene.add(other))
+  @common.update_frame(scene.node, scene.node)
+  let lights = @common.collect_lights(scene.node)
+  assert_eq(lights.spot_enabled, 1.0)
+  assert_eq(lights.point_enabled, 0.0)
+  assert_eq(lights.spot_position.y, 4.0)
+  assert_eq(lights.spot_position.x, 0.0)
+  assert_eq(lights.spot_direction.x, 0.0)
+  assert_eq(lights.spot_direction.y, 1.0)
+  assert_eq(lights.spot_direction.z, 0.0)
+  assert_eq(lights.spot_color.x, 2.0)
+  assert_eq(lights.spot_color.y, 0.0)
+  assert_eq(lights.spot_distance, 4.0)
+  assert_eq(lights.spot_decay, 2.0)
+  assert_eq(lights.spot_cone_cos, @std.cos(@std.PI / 3.0))
+  assert_eq(lights.spot_penumbra_cos, @std.cos(@std.PI / 3.0))
 }
 
 ///|
@@ -939,6 +977,84 @@ test "a point light is packed after emissive" {
   assert_eq(uniforms[553], b'\x00')
   assert_eq(uniforms[554], b'\x80')
   assert_eq(uniforms[555], b'\x3F')
+}
+
+///|
+test "a spot light is packed after the point light" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let uniforms = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    spot_y=4.0,
+    spot_dy=1.0,
+    spot_r=2.0,
+    spot_distance=4.0,
+    spot_decay=2.0,
+    spot_cone_cos=0.5,
+    spot_penumbra_cos=1.0,
+    spot_enabled=1.0,
+  )
+  assert_eq(uniforms.length(), @common.uniform_bytes)
+  assert_eq(uniforms[564], b'\x00')
+  assert_eq(uniforms[565], b'\x00')
+  assert_eq(uniforms[566], b'\x80')
+  assert_eq(uniforms[567], b'\x40')
+  assert_eq(uniforms[580], b'\x00')
+  assert_eq(uniforms[581], b'\x00')
+  assert_eq(uniforms[582], b'\x80')
+  assert_eq(uniforms[583], b'\x3F')
+  assert_eq(uniforms[588], b'\x00')
+  assert_eq(uniforms[589], b'\x00')
+  assert_eq(uniforms[590], b'\x80')
+  assert_eq(uniforms[591], b'\x3F')
+  assert_eq(uniforms[592], b'\x00')
+  assert_eq(uniforms[593], b'\x00')
+  assert_eq(uniforms[594], b'\x00')
+  assert_eq(uniforms[595], b'\x40')
+  assert_eq(uniforms[608], b'\x00')
+  assert_eq(uniforms[609], b'\x00')
+  assert_eq(uniforms[610], b'\x80')
+  assert_eq(uniforms[611], b'\x40')
+  assert_eq(uniforms[612], b'\x00')
+  assert_eq(uniforms[613], b'\x00')
+  assert_eq(uniforms[614], b'\x00')
+  assert_eq(uniforms[615], b'\x40')
+  assert_eq(uniforms[616], b'\x00')
+  assert_eq(uniforms[617], b'\x00')
+  assert_eq(uniforms[618], b'\x00')
+  assert_eq(uniforms[619], b'\x3F')
+  assert_eq(uniforms[620], b'\x00')
+  assert_eq(uniforms[621], b'\x00')
+  assert_eq(uniforms[622], b'\x80')
+  assert_eq(uniforms[623], b'\x3F')
 }
 
 ///|

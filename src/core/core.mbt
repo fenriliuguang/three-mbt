@@ -13,6 +13,7 @@ pub(all) enum NodeKind {
   AmbientLight
   DirectionalLight
   PointLight
+  SpotLight
   Points
   Line
   LineSegments
@@ -31,6 +32,7 @@ pub(all) enum LightKind {
   Ambient
   Directional
   Point
+  Spot
 }
 
 ///|

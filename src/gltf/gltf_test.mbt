@@ -301,9 +301,9 @@ test "glTF directional lights point down local -Z" {
 }
 
 ///|
-test "a glTF spot light is rejected" {
+test "a glTF rect light is rejected" {
   let text =
-    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"spot"}]}},"nodes":[{}]}
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"rect"}]}},"nodes":[{}]}
   let failed = try {
     ignore(@gltf.parse(text).scene)
     false
@@ -341,6 +341,48 @@ test "glTF point lights keep range and a zero intensity" {
       assert_eq(state.distance, 0.0)
       assert_eq(state.intensity, 1.0)
       assert_eq(state.decay, 2.0)
+    }
+  }
+}
+
+///|
+test "glTF spot lights keep the cone and a zero intensity" {
+  let text =
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"spot","color":[0,0,1],"intensity":0,"range":0,"spot":{"innerConeAngle":0.5,"outerConeAngle":1}},{"type":"spot"}]}},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"lamp","translation":[0,2,0],"extensions":{"KHR_lights_punctual":{"light":0}}},{"name":"wide","extensions":{"KHR_lights_punctual":{"light":1}}}]}
+  let scene = @gltf.parse(text).scene
+  let lamp = must(scene.node, "lamp")
+  assert_eq(lamp.kind is @core.NodeKind::SpotLight, true)
+  assert_eq(lamp.position.x, 0.0)
+  assert_eq(lamp.position.y, 2.0)
+  assert_eq(lamp.position.z, 0.0)
+  assert_eq(lamp.children.length(), 1)
+  assert_eq(lamp.children[0].position.z, -1.0)
+  match lamp.light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.kind is @core.LightKind::Spot, true)
+      assert_eq(state.intensity, 0.0)
+      assert_eq(state.distance, 0.0)
+      assert_eq(state.decay, 2.0)
+      assert_eq(state.angle, 1.0)
+      assert_eq(state.penumbra, 0.5)
+      assert_eq(state.color.b, 1.0)
+      assert_eq(state.color.r, 0.0)
+      match state.target {
+        None => panic()
+        Some(target) =>
+          assert_eq(physical_equal(target, lamp.children[0]), true)
+      }
+    }
+  }
+  match must(scene.node, "wide").light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.distance, 0.0)
+      assert_eq(state.intensity, 1.0)
+      assert_eq(state.decay, 2.0)
+      assert_eq(state.angle, @std.PI / 4.0)
+      assert_eq(state.penumbra, 1.0)
     }
   }
 }

@@ -75,6 +75,8 @@ pub(all) struct LightState {
   mut intensity : Double
   mut distance : Double
   mut decay : Double
+  mut angle : Double
+  mut penumbra : Double
   mut target : Object3D?
   kind : LightKind
   mut shadow : ShadowState?

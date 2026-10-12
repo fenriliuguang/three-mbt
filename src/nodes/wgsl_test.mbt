@@ -96,6 +96,16 @@ test "lambert and standard add one point light" {
   )
   assert_eq(includes(basic, "fn point_term("), false)
   assert_eq(includes(basic, "fn point_standard("), false)
+  assert_eq(includes(lambert, "fn spot_falloff("), true)
+  assert_eq(includes(lambert, "fn spot_cone("), true)
+  assert_eq(includes(lambert, "spot_term(input.v_world, input.v_normal)"), true)
+  assert_eq(includes(standard, "fn spot_standard("), true)
+  assert_eq(
+    includes(standard, "spot_standard(N, V, world, diffuse, f0, alpha)"),
+    true,
+  )
+  assert_eq(includes(basic, "fn spot_term("), false)
+  assert_eq(includes(basic, "fn spot_standard("), false)
 }
 
 ///|
