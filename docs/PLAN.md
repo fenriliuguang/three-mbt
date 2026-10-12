@@ -269,6 +269,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `traverseAncestors` has landed. It visits the parent first, then that parent's parent, and stops at the root. The node itself is not visited. A child under `parent` under `root` yields `parent`, then `root`. A node with no parent yields nothing. Changing the scene graph inside the callback stays unsupported.
 
+`getObjectById` has landed. The search starts at the node itself, then walks children depth first, and returns the first match. A parent can find a grandchild. A child does not find its parent. An unknown id returns nothing. Dynamic property lookup stays out.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -344,6 +346,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Object3D `setRotationFromAxisAngle`, `setRotationFromEuler`, `setRotationFromMatrix`, and `setRotationFromQuaternion` | `core` |
 | planned | 7 | Object3D `attach` | `core` |
 | planned | 7 | Object3D `traverseAncestors` | `core` |
+| planned | 7 | Object3D `getObjectById` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

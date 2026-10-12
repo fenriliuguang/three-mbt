@@ -90,6 +90,37 @@ test "world axis rotation premultiplies the quaternion" {
 }
 
 ///|
+test "get object by id searches self then descendants" {
+  let root = @core.Object3D::new()
+  let child = @core.Object3D::new()
+  let grandchild = @core.Object3D::new()
+  let sibling = @core.Object3D::new()
+  ignore(root.add(child))
+  ignore(child.add(grandchild))
+  ignore(root.add(sibling))
+  match root.get_object_by_id(root.id) {
+    Some(found) => assert_eq(found.id, root.id)
+    None => assert_eq(false, true)
+  }
+  match root.get_object_by_id(grandchild.id) {
+    Some(found) => assert_eq(found.id, grandchild.id)
+    None => assert_eq(false, true)
+  }
+  match child.get_object_by_id(root.id) {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  match root.get_object_by_id(-1) {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  match root.get_object_by_id(sibling.id) {
+    Some(found) => assert_eq(found.id, sibling.id)
+    None => assert_eq(false, true)
+  }
+}
+
+///|
 test "traverse ancestors visits parents toward the root" {
   let root = @core.Object3D::new()
   root.name = "root"

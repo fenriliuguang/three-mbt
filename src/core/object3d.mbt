@@ -627,6 +627,24 @@ pub fn Object3D::attach(self : Object3D, object : Object3D) -> Object3D {
 }
 
 ///|
+/// 深度优先，先看自己再看子节点。
+/// r186: `getObjectById` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L917
+pub fn Object3D::get_object_by_id(self : Object3D, id : Int) -> Object3D? {
+  if self.id == id {
+    return Some(self)
+  }
+  let count = self.children.length()
+  let mut index = 0
+  while index < count {
+    match self.children[index].get_object_by_id(id) {
+      Some(found) => return Some(found)
+      None => index = index + 1
+    }
+  }
+  None
+}
+
+///|
 /// 深度优先，先看自己再看子节点。名字相同的话返回最先遇到的那个。
 pub fn Object3D::get_object_by_name(
   self : Object3D,
