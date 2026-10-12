@@ -216,6 +216,8 @@ pub using @cameras {type PerspectiveCamera}
 
 pub using @math {type Plane}
 
+pub using @lights {type PointLight}
+
 pub using @objects {type Points}
 
 pub using @materials {type PointsMaterial}

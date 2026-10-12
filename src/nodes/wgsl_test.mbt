@@ -75,6 +75,30 @@ test "lambert and standard add emissive after lighting" {
 }
 
 ///|
+test "lambert and standard add one point light" {
+  let lambert = @nodes.lambert_wgsl()
+  let standard = @nodes.standard_wgsl()
+  let basic = @nodes.basic_wgsl()
+  assert_eq(includes(lambert, "fn point_falloff("), true)
+  assert_eq(includes(lambert, "1.0 / max(pow(dist, decay), 0.01)"), true)
+  assert_eq(
+    includes(lambert, "point_term(input.v_world, input.v_normal)"),
+    true,
+  )
+  assert_eq(includes(standard, "fn point_standard("), true)
+  assert_eq(
+    includes(standard, "point_standard(N, V, world, diffuse, f0, alpha)"),
+    true,
+  )
+  assert_eq(
+    includes(standard, "return vec4<f32>(direct + indirect, base.w)"),
+    true,
+  )
+  assert_eq(includes(basic, "fn point_term("), false)
+  assert_eq(includes(basic, "fn point_standard("), false)
+}
+
+///|
 test "instanced meshes multiply instance matrix and color" {
   let matrix = "mat4x4<f32>(input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2, input.instance_matrix_3)"
   let basic = @nodes.basic_instanced_wgsl()

@@ -30,6 +30,13 @@ pub fn DirectionalLight::set_shadow_bounds(Self, Double, Double, Double, Double,
 pub fn DirectionalLight::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for DirectionalLight
 
+pub(all) struct PointLight {
+  node : @core.Object3D
+}
+pub fn PointLight::new(hex? : Int, intensity? : Double, distance? : Double, decay? : Double) -> Self
+pub fn PointLight::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for PointLight
+
 // Type aliases
 
 // Traits

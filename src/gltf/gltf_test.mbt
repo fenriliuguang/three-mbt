@@ -301,9 +301,9 @@ test "glTF directional lights point down local -Z" {
 }
 
 ///|
-test "a glTF point light is rejected" {
+test "a glTF spot light is rejected" {
   let text =
-    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"point"}]}},"nodes":[{}]}
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"spot"}]}},"nodes":[{}]}
   let failed = try {
     ignore(@gltf.parse(text).scene)
     false
@@ -311,6 +311,38 @@ test "a glTF point light is rejected" {
     @gltf.GltfError::Invalid(_) => true
   }
   assert_eq(failed, true)
+}
+
+///|
+test "glTF point lights keep range and a zero intensity" {
+  let text =
+    #|{"asset":{"version":"2.0"},"extensions":{"KHR_lights_punctual":{"lights":[{"type":"point","color":[0,1,0],"intensity":0,"range":4},{"type":"point"}]}},"scenes":[{"nodes":[0,1]}],"nodes":[{"name":"bulb","translation":[4,5,6],"extensions":{"KHR_lights_punctual":{"light":0}}},{"name":"bare","extensions":{"KHR_lights_punctual":{"light":1}}}]}
+  let scene = @gltf.parse(text).scene
+  let bulb = must(scene.node, "bulb")
+  assert_eq(bulb.kind is @core.NodeKind::PointLight, true)
+  assert_eq(bulb.position.x, 4.0)
+  assert_eq(bulb.position.y, 5.0)
+  assert_eq(bulb.position.z, 6.0)
+  assert_eq(bulb.children.length(), 0)
+  match bulb.light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.kind is @core.LightKind::Point, true)
+      assert_eq(state.intensity, 0.0)
+      assert_eq(state.distance, 4.0)
+      assert_eq(state.decay, 2.0)
+      assert_eq(state.color.g, 1.0)
+      assert_eq(state.color.r, 0.0)
+    }
+  }
+  match must(scene.node, "bare").light {
+    None => panic()
+    Some(state) => {
+      assert_eq(state.distance, 0.0)
+      assert_eq(state.intensity, 1.0)
+      assert_eq(state.decay, 2.0)
+    }
+  }
 }
 
 ///|

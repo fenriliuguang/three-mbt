@@ -4,10 +4,10 @@
 using @core {type BufferAttribute}
 
 ///|
-/// 五块 `mat4x4<f32>` 和十二块 `vec4<f32>`。512 字节。
+/// 五块 `mat4x4<f32>` 和十五块 `vec4<f32>`。560 字节。
 /// 阴影参数之后是雾的颜色和开关，以及 `(near, far, density, mode)`。
-/// 最后一块是自发光的 `rgb`，`w` 留空。
-pub let uniform_bytes : Int = 512
+/// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
+pub let uniform_bytes : Int = 560
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
@@ -259,6 +259,15 @@ pub fn pack_uniforms(
   emissive_g? : Double = 0.0,
   emissive_b? : Double = 0.0,
   emissive_intensity? : Double = 1.0,
+  point_x? : Double = 0.0,
+  point_y? : Double = 0.0,
+  point_z? : Double = 0.0,
+  point_r? : Double = 0.0,
+  point_g? : Double = 0.0,
+  point_b? : Double = 0.0,
+  point_distance? : Double = 0.0,
+  point_decay? : Double = 2.0,
+  point_enabled? : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -296,6 +305,15 @@ pub fn pack_uniforms(
   write_f32(dst, 496, emissive_r * emissive_intensity)
   write_f32(dst, 500, emissive_g * emissive_intensity)
   write_f32(dst, 504, emissive_b * emissive_intensity)
+  write_f32(dst, 512, point_x)
+  write_f32(dst, 516, point_y)
+  write_f32(dst, 520, point_z)
+  write_f32(dst, 528, point_r)
+  write_f32(dst, 532, point_g)
+  write_f32(dst, 536, point_b)
+  write_f32(dst, 544, point_distance)
+  write_f32(dst, 548, point_decay)
+  write_f32(dst, 552, point_enabled)
   dst
 }
 

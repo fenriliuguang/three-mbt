@@ -3455,6 +3455,15 @@ fn WebGPURenderer::draw_meshes(
           emissive_g=item.emissive.g,
           emissive_b=item.emissive.b,
           emissive_intensity=item.emissive_intensity,
+          point_x=lights.point_position.x,
+          point_y=lights.point_position.y,
+          point_z=lights.point_position.z,
+          point_r=lights.point_color.x,
+          point_g=lights.point_color.y,
+          point_b=lights.point_color.z,
+          point_distance=lights.point_distance,
+          point_decay=lights.point_decay,
+          point_enabled=lights.point_enabled,
         )
         ignore(
           self.device

@@ -29,6 +29,7 @@ pub(all) enum Node {
   StandardLit(Node)
   InstanceNormal(Node)
   DirectShadow
+  PointTerm
 }
 
 ///|
@@ -65,6 +66,9 @@ fn frame_uniforms() -> Array[(String, ValueType)] {
     ("fog", Vec4),
     ("fog_params", Vec4),
     ("emissive", Vec4),
+    ("point_position", Vec4),
+    ("point_color", Vec4),
+    ("point_params", Vec4),
   ]
 }
 
@@ -99,6 +103,14 @@ fn with_fog(
 
 ///|
 /// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18
+/// 点光衰减来自 Frostbite：`1 / max(distance^decay, 0.01)`，有截断时再乘平滑边缘。
+/// 不乘阴影。`point_params.z` 小于 0.5 时没有点光。
+/// r186: `getDistanceAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_pars_begin.glsl.js#L56
+fn point_preamble() -> String {
+  "fn point_falloff(world : vec3<f32>) -> f32 {\n  if ((uniforms.point_params).z < 0.5) {\n    return 0.0;\n  }\n  let delta = (uniforms.point_position).xyz - world;\n  let dist = length(delta);\n  let decay = (uniforms.point_params).y;\n  var falloff = 1.0 / max(pow(dist, decay), 0.01);\n  let cutoff = (uniforms.point_params).x;\n  if (cutoff > 0.0) {\n    let ratio = dist / cutoff;\n    let edged = clamp(1.0 - ratio * ratio * ratio * ratio, 0.0, 1.0);\n    falloff = falloff * edged * edged;\n  }\n  return falloff;\n}\n\nfn point_direction(world : vec3<f32>) -> vec3<f32> {\n  let delta = (uniforms.point_position).xyz - world;\n  return delta / max(length(delta), 0.000001);\n}\n\nfn point_term(world : vec3<f32>, normal : vec3<f32>) -> vec3<f32> {\n  let falloff = point_falloff(world);\n  let L = point_direction(world);\n  let ndotl = max(dot(normalize(normal), L), 0.0);\n  return (uniforms.point_color).xyz * ndotl * falloff;\n}\n\n"
+}
+
+///|
 fn shadow_preamble() -> String {
   "fn direct_shadow(world : vec3<f32>, normal : vec3<f32>) -> f32 {\n  if ((uniforms.shadow).z < 0.5) {\n    return 1.0;\n  }\n  let shifted = world + normalize(normal) * (uniforms.shadow).y;\n  let clip = uniforms.shadow_matrix * vec4<f32>(shifted, 1.0);\n  let uv = clip.xy / clip.w;\n  let depth = clip.z / clip.w + (uniforms.shadow).x;\n  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0 || depth < 0.0 || depth > 1.0) {\n    return 1.0;\n  }\n  let texel = (uniforms.shadow).w;\n  var sum = 0.0;\n  for (var y = -1; y <= 1; y = y + 1) {\n    for (var x = -1; x <= 1; x = x + 1) {\n      let offset = vec2<f32>(f32(x), f32(y)) * texel;\n      sum = sum + textureSampleCompare(shadow_map, shadow_sampler, uv + offset, depth);\n    }\n  }\n  return sum / 9.0;\n}\n\n"
 }
@@ -115,16 +127,21 @@ fn standard_preamble() -> String {
     "  let a2 = alpha * alpha;\n", "  let gv = NoL * sqrt(a2 + (1.0 - a2) * (NoV * NoV));\n",
     "  let gl = NoV * sqrt(a2 + (1.0 - a2) * (NoL * NoL));\n", "  return 0.5 / max(gv + gl, 0.000001);\n",
     "}\n\n", "fn F_Schlick(f0 : vec3<f32>, VoH : f32) -> vec3<f32> {\n", "  let fresnel = exp2((-5.55473 * VoH - 6.98316) * VoH);\n",
-    "  return f0 * (1.0 - fresnel) + fresnel;\n", "}\n\n", "fn standard_lit(base : vec4<f32>, normal : vec3<f32>, world : vec3<f32>) -> vec4<f32> {\n",
+    "  return f0 * (1.0 - fresnel) + fresnel;\n", "}\n\n", "fn point_standard(N : vec3<f32>, V : vec3<f32>, world : vec3<f32>, diffuse : vec3<f32>, f0 : vec3<f32>, alpha : f32) -> vec3<f32> {\n",
+    "  let falloff = point_falloff(world);\n", "  let L = point_direction(world);\n",
+    "  let H = normalize(V + L);\n", "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n",
+    "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
+    "  return (diffuse + specular) * (uniforms.point_color).xyz * NoL * falloff;\n",
+    "}\n\n", "fn standard_lit(base : vec4<f32>, normal : vec3<f32>, world : vec3<f32>) -> vec4<f32> {\n",
     "  let roughness = max((uniforms.surface).x, 0.0525);\n", "  let metalness = clamp((uniforms.surface).y, 0.0, 1.0);\n",
     "  let alpha = roughness * roughness;\n", "  let diffuse_color = base.xyz * (1.0 - metalness);\n",
     "  let f0 = mix(vec3<f32>(0.04), base.xyz, metalness);\n", "  let N = normalize(normal);\n",
     "  let V = normalize((uniforms.camera_position).xyz - world);\n", "  let L = normalize((uniforms.light_direction).xyz);\n",
     "  let H = normalize(V + L);\n", "  let NoL = max(dot(N, L), 0.0);\n", "  let NoV = max(dot(N, V), 0.0);\n",
     "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
-    "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  let direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
-    "  let indirect = (uniforms.ambient).xyz * diffuse;\n", "  return vec4<f32>(direct + indirect, base.w);\n",
-    "}\n\n",
+    "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  var direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
+    "  direct = direct + point_standard(N, V, world, diffuse, f0, alpha);\n", "  let indirect = (uniforms.ambient).xyz * diffuse;\n",
+    "  return vec4<f32>(direct + indirect, base.w);\n", "}\n\n",
   ]
   let mut text = ""
   for line in lines {
@@ -295,7 +312,10 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     Mul(Swizzle(Uniform("light_color", Vec4), "xyz"), ndotl),
     DirectShadow,
   )
-  let lit = Add(Swizzle(Uniform("ambient", Vec4), "xyz"), direct)
+  let lit = Add(
+    Add(Swizzle(Uniform("ambient", Vec4), "xyz"), direct),
+    PointTerm,
+  )
   let sample = TextureSample(Varying("v_uv", Vec2))
   let rgb = Mul(
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
@@ -338,9 +358,9 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
     sampled: true,
     shadowed: true,
     preamble: if instanced {
-      instance_preamble() + shadow_preamble()
+      instance_preamble() + shadow_preamble() + point_preamble()
     } else {
-      shadow_preamble()
+      shadow_preamble() + point_preamble()
     },
   }
 }
@@ -391,9 +411,12 @@ pub fn standard_program(instanced? : Bool = false) -> Program {
     sampled: true,
     shadowed: true,
     preamble: if instanced {
-      instance_preamble() + shadow_preamble() + standard_preamble()
+      instance_preamble() +
+      shadow_preamble() +
+      point_preamble() +
+      standard_preamble()
     } else {
-      shadow_preamble() + standard_preamble()
+      shadow_preamble() + point_preamble() + standard_preamble()
     },
   }
 }

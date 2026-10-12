@@ -12,6 +12,7 @@ pub(all) enum NodeKind {
   OrthographicCamera
   AmbientLight
   DirectionalLight
+  PointLight
   Points
   Line
   LineSegments
@@ -29,6 +30,7 @@ pub(all) enum ProjectionKind {
 pub(all) enum LightKind {
   Ambient
   Directional
+  Point
 }
 
 ///|

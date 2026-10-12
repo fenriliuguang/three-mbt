@@ -51,6 +51,7 @@ pub(all) enum Node {
   StandardLit(Node)
   InstanceNormal(Node)
   DirectShadow
+  PointTerm
 }
 
 pub(all) struct Program {

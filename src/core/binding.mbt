@@ -73,6 +73,8 @@ pub(all) struct ShadowState {
 pub(all) struct LightState {
   color : @math.Color
   mut intensity : Double
+  mut distance : Double
+  mut decay : Double
   mut target : Object3D?
   kind : LightKind
   mut shadow : ShadowState?

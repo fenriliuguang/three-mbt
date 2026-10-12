@@ -132,7 +132,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光、聚光、贴图和蒙皮先不读。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光、贴图和蒙皮先不读。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -1527,11 +1527,19 @@ fn camera_object(cam : Cam) -> @core.Object3D {
 ///|
 
 ///|
+priv enum PunctualKind {
+  Directional
+  Point
+}
+
+///|
 priv struct Punctual {
+  kind : PunctualKind
   r : Double
   g : Double
   b : Double
   intensity : Double
+  distance : Double
   name : String
 }
 
@@ -1566,14 +1574,20 @@ fn node_light(obj : Map[String, Json]) -> Int? raise GltfError {
 
 ///|
 /// 平行光的目标在本地 `(0, 0, -1)`，位置先归零，再套节点变换。
+/// 点光用节点位置，`range` 缺省是 0，表示不截断。聚光仍拒绝。
 /// r186: `_loadLight` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L695
 fn load_punctual(
   obj : Map[String, Json],
   index : Int,
 ) -> Punctual raise GltfError {
-  match opt_string(obj, "type", "") {
-    "directional" => ()
+  let kind = match opt_string(obj, "type", "") {
+    "directional" => Directional
+    "point" => Point
     _ => raise GltfError::Invalid("punctual light type")
+  }
+  let distance = match kind {
+    Point => opt_f64(obj, "range", 0.0)
+    Directional => 0.0
   }
   let (r, g, b) = match obj.get("color") {
     None => (1.0, 1.0, 1.0)
@@ -1587,7 +1601,7 @@ fn load_punctual(
   }
   let given = opt_string(obj, "name", "")
   let name = if given == "" { "light_\{index}" } else { given }
-  { r, g, b, intensity: opt_f64(obj, "intensity", 1.0), name, }
+  { kind, r, g, b, intensity: opt_f64(obj, "intensity", 1.0), distance, name, }
 }
 
 ///|
@@ -1607,16 +1621,33 @@ fn load_punctuals(root : Map[String, Json]) -> Array[Punctual] raise GltfError {
 
 ///|
 fn light_object(light : Punctual) -> @core.Object3D {
-  let sun = @lights.DirectionalLight::new(intensity=light.intensity)
-  ignore(sun.node.position.set(0.0, 0.0, 0.0))
-  match sun.node.light {
-    None => ()
-    Some(state) => ignore(state.color.set_rgb(light.r, light.g, light.b))
+  match light.kind {
+    Directional => {
+      let sun = @lights.DirectionalLight::new(intensity=light.intensity)
+      ignore(sun.node.position.set(0.0, 0.0, 0.0))
+      match sun.node.light {
+        None => ()
+        Some(state) => ignore(state.color.set_rgb(light.r, light.g, light.b))
+      }
+      ignore(sun.target.position.set(0.0, 0.0, -1.0))
+      ignore(sun.node.add(sun.target))
+      sun.node.name = light.name
+      sun.node
+    }
+    Point => {
+      let bulb = @lights.PointLight::new(
+        intensity=light.intensity,
+        distance=light.distance,
+      )
+      ignore(bulb.node.position.set(0.0, 0.0, 0.0))
+      match bulb.node.light {
+        None => ()
+        Some(state) => ignore(state.color.set_rgb(light.r, light.g, light.b))
+      }
+      bulb.node.name = light.name
+      bulb.node
+    }
   }
-  ignore(sun.target.position.set(0.0, 0.0, -1.0))
-  ignore(sun.node.add(sun.target))
-  sun.node.name = light.name
-  sun.node
 }
 
 ///|

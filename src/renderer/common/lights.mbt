@@ -23,6 +23,11 @@ pub(all) struct LightFrame {
   color : @math.Vector3
   direction : @math.Vector3
   shadow : ShadowFrame?
+  point_color : @math.Vector3
+  point_position : @math.Vector3
+  point_distance : Double
+  point_decay : Double
+  point_enabled : Double
 }
 
 ///|
@@ -32,6 +37,11 @@ priv struct LightAccum {
   direction : @math.Vector3
   mut found_directional : Bool
   mut shadow : ShadowFrame?
+  point_color : @math.Vector3
+  point_position : @math.Vector3
+  mut point_distance : Double
+  mut point_decay : Double
+  mut found_point : Bool
 }
 
 ///|
@@ -96,7 +106,9 @@ fn light_direction(node : @core.Object3D, light : LightState) -> @math.Vector3 {
 }
 
 ///|
-/// 遍历可见节点。多盏平行光只保留第一盏。传入相机时，层掩码不相交的灯跳过。
+/// 遍历可见节点。多盏平行光只保留第一盏，多盏点光也只保留第一盏。传入相机时，层掩码不相交的灯跳过。
+/// 点光不产生阴影贴图。
+/// r186: `getDistanceAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_pars_begin.glsl.js#L56
 pub fn collect_lights(
   root : @core.Object3D,
   camera? : @core.Object3D,
@@ -107,6 +119,11 @@ pub fn collect_lights(
     direction: @math.Vector3::new(y=1.0),
     found_directional: false,
     shadow: None,
+    point_color: @math.Vector3::new(),
+    point_position: @math.Vector3::new(),
+    point_distance: 0.0,
+    point_decay: 2.0,
+    found_point: false,
   }
   root.traverse_visible(fn(node : @core.Object3D) {
     if on_camera_layer(node, camera) {
@@ -128,6 +145,14 @@ pub fn collect_lights(
                   }
                 }
               }
+            @core.Point =>
+              if !accum.found_point {
+                accum.found_point = true
+                ignore(accum.point_color.copy(scaled_color(light)))
+                ignore(node.get_world_position(accum.point_position))
+                accum.point_distance = light.distance
+                accum.point_decay = light.decay
+              }
           }
       }
     }
@@ -137,5 +162,14 @@ pub fn collect_lights(
     color: accum.color,
     direction: accum.direction,
     shadow: accum.shadow,
+    point_color: accum.point_color,
+    point_position: accum.point_position,
+    point_distance: accum.point_distance,
+    point_decay: accum.point_decay,
+    point_enabled: if accum.found_point {
+      1.0
+    } else {
+      0.0
+    },
   }
 }

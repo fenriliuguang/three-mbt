@@ -325,6 +325,32 @@ test "frame lights sum ambient and the first directional" {
   assert_eq(lights.direction.y, 1.0)
   assert_eq(lights.direction.z, 0.0)
   assert_eq(lights.shadow is None, true)
+  assert_eq(lights.point_enabled, 0.0)
+}
+
+///|
+test "frame lights keep the first point light" {
+  let scene = @scenes.Scene::new()
+  let bulb = @lights.PointLight::new(
+    hex=0xFF0000,
+    intensity=2.0,
+    distance=4.0,
+    decay=2.0,
+  )
+  ignore(bulb.node.position.set(0.0, 3.0, 0.0))
+  ignore(scene.add(bulb))
+  let other = @lights.PointLight::new(intensity=9.0)
+  ignore(other.node.position.set(8.0, 0.0, 0.0))
+  ignore(scene.add(other))
+  @common.update_frame(scene.node, scene.node)
+  let lights = @common.collect_lights(scene.node)
+  assert_eq(lights.point_enabled, 1.0)
+  assert_eq(lights.point_position.y, 3.0)
+  assert_eq(lights.point_position.x, 0.0)
+  assert_eq(lights.point_color.x, 2.0)
+  assert_eq(lights.point_color.y, 0.0)
+  assert_eq(lights.point_distance, 4.0)
+  assert_eq(lights.point_decay, 2.0)
 }
 
 ///|
@@ -848,6 +874,71 @@ test "emissive intensity scales the packed color" {
   )
   assert_eq(dark[496], b'\x00')
   assert_eq(dark[499], b'\x00')
+}
+
+///|
+test "a point light is packed after emissive" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let uniforms = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    point_x=0.0,
+    point_y=3.0,
+    point_z=0.0,
+    point_r=2.0,
+    point_distance=4.0,
+    point_decay=2.0,
+    point_enabled=1.0,
+  )
+  assert_eq(uniforms.length(), @common.uniform_bytes)
+  assert_eq(uniforms[516], b'\x00')
+  assert_eq(uniforms[517], b'\x00')
+  assert_eq(uniforms[518], b'\x40')
+  assert_eq(uniforms[519], b'\x40')
+  assert_eq(uniforms[528], b'\x00')
+  assert_eq(uniforms[529], b'\x00')
+  assert_eq(uniforms[530], b'\x00')
+  assert_eq(uniforms[531], b'\x40')
+  assert_eq(uniforms[544], b'\x00')
+  assert_eq(uniforms[545], b'\x00')
+  assert_eq(uniforms[546], b'\x80')
+  assert_eq(uniforms[547], b'\x40')
+  assert_eq(uniforms[548], b'\x00')
+  assert_eq(uniforms[549], b'\x00')
+  assert_eq(uniforms[550], b'\x00')
+  assert_eq(uniforms[551], b'\x40')
+  assert_eq(uniforms[552], b'\x00')
+  assert_eq(uniforms[553], b'\x00')
+  assert_eq(uniforms[554], b'\x80')
+  assert_eq(uniforms[555], b'\x3F')
 }
 
 ///|

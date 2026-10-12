@@ -96,11 +96,14 @@ pub fn Layers::toggle(Self, Int) -> Unit
 pub(all) enum LightKind {
   Ambient
   Directional
+  Point
 }
 
 pub(all) struct LightState {
   color : @math.Color
   mut intensity : Double
+  mut distance : Double
+  mut decay : Double
   mut target : Object3D?
   kind : LightKind
   mut shadow : ShadowState?
@@ -149,6 +152,7 @@ pub(all) enum NodeKind {
   OrthographicCamera
   AmbientLight
   DirectionalLight
+  PointLight
   Points
   Line
   LineSegments
