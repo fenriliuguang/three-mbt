@@ -362,6 +362,13 @@ pub fn Vector3::apply_matrix3(self : Vector3, m : Matrix3) -> Vector3 {
 }
 
 ///|
+/// 先乘矩阵，再归一化。零向量保持为零。
+/// r186: `applyNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L437
+pub fn Vector3::apply_normal_matrix(self : Vector3, m : Matrix3) -> Vector3 {
+  self.apply_matrix3(m).normalize()
+}
+
+///|
 /// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L450
 pub fn Vector3::apply_matrix4(self : Vector3, m : Matrix4) -> Vector3 {
   let x = self.x

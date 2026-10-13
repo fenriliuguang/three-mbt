@@ -179,6 +179,20 @@ test "applyMatrix3 multiplies by a column-major 3x3 matrix" {
 }
 
 ///|
+test "applyNormalMatrix multiplies and then normalizes" {
+  let v = @math.Vector3::new(y=3.0, z=4.0)
+  ignore(v.apply_normal_matrix(@math.Matrix3::new()))
+  assert_eq(v.x, 0.0)
+  assert_close(v.y, 0.6)
+  assert_close(v.z, 0.8)
+  let zero = @math.Vector3::new()
+  ignore(zero.apply_normal_matrix(@math.Matrix3::new()))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+  assert_eq(zero.z, 0.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
