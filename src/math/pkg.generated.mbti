@@ -200,6 +200,7 @@ pub fn Vector3::add_scalar(Self, Double) -> Self
 pub fn Vector3::add_scaled_vector(Self, Self, Double) -> Self
 pub fn Vector3::add_vectors(Self, Self, Self) -> Self
 pub fn Vector3::angle_to(Self, Self) -> Double
+pub fn Vector3::apply_euler(Self, Euler) -> Self
 pub fn Vector3::apply_matrix4(Self, Matrix4) -> Self
 pub fn Vector3::apply_quaternion(Self, Quaternion) -> Self
 pub fn Vector3::clone(Self) -> Self

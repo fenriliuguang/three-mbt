@@ -317,6 +317,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.multiplyVectors` has landed. It stores the component-wise product of two vectors. The product of `(2, 3, 4)` and `(5, 6, 0.5)` is `(10, 18, 2)`. Writing the product back into the first vector still yields that result, and the second vector is not modified.
 
+`Vector3.applyEuler` has landed. It converts the Euler angles to a quaternion and applies that. The identity leaves `(1, 0, 0)` unchanged. A yaw of a right angle, order `XYZ`, turns it into `(0, 0, -1)`. The temporary quaternion is not stored.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -416,6 +418,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.subScalar` | `math` |
 | planned | 7 | `Vector3.multiply` | `math` |
 | planned | 7 | `Vector3.multiplyVectors` | `math` |
+| planned | 7 | `Vector3.applyEuler` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
