@@ -301,6 +301,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.fromBufferAttribute` has landed as `BufferAttribute.copy_to_vector3`, because `math` does not import `core`. It writes `getX`, `getY`, and `getZ` into the target vector. Index 1 of `[1, 2, 3, 4, 5, 6]` with item size 3 is `(4, 5, 6)`. Item size 4 skips the fourth component, so index 1 of `[1, 2, 3, 9, 4, 5, 6, 8]` is also `(4, 5, 6)`. The attribute is not modified.
 
+`Vector3.setScalar` has landed. It writes the same value into x, y, and z. `(1, 2, 3)` set to 4 becomes `(4, 4, 4)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -392,6 +394,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.fromArray` | `math` |
 | planned | 7 | `Vector3.toArray` | `math` |
 | planned | 7 | `Vector3.fromBufferAttribute` on `BufferAttribute` | `core` |
+| planned | 7 | `Vector3.setScalar` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

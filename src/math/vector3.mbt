@@ -32,6 +32,15 @@ pub fn Vector3::set(
 }
 
 ///|
+/// r186: `setScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L102
+pub fn Vector3::set_scalar(self : Vector3, scalar : Double) -> Vector3 {
+  self.x = scalar
+  self.y = scalar
+  self.z = scalar
+  self
+}
+
+///|
 pub fn Vector3::copy(self : Vector3, v : Vector3) -> Vector3 {
   self.x = v.x
   self.y = v.y

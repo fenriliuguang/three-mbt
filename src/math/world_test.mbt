@@ -14,6 +14,15 @@ fn assert_close(actual : Double, expected : Double) -> Unit raise {
 }
 
 ///|
+test "setScalar writes the same value into every component" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(v.set_scalar(4.0))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 4.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
