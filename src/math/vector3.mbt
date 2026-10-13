@@ -195,6 +195,22 @@ pub fn Vector3::manhattan_distance_to(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// `phi` 是相对正 Y 轴的夹角，`theta` 绕 Y 轴、从正 Z 转向正 X。
+/// r186: `setFromSphericalCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1007
+pub fn Vector3::set_from_spherical_coords(
+  self : Vector3,
+  radius : Double,
+  phi : Double,
+  theta : Double,
+) -> Vector3 {
+  let sin_phi_radius = @std.sin(phi) * radius
+  self.x = sin_phi_radius * @std.sin(theta)
+  self.y = @std.cos(phi) * radius
+  self.z = sin_phi_radius * @std.cos(theta)
+  self
+}
+
+///|
 /// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L933
 pub fn Vector3::angle_to(self : Vector3, v : Vector3) -> Double {
   let denominator = (self.length_sq() * v.length_sq()).sqrt()

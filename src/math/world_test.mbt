@@ -75,6 +75,27 @@ test "manhattanDistanceTo sums the absolute component differences" {
 }
 
 ///|
+test "setFromSphericalCoords uses y-up spherical coordinates" {
+  let v = @math.Vector3::new(x=9.0)
+  ignore(v.set_from_spherical_coords(5.0, 0.0, 1.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 0.0)
+  ignore(v.set_from_spherical_coords(2.0, 1.5707963267948966, 0.0))
+  assert_close(v.x, 0.0)
+  assert_close(v.y, 0.0)
+  assert_close(v.z, 2.0)
+  ignore(v.set_from_spherical_coords(2.0, 1.5707963267948966, 1.5707963267948966))
+  assert_close(v.x, 2.0)
+  assert_close(v.y, 0.0)
+  assert_close(v.z, 0.0)
+  ignore(v.set_from_spherical_coords(4.0, 0.5, -0.3))
+  assert_close(v.x, -0.5667197369881524)
+  assert_close(v.y, 3.510330247561491)
+  assert_close(v.z, 1.832050843389168)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

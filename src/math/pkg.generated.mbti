@@ -221,6 +221,7 @@ pub fn Vector3::normalize(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_from_matrix_column(Self, Matrix4, Int) -> Self
 pub fn Vector3::set_from_matrix_position(Self, Matrix4) -> Self
+pub fn Vector3::set_from_spherical_coords(Self, Double, Double, Double) -> Self
 pub fn Vector3::sub(Self, Self) -> Self
 pub fn Vector3::sub_vectors(Self, Self, Self) -> Self
 pub fn Vector3::transform_direction(Self, Matrix4) -> Self
