@@ -14,6 +14,26 @@ fn assert_close(actual : Double, expected : Double) -> Unit raise {
 }
 
 ///|
+test "fromBufferAttribute reads xyz and skips a fourth component" {
+  let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let v = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
+  ignore(positions.copy_to_vector3(1, v))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 6.0)
+  let wide = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 9.0, 4.0, 5.0, 6.0, 8.0],
+    4,
+  )
+  ignore(wide.copy_to_vector3(1, v))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 6.0)
+  assert_eq(positions.get_x(0), 1.0)
+  assert_eq(wide.get_component(1, 3), 8.0)
+}
+
+///|
 test "child world matrix matches r186" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))

@@ -56,6 +56,17 @@ pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int) -> Double {
 }
 
 ///|
+/// 写入 `target`。`math` 不依赖 `core`，所以这个函数放在属性上，而不是 `Vector3` 上。
+/// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1203
+pub fn BufferAttribute::copy_to_vector3(
+  self : BufferAttribute,
+  index : Int,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  target.set(self.get_x(index), self.get_y(index), self.get_z(index))
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,
