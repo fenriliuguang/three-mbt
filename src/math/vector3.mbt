@@ -214,6 +214,12 @@ pub fn Vector3::divide(self : Vector3, v : Vector3) -> Vector3 {
 }
 
 ///|
+/// r186: `divideScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L563
+pub fn Vector3::divide_scalar(self : Vector3, scalar : Double) -> Vector3 {
+  self.multiply_scalar(1.0 / scalar)
+}
+
+///|
 pub fn Vector3::negate(self : Vector3) -> Vector3 {
   self.x = -self.x
   self.y = -self.y
