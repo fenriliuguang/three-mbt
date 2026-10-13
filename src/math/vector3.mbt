@@ -297,6 +297,19 @@ pub fn Vector3::set_from_matrix_position(
 }
 
 ///|
+/// 取前三列的长度。负缩放的符号会丢掉。
+/// r186: `setFromMatrixScale` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1075
+pub fn Vector3::set_from_matrix_scale(self : Vector3, m : Matrix4) -> Vector3 {
+  let sx = self.set_from_matrix_column(m, 0).length()
+  let sy = self.set_from_matrix_column(m, 1).length()
+  let sz = self.set_from_matrix_column(m, 2).length()
+  self.x = sx
+  self.y = sy
+  self.z = sz
+  self
+}
+
+///|
 pub fn Vector3::set_from_matrix_column(
   self : Vector3,
   m : Matrix4,

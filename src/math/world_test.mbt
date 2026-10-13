@@ -113,6 +113,27 @@ test "setFromCylindricalCoords uses a y-up cylinder" {
 }
 
 ///|
+test "setFromMatrixScale reads the column lengths" {
+  let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  let matrix = @math.Matrix4::new().compose(
+    @math.Vector3::new(x=10.0),
+    @math.Quaternion::new(),
+    scale,
+  )
+  let v = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  ignore(v.set_from_matrix_scale(matrix))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+  ignore(scale.set(-2.0, 3.0, 4.0))
+  ignore(matrix.compose(@math.Vector3::new(), @math.Quaternion::new(), scale))
+  ignore(v.set_from_matrix_scale(matrix))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)
