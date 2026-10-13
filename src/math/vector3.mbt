@@ -133,6 +133,19 @@ pub fn Vector3::add_vectors(
 }
 
 ///|
+/// r186: `addScaledVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L278
+pub fn Vector3::add_scaled_vector(
+  self : Vector3,
+  v : Vector3,
+  s : Double,
+) -> Vector3 {
+  self.x += v.x * s
+  self.y += v.y * s
+  self.z += v.z * s
+  self
+}
+
+///|
 pub fn Vector3::sub(self : Vector3, v : Vector3) -> Vector3 {
   self.x -= v.x
   self.y -= v.y

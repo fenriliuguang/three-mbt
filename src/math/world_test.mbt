@@ -70,6 +70,19 @@ test "addScalar adds one number to every component" {
 }
 
 ///|
+test "addScaledVector adds a vector multiplied by a factor" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let step = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
+  ignore(v.add_scaled_vector(step, 2.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 12.0)
+  assert_eq(v.z, 15.0)
+  assert_eq(step.x, 4.0)
+  assert_eq(step.y, 5.0)
+  assert_eq(step.z, 6.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
