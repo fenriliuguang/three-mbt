@@ -390,6 +390,17 @@ pub fn Vector3::apply_euler(self : Vector3, euler : Euler) -> Vector3 {
 }
 
 ///|
+/// 轴假定为单位长度。临时四元数不保留。
+/// r186: `applyAxisAngle` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L405
+pub fn Vector3::apply_axis_angle(
+  self : Vector3,
+  axis : Vector3,
+  angle : Double,
+) -> Vector3 {
+  self.apply_quaternion(Quaternion::new().set_from_axis_angle(axis, angle))
+}
+
+///|
 /// 只用矩阵左上 3×3，并把结果归一化。平移不参与。
 /// r186: `transformDirection` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L525
 pub fn Vector3::transform_direction(self : Vector3, m : Matrix4) -> Vector3 {

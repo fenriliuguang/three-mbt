@@ -141,6 +141,22 @@ test "applyEuler rotates by the euler quaternion" {
 }
 
 ///|
+test "applyAxisAngle rotates around a unit axis" {
+  let right_angle = 1.5707963267948966
+  let axis = @math.Vector3::new(y=1.0)
+  let v = @math.Vector3::new(x=1.0)
+  ignore(v.apply_axis_angle(axis, 0.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 0.0)
+  ignore(v.apply_axis_angle(axis, right_angle))
+  assert_close(v.x, 0.0)
+  assert_close(v.y, 0.0)
+  assert_close(v.z, -1.0)
+  assert_eq(axis.y, 1.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
