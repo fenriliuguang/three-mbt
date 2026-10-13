@@ -57,6 +57,19 @@ test "panic component index past z" {
 }
 
 ///|
+test "addScalar adds one number to every component" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(v.add_scalar(4.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 6.0)
+  assert_eq(v.z, 7.0)
+  ignore(v.add_scalar(-1.0))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 6.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)

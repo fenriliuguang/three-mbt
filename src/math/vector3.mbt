@@ -112,6 +112,15 @@ pub fn Vector3::add(self : Vector3, v : Vector3) -> Vector3 {
 }
 
 ///|
+/// r186: `addScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L244
+pub fn Vector3::add_scalar(self : Vector3, s : Double) -> Vector3 {
+  self.x += s
+  self.y += s
+  self.z += s
+  self
+}
+
+///|
 pub fn Vector3::add_vectors(
   self : Vector3,
   a : Vector3,
