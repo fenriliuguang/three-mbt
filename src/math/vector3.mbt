@@ -62,6 +62,35 @@ pub fn Vector3::set_z(self : Vector3, z : Double) -> Vector3 {
 }
 
 ///|
+/// 0 是 x，1 是 y，2 是 z。其他下标中止。
+/// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L161
+pub fn Vector3::set_component(
+  self : Vector3,
+  index : Int,
+  value : Double,
+) -> Vector3 {
+  match index {
+    0 => self.x = value
+    1 => self.y = value
+    2 => self.z = value
+    _ => abort("Vector3 index is out of range")
+  }
+  self
+}
+
+///|
+/// 0 是 x，1 是 y，2 是 z。其他下标中止。
+/// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L182
+pub fn Vector3::get_component(self : Vector3, index : Int) -> Double {
+  match index {
+    0 => self.x
+    1 => self.y
+    2 => self.z
+    _ => abort("Vector3 index is out of range")
+  }
+}
+
+///|
 pub fn Vector3::copy(self : Vector3, v : Vector3) -> Vector3 {
   self.x = v.x
   self.y = v.y

@@ -305,6 +305,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.setX`, `setY`, and `setZ` have landed. Each writes one component and leaves the other two alone. `(1, 2, 3)` then `setX(9)`, `setY(8)`, and `setZ(7)` becomes `(9, 8, 7)`.
 
+`Vector3.setComponent` and `getComponent` have landed. Index 0 is x, 1 is y, and 2 is z. `(1, 2, 3)` with `setComponent(1, 8)` becomes `(1, 8, 3)`. Any other index aborts.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -398,6 +400,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | `Vector3.setScalar` | `math` |
 | planned | 7 | `Vector3.setX`, `setY`, and `setZ` | `math` |
+| planned | 7 | `Vector3.setComponent` and `getComponent` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

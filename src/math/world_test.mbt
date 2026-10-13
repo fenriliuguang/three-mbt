@@ -40,6 +40,23 @@ test "setX setY and setZ change one component" {
 }
 
 ///|
+test "component index 0 is x, 1 is y, and 2 is z" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  assert_eq(v.get_component(0), 1.0)
+  assert_eq(v.get_component(1), 2.0)
+  assert_eq(v.get_component(2), 3.0)
+  ignore(v.set_component(1, 8.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 3.0)
+}
+
+///|
+test "panic component index past z" {
+  ignore(@math.Vector3::new().get_component(3))
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)

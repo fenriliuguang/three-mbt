@@ -209,6 +209,7 @@ pub fn Vector3::distance_to_squared(Self, Self) -> Double
 pub fn Vector3::dot(Self, Self) -> Double
 pub fn Vector3::equals(Self, Self) -> Bool
 pub fn Vector3::from_array(Self, Array[Double], offset? : Int) -> Self
+pub fn Vector3::get_component(Self, Int) -> Double
 pub fn Vector3::length(Self) -> Double
 pub fn Vector3::length_sq(Self) -> Double
 pub fn Vector3::lerp(Self, Self, Double) -> Self
@@ -220,6 +221,7 @@ pub fn Vector3::negate(Self) -> Self
 pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
 pub fn Vector3::normalize(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
+pub fn Vector3::set_component(Self, Int, Double) -> Self
 pub fn Vector3::set_from_color(Self, Color) -> Self
 pub fn Vector3::set_from_cylindrical_coords(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_from_euler(Self, Euler) -> Self
