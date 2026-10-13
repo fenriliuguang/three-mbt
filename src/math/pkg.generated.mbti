@@ -208,6 +208,7 @@ pub fn Vector3::distance_to(Self, Self) -> Double
 pub fn Vector3::distance_to_squared(Self, Self) -> Double
 pub fn Vector3::dot(Self, Self) -> Double
 pub fn Vector3::equals(Self, Self) -> Bool
+pub fn Vector3::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Vector3::length(Self) -> Double
 pub fn Vector3::length_sq(Self) -> Double
 pub fn Vector3::lerp(Self, Self, Double) -> Self

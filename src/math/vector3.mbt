@@ -362,3 +362,17 @@ pub fn Vector3::set_from_color(self : Vector3, color : Color) -> Vector3 {
 pub fn Vector3::equals(self : Vector3, v : Vector3) -> Bool {
   self.x == v.x && self.y == v.y && self.z == v.z
 }
+
+///|
+/// `offset` 默认是 0。数组本身不改。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1168
+pub fn Vector3::from_array(
+  self : Vector3,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Vector3 {
+  self.x = array[offset]
+  self.y = array[offset + 1]
+  self.z = array[offset + 2]
+  self
+}

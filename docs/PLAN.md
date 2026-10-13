@@ -295,6 +295,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.setFromColor` has landed. It copies the stored linear channels and does not run the sRGB conversion that `setHex` does. Color `(0.25, 0.5, 0.75)` becomes that same triple. Changing the color afterwards leaves the vector alone.
 
+`Vector3.fromArray` has landed. It reads three components starting at `offset`, which defaults to 0. From `[1, 2, 3, 4, 5]`, offset 0 is `(1, 2, 3)` and offset 2 is `(3, 4, 5)`. The array is not modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -383,6 +385,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.setFromMatrix3Column` | `math` |
 | planned | 7 | `Vector3.setFromEuler` | `math` |
 | planned | 7 | `Vector3.setFromColor` | `math` |
+| planned | 7 | `Vector3.fromArray` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

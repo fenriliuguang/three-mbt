@@ -182,6 +182,22 @@ test "setFromColor copies the stored linear channels" {
 }
 
 ///|
+test "fromArray reads three components at an offset" {
+  let values = [1.0, 2.0, 3.0, 4.0, 5.0]
+  let v = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
+  ignore(v.from_array(values))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  ignore(v.from_array(values, offset=2))
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 5.0)
+  assert_eq(values[0], 1.0)
+  assert_eq(values[4], 5.0)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)
