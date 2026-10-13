@@ -349,6 +349,19 @@ pub fn Vector3::angle_to(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// r186: `applyMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L417
+pub fn Vector3::apply_matrix3(self : Vector3, m : Matrix3) -> Vector3 {
+  let x = self.x
+  let y = self.y
+  let z = self.z
+  let e = m.elements
+  self.x = e[0] * x + e[3] * y + e[6] * z
+  self.y = e[1] * x + e[4] * y + e[7] * z
+  self.z = e[2] * x + e[5] * y + e[8] * z
+  self
+}
+
+///|
 /// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L450
 pub fn Vector3::apply_matrix4(self : Vector3, m : Matrix4) -> Vector3 {
   let x = self.x

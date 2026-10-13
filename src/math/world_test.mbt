@@ -157,6 +157,28 @@ test "applyAxisAngle rotates around a unit axis" {
 }
 
 ///|
+test "applyMatrix3 multiplies by a column-major 3x3 matrix" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(v.apply_matrix3(@math.Matrix3::new()))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  let scale = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
+  ignore(v.apply_matrix3(scale))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 6.0)
+  assert_eq(v.z, 12.0)
+  let mixed = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
+  let axis = @math.Vector3::new(x=1.0)
+  ignore(axis.apply_matrix3(mixed))
+  assert_eq(axis.x, 1.0)
+  assert_eq(axis.y, 4.0)
+  assert_eq(axis.z, 7.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
