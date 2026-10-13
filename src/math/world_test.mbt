@@ -23,6 +23,23 @@ test "setScalar writes the same value into every component" {
 }
 
 ///|
+test "setX setY and setZ change one component" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(v.set_x(9.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  ignore(v.set_y(8.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 3.0)
+  ignore(v.set_z(7.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 7.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)

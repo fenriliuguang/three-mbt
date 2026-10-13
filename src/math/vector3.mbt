@@ -41,6 +41,27 @@ pub fn Vector3::set_scalar(self : Vector3, scalar : Double) -> Vector3 {
 }
 
 ///|
+/// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L118
+pub fn Vector3::set_x(self : Vector3, x : Double) -> Vector3 {
+  self.x = x
+  self
+}
+
+///|
+/// r186: `setY` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L132
+pub fn Vector3::set_y(self : Vector3, y : Double) -> Vector3 {
+  self.y = y
+  self
+}
+
+///|
+/// r186: `setZ` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L146
+pub fn Vector3::set_z(self : Vector3, z : Double) -> Vector3 {
+  self.z = z
+  self
+}
+
+///|
 pub fn Vector3::copy(self : Vector3, v : Vector3) -> Vector3 {
   self.x = v.x
   self.y = v.y
