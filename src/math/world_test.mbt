@@ -198,6 +198,35 @@ test "fromArray reads three components at an offset" {
 }
 
 ///|
+test "toArray writes three components at an offset" {
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let fresh = v.to_array()
+  assert_eq(fresh.length(), 3)
+  assert_eq(fresh[0], 1.0)
+  assert_eq(fresh[1], 2.0)
+  assert_eq(fresh[2], 3.0)
+  let values = [9.0, 8.0, 7.0, 6.0, 5.0]
+  let written = v.to_array(array=values, offset=1)
+  assert_eq(physical_equal(written, values), true)
+  assert_eq(values[0], 9.0)
+  assert_eq(values[1], 1.0)
+  assert_eq(values[2], 2.0)
+  assert_eq(values[3], 3.0)
+  assert_eq(values[4], 5.0)
+  let short = [4.0]
+  ignore(v.to_array(array=short, offset=2))
+  assert_eq(short.length(), 5)
+  assert_eq(short[0], 4.0)
+  assert_eq(short[1], 0.0)
+  assert_eq(short[2], 1.0)
+  assert_eq(short[3], 2.0)
+  assert_eq(short[4], 3.0)
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

@@ -376,3 +376,25 @@ pub fn Vector3::from_array(
   self.z = array[offset + 2]
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 3` 的数组会补零再写入。向量本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1186
+pub fn Vector3::to_array(
+  self : Vector3,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 3
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.x
+  target[offset + 1] = self.y
+  target[offset + 2] = self.z
+  target
+}
