@@ -96,6 +96,23 @@ test "setFromSphericalCoords uses y-up spherical coordinates" {
 }
 
 ///|
+test "setFromCylindricalCoords uses a y-up cylinder" {
+  let v = @math.Vector3::new(x=9.0)
+  ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 2.0)
+  ignore(v.set_from_cylindrical_coords(2.0, 1.5707963267948966, -1.0))
+  assert_close(v.x, 2.0)
+  assert_eq(v.y, -1.0)
+  assert_close(v.z, 0.0)
+  ignore(v.set_from_cylindrical_coords(3.0, -0.3, 1.0))
+  assert_close(v.x, -0.8865606199840186)
+  assert_eq(v.y, 1.0)
+  assert_close(v.z, 2.866009467376818)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

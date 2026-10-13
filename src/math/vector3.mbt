@@ -211,6 +211,21 @@ pub fn Vector3::set_from_spherical_coords(
 }
 
 ///|
+/// `theta` 绕 Y 轴、从正 Z 转向正 X，`y` 是高度。
+/// r186: `setFromCylindricalCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1039
+pub fn Vector3::set_from_cylindrical_coords(
+  self : Vector3,
+  radius : Double,
+  theta : Double,
+  y : Double,
+) -> Vector3 {
+  self.x = radius * @std.sin(theta)
+  self.y = y
+  self.z = radius * @std.cos(theta)
+  self
+}
+
+///|
 /// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L933
 pub fn Vector3::angle_to(self : Vector3, v : Vector3) -> Double {
   let denominator = (self.length_sq() * v.length_sq()).sqrt()
