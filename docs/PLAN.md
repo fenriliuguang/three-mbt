@@ -329,6 +329,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.divideScalar` has landed. It divides every component by one number, through `multiplyScalar(1 / scalar)`. `(2, 4, 6)` divided by 2 is `(1, 2, 3)`. Dividing by `-1` then yields `(-1, -2, -3)`.
 
+`Vector3.clamp` has landed. Each component is limited by the matching component of `min` and `max`, which are assumed to be ordered. `(0, 5, -2)` clamped by `(1, 0, -1)` and `(3, 4, 1)` becomes `(1, 4, -1)`. `(2, 2, 2)` inside `(0, 0, 0)` and `(3, 3, 3)` stays put. The bound vectors are not modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -434,6 +436,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.applyNormalMatrix` | `math` |
 | planned | 7 | `Vector3.divide` | `math` |
 | planned | 7 | `Vector3.divideScalar` | `math` |
+| planned | 7 | `Vector3.clamp` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

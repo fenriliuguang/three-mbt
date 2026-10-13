@@ -302,6 +302,16 @@ pub fn Vector3::max(self : Vector3, v : Vector3) -> Vector3 {
 }
 
 ///|
+/// 假定每个分量都是 `min` 小于 `max`。两个边界向量不改。
+/// r186: `clamp` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L613
+pub fn Vector3::clamp(self : Vector3, min : Vector3, max : Vector3) -> Vector3 {
+  self.x = self.x.clamp(min=min.x, max=max.x)
+  self.y = self.y.clamp(min=min.y, max=max.y)
+  self.z = self.z.clamp(min=min.z, max=max.z)
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y

@@ -206,6 +206,7 @@ pub fn Vector3::apply_matrix3(Self, Matrix3) -> Self
 pub fn Vector3::apply_matrix4(Self, Matrix4) -> Self
 pub fn Vector3::apply_normal_matrix(Self, Matrix3) -> Self
 pub fn Vector3::apply_quaternion(Self, Quaternion) -> Self
+pub fn Vector3::clamp(Self, Self, Self) -> Self
 pub fn Vector3::clone(Self) -> Self
 pub fn Vector3::copy(Self, Self) -> Self
 pub fn Vector3::cross(Self, Self) -> Self
