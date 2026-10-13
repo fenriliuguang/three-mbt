@@ -324,6 +324,21 @@ pub fn Vector3::set_from_matrix_column(
 }
 
 ///|
+/// r186: `setFromMatrix3Column` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1109
+pub fn Vector3::set_from_matrix3_column(
+  self : Vector3,
+  m : Matrix3,
+  index : Int,
+) -> Vector3 {
+  let e = m.elements
+  let offset = index * 3
+  self.x = e[offset]
+  self.y = e[offset + 1]
+  self.z = e[offset + 2]
+  self
+}
+
+///|
 pub fn Vector3::equals(self : Vector3, v : Vector3) -> Bool {
   self.x == v.x && self.y == v.y && self.z == v.z
 }

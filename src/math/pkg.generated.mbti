@@ -220,6 +220,7 @@ pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
 pub fn Vector3::normalize(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_from_cylindrical_coords(Self, Double, Double, Double) -> Self
+pub fn Vector3::set_from_matrix3_column(Self, Matrix3, Int) -> Self
 pub fn Vector3::set_from_matrix_column(Self, Matrix4, Int) -> Self
 pub fn Vector3::set_from_matrix_position(Self, Matrix4) -> Self
 pub fn Vector3::set_from_matrix_scale(Self, Matrix4) -> Self

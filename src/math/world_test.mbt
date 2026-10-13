@@ -134,6 +134,26 @@ test "setFromMatrixScale reads the column lengths" {
 }
 
 ///|
+test "setFromMatrix3Column reads one column" {
+  let matrix = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
+  let v = @math.Vector3::new(x=9.0)
+  ignore(v.set_from_matrix3_column(matrix, 0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 7.0)
+  ignore(v.set_from_matrix3_column(matrix, 1))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 8.0)
+  ignore(v.set_from_matrix3_column(matrix, 2))
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, 6.0)
+  assert_eq(v.z, 9.0)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)
