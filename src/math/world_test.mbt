@@ -154,6 +154,20 @@ test "setFromMatrix3Column reads one column" {
 }
 
 ///|
+test "setFromEuler copies the three angles" {
+  let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6, order=@math.EulerOrder::YXZ)
+  let v = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
+  ignore(v.set_from_euler(euler))
+  assert_eq(v.x, 0.2)
+  assert_eq(v.y, -0.4)
+  assert_eq(v.z, 0.6)
+  ignore(euler.set(1.0, 2.0, 3.0))
+  assert_eq(v.x, 0.2)
+  assert_eq(v.y, -0.4)
+  assert_eq(v.z, 0.6)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

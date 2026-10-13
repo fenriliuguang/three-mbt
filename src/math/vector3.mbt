@@ -339,6 +339,16 @@ pub fn Vector3::set_from_matrix3_column(
 }
 
 ///|
+/// 只抄三个分量，旋转顺序不参与。
+/// r186: `setFromEuler` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1121
+pub fn Vector3::set_from_euler(self : Vector3, euler : Euler) -> Vector3 {
+  self.x = euler.x
+  self.y = euler.y
+  self.z = euler.z
+  self
+}
+
+///|
 pub fn Vector3::equals(self : Vector3, v : Vector3) -> Bool {
   self.x == v.x && self.y == v.y && self.z == v.z
 }
