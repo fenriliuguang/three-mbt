@@ -168,6 +168,20 @@ test "setFromEuler copies the three angles" {
 }
 
 ///|
+test "setFromColor copies the stored linear channels" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let v = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
+  ignore(v.set_from_color(color))
+  assert_eq(v.x, 0.25)
+  assert_eq(v.y, 0.5)
+  assert_eq(v.z, 0.75)
+  ignore(color.set_rgb(1.0, 0.0, 0.0))
+  assert_eq(v.x, 0.25)
+  assert_eq(v.y, 0.5)
+  assert_eq(v.z, 0.75)
+}
+
+///|
 test "angleTo matches the right angle and the zero vector" {
   let axis = @math.Vector3::new(x=1.0)
   assert_eq(axis.angle_to(axis), 0.0)

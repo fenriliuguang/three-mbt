@@ -219,6 +219,7 @@ pub fn Vector3::negate(Self) -> Self
 pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
 pub fn Vector3::normalize(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
+pub fn Vector3::set_from_color(Self, Color) -> Self
 pub fn Vector3::set_from_cylindrical_coords(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_from_euler(Self, Euler) -> Self
 pub fn Vector3::set_from_matrix3_column(Self, Matrix3, Int) -> Self

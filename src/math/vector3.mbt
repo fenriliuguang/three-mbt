@@ -349,6 +349,16 @@ pub fn Vector3::set_from_euler(self : Vector3, euler : Euler) -> Vector3 {
 }
 
 ///|
+/// 抄已经存放的线性通道，不再做 sRGB 转换。
+/// r186: `setFromColor` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1138
+pub fn Vector3::set_from_color(self : Vector3, color : Color) -> Vector3 {
+  self.x = color.r
+  self.y = color.g
+  self.z = color.b
+  self
+}
+
+///|
 pub fn Vector3::equals(self : Vector3, v : Vector3) -> Bool {
   self.x == v.x && self.y == v.y && self.z == v.z
 }
