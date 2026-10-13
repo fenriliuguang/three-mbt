@@ -175,6 +175,15 @@ pub fn Vector3::sub_vectors(
 }
 
 ///|
+/// r186: `multiply` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L343
+pub fn Vector3::multiply(self : Vector3, v : Vector3) -> Vector3 {
+  self.x *= v.x
+  self.y *= v.y
+  self.z *= v.z
+  self
+}
+
+///|
 pub fn Vector3::multiply_scalar(self : Vector3, s : Double) -> Vector3 {
   self.x *= s
   self.y *= s

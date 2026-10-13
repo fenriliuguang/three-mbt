@@ -218,6 +218,7 @@ pub fn Vector3::lerp(Self, Self, Double) -> Self
 pub fn Vector3::manhattan_distance_to(Self, Self) -> Double
 pub fn Vector3::max(Self, Self) -> Self
 pub fn Vector3::min(Self, Self) -> Self
+pub fn Vector3::multiply(Self, Self) -> Self
 pub fn Vector3::multiply_scalar(Self, Double) -> Self
 pub fn Vector3::negate(Self) -> Self
 pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self

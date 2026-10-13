@@ -96,6 +96,19 @@ test "subScalar subtracts one number from every component" {
 }
 
 ///|
+test "multiply scales each component by the other vector" {
+  let v = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  let factor = @math.Vector3::new(x=5.0, y=6.0, z=0.5)
+  ignore(v.multiply(factor))
+  assert_eq(v.x, 10.0)
+  assert_eq(v.y, 18.0)
+  assert_eq(v.z, 2.0)
+  assert_eq(factor.x, 5.0)
+  assert_eq(factor.y, 6.0)
+  assert_eq(factor.z, 0.5)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
