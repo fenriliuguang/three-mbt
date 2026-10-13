@@ -127,6 +127,19 @@ test "multiplyVectors stores the componentwise product" {
 }
 
 ///|
+test "divide scales each component by the other vector" {
+  let v = @math.Vector3::new(x=10.0, y=18.0, z=2.0)
+  let factor = @math.Vector3::new(x=5.0, y=6.0, z=0.5)
+  ignore(v.divide(factor))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+  assert_eq(factor.x, 5.0)
+  assert_eq(factor.y, 6.0)
+  assert_eq(factor.z, 0.5)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)

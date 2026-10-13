@@ -205,6 +205,15 @@ pub fn Vector3::multiply_vectors(
 }
 
 ///|
+/// r186: `divide` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L547
+pub fn Vector3::divide(self : Vector3, v : Vector3) -> Vector3 {
+  self.x /= v.x
+  self.y /= v.y
+  self.z /= v.z
+  self
+}
+
+///|
 pub fn Vector3::negate(self : Vector3) -> Vector3 {
   self.x = -self.x
   self.y = -self.y

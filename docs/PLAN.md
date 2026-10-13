@@ -323,7 +323,9 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.applyMatrix3` has landed. It multiplies by a column-major 3×3 matrix and does not divide by a perspective term. The identity leaves `(1, 2, 3)` unchanged. A diagonal scale of `(2, 3, 4)` turns it into `(2, 6, 12)`. The first column of the matrix written as rows `(1, 2, 3)`, `(4, 5, 6)`, `(7, 8, 9)` turns `(1, 0, 0)` into `(1, 4, 7)`.
 
-`Vector3.applyNormalMatrix` has landed. It multiplies by the 3×3 matrix and then normalizes. The identity takes `(0, 3, 4)` to `(0, 0.6, 0.8)`. A zero vector stays zero.
+`Vector3.applyNormalMatrix` has landed. It multiplies by the 3×3 matrix and then normalizes. The identity takes `(0, 3, 4)` to `(0, 0.6, 0.8)`. A zero vector stays zero. `project` and `unproject` stay out of `math`, because that package does not import cameras.
+
+`Vector3.divide` has landed. It divides each component by the matching component of the other vector. `(10, 18, 2)` divided by `(5, 6, 0.5)` is `(2, 3, 4)`. The other vector is not modified.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -428,6 +430,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.applyAxisAngle` | `math` |
 | planned | 7 | `Vector3.applyMatrix3` | `math` |
 | planned | 7 | `Vector3.applyNormalMatrix` | `math` |
+| planned | 7 | `Vector3.divide` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

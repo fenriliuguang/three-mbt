@@ -212,6 +212,7 @@ pub fn Vector3::cross(Self, Self) -> Self
 pub fn Vector3::cross_vectors(Self, Self, Self) -> Self
 pub fn Vector3::distance_to(Self, Self) -> Double
 pub fn Vector3::distance_to_squared(Self, Self) -> Double
+pub fn Vector3::divide(Self, Self) -> Self
 pub fn Vector3::dot(Self, Self) -> Double
 pub fn Vector3::equals(Self, Self) -> Bool
 pub fn Vector3::from_array(Self, Array[Double], offset? : Int) -> Self
