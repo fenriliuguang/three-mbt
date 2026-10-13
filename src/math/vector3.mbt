@@ -192,6 +192,19 @@ pub fn Vector3::multiply_scalar(self : Vector3, s : Double) -> Vector3 {
 }
 
 ///|
+/// r186: `multiplyVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L376
+pub fn Vector3::multiply_vectors(
+  self : Vector3,
+  a : Vector3,
+  b : Vector3,
+) -> Vector3 {
+  self.x = a.x * b.x
+  self.y = a.y * b.y
+  self.z = a.z * b.z
+  self
+}
+
+///|
 pub fn Vector3::negate(self : Vector3) -> Vector3 {
   self.x = -self.x
   self.y = -self.y

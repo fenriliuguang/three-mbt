@@ -109,6 +109,24 @@ test "multiply scales each component by the other vector" {
 }
 
 ///|
+test "multiplyVectors stores the componentwise product" {
+  let a = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  let b = @math.Vector3::new(x=5.0, y=6.0, z=0.5)
+  let out = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  ignore(out.multiply_vectors(a, b))
+  assert_eq(out.x, 10.0)
+  assert_eq(out.y, 18.0)
+  assert_eq(out.z, 2.0)
+  assert_eq(a.x, 2.0)
+  assert_eq(b.z, 0.5)
+  ignore(a.multiply_vectors(a, b))
+  assert_eq(a.x, 10.0)
+  assert_eq(a.y, 18.0)
+  assert_eq(a.z, 2.0)
+  assert_eq(b.x, 5.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)
