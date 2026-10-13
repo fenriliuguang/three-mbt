@@ -237,6 +237,7 @@ pub fn Vector3::set_x(Self, Double) -> Self
 pub fn Vector3::set_y(Self, Double) -> Self
 pub fn Vector3::set_z(Self, Double) -> Self
 pub fn Vector3::sub(Self, Self) -> Self
+pub fn Vector3::sub_scalar(Self, Double) -> Self
 pub fn Vector3::sub_vectors(Self, Self, Self) -> Self
 pub fn Vector3::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 pub fn Vector3::transform_direction(Self, Matrix4) -> Self

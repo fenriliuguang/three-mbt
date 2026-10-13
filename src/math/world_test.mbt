@@ -83,6 +83,19 @@ test "addScaledVector adds a vector multiplied by a factor" {
 }
 
 ///|
+test "subScalar subtracts one number from every component" {
+  let v = @math.Vector3::new(x=5.0, y=6.0, z=7.0)
+  ignore(v.sub_scalar(4.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  ignore(v.sub_scalar(-1.0))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+}
+
+///|
 test "matrix compose and decompose match r186" {
   let position = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6)

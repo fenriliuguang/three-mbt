@@ -154,6 +154,15 @@ pub fn Vector3::sub(self : Vector3, v : Vector3) -> Vector3 {
 }
 
 ///|
+/// r186: `subScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L310
+pub fn Vector3::sub_scalar(self : Vector3, s : Double) -> Vector3 {
+  self.x -= s
+  self.y -= s
+  self.z -= s
+  self
+}
+
+///|
 pub fn Vector3::sub_vectors(
   self : Vector3,
   a : Vector3,
