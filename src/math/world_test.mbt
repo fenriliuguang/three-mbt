@@ -3790,6 +3790,30 @@ test "Sphere.translate moves the center and keeps the radius" {
 }
 
 ///|
+test "Sphere.expandByPoint grows the radius to include a point" {
+  let sphere = @math.Sphere::new(radius=1.0)
+  let inside = @math.Vector3::new(x=0.5)
+  ignore(sphere.expand_by_point(inside))
+  assert_eq(sphere.center.x, 0.0)
+  assert_eq(sphere.radius, 1.0)
+  let outside = @math.Vector3::new(x=3.0)
+  ignore(sphere.expand_by_point(outside))
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 0.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 2.0)
+  assert_eq(outside.x, 3.0)
+  let empty = @math.Sphere::new()
+  let point = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(empty.expand_by_point(point))
+  assert_eq(empty.center.x, 1.0)
+  assert_eq(empty.center.y, 2.0)
+  assert_eq(empty.center.z, 3.0)
+  assert_eq(empty.radius, 0.0)
+  assert_eq(point.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

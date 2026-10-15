@@ -146,3 +146,23 @@ pub fn Sphere::translate(self : Sphere, offset : Vector3) -> Sphere {
   ignore(self.center.add(offset))
   self
 }
+
+///|
+/// 扩张球体以包含这个点。空球变成以该点为心、半径为零的球。点不改。
+/// r186: `expandByPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L293
+pub fn Sphere::expand_by_point(self : Sphere, point : Vector3) -> Sphere {
+  if self.is_empty() {
+    ignore(self.center.copy(point))
+    self.radius = 0.0
+    return self
+  }
+  let direction = Vector3::new().sub_vectors(point, self.center)
+  let length_sq = direction.length_sq()
+  if length_sq > self.radius * self.radius {
+    let length = length_sq.sqrt()
+    let delta = (length - self.radius) * 0.5
+    ignore(self.center.add_scaled_vector(direction, delta / length))
+    self.radius = self.radius + delta
+  }
+  self
+}

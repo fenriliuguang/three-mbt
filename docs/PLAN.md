@@ -745,6 +745,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Sphere.translate` has landed. It adds the offset to the center and leaves the radius alone. A unit sphere at the origin moved by `(1, 2, 3)` has center `(1, 2, 3)`. The offset is unchanged.
 
+`Sphere.expandByPoint` has landed. A point already inside leaves the sphere alone. A unit sphere at the origin grown to include `(3, 0, 0)` moves its center to `(1, 0, 0)` and its radius to `2`. An empty sphere becomes a zero-radius sphere at the point. The point is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1058,6 +1060,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Sphere.clampPoint` | `math` |
 | planned | 7 | `Sphere.getBoundingBox` | `math` |
 | planned | 7 | `Sphere.translate` | `math` |
+| planned | 7 | `Sphere.expandByPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
