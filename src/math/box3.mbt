@@ -186,6 +186,19 @@ pub fn Box3::distance_to_point(self : Box3, point : Vector3) -> Double {
 }
 
 ///|
+/// 把包围球写入 target。空盒写入空球。盒子本身不改。
+/// r186: `getBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L611
+pub fn Box3::get_bounding_sphere(self : Box3, target : Sphere) -> Sphere {
+  if self.is_empty() {
+    ignore(target.make_empty())
+  } else {
+    ignore(self.get_center(target.center))
+    target.radius = self.get_size(Vector3::new()).length() * 0.5
+  }
+  target
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

@@ -2519,6 +2519,31 @@ test "Box3.distanceToPoint is zero inside the box" {
 }
 
 ///|
+test "Box3.getBoundingSphere uses the center and half diagonal" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=0.0, y=0.0, z=0.0),
+    @math.Vector3::new(x=2.0, y=0.0, z=0.0),
+  )
+  let sphere = @math.Sphere::new(
+    center=@math.Vector3::new(x=9.0, y=9.0, z=9.0),
+    radius=4.0,
+  )
+  let written = box.get_bounding_sphere(sphere)
+  assert_eq(physical_equal(written, sphere), true)
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 0.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 1.0)
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.max.x, 2.0)
+  ignore(@math.Box3::empty().get_bounding_sphere(sphere))
+  assert_eq(sphere.center.x, 0.0)
+  assert_eq(sphere.center.y, 0.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -60,6 +60,7 @@ pub fn Box3::empty() -> Self
 pub fn Box3::expand_by_point(Self, Vector3) -> Self
 pub fn Box3::expand_by_scalar(Self, Double) -> Self
 pub fn Box3::expand_by_vector(Self, Vector3) -> Self
+pub fn Box3::get_bounding_sphere(Self, Sphere) -> Sphere
 pub fn Box3::get_center(Self, Vector3) -> Vector3
 pub fn Box3::get_parameter(Self, Vector3, Vector3) -> Vector3
 pub fn Box3::get_size(Self, Vector3) -> Vector3
