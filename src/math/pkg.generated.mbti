@@ -141,6 +141,12 @@ pub fn Frustum::intersects_sphere(Self, Sphere) -> Bool
 pub fn Frustum::new() -> Self
 pub fn Frustum::set_from_projection_matrix(Self, Matrix4, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
 
+pub(all) struct Line3 {
+  start : Vector3
+  end : Vector3
+}
+pub fn Line3::new(start? : Vector3, end? : Vector3) -> Self
+
 pub(all) struct Matrix3 {
   elements : FixedArray[Double]
 }

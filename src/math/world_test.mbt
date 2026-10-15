@@ -3240,6 +3240,27 @@ test "projectPoint drops the point onto the plane" {
 }
 
 ///|
+test "Line3 stores copies of its endpoints" {
+  let empty = @math.Line3::new()
+  assert_eq(empty.start.x, 0.0)
+  assert_eq(empty.start.y, 0.0)
+  assert_eq(empty.start.z, 0.0)
+  assert_eq(empty.end.x, 0.0)
+  let start = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let end = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
+  let line = @math.Line3::new(start=start, end=end)
+  assert_eq(line.start.x, 1.0)
+  assert_eq(line.start.y, 2.0)
+  assert_eq(line.start.z, 3.0)
+  assert_eq(line.end.y, 5.0)
+  assert_eq(line.end.z, 6.0)
+  start.x = 9.0
+  end.z = 0.0
+  assert_eq(line.start.x, 1.0)
+  assert_eq(line.end.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
