@@ -110,6 +110,19 @@ pub fn Vector2::add_vectors(
 }
 
 ///|
+/// 加上 `v * s`。另一个向量不改。
+/// r186: `addScaledVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L278
+pub fn Vector2::add_scaled_vector(
+  self : Vector2,
+  v : Vector2,
+  s : Double,
+) -> Vector2 {
+  self.x += v.x * s
+  self.y += v.y * s
+  self
+}
+
+///|
 pub fn Vector2::sub(self : Vector2, v : Vector2) -> Vector2 {
   self.x -= v.x
   self.y -= v.y

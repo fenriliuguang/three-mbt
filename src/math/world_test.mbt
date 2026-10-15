@@ -784,6 +784,17 @@ test "Vector2.addVectors stores the sum of two vectors" {
 }
 
 ///|
+test "Vector2.addScaledVector adds a scaled vector" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  let extra = @math.Vector2::new(x=4.0, y=5.0)
+  ignore(v.add_scaled_vector(extra, 2.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 12.0)
+  assert_eq(extra.x, 4.0)
+  assert_eq(extra.y, 5.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

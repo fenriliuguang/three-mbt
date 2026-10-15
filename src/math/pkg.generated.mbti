@@ -203,6 +203,7 @@ pub(all) struct Vector2 {
 }
 pub fn Vector2::add(Self, Self) -> Self
 pub fn Vector2::add_scalar(Self, Double) -> Self
+pub fn Vector2::add_scaled_vector(Self, Self, Double) -> Self
 pub fn Vector2::add_vectors(Self, Self, Self) -> Self
 pub fn Vector2::clone(Self) -> Self
 pub fn Vector2::copy(Self, Self) -> Self
