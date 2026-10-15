@@ -2617,6 +2617,26 @@ test "Box3.equals compares both corners" {
 }
 
 ///|
+test "Box3.toJSON writes both corners" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let (low, high) = box.to_json()
+  assert_eq(low.length(), 3)
+  assert_eq(low[0], 1.0)
+  assert_eq(low[1], 2.0)
+  assert_eq(low[2], 3.0)
+  assert_eq(high.length(), 3)
+  assert_eq(high[0], 4.0)
+  assert_eq(high[1], 5.0)
+  assert_eq(high[2], 6.0)
+  low[0] = 9.0
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

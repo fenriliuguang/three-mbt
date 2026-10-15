@@ -617,6 +617,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.equals` has landed. Both corners must match. A box from `(1, 2, 3)` to `(4, 5, 6)` equals a copy of itself and does not equal a box whose upper corner is `(4, 5, 7)`. Neither box changes.
 
+`Box3.toJSON` has landed. It writes both corners as arrays. A box from `(1, 2, 3)` to `(4, 5, 6)` becomes `[1, 2, 3]` and `[4, 5, 6]`. Changing the arrays leaves the box alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -866,6 +868,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box3.intersect` | `math` |
 | planned | 7 | `Box3.translate` | `math` |
 | planned | 7 | `Box3.equals` | `math` |
+| planned | 7 | `Box3.toJSON` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

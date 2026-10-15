@@ -227,6 +227,13 @@ pub fn Box3::equals(self : Box3, box : Box3) -> Bool {
 }
 
 ///|
+/// 把两个角点写成数组。盒子本身不改。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L727
+pub fn Box3::to_json(self : Box3) -> (Array[Double], Array[Double]) {
+  (self.min.to_array(), self.max.to_array())
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
