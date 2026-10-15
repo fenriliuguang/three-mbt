@@ -202,6 +202,7 @@ pub(all) struct Vector2 {
   mut y : Double
 }
 pub fn Vector2::add(Self, Self) -> Self
+pub fn Vector2::add_scalar(Self, Double) -> Self
 pub fn Vector2::clone(Self) -> Self
 pub fn Vector2::copy(Self, Self) -> Self
 pub fn Vector2::dot(Self, Self) -> Double

@@ -89,6 +89,14 @@ pub fn Vector2::add(self : Vector2, v : Vector2) -> Vector2 {
 }
 
 ///|
+/// r186: `addScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L246
+pub fn Vector2::add_scalar(self : Vector2, s : Double) -> Vector2 {
+  self.x += s
+  self.y += s
+  self
+}
+
+///|
 pub fn Vector2::sub(self : Vector2, v : Vector2) -> Vector2 {
   self.x -= v.x
   self.y -= v.y

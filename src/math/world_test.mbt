@@ -757,6 +757,17 @@ test "Vector2.getComponent reads x or y" {
 }
 
 ///|
+test "Vector2.addScalar adds one number to both components" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(v.add_scalar(4.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 6.0)
+  ignore(v.add_scalar(-1.0))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 5.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
