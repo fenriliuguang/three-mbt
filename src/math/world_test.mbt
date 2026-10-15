@@ -1185,6 +1185,16 @@ test "Vector4.setY writes y and leaves the rest" {
 }
 
 ///|
+test "Vector4.setZ writes z and leaves the rest" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  ignore(v.set_z(7.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 7.0)
+  assert_eq(v.w, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
