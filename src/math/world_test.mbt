@@ -3560,6 +3560,19 @@ test "Plane.intersectsBox matches the box test" {
 }
 
 ///|
+test "intersectsPlane accepts a tangent sphere and rejects a distant one" {
+  let plane = @math.Plane::new()
+  let touching = @math.Sphere::new(center=@math.Vector3::new(x=1.0), radius=1.0)
+  let apart = @math.Sphere::new(center=@math.Vector3::new(x=3.0), radius=1.0)
+  let empty = @math.Sphere::new()
+  assert_eq(touching.intersects_plane(plane), true)
+  assert_eq(apart.intersects_plane(plane), false)
+  assert_eq(empty.intersects_plane(plane), false)
+  assert_eq(touching.radius, 1.0)
+  assert_eq(plane.constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

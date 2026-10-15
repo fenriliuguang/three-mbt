@@ -74,3 +74,10 @@ pub fn Sphere::intersects_sphere(self : Sphere, sphere : Sphere) -> Bool {
   let radius_sum = self.radius + sphere.radius
   self.center.distance_to_squared(sphere.center) <= radius_sum * radius_sum
 }
+
+///|
+/// 球心到平面的距离不超过半径则为真。球和平面都不改。
+/// r186: `intersectsPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L203
+pub fn Sphere::intersects_plane(self : Sphere, plane : Plane) -> Bool {
+  plane.distance_to_point(self.center).abs() <= self.radius
+}
