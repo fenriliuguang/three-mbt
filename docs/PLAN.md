@@ -363,6 +363,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Spherical.makeSafe` has landed. It clamps `phi` to the open interval from `0.000001` to `π - 0.000001`. A polar angle of 0 becomes `0.000001`, and `π` becomes `π - 0.000001`. An angle of 0.5 stays 0.5. Radius and `theta` are not modified. The Cartesian constructors stay later.
 
+`Spherical.setFromCartesianCoords` has landed. The radius is the distance from the origin. `phi` is the angle from the positive Y axis, and `theta` turns around Y from positive Z toward positive X. The origin stays radius 0 with both angles 0. `(0, 5, 0)` is radius 5 at `phi` 0. `(0, 0, 2)` is radius 2 at `phi` π/2 and `theta` 0. `(2, 0, 0)` is the same radius at `theta` π/2. The point produced by radius 4, `phi` 0.5, and `theta` -0.3 converts back to those coordinates. `setFromVector3` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -485,6 +487,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Spherical.set` | `math` |
 | planned | 7 | `Spherical.copy` | `math` |
 | planned | 7 | `Spherical.makeSafe` | `math` |
+| planned | 7 | `Spherical.setFromCartesianCoords` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

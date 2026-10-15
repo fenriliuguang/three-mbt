@@ -51,3 +51,23 @@ pub fn Spherical::make_safe(self : Spherical) -> Spherical {
   self.phi = self.phi.clamp(min=eps, max=@std.PI - eps)
   self
 }
+
+///|
+/// 从直角坐标写入半径和两个角。原点的两个角都是 0。
+/// r186: `setFromCartesianCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L114
+pub fn Spherical::set_from_cartesian_coords(
+  self : Spherical,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> Spherical {
+  self.radius = (x * x + y * y + z * z).sqrt()
+  if self.radius == 0.0 {
+    self.theta = 0.0
+    self.phi = 0.0
+  } else {
+    self.theta = @std.atan2(x, z)
+    self.phi = @std.acos((y / self.radius).clamp(min=-1.0, max=1.0))
+  }
+  self
+}

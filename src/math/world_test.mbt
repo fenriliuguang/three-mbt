@@ -537,6 +537,41 @@ test "Spherical.makeSafe clamps phi away from the poles" {
 }
 
 ///|
+test "setFromCartesianCoords recovers y-up spherical coordinates" {
+  let origin = @math.Spherical::new(radius=9.0, phi=1.0, theta=1.0)
+  ignore(origin.set_from_cartesian_coords(0.0, 0.0, 0.0))
+  assert_eq(origin.radius, 0.0)
+  assert_eq(origin.phi, 0.0)
+  assert_eq(origin.theta, 0.0)
+  let up = @math.Spherical::new()
+  ignore(up.set_from_cartesian_coords(0.0, 5.0, 0.0))
+  assert_eq(up.radius, 5.0)
+  assert_eq(up.phi, 0.0)
+  assert_eq(up.theta, 0.0)
+  let forward = @math.Spherical::new()
+  ignore(forward.set_from_cartesian_coords(0.0, 0.0, 2.0))
+  assert_eq(forward.radius, 2.0)
+  assert_close(forward.phi, 1.5707963267948966)
+  assert_eq(forward.theta, 0.0)
+  let right = @math.Spherical::new()
+  ignore(right.set_from_cartesian_coords(2.0, 0.0, 0.0))
+  assert_eq(right.radius, 2.0)
+  assert_close(right.phi, 1.5707963267948966)
+  assert_close(right.theta, 1.5707963267948966)
+  let tilted = @math.Spherical::new()
+  ignore(
+    tilted.set_from_cartesian_coords(
+      -0.5667197369881524,
+      3.510330247561491,
+      1.832050843389168,
+    ),
+  )
+  assert_close(tilted.radius, 4.0)
+  assert_close(tilted.phi, 0.5)
+  assert_close(tilted.theta, -0.3)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))
