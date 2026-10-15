@@ -3065,6 +3065,30 @@ test "Triangle.interpolation blends three values" {
 }
 
 ///|
+test "Triangle.contains accepts the interior and the boundary" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let inside = @math.Vector3::new(x=0.25, y=0.25)
+  let corner = @math.Vector3::new(x=1.0)
+  let outside = @math.Vector3::new(x=2.0)
+  assert_eq(triangle.contains(inside), true)
+  assert_eq(triangle.contains(corner), true)
+  assert_eq(triangle.contains(outside), false)
+  let flat = @math.Triangle::new(
+    a=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    b=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    c=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  assert_eq(flat.contains(inside), false)
+  assert_eq(inside.x, 0.25)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

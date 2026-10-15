@@ -233,3 +233,10 @@ pub fn Triangle::interpolation(
 ) -> Vector3? {
   Triangle::get_interpolation(point, self.a, self.b, self.c, v1, v2, v3, target)
 }
+
+///|
+/// 点投影到三角形所在平面后落在三角形内或边上则为真。点和角点都不改。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L405
+pub fn Triangle::contains(self : Triangle, point : Vector3) -> Bool {
+  Triangle::contains_point(point, self.a, self.b, self.c)
+}

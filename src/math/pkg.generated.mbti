@@ -254,6 +254,7 @@ pub(all) struct Triangle {
 }
 pub fn Triangle::barycoord(Self, Vector3, Vector3) -> Vector3?
 pub fn Triangle::clone(Self) -> Self
+pub fn Triangle::contains(Self, Vector3) -> Bool
 pub fn Triangle::contains_point(Vector3, Vector3, Vector3, Vector3) -> Bool
 pub fn Triangle::copy(Self, Self) -> Self
 pub fn Triangle::get_area(Self) -> Double
