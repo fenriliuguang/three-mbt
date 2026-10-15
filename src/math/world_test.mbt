@@ -2012,6 +2012,31 @@ test "Box2.containsPoint includes the boundary" {
 }
 
 ///|
+test "Box2.containsBox includes an identical box" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=5.0, y=6.0),
+  )
+  let inner = @math.Box2::new(
+    min=@math.Vector2::new(x=2.0, y=3.0),
+    max=@math.Vector2::new(x=4.0, y=5.0),
+  )
+  let same = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=5.0, y=6.0),
+  )
+  let overflow = @math.Box2::new(
+    min=@math.Vector2::new(x=0.0, y=3.0),
+    max=@math.Vector2::new(x=4.0, y=5.0),
+  )
+  assert_eq(box.contains_box(inner), true)
+  assert_eq(box.contains_box(same), true)
+  assert_eq(box.contains_box(overflow), false)
+  assert_eq(inner.min.x, 2.0)
+  assert_eq(box.max.y, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

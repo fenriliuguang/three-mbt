@@ -147,3 +147,13 @@ pub fn Box2::contains_point(self : Box2, point : Vector2) -> Bool {
   point.y >= self.min.y &&
   point.y <= self.max.y
 }
+
+///|
+/// 整个盒子都在内部或边界上则为真。两个盒子都不改。
+/// r186: `containsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L247
+pub fn Box2::contains_box(self : Box2, box : Box2) -> Bool {
+  self.min.x <= box.min.x &&
+  box.max.x <= self.max.x &&
+  self.min.y <= box.min.y &&
+  box.max.y <= self.max.y
+}
