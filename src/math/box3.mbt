@@ -179,6 +179,13 @@ pub fn Box3::intersects_plane(self : Box3, plane : Plane) -> Bool {
 }
 
 ///|
+/// 盒外点到最近边界的距离。盒内为 0。点和盒子都不改。
+/// r186: `distanceToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L599
+pub fn Box3::distance_to_point(self : Box3, point : Vector3) -> Double {
+  self.clamp_point(point, Vector3::new()).distance_to(point)
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

@@ -2503,6 +2503,22 @@ test "Box3.intersectsPlane counts a plane through the box" {
 }
 
 ///|
+test "Box3.distanceToPoint is zero inside the box" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let outside = @math.Vector3::new(x=0.0, y=3.0, z=4.0)
+  let inside = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  assert_eq(box.distance_to_point(outside), 1.0)
+  assert_eq(box.distance_to_point(inside), 0.0)
+  assert_eq(outside.x, 0.0)
+  assert_eq(inside.y, 3.0)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
