@@ -129,6 +129,17 @@ pub fn Box3::intersects_box(self : Box3, box : Box3) -> Bool {
 }
 
 ///|
+/// 把点夹进盒子，写入 target。点和盒子都不改。
+/// r186: `clampPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L586
+pub fn Box3::clamp_point(
+  self : Box3,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  target.copy(point).clamp(self.min, self.max)
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

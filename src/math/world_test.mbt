@@ -2425,6 +2425,30 @@ test "Box3.intersectsBox counts a shared face" {
 }
 
 ///|
+test "Box3.clampPoint keeps the point inside the box" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let outside = @math.Vector3::new(x=0.0, y=7.0, z=3.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let clamped = box.clamp_point(outside, target)
+  assert_eq(physical_equal(clamped, target), true)
+  assert_eq(clamped.x, 1.0)
+  assert_eq(clamped.y, 5.0)
+  assert_eq(clamped.z, 3.0)
+  let inside = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  ignore(box.clamp_point(inside, target))
+  assert_eq(target.x, 2.0)
+  assert_eq(target.y, 3.0)
+  assert_eq(target.z, 4.0)
+  assert_eq(outside.x, 0.0)
+  assert_eq(outside.y, 7.0)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
