@@ -24,6 +24,7 @@ pub(all) struct Box2 {
 pub fn Box2::clone(Self) -> Self
 pub fn Box2::copy(Self, Self) -> Self
 pub fn Box2::expand_by_point(Self, Vector2) -> Self
+pub fn Box2::expand_by_vector(Self, Vector2) -> Self
 pub fn Box2::get_center(Self, Vector2) -> Vector2
 pub fn Box2::get_size(Self, Vector2) -> Vector2
 pub fn Box2::is_empty(Self) -> Bool

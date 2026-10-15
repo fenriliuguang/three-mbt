@@ -119,3 +119,12 @@ pub fn Box2::get_size(self : Box2, target : Vector2) -> Vector2 {
     target.sub_vectors(self.max, self.min)
   }
 }
+
+///|
+/// 沿向量向两侧扩张。向量本身不改。
+/// r186: `expandByVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L202
+pub fn Box2::expand_by_vector(self : Box2, vector : Vector2) -> Box2 {
+  ignore(self.min.sub(vector))
+  ignore(self.max.add(vector))
+  self
+}
