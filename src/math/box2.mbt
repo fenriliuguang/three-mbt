@@ -83,3 +83,10 @@ pub fn Box2::copy(self : Box2, box : Box2) -> Box2 {
   ignore(self.max.copy(box.max))
   self
 }
+
+///|
+/// 返回一份新的盒子。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L104
+pub fn Box2::clone(self : Box2) -> Box2 {
+  Box2::new().copy(self)
+}
