@@ -369,6 +369,17 @@ pub fn Vector4::min(self : Vector4, v : Vector4) -> Vector4 {
 }
 
 ///|
+/// 每个分量取较大值。另一个向量不改。
+/// r186: `max` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L700
+pub fn Vector4::max(self : Vector4, v : Vector4) -> Vector4 {
+  self.x = self.x.max(v.x)
+  self.y = self.y.max(v.y)
+  self.z = self.z.max(v.z)
+  self.w = self.w.max(v.w)
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
