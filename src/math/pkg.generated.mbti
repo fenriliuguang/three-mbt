@@ -41,6 +41,7 @@ pub fn Box2::new(min? : Vector2, max? : Vector2) -> Self
 pub fn Box2::set(Self, Vector2, Vector2) -> Self
 pub fn Box2::set_from_center_and_size(Self, Vector2, Vector2) -> Self
 pub fn Box2::set_from_points(Self, Array[Vector2]) -> Self
+pub fn Box2::translate(Self, Vector2) -> Self
 pub fn Box2::union(Self, Self) -> Self
 
 pub(all) struct Box3 {

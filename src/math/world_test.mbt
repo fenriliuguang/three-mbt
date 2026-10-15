@@ -2178,6 +2178,22 @@ test "Box2.union covers both boxes" {
 }
 
 ///|
+test "Box2.translate moves both corners" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let offset = @math.Vector2::new(x=1.0, y=-2.0)
+  ignore(box.translate(offset))
+  assert_eq(box.min.x, 2.0)
+  assert_eq(box.min.y, 0.0)
+  assert_eq(box.max.x, 4.0)
+  assert_eq(box.max.y, 2.0)
+  assert_eq(offset.x, 1.0)
+  assert_eq(offset.y, -2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

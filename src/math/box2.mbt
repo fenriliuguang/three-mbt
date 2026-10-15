@@ -220,3 +220,12 @@ pub fn Box2::union(self : Box2, box : Box2) -> Box2 {
   ignore(self.max.max(box.max))
   self
 }
+
+///|
+/// 上下界都加上偏移。偏移本身不改。
+/// r186: `translate` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L358
+pub fn Box2::translate(self : Box2, offset : Vector2) -> Box2 {
+  ignore(self.min.add(offset))
+  ignore(self.max.add(offset))
+  self
+}
