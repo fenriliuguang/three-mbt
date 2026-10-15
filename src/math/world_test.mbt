@@ -3526,6 +3526,25 @@ test "intersectLine writes the crossing and skips a miss" {
 }
 
 ///|
+test "intersectsLine is true only when the ends are on opposite sides" {
+  let plane = @math.Plane::new()
+  let crossing = @math.Line3::new(
+    start=@math.Vector3::new(x=-1.0),
+    end=@math.Vector3::new(x=1.0),
+  )
+  let aside = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0),
+    end=@math.Vector3::new(x=2.0),
+  )
+  let lying = @math.Line3::new(end=@math.Vector3::new(y=1.0))
+  assert_eq(plane.intersects_line(crossing), true)
+  assert_eq(plane.intersects_line(aside), false)
+  assert_eq(plane.intersects_line(lying), false)
+  assert_eq(crossing.start.x, -1.0)
+  assert_eq(plane.constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

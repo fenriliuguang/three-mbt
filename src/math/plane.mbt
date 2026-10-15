@@ -145,3 +145,12 @@ pub fn Plane::intersect_line(
     }
   }
 }
+
+///|
+/// 线段两端分别在平面两侧则为真。贴在平面上不算。线段和平面都不改。
+/// r186: `intersectsLine` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L254
+pub fn Plane::intersects_line(self : Plane, line : Line3) -> Bool {
+  let start_sign = self.distance_to_point(line.start)
+  let end_sign = self.distance_to_point(line.end)
+  (start_sign < 0.0 && end_sign > 0.0) || (end_sign < 0.0 && start_sign > 0.0)
+}
