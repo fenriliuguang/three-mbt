@@ -733,6 +733,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Plane.fromJSON` has landed. It reads the normal from an array and stores the constant. `[0, 1, 0]` and `-2` become normal `(0, 1, 0)` and constant `-2`. Changing the array afterwards leaves the plane alone.
 
+`Sphere.set` has landed. It copies the center and stores the radius. Center `(1, 2, 3)` and radius `4` are stored. Later changes to the source center leave the sphere alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1040,6 +1042,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Plane.clone` | `math` |
 | planned | 7 | `Plane.toJSON` | `math` |
 | planned | 7 | `Plane.fromJSON` | `math` |
+| planned | 7 | `Sphere.set` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

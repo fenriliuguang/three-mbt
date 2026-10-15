@@ -81,3 +81,12 @@ pub fn Sphere::intersects_sphere(self : Sphere, sphere : Sphere) -> Bool {
 pub fn Sphere::intersects_plane(self : Sphere, plane : Plane) -> Bool {
   plane.distance_to_point(self.center).abs() <= self.radius
 }
+
+///|
+/// 拷贝球心并写入半径。之后改来源球心不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L54
+pub fn Sphere::set(self : Sphere, center : Vector3, radius : Double) -> Sphere {
+  ignore(self.center.copy(center))
+  self.radius = radius
+  self
+}

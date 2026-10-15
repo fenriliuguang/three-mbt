@@ -3684,6 +3684,20 @@ test "Plane.fromJSON reads the normal and the constant" {
 }
 
 ///|
+test "Sphere.set copies the center and stores the radius" {
+  let sphere = @math.Sphere::new()
+  let center = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(sphere.set(center, 4.0))
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 2.0)
+  assert_eq(sphere.center.z, 3.0)
+  assert_eq(sphere.radius, 4.0)
+  center.x = 0.0
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.radius, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
