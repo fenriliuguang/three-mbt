@@ -160,6 +160,15 @@ pub fn Vector2::multiply(self : Vector2, v : Vector2) -> Vector2 {
 }
 
 ///|
+/// 按分量相除。另一个向量不改。
+/// r186: `divide` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L369
+pub fn Vector2::divide(self : Vector2, v : Vector2) -> Vector2 {
+  self.x /= v.x
+  self.y /= v.y
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
