@@ -49,6 +49,28 @@ test "fromBufferAttribute reads xy and skips later components" {
 }
 
 ///|
+test "fromBufferAttribute reads xyzw" {
+  let colors = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+    4,
+  )
+  let v = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(colors.copy_to_vector4(1, v))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 6.0)
+  assert_eq(v.z, 7.0)
+  assert_eq(v.w, 8.0)
+  let packed = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  ignore(packed.copy_to_vector4(0, v))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 4.0)
+  assert_eq(colors.get_x(0), 1.0)
+  assert_eq(packed.get_x(1), 4.0)
+}
+
+///|
 test "child world matrix matches r186" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))
