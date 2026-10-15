@@ -713,6 +713,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Plane.intersectsLine` has landed. It is true only when the ends sit on opposite sides of the plane. On the plane `x = 0`, the segment from `(-1, 0, 0)` to `(1, 0, 0)` crosses, the segment from `(1, 0, 0)` to `(2, 0, 0)` stays on one side, and a segment lying on the plane does not count. The segment and the plane are unchanged.
 
+`Plane.intersectsBox` has landed. It asks the box whether it meets this plane. For a box from `(1, 2, 3)` to `(4, 5, 6)`, the plane `x = 2` intersects it and the plane `x = 0` stays apart. An empty box misses the plane. The plane and the box are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1010,6 +1012,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Line3.clone` | `math` |
 | planned | 7 | `Plane.intersectLine` | `math` |
 | planned | 7 | `Plane.intersectsLine` | `math` |
+| planned | 7 | `Plane.intersectsBox` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

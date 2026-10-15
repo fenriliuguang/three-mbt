@@ -3545,6 +3545,21 @@ test "intersectsLine is true only when the ends are on opposite sides" {
 }
 
 ///|
+test "Plane.intersectsBox matches the box test" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let through = @math.Plane::new(constant=-2.0)
+  let before = @math.Plane::new()
+  assert_eq(through.intersects_box(box), true)
+  assert_eq(before.intersects_box(box), false)
+  assert_eq(through.intersects_box(@math.Box3::empty()), false)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(through.constant, -2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

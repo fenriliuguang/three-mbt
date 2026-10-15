@@ -154,3 +154,10 @@ pub fn Plane::intersects_line(self : Plane, line : Line3) -> Bool {
   let end_sign = self.distance_to_point(line.end)
   (start_sign < 0.0 && end_sign > 0.0) || (end_sign < 0.0 && start_sign > 0.0)
 }
+
+///|
+/// 平面与盒子相交或贴在面上则为真。平面和盒子都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L271
+pub fn Plane::intersects_box(self : Plane, box : Box3) -> Bool {
+  box.intersects_plane(self)
+}
