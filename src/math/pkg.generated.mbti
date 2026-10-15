@@ -353,6 +353,7 @@ pub fn Vector4::set_x(Self, Double) -> Self
 pub fn Vector4::set_y(Self, Double) -> Self
 pub fn Vector4::set_z(Self, Double) -> Self
 pub fn Vector4::sub(Self, Self) -> Self
+pub fn Vector4::sub_scalar(Self, Double) -> Self
 
 // Type aliases
 

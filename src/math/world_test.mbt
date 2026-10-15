@@ -1330,6 +1330,21 @@ test "Vector4.sub subtracts another vector" {
 }
 
 ///|
+test "Vector4.subScalar subtracts one number from every component" {
+  let v = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  ignore(v.sub_scalar(4.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 4.0)
+  ignore(v.sub_scalar(-1.0))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+  assert_eq(v.w, 5.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
