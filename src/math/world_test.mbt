@@ -2852,6 +2852,24 @@ test "Triangle.copy copies the three corners" {
 }
 
 ///|
+test "Triangle.clone copies the three corners" {
+  let source = @math.Triangle::new(
+    a=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    b=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+    c=@math.Vector3::new(x=7.0, y=8.0, z=9.0),
+  )
+  let triangle = source.clone()
+  assert_eq(triangle.a.x, 1.0)
+  assert_eq(triangle.a.y, 2.0)
+  assert_eq(triangle.b.z, 6.0)
+  assert_eq(triangle.c.z, 9.0)
+  source.a.x = 0.0
+  triangle.c.z = 0.0
+  assert_eq(triangle.a.x, 1.0)
+  assert_eq(source.c.z, 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

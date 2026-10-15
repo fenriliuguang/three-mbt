@@ -169,3 +169,10 @@ pub fn Triangle::copy(self : Triangle, triangle : Triangle) -> Triangle {
   ignore(self.c.copy(triangle.c))
   self
 }
+
+///|
+/// 返回一份新的三角形。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L294
+pub fn Triangle::clone(self : Triangle) -> Triangle {
+  Triangle::new().copy(self)
+}
