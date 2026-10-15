@@ -74,3 +74,12 @@ pub fn Box2::set_from_center_and_size(
   ignore(self.max.copy(center).add(half_size))
   self
 }
+
+///|
+/// 复制另一个盒子的两个角点。来源不改。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L116
+pub fn Box2::copy(self : Box2, box : Box2) -> Box2 {
+  ignore(self.min.copy(box.min))
+  ignore(self.max.copy(box.max))
+  self
+}
