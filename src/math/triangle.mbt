@@ -45,3 +45,33 @@ pub fn Triangle::get_normal(
     target.set(0.0, 0.0, 0.0)
   }
 }
+
+///|
+/// 把重心坐标写入 target。退化三角形写入 (0, 0, 0) 并返回空。角点和点都不改。
+/// r186: `getBarycoord` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L94
+pub fn Triangle::get_barycoord(
+  point : Vector3,
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+  target : Vector3,
+) -> Vector3? {
+  let v0 = Vector3::new().sub_vectors(c, a)
+  let v1 = Vector3::new().sub_vectors(b, a)
+  let v2 = Vector3::new().sub_vectors(point, a)
+  let dot00 = v0.dot(v0)
+  let dot01 = v0.dot(v1)
+  let dot02 = v0.dot(v2)
+  let dot11 = v1.dot(v1)
+  let dot12 = v1.dot(v2)
+  let denom = dot00 * dot11 - dot01 * dot01
+  if denom == 0.0 {
+    ignore(target.set(0.0, 0.0, 0.0))
+    None
+  } else {
+    let inv_denom = 1.0 / denom
+    let u = (dot11 * dot02 - dot01 * dot12) * inv_denom
+    let v = (dot00 * dot12 - dot01 * dot02) * inv_denom
+    Some(target.set(1.0 - u - v, v, u))
+  }
+}
