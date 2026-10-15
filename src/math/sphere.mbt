@@ -126,3 +126,15 @@ pub fn Sphere::clamp_point(
   }
   target
 }
+
+///|
+/// 把包围这个球的盒子写入 target。空球得到空盒。球不改。
+/// r186: `getBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L241
+pub fn Sphere::get_bounding_box(self : Sphere, target : Box3) -> Box3 {
+  if self.is_empty() {
+    ignore(target.make_empty())
+    return target
+  }
+  ignore(target.set(self.center, self.center))
+  target.expand_by_scalar(self.radius)
+}

@@ -3756,6 +3756,26 @@ test "Sphere.clampPoint pulls an outside point onto the sphere" {
 }
 
 ///|
+test "Sphere.getBoundingBox encloses the sphere" {
+  let center = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let sphere = @math.Sphere::new(center=center, radius=1.0)
+  let box = @math.Box3::empty()
+  ignore(sphere.get_bounding_box(box))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 1.0)
+  assert_eq(box.min.z, 2.0)
+  assert_eq(box.max.x, 2.0)
+  assert_eq(box.max.y, 3.0)
+  assert_eq(box.max.z, 4.0)
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.radius, 1.0)
+  let empty = @math.Sphere::new()
+  ignore(empty.get_bounding_box(box))
+  assert_eq(box.is_empty(), true)
+  assert_eq(empty.radius, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
