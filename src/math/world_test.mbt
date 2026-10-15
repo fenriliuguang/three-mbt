@@ -1900,6 +1900,29 @@ test "Box2.clone copies both corners into a new box" {
 }
 
 ///|
+test "Box2.isEmpty treats equal bounds as a point" {
+  let empty = @math.Box2::new()
+  assert_eq(empty.is_empty(), true)
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  assert_eq(box.is_empty(), false)
+  let point = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=1.0, y=2.0),
+  )
+  assert_eq(point.is_empty(), false)
+  let inverted = @math.Box2::new(
+    min=@math.Vector2::new(x=3.0, y=2.0),
+    max=@math.Vector2::new(x=1.0, y=4.0),
+  )
+  assert_eq(inverted.is_empty(), true)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.y, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

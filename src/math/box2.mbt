@@ -90,3 +90,10 @@ pub fn Box2::copy(self : Box2, box : Box2) -> Box2 {
 pub fn Box2::clone(self : Box2) -> Box2 {
   Box2::new().copy(self)
 }
+
+///|
+/// 任一轴上界小于下界则为空。上下界相等不算空。
+/// r186: `isEmpty` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L146
+pub fn Box2::is_empty(self : Box2) -> Bool {
+  self.max.x < self.min.x || self.max.y < self.min.y
+}
