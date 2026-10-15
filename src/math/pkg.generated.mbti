@@ -219,6 +219,7 @@ pub fn Vector3::divide(Self, Self) -> Self
 pub fn Vector3::divide_scalar(Self, Double) -> Self
 pub fn Vector3::dot(Self, Self) -> Double
 pub fn Vector3::equals(Self, Self) -> Bool
+pub fn Vector3::floor(Self) -> Self
 pub fn Vector3::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Vector3::get_component(Self, Int) -> Double
 pub fn Vector3::length(Self) -> Double

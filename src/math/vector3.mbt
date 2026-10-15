@@ -339,6 +339,15 @@ pub fn Vector3::clamp_length(
 }
 
 ///|
+/// r186: `floor` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L668
+pub fn Vector3::floor(self : Vector3) -> Vector3 {
+  self.x = self.x.floor()
+  self.y = self.y.floor()
+  self.z = self.z.floor()
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y
