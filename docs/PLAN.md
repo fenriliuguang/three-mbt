@@ -533,6 +533,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.fromBufferAttribute` has landed as `BufferAttribute.copy_to_vector4`, because `math` does not import `core`. It writes x, y, z, and the fourth component into the target. Index 1 of `[1, 2, 3, 4, 5, 6, 7, 8]` with item size 4 is `(5, 6, 7, 8)`. Item size 3 still reads a fourth value, so index 0 of `[1, 2, 3, 4, 5, 6]` is `(1, 2, 3, 4)`. The attribute is not modified. `Vector4.random` stays out, because it draws from `Math.random`.
 
+`Box2` has landed. A box with no arguments is empty: the lower corner is `(+∞, +∞)` and the upper corner is `(-∞, -∞)`. Passing corners copies them, so later changes to those vectors leave the box alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -740,6 +742,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.fromArray` | `math` |
 | planned | 7 | `Vector4.toArray` | `math` |
 | planned | 7 | `Vector4.fromBufferAttribute` on `BufferAttribute` | `core` |
+| planned | 7 | `Box2` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

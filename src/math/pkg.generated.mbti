@@ -17,6 +17,12 @@ pub fn srgb_to_linear(Double) -> Double
 // Errors
 
 // Types and methods
+pub(all) struct Box2 {
+  min : Vector2
+  max : Vector2
+}
+pub fn Box2::new(min? : Vector2, max? : Vector2) -> Self
+
 pub(all) struct Box3 {
   min : Vector3
   max : Vector3

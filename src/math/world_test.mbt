@@ -1756,6 +1756,26 @@ test "Vector4.fromArray reads four components at an offset" {
 }
 
 ///|
+test "Box2 starts empty and copies its corners" {
+  let empty = @math.Box2::new()
+  assert_eq(empty.min.x > 1.0e308, true)
+  assert_eq(empty.min.y > 1.0e308, true)
+  assert_eq(empty.max.x < -1.0e308, true)
+  assert_eq(empty.max.y < -1.0e308, true)
+  let low = @math.Vector2::new(x=1.0, y=2.0)
+  let high = @math.Vector2::new(x=3.0, y=4.0)
+  let box = @math.Box2::new(min=low, max=high)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 3.0)
+  assert_eq(box.max.y, 4.0)
+  low.x = 9.0
+  high.y = 8.0
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.y, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
