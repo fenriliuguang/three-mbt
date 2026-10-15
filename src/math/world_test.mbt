@@ -874,6 +874,17 @@ test "Vector2.applyMatrix3 uses an implicit z of 1" {
 }
 
 ///|
+test "Vector2.min keeps the smaller component" {
+  let v = @math.Vector2::new(x=0.0, y=5.0)
+  let bound = @math.Vector2::new(x=1.0, y=4.0)
+  ignore(v.min(bound))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(bound.x, 1.0)
+  assert_eq(bound.y, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

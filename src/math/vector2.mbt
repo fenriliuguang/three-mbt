@@ -187,6 +187,15 @@ pub fn Vector2::apply_matrix3(self : Vector2, m : Matrix3) -> Vector2 {
 }
 
 ///|
+/// 每个分量取较小值。另一个向量不改。
+/// r186: `min` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L416
+pub fn Vector2::min(self : Vector2, v : Vector2) -> Vector2 {
+  self.x = self.x.min(v.x)
+  self.y = self.y.min(v.y)
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
