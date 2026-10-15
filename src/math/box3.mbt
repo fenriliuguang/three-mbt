@@ -60,6 +60,15 @@ pub fn Box3::expand_by_point(self : Box3, point : Vector3) -> Box3 {
 }
 
 ///|
+/// 沿向量向两侧扩张。向量本身不改。
+/// r186: `expandByVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L267
+pub fn Box3::expand_by_vector(self : Box3, vector : Vector3) -> Box3 {
+  ignore(self.min.sub(vector))
+  ignore(self.max.add(vector))
+  self
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

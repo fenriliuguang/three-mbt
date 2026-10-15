@@ -54,6 +54,7 @@ pub fn Box3::clone(Self) -> Self
 pub fn Box3::copy(Self, Self) -> Self
 pub fn Box3::empty() -> Self
 pub fn Box3::expand_by_point(Self, Vector3) -> Self
+pub fn Box3::expand_by_vector(Self, Vector3) -> Self
 pub fn Box3::get_center(Self, Vector3) -> Vector3
 pub fn Box3::get_size(Self, Vector3) -> Vector3
 pub fn Box3::is_empty(Self) -> Bool
