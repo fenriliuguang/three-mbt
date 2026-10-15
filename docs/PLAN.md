@@ -483,6 +483,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.subVectors` has landed. It writes the difference of two vectors into this one. `(5, 6, 7, 8)` minus `(1, 2, 3, 4)` becomes `(4, 4, 4, 4)`. Writing into the first vector still works. The second vector is unchanged.
 
+`Vector4.multiply` has landed. It multiplies matching components. `(2, 4, 6, 8)` times `(5, 6, 7, 8)` becomes `(10, 24, 42, 64)`. The other vector is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -665,6 +667,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.sub` | `math` |
 | planned | 7 | `Vector4.subScalar` | `math` |
 | planned | 7 | `Vector4.subVectors` | `math` |
+| planned | 7 | `Vector4.multiply` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

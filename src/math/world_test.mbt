@@ -1368,6 +1368,21 @@ test "Vector4.subVectors stores the difference of two vectors" {
 }
 
 ///|
+test "Vector4.multiply multiplies matching components" {
+  let v = @math.Vector4::new(x=2.0, y=4.0, z=6.0, w=8.0)
+  let factor = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  ignore(v.multiply(factor))
+  assert_eq(v.x, 10.0)
+  assert_eq(v.y, 24.0)
+  assert_eq(v.z, 42.0)
+  assert_eq(v.w, 64.0)
+  assert_eq(factor.x, 5.0)
+  assert_eq(factor.y, 6.0)
+  assert_eq(factor.z, 7.0)
+  assert_eq(factor.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
