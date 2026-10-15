@@ -254,3 +254,57 @@ pub fn Triangle::front_facing(self : Triangle, direction : Vector3) -> Bool {
 pub fn Triangle::intersects_box(self : Triangle, box : Box3) -> Bool {
   box.intersects_triangle(self)
 }
+
+///|
+/// 把三角形上离给定点最近的点写入 target。点和角点都不改。
+/// r186: `closestPointToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L442
+pub fn Triangle::closest_point_to_point(
+  self : Triangle,
+  p : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let a = self.a
+  let b = self.b
+  let c = self.c
+  let vab = Vector3::new().sub_vectors(b, a)
+  let vac = Vector3::new().sub_vectors(c, a)
+  let vap = Vector3::new().sub_vectors(p, a)
+  let d1 = vab.dot(vap)
+  let d2 = vac.dot(vap)
+  if d1 <= 0.0 && d2 <= 0.0 {
+    return target.copy(a)
+  }
+  let vbp = Vector3::new().sub_vectors(p, b)
+  let d3 = vab.dot(vbp)
+  let d4 = vac.dot(vbp)
+  if d3 >= 0.0 && d4 <= d3 {
+    return target.copy(b)
+  }
+  let vc = d1 * d4 - d3 * d2
+  if vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0 {
+    let v = d1 / (d1 - d3)
+    return target.copy(a).add_scaled_vector(vab, v)
+  }
+  let vcp = Vector3::new().sub_vectors(p, c)
+  let d5 = vab.dot(vcp)
+  let d6 = vac.dot(vcp)
+  if d6 >= 0.0 && d5 <= d6 {
+    return target.copy(c)
+  }
+  let vb = d5 * d2 - d1 * d6
+  if vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0 {
+    let w = d2 / (d2 - d6)
+    return target.copy(a).add_scaled_vector(vac, w)
+  }
+  let va = d3 * d6 - d5 * d4
+  if va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0 {
+    let vbc = Vector3::new().sub_vectors(c, b)
+    let w = (d4 - d3) / ((d4 - d3) + (d5 - d6))
+    return target.copy(b).add_scaled_vector(vbc, w)
+  }
+  let denom = 1.0 / (va + vb + vc)
+  let v = vb * denom
+  let w = vc * denom
+  ignore(target.copy(a).add_scaled_vector(vab, v))
+  target.add_scaled_vector(vac, w)
+}

@@ -3150,6 +3150,30 @@ test "Triangle.intersectsBox matches the box test" {
 }
 
 ///|
+test "closestPointToPoint projects onto the triangle" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let above = @math.Vector3::new(x=0.25, y=0.25, z=3.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let closest = triangle.closest_point_to_point(above, target)
+  assert_eq(physical_equal(closest, target), true)
+  assert_eq(closest.x, 0.25)
+  assert_eq(closest.y, 0.25)
+  assert_eq(closest.z, 0.0)
+  let outside = @math.Vector3::new(x=2.0, y=-1.0)
+  ignore(triangle.closest_point_to_point(outside, target))
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(above.z, 3.0)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
