@@ -519,6 +519,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.manhattanLength` has landed. It sums the absolute components. `(3, -4, 5, -6)` is 18. A zero vector is 0. The vector is not modified.
 
+`Vector4.setLength` has landed. It divides by the current length, using 1 when that length is zero, then multiplies by the requested length. `(0, 0, 0, 4)` set to length 2 becomes `(0, 0, 0, 2)`, then set to 0 becomes zero. A zero vector set to 5 stays zero.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -719,6 +721,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.roundToZero` | `math` |
 | planned | 7 | `Vector4.negate` | `math` |
 | planned | 7 | `Vector4.manhattanLength` | `math` |
+| planned | 7 | `Vector4.setLength` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

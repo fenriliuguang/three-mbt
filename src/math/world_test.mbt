@@ -1662,6 +1662,24 @@ test "Vector4.manhattanLength sums the absolute components" {
 }
 
 ///|
+test "Vector4.setLength scales to the requested length" {
+  let v = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=4.0)
+  ignore(v.set_length(2.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 0.0)
+  assert_eq(v.w, 2.0)
+  ignore(v.set_length(0.0))
+  assert_eq(v.w, 0.0)
+  let zero = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=0.0)
+  ignore(zero.set_length(5.0))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+  assert_eq(zero.z, 0.0)
+  assert_eq(zero.w, 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

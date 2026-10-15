@@ -510,6 +510,15 @@ pub fn Vector4::normalize(self : Vector4) -> Vector4 {
 }
 
 ///|
+/// 按当前长度缩放。长度为 0 时除数用 1，零向量保持为零。
+/// r186: `setLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L920
+pub fn Vector4::set_length(self : Vector4, length : Double) -> Vector4 {
+  let len = self.length()
+  let divisor = if len == 0.0 { 1.0 } else { len }
+  self.divide_scalar(divisor).multiply_scalar(length)
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x

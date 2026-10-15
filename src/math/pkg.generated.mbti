@@ -365,6 +365,7 @@ pub fn Vector4::set_axis_angle_from_quaternion(Self, Quaternion) -> Self
 pub fn Vector4::set_axis_angle_from_rotation_matrix(Self, Matrix4) -> Self
 pub fn Vector4::set_component(Self, Int, Double) -> Self
 pub fn Vector4::set_from_matrix_position(Self, Matrix4) -> Self
+pub fn Vector4::set_length(Self, Double) -> Self
 pub fn Vector4::set_scalar(Self, Double) -> Self
 pub fn Vector4::set_w(Self, Double) -> Self
 pub fn Vector4::set_x(Self, Double) -> Self
