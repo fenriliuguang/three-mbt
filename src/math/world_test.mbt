@@ -3455,6 +3455,23 @@ test "Line3.applyMatrix4 transforms both endpoints" {
 }
 
 ///|
+test "Line3.equals compares both endpoints" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let same = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  assert_eq(line.equals(same), true)
+  assert_eq(line.equals(line), true)
+  same.end.z = 0.0
+  assert_eq(line.equals(same), false)
+  assert_eq(line.end.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

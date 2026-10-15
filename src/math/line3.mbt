@@ -180,3 +180,10 @@ pub fn Line3::apply_matrix4(self : Line3, matrix : Matrix4) -> Line3 {
   ignore(self.end.apply_matrix4(matrix))
   self
 }
+
+///|
+/// 两端都相等则为真。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L318
+pub fn Line3::equals(self : Line3, line : Line3) -> Bool {
+  line.start.equals(self.start) && line.end.equals(self.end)
+}
