@@ -2870,6 +2870,24 @@ test "Triangle.clone copies the three corners" {
 }
 
 ///|
+test "Triangle.getArea is half the cross product length" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  assert_eq(triangle.get_area(), 0.5)
+  let flat = @math.Triangle::new(
+    a=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    b=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    c=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  assert_eq(flat.get_area(), 0.0)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -176,3 +176,12 @@ pub fn Triangle::copy(self : Triangle, triangle : Triangle) -> Triangle {
 pub fn Triangle::clone(self : Triangle) -> Triangle {
   Triangle::new().copy(self)
 }
+
+///|
+/// 返回三角形面积。角点不改。
+/// r186: `getArea` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L321
+pub fn Triangle::get_area(self : Triangle) -> Double {
+  let edge0 = Vector3::new().sub_vectors(self.c, self.b)
+  let edge1 = Vector3::new().sub_vectors(self.a, self.b)
+  edge0.cross(edge1).length() * 0.5
+}
