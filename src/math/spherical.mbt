@@ -17,3 +17,18 @@ pub fn Spherical::new(
 ) -> Spherical {
   { radius, phi, theta }
 }
+
+///|
+/// 写入半径和两个角。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L52
+pub fn Spherical::set(
+  self : Spherical,
+  radius : Double,
+  phi : Double,
+  theta : Double,
+) -> Spherical {
+  self.radius = radius
+  self.phi = phi
+  self.theta = theta
+  self
+}

@@ -499,6 +499,15 @@ test "setFromSpherical copies radius phi and theta" {
 }
 
 ///|
+test "Spherical.set writes radius phi and theta" {
+  let s = @math.Spherical::new()
+  ignore(s.set(2.0, 0.5, -0.3))
+  assert_eq(s.radius, 2.0)
+  assert_eq(s.phi, 0.5)
+  assert_eq(s.theta, -0.3)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))

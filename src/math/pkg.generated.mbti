@@ -178,6 +178,7 @@ pub(all) struct Spherical {
   mut theta : Double
 }
 pub fn Spherical::new(radius? : Double, phi? : Double, theta? : Double) -> Self
+pub fn Spherical::set(Self, Double, Double, Double) -> Self
 
 pub(all) struct Vector2 {
   mut x : Double
