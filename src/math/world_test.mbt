@@ -1601,6 +1601,16 @@ test "Vector4.clampLength limits the vector length" {
 }
 
 ///|
+test "Vector4.floor rounds each component down" {
+  let v = @math.Vector4::new(x=1.2, y=-1.2, z=2.8, w=-2.8)
+  ignore(v.floor())
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, -2.0)
+  assert_eq(v.z, 2.0)
+  assert_eq(v.w, -3.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
