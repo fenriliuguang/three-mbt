@@ -822,6 +822,17 @@ test "Vector2.subVectors stores the difference of two vectors" {
 }
 
 ///|
+test "Vector2.multiply multiplies matching components" {
+  let v = @math.Vector2::new(x=2.0, y=4.0)
+  let factor = @math.Vector2::new(x=5.0, y=6.0)
+  ignore(v.multiply(factor))
+  assert_eq(v.x, 10.0)
+  assert_eq(v.y, 24.0)
+  assert_eq(factor.x, 5.0)
+  assert_eq(factor.y, 6.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
