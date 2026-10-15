@@ -201,3 +201,10 @@ pub fn Triangle::get_midpoint(self : Triangle, target : Vector3) -> Vector3 {
 pub fn Triangle::normal(self : Triangle, target : Vector3) -> Vector3 {
   Triangle::get_normal(self.a, self.b, self.c, target)
 }
+
+///|
+/// 把三角形所在平面写入 target。角点不改。
+/// r186: `getPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L360
+pub fn Triangle::get_plane(self : Triangle, target : Plane) -> Plane {
+  target.set_from_coplanar_points(self.a, self.b, self.c)
+}
