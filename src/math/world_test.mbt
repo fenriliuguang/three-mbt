@@ -1538,6 +1538,31 @@ test "Vector4.max keeps the larger component" {
 }
 
 ///|
+test "Vector4.clamp limits each component" {
+  let v = @math.Vector4::new(x=0.0, y=5.0, z=2.0, w=9.0)
+  let low = @math.Vector4::new(x=1.0, y=0.0, z=1.0, w=0.0)
+  let high = @math.Vector4::new(x=3.0, y=4.0, z=4.0, w=8.0)
+  ignore(v.clamp(low, high))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 2.0)
+  assert_eq(v.w, 8.0)
+  assert_eq(low.x, 1.0)
+  assert_eq(high.w, 8.0)
+  let inside = @math.Vector4::new(x=2.0, y=2.0, z=2.0, w=2.0)
+  ignore(
+    inside.clamp(
+      @math.Vector4::new(w=0.0),
+      @math.Vector4::new(x=3.0, y=3.0, z=3.0, w=3.0),
+    ),
+  )
+  assert_eq(inside.x, 2.0)
+  assert_eq(inside.y, 2.0)
+  assert_eq(inside.z, 2.0)
+  assert_eq(inside.w, 2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

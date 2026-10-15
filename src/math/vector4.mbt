@@ -380,6 +380,17 @@ pub fn Vector4::max(self : Vector4, v : Vector4) -> Vector4 {
 }
 
 ///|
+/// 假定每个分量都是 `min` 小于 `max`。两个边界向量不改。
+/// r186: `clamp` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L721
+pub fn Vector4::clamp(self : Vector4, min : Vector4, max : Vector4) -> Vector4 {
+  self.x = self.x.clamp(min=min.x, max=max.x)
+  self.y = self.y.clamp(min=min.y, max=max.y)
+  self.z = self.z.clamp(min=min.z, max=max.z)
+  self.w = self.w.clamp(min=min.w, max=max.w)
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

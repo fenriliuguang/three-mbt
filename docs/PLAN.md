@@ -501,6 +501,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.max` has landed. It keeps the larger value of each component. `(0, 5, 2, 8)` against `(1, 4, 3, 7)` becomes `(1, 5, 3, 8)`. The other vector is unchanged.
 
+`Vector4.clamp` has landed. It assumes min is less than max on each component. `(0, 5, 2, 9)` clamped by `(1, 0, 1, 0)` and `(3, 4, 4, 8)` becomes `(1, 4, 2, 8)`. `(2, 2, 2, 2)` inside `(0, 0, 0, 0)` and `(3, 3, 3, 3)` stays. The bounds are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -692,6 +694,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.setFromMatrixPosition` | `math` |
 | planned | 7 | `Vector4.min` | `math` |
 | planned | 7 | `Vector4.max` | `math` |
+| planned | 7 | `Vector4.clamp` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
