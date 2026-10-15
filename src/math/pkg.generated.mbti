@@ -215,6 +215,7 @@ pub fn Vector2::clamp_scalar(Self, Double, Double) -> Self
 pub fn Vector2::clone(Self) -> Self
 pub fn Vector2::copy(Self, Self) -> Self
 pub fn Vector2::cross(Self, Self) -> Double
+pub fn Vector2::distance_to_squared(Self, Self) -> Double
 pub fn Vector2::divide(Self, Self) -> Self
 pub fn Vector2::divide_scalar(Self, Double) -> Self
 pub fn Vector2::dot(Self, Self) -> Double

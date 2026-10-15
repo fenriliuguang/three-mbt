@@ -1030,6 +1030,16 @@ test "Vector2.angleTo is the angle between two vectors" {
 }
 
 ///|
+test "Vector2.distanceToSquared is the squared separation" {
+  let origin = @math.Vector2::new()
+  let point = @math.Vector2::new(x=3.0, y=4.0)
+  assert_eq(origin.distance_to_squared(point), 25.0)
+  assert_eq(point.distance_to_squared(point), 0.0)
+  assert_eq(origin.x, 0.0)
+  assert_eq(point.y, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

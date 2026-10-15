@@ -314,6 +314,15 @@ pub fn Vector2::angle_to(self : Vector2, v : Vector2) -> Double {
 }
 
 ///|
+/// 两个向量都不改。
+/// r186: `distanceToSquared` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L694
+pub fn Vector2::distance_to_squared(self : Vector2, v : Vector2) -> Double {
+  let dx = self.x - v.x
+  let dy = self.y - v.y
+  dx * dx + dy * dy
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
