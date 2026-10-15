@@ -2153,6 +2153,31 @@ test "Box2.intersect keeps the overlap" {
 }
 
 ///|
+test "Box2.union covers both boxes" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let other = @math.Box2::new(
+    min=@math.Vector2::new(x=0.0, y=5.0),
+    max=@math.Vector2::new(x=2.0, y=6.0),
+  )
+  ignore(box.union(other))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 3.0)
+  assert_eq(box.max.y, 6.0)
+  assert_eq(other.min.x, 0.0)
+  assert_eq(other.max.y, 6.0)
+  let empty = @math.Box2::new()
+  ignore(empty.union(other))
+  assert_eq(empty.min.x, 0.0)
+  assert_eq(empty.min.y, 5.0)
+  assert_eq(empty.max.x, 2.0)
+  assert_eq(empty.max.y, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

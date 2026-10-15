@@ -211,3 +211,12 @@ pub fn Box2::intersect(self : Box2, box : Box2) -> Box2 {
   }
   self
 }
+
+///|
+/// 扩成能包住两个盒子的范围。另一个盒子不改。
+/// r186: `union` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L342
+pub fn Box2::union(self : Box2, box : Box2) -> Box2 {
+  ignore(self.min.min(box.min))
+  ignore(self.max.max(box.max))
+  self
+}
