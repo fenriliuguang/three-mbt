@@ -131,3 +131,18 @@ pub fn Triangle::is_front_facing(
   let edge1 = Vector3::new().sub_vectors(a, b)
   edge0.cross(edge1).dot(direction) < 0.0
 }
+
+///|
+/// 把三个角点拷进三角形。之后改来源向量不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L241
+pub fn Triangle::set(
+  self : Triangle,
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+) -> Triangle {
+  ignore(self.a.copy(a))
+  ignore(self.b.copy(b))
+  ignore(self.c.copy(c))
+  self
+}
