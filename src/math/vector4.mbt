@@ -358,6 +358,17 @@ pub fn Vector4::set_from_matrix_position(
 }
 
 ///|
+/// 每个分量取较小值。另一个向量不改。
+/// r186: `min` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L682
+pub fn Vector4::min(self : Vector4, v : Vector4) -> Vector4 {
+  self.x = self.x.min(v.x)
+  self.y = self.y.min(v.y)
+  self.z = self.z.min(v.z)
+  self.w = self.w.min(v.w)
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

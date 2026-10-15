@@ -1508,6 +1508,21 @@ test "Vector4.setFromMatrixPosition copies the last column" {
 }
 
 ///|
+test "Vector4.min keeps the smaller component" {
+  let v = @math.Vector4::new(x=0.0, y=5.0, z=2.0, w=8.0)
+  let bound = @math.Vector4::new(x=1.0, y=4.0, z=3.0, w=7.0)
+  ignore(v.min(bound))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 2.0)
+  assert_eq(v.w, 7.0)
+  assert_eq(bound.x, 1.0)
+  assert_eq(bound.y, 4.0)
+  assert_eq(bound.z, 3.0)
+  assert_eq(bound.w, 7.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
