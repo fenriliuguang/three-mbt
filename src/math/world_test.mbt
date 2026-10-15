@@ -3226,6 +3226,20 @@ test "distanceToSphere subtracts the radius from the center distance" {
 }
 
 ///|
+test "projectPoint drops the point onto the plane" {
+  let plane = @math.Plane::new()
+  let point = @math.Vector3::new(x=3.0, y=4.0, z=5.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let projected = plane.project_point(point, target)
+  assert_eq(physical_equal(projected, target), true)
+  assert_eq(projected.x, 0.0)
+  assert_eq(projected.y, 4.0)
+  assert_eq(projected.z, 5.0)
+  assert_eq(point.x, 3.0)
+  assert_eq(plane.normal.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -106,3 +106,15 @@ pub fn Plane::negate(self : Plane) -> Plane {
 pub fn Plane::distance_to_sphere(self : Plane, sphere : Sphere) -> Double {
   self.distance_to_point(sphere.center) - sphere.radius
 }
+
+///|
+/// 把点沿法线投到平面上，写入 target。点和平面都不改。
+/// r186: `projectPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L200
+pub fn Plane::project_point(
+  self : Plane,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let distance = self.distance_to_point(point)
+  target.copy(point).add_scaled_vector(self.normal, -distance)
+}
