@@ -629,6 +629,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Triangle.containsPoint` has landed. A point projected onto the triangle plane counts when it lands inside or on the boundary. For corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)`, `(0.25, 0.25, 0)` and the corner `(1, 0, 0)` are inside, and `(2, 0, 0)` is outside. A degenerate triangle contains nothing. The point and the corners are unchanged.
 
+`Triangle.getInterpolation` has landed. It blends three values with the barycentric weights. For corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)`, the point `(0.5, 0.5, 0)` blends `(1, 0, 0)`, `(0, 1, 0)`, and `(0, 0, 1)` into `(0, 0.5, 0.5)`. A degenerate triangle writes `(0, 0, 0)` and returns nothing. The inputs are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -884,6 +886,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.getNormal` | `math` |
 | planned | 7 | `Triangle.getBarycoord` | `math` |
 | planned | 7 | `Triangle.containsPoint` | `math` |
+| planned | 7 | `Triangle.getInterpolation` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

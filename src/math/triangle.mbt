@@ -90,3 +90,30 @@ pub fn Triangle::contains_point(
     Some(coord) => coord.x >= 0.0 && coord.y >= 0.0 && coord.x + coord.y <= 1.0
   }
 }
+
+///|
+/// 按重心坐标插值。退化三角形写入 (0, 0, 0) 并返回空。来源不改。
+/// r186: `getInterpolation` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L163
+pub fn Triangle::get_interpolation(
+  point : Vector3,
+  p1 : Vector3,
+  p2 : Vector3,
+  p3 : Vector3,
+  v1 : Vector3,
+  v2 : Vector3,
+  v3 : Vector3,
+  target : Vector3,
+) -> Vector3? {
+  match Triangle::get_barycoord(point, p1, p2, p3, Vector3::new()) {
+    None => {
+      ignore(target.set(0.0, 0.0, 0.0))
+      None
+    }
+    Some(coord) => {
+      ignore(target.set_scalar(0.0))
+      ignore(target.add_scaled_vector(v1, coord.x))
+      ignore(target.add_scaled_vector(v2, coord.y))
+      Some(target.add_scaled_vector(v3, coord.z))
+    }
+  }
+}
