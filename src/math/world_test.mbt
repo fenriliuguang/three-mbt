@@ -2814,6 +2814,25 @@ test "Triangle.set copies the three corners" {
 }
 
 ///|
+test "setFromPointsAndIndices copies three indexed points" {
+  let p0 = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let p1 = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
+  let p2 = @math.Vector3::new(x=7.0, y=8.0, z=9.0)
+  let p3 = @math.Vector3::new(z=1.0)
+  let triangle = @math.Triangle::new()
+  ignore(triangle.set_from_points_and_indices([p3, p0, p1, p2], 0, 1, 2))
+  assert_eq(triangle.a.z, 1.0)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.b.y, 2.0)
+  assert_eq(triangle.c.y, 5.0)
+  assert_eq(triangle.c.z, 6.0)
+  p0.x = 0.0
+  p3.z = 0.0
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.a.z, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

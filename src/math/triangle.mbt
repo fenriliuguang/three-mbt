@@ -146,3 +146,16 @@ pub fn Triangle::set(
   ignore(self.c.copy(c))
   self
 }
+
+///|
+/// 按三个下标从点数组拷出角点。之后改点数组不影响这里。
+/// r186: `setFromPointsAndIndices` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L260
+pub fn Triangle::set_from_points_and_indices(
+  self : Triangle,
+  points : Array[Vector3],
+  i0 : Int,
+  i1 : Int,
+  i2 : Int,
+) -> Triangle {
+  self.set(points[i0], points[i1], points[i2])
+}
