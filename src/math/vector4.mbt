@@ -153,6 +153,21 @@ pub fn Vector4::add_vectors(
 }
 
 ///|
+/// 加上 `v * s`。另一个向量不改。
+/// r186: `addScaledVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L341
+pub fn Vector4::add_scaled_vector(
+  self : Vector4,
+  v : Vector4,
+  s : Double,
+) -> Vector4 {
+  self.x += v.x * s
+  self.y += v.y * s
+  self.z += v.z * s
+  self.w += v.w * s
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
