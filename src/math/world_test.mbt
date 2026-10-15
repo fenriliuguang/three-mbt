@@ -3814,6 +3814,30 @@ test "Sphere.expandByPoint grows the radius to include a point" {
 }
 
 ///|
+test "Sphere.union encloses both spheres" {
+  let sphere = @math.Sphere::new(radius=1.0)
+  let other = @math.Sphere::new(
+    center=@math.Vector3::new(x=4.0),
+    radius=1.0,
+  )
+  ignore(sphere.union(other))
+  assert_eq(sphere.center.x, 2.0)
+  assert_eq(sphere.center.y, 0.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 3.0)
+  assert_eq(other.center.x, 4.0)
+  assert_eq(other.radius, 1.0)
+  let shared = @math.Sphere::new(radius=1.0)
+  ignore(shared.union(@math.Sphere::new(radius=3.0)))
+  assert_eq(shared.center.x, 0.0)
+  assert_eq(shared.radius, 3.0)
+  let kept = @math.Sphere::new(radius=1.0)
+  ignore(kept.union(@math.Sphere::new()))
+  assert_eq(kept.center.x, 0.0)
+  assert_eq(kept.radius, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

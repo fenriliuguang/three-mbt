@@ -166,3 +166,29 @@ pub fn Sphere::expand_by_point(self : Sphere, point : Vector3) -> Sphere {
   }
   self
 }
+
+///|
+/// 扩张球体以包住另一个球。对方为空则不动。另一个球不改。
+/// r186: `union` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L333
+pub fn Sphere::union(self : Sphere, sphere : Sphere) -> Sphere {
+  if sphere.is_empty() {
+    return self
+  }
+  if self.is_empty() {
+    return self.copy(sphere)
+  }
+  if self.center.equals(sphere.center) {
+    self.radius = self.radius.max(sphere.radius)
+  } else {
+    let direction = Vector3::new()
+      .sub_vectors(sphere.center, self.center)
+      .set_length(sphere.radius)
+    ignore(
+      self.expand_by_point(Vector3::new().copy(sphere.center).add(direction)),
+    )
+    ignore(
+      self.expand_by_point(Vector3::new().copy(sphere.center).sub(direction)),
+    )
+  }
+  self
+}
