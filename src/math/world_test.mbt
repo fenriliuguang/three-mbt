@@ -1794,6 +1794,19 @@ test "Box2.set copies both corners" {
 }
 
 ///|
+test "Box2.makeEmpty clears both corners" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  ignore(box.make_empty())
+  assert_eq(box.min.x > 1.0e308, true)
+  assert_eq(box.min.y > 1.0e308, true)
+  assert_eq(box.max.x < -1.0e308, true)
+  assert_eq(box.max.y < -1.0e308, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

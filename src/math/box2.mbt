@@ -29,3 +29,14 @@ pub fn Box2::set(self : Box2, min : Vector2, max : Vector2) -> Box2 {
   ignore(self.max.copy(max))
   self
 }
+
+///|
+/// 下界设为 +∞，上界设为 -∞。
+/// r186: `makeEmpty` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L130
+pub fn Box2::make_empty(self : Box2) -> Box2 {
+  self.min.x = @double.infinity
+  self.min.y = @double.infinity
+  self.max.x = @double.neg_infinity
+  self.max.y = @double.neg_infinity
+  self
+}
