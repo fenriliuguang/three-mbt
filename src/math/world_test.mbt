@@ -292,6 +292,21 @@ test "lerpVectors stores the blend of two vectors" {
 }
 
 ///|
+test "projectOnVector keeps the component along the target" {
+  let v = @math.Vector3::new(x=2.0, y=3.0)
+  let axis = @math.Vector3::new(x=4.0)
+  ignore(v.project_on_vector(axis))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 0.0)
+  assert_eq(axis.x, 4.0)
+  ignore(v.project_on_vector(@math.Vector3::new()))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 0.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)

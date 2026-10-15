@@ -257,6 +257,18 @@ pub fn Vector3::cross_vectors(
 }
 
 ///|
+/// 投影到零向量上得到零。目标向量不改。
+/// r186: `projectOnVector` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L889
+pub fn Vector3::project_on_vector(self : Vector3, v : Vector3) -> Vector3 {
+  let denominator = v.length_sq()
+  if denominator == 0.0 {
+    return self.set(0.0, 0.0, 0.0)
+  }
+  let scalar = v.dot(self) / denominator
+  self.copy(v).multiply_scalar(scalar)
+}
+
+///|
 pub fn Vector3::length_sq(self : Vector3) -> Double {
   self.x * self.x + self.y * self.y + self.z * self.z
 }

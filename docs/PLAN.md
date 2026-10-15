@@ -349,6 +349,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.lerpVectors` has landed. It stores `(1 - alpha)` of the first vector plus `alpha` of the second. Alpha 0.25 from `(1, 2, 3)` toward `(5, 6, 7)` is `(2, 3, 4)`. Alpha 0 keeps the first vector, and alpha 1 keeps the second. Neither input is modified.
 
+`Vector3.projectOnVector` has landed. It replaces this vector with its projection onto the target. `(2, 3, 0)` onto `(4, 0, 0)` becomes `(2, 0, 0)`. Projecting onto the zero vector yields zero. The target is not modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -464,6 +466,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.manhattanLength` | `math` |
 | planned | 7 | `Vector3.setLength` | `math` |
 | planned | 7 | `Vector3.lerpVectors` | `math` |
+| planned | 7 | `Vector3.projectOnVector` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
