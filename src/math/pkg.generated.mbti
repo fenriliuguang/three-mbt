@@ -259,6 +259,7 @@ pub fn Triangle::closest_point_to_point(Self, Vector3, Vector3) -> Vector3
 pub fn Triangle::contains(Self, Vector3) -> Bool
 pub fn Triangle::contains_point(Vector3, Vector3, Vector3, Vector3) -> Bool
 pub fn Triangle::copy(Self, Self) -> Self
+pub fn Triangle::equals(Self, Self) -> Bool
 pub fn Triangle::front_facing(Self, Vector3) -> Bool
 pub fn Triangle::get_area(Self) -> Double
 pub fn Triangle::get_barycoord(Vector3, Vector3, Vector3, Vector3, Vector3) -> Vector3?

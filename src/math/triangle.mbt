@@ -308,3 +308,12 @@ pub fn Triangle::closest_point_to_point(
   ignore(target.copy(a).add_scaled_vector(vab, v))
   target.add_scaled_vector(vac, w)
 }
+
+///|
+/// 三个角都相等则为真。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L529
+pub fn Triangle::equals(self : Triangle, triangle : Triangle) -> Bool {
+  triangle.a.equals(self.a) &&
+  triangle.b.equals(self.b) &&
+  triangle.c.equals(self.c)
+}
