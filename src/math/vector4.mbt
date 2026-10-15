@@ -391,6 +391,21 @@ pub fn Vector4::clamp(self : Vector4, min : Vector4, max : Vector4) -> Vector4 {
 }
 
 ///|
+/// 假定 `min_val` 小于 `max_val`。
+/// r186: `clampScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L744
+pub fn Vector4::clamp_scalar(
+  self : Vector4,
+  min_val : Double,
+  max_val : Double,
+) -> Vector4 {
+  self.x = self.x.clamp(min=min_val, max=max_val)
+  self.y = self.y.clamp(min=min_val, max=max_val)
+  self.z = self.z.clamp(min=min_val, max=max_val)
+  self.w = self.w.clamp(min=min_val, max=max_val)
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
