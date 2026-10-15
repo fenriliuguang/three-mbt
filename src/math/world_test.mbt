@@ -748,6 +748,20 @@ test "panic Vector2 component index past y" {
 }
 
 ///|
+test "Vector2.getComponent reads x or y" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  assert_eq(v.get_component(0), 1.0)
+  assert_eq(v.get_component(1), 2.0)
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+}
+
+///|
+test "panic Vector2 getComponent index past y" {
+  ignore(@math.Vector2::new().get_component(2))
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(

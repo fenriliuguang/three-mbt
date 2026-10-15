@@ -59,6 +59,17 @@ pub fn Vector2::set_component(
 }
 
 ///|
+/// 0 是 x，1 是 y。其他下标中止。
+/// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L187
+pub fn Vector2::get_component(self : Vector2, index : Int) -> Double {
+  match index {
+    0 => self.x
+    1 => self.y
+    _ => abort("Vector2 index is out of range")
+  }
+}
+
+///|
 pub fn Vector2::copy(self : Vector2, v : Vector2) -> Vector2 {
   self.x = v.x
   self.y = v.y
