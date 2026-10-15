@@ -326,6 +326,19 @@ pub fn Vector3::clamp_scalar(
 }
 
 ///|
+/// 假定 `min` 小于 `max`。零向量保持为零。
+/// r186: `clampLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L655
+pub fn Vector3::clamp_length(
+  self : Vector3,
+  min : Double,
+  max : Double,
+) -> Vector3 {
+  let length = self.length()
+  let divisor = if length == 0.0 { 1.0 } else { length }
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y
