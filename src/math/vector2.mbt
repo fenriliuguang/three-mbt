@@ -314,6 +314,13 @@ pub fn Vector2::angle_to(self : Vector2, v : Vector2) -> Double {
 }
 
 ///|
+/// 直线距离。两个向量都不改。
+/// r186: `distanceTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L680
+pub fn Vector2::distance_to(self : Vector2, v : Vector2) -> Double {
+  self.distance_to_squared(v).sqrt()
+}
+
+///|
 /// 两个向量都不改。
 /// r186: `distanceToSquared` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L694
 pub fn Vector2::distance_to_squared(self : Vector2, v : Vector2) -> Double {

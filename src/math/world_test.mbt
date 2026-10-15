@@ -1040,6 +1040,16 @@ test "Vector2.distanceToSquared is the squared separation" {
 }
 
 ///|
+test "Vector2.distanceTo is the straight-line separation" {
+  let origin = @math.Vector2::new()
+  let point = @math.Vector2::new(x=3.0, y=4.0)
+  assert_eq(origin.distance_to(point), 5.0)
+  assert_eq(point.distance_to(point), 0.0)
+  assert_eq(origin.y, 0.0)
+  assert_eq(point.x, 3.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
