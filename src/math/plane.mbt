@@ -49,3 +49,16 @@ pub fn Plane::normalize(self : Plane) -> Plane {
 pub fn Plane::distance_to_point(self : Plane, point : Vector3) -> Double {
   self.normal.dot(point) + self.constant
 }
+
+///|
+/// 用法线和平面上一点重设平面。来源不改。
+/// r186: `setFromNormalAndCoplanarPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L92
+pub fn Plane::set_from_normal_and_coplanar_point(
+  self : Plane,
+  normal : Vector3,
+  point : Vector3,
+) -> Plane {
+  ignore(self.normal.copy(normal))
+  self.constant = -point.dot(self.normal)
+  self
+}

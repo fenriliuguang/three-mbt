@@ -651,6 +651,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Triangle.normal` has landed. It is the instance form of `getNormal`, and it writes the same unit normal as the static function. Corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)` give `(0, 0, 1)`. A triangle with three identical corners writes `(0, 0, 0)`. The corners are unchanged.
 
+`Plane.setFromNormalAndCoplanarPoint` has landed. It copies the normal and sets the constant so the point lies on the plane. Normal `(0, 1, 0)` and point `(1, 2, 3)` give constant `-2`. Later changes to the source normal and point leave the plane alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -917,6 +919,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.getArea` | `math` |
 | planned | 7 | `Triangle.getMidpoint` | `math` |
 | planned | 7 | `Triangle.normal`, the instance `getNormal` | `math` |
+| planned | 7 | `Plane.setFromNormalAndCoplanarPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
