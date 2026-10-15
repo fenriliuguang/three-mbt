@@ -1205,6 +1205,30 @@ test "Vector4.setW writes w and leaves the rest" {
 }
 
 ///|
+test "Vector4.setComponent writes x, y, z, or w" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  ignore(v.set_component(3, 6.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 6.0)
+  ignore(v.set_component(2, 7.0))
+  assert_eq(v.z, 7.0)
+  ignore(v.set_component(1, 8.0))
+  assert_eq(v.y, 8.0)
+  ignore(v.set_component(0, 9.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 7.0)
+  assert_eq(v.w, 6.0)
+}
+
+///|
+test "panic Vector4 component index past w" {
+  ignore(@math.Vector4::new().set_component(4, 1.0))
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

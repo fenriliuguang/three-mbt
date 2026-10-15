@@ -74,6 +74,24 @@ pub fn Vector4::set_w(self : Vector4, w : Double) -> Vector4 {
 }
 
 ///|
+/// 0 是 x，1 是 y，2 是 z，3 是 w。其他下标中止。
+/// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L217
+pub fn Vector4::set_component(
+  self : Vector4,
+  index : Int,
+  value : Double,
+) -> Vector4 {
+  match index {
+    0 => self.x = value
+    1 => self.y = value
+    2 => self.z = value
+    3 => self.w = value
+    _ => abort("Vector4 index is out of range")
+  }
+  self
+}
+
+///|
 pub fn Vector4::copy(self : Vector4, v : Vector4) -> Vector4 {
   self.x = v.x
   self.y = v.y
