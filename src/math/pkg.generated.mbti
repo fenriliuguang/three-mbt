@@ -147,6 +147,7 @@ pub(all) struct Line3 {
 }
 pub fn Line3::apply_matrix4(Self, Matrix4) -> Self
 pub fn Line3::at(Self, Double, Vector3) -> Vector3
+pub fn Line3::clone(Self) -> Self
 pub fn Line3::closest_point_to_point(Self, Vector3, Bool, Vector3) -> Vector3
 pub fn Line3::closest_point_to_point_parameter(Self, Vector3, Bool) -> Double
 pub fn Line3::copy(Self, Self) -> Self

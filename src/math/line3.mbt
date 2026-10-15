@@ -187,3 +187,10 @@ pub fn Line3::apply_matrix4(self : Line3, matrix : Matrix4) -> Line3 {
 pub fn Line3::equals(self : Line3, line : Line3) -> Bool {
   line.start.equals(self.start) && line.end.equals(self.end)
 }
+
+///|
+/// 返回一条新线段。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L329
+pub fn Line3::clone(self : Line3) -> Line3 {
+  Line3::new().copy(self)
+}
