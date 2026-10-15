@@ -159,3 +159,13 @@ pub fn Triangle::set_from_points_and_indices(
 ) -> Triangle {
   self.set(points[i0], points[i1], points[i2])
 }
+
+///|
+/// 把另一个三角形的三个角拷过来。之后改来源不影响这里。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L306
+pub fn Triangle::copy(self : Triangle, triangle : Triangle) -> Triangle {
+  ignore(self.a.copy(triangle.a))
+  ignore(self.b.copy(triangle.b))
+  ignore(self.c.copy(triangle.c))
+  self
+}

@@ -251,6 +251,7 @@ pub(all) struct Triangle {
   c : Vector3
 }
 pub fn Triangle::contains_point(Vector3, Vector3, Vector3, Vector3) -> Bool
+pub fn Triangle::copy(Self, Self) -> Self
 pub fn Triangle::get_barycoord(Vector3, Vector3, Vector3, Vector3, Vector3) -> Vector3?
 pub fn Triangle::get_interpolation(Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3) -> Vector3?
 pub fn Triangle::get_normal(Vector3, Vector3, Vector3, Vector3) -> Vector3
