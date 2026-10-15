@@ -215,3 +215,10 @@ pub fn Plane::equals(self : Plane, plane : Plane) -> Bool {
 pub fn Plane::clone(self : Plane) -> Plane {
   Plane::new().copy(self)
 }
+
+///|
+/// 把法线写成数组，并带上常数。改数组不影响平面。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L371
+pub fn Plane::to_json(self : Plane) -> (Array[Double], Double) {
+  (self.normal.to_array(), self.constant)
+}

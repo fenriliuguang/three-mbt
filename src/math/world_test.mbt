@@ -3654,6 +3654,23 @@ test "Plane.clone copies the normal and the constant" {
 }
 
 ///|
+test "Plane.toJSON writes the normal and the constant" {
+  let plane = @math.Plane::new(
+    normal=@math.Vector3::new(y=1.0),
+    constant=-2.0,
+  )
+  let (normal, constant) = plane.to_json()
+  assert_eq(normal.length(), 3)
+  assert_eq(normal[0], 0.0)
+  assert_eq(normal[1], 1.0)
+  assert_eq(normal[2], 0.0)
+  assert_eq(constant, -2.0)
+  normal[1] = 9.0
+  assert_eq(plane.normal.y, 1.0)
+  assert_eq(plane.constant, -2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

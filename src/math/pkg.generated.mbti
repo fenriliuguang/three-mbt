@@ -227,6 +227,7 @@ pub fn Plane::set(Self, Vector3, Double) -> Self
 pub fn Plane::set_components(Self, Double, Double, Double, Double) -> Self
 pub fn Plane::set_from_coplanar_points(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Plane::set_from_normal_and_coplanar_point(Self, Vector3, Vector3) -> Self
+pub fn Plane::to_json(Self) -> (Array[Double], Double)
 pub fn Plane::translate(Self, Vector3) -> Self
 
 pub(all) struct Quaternion {
