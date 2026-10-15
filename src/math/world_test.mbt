@@ -683,6 +683,18 @@ test "setFromCartesianCoords recovers a y-up cylinder" {
 }
 
 ///|
+test "Cylindrical.setFromVector3 reads the vector components" {
+  let c = @math.Cylindrical::new(radius=9.0, theta=1.0, y=4.0)
+  let forward = @math.Vector3::new(y=5.0, z=2.0)
+  ignore(c.set_from_vector3(forward))
+  assert_eq(c.radius, 2.0)
+  assert_eq(c.theta, 0.0)
+  assert_eq(c.y, 5.0)
+  assert_eq(forward.y, 5.0)
+  assert_eq(forward.z, 2.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(

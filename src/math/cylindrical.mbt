@@ -44,6 +44,16 @@ pub fn Cylindrical::copy(self : Cylindrical, other : Cylindrical) -> Cylindrical
 }
 
 ///|
+/// 从向量的三个分量写入柱坐标。向量本身不改。
+/// r186: `setFromVector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L83
+pub fn Cylindrical::set_from_vector3(
+  self : Cylindrical,
+  v : Vector3,
+) -> Cylindrical {
+  self.set_from_cartesian_coords(v.x, v.y, v.z)
+}
+
+///|
 /// 从直角坐标写入半径、方位角和高度。半径是 xz 平面上到原点的距离。
 /// r186: `setFromCartesianCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L97
 pub fn Cylindrical::set_from_cartesian_coords(
