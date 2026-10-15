@@ -208,3 +208,10 @@ pub fn Plane::translate(self : Plane, offset : Vector3) -> Plane {
 pub fn Plane::equals(self : Plane, plane : Plane) -> Bool {
   plane.normal.equals(self.normal) && plane.constant == self.constant
 }
+
+///|
+/// 返回一个新平面。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L360
+pub fn Plane::clone(self : Plane) -> Plane {
+  Plane::new().copy(self)
+}
