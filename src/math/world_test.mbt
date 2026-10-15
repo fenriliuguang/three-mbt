@@ -1133,6 +1133,28 @@ test "Vector2.toArray writes two components at an offset" {
 }
 
 ///|
+test "Vector2.rotateAround turns counterclockwise about a center" {
+  let right_angle = 1.5707963267948966
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  let origin = @math.Vector2::new()
+  ignore(v.rotate_around(origin, 0.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  let axis = @math.Vector2::new(x=1.0)
+  ignore(axis.rotate_around(origin, right_angle))
+  assert_close(axis.x, 0.0)
+  assert_close(axis.y, 1.0)
+  assert_eq(origin.x, 0.0)
+  let center = @math.Vector2::new(x=1.0, y=1.0)
+  let point = @math.Vector2::new(x=2.0, y=1.0)
+  ignore(point.rotate_around(center, right_angle))
+  assert_close(point.x, 1.0)
+  assert_close(point.y, 2.0)
+  assert_eq(center.x, 1.0)
+  assert_eq(center.y, 1.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

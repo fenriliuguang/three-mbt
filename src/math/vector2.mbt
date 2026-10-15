@@ -392,6 +392,23 @@ pub fn Vector2::to_array(
 }
 
 ///|
+/// 绕 `center` 逆时针旋转。圆心不改。
+/// r186: `rotateAround` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L832
+pub fn Vector2::rotate_around(
+  self : Vector2,
+  center : Vector2,
+  angle : Double,
+) -> Vector2 {
+  let c = @std.cos(angle)
+  let s = @std.sin(angle)
+  let x = self.x - center.x
+  let y = self.y - center.y
+  self.x = x * c - y * s + center.x
+  self.y = x * s + y * c + center.y
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

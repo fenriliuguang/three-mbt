@@ -237,6 +237,7 @@ pub fn Vector2::multiply_scalar(Self, Double) -> Self
 pub fn Vector2::negate(Self) -> Self
 pub fn Vector2::new(x? : Double, y? : Double) -> Self
 pub fn Vector2::normalize(Self) -> Self
+pub fn Vector2::rotate_around(Self, Self, Double) -> Self
 pub fn Vector2::round(Self) -> Self
 pub fn Vector2::round_to_zero(Self) -> Self
 pub fn Vector2::set(Self, Double, Double) -> Self
