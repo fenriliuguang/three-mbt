@@ -1006,6 +1006,16 @@ test "Vector2.manhattanLength sums the absolute components" {
 }
 
 ///|
+test "Vector2.angle is measured from the positive x axis" {
+  let right = @math.Vector2::new(x=1.0)
+  assert_eq(right.angle(), 0.0)
+  assert_eq(right.x, 1.0)
+  assert_close(@math.Vector2::new(y=1.0).angle(), 1.5707963267948966)
+  assert_close(@math.Vector2::new(x=-1.0).angle(), 3.141592653589793)
+  assert_close(@math.Vector2::new(y=-1.0).angle(), 4.71238898038469)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

@@ -295,6 +295,13 @@ pub fn Vector2::manhattan_length(self : Vector2) -> Double {
 }
 
 ///|
+/// 相对正 X 轴的夹角，范围是 `[0, 2π)`。向量本身不改。
+/// r186: `angle` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L646
+pub fn Vector2::angle(self : Vector2) -> Double {
+  @std.atan2(-self.y, -self.x) + @std.PI
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
