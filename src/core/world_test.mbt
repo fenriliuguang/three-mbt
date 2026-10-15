@@ -67,6 +67,24 @@ test "setFromBufferAttribute fits each vertex" {
 }
 
 ///|
+test "getInterpolatedAttribute blends three vertices" {
+  let colors = @core.BufferAttribute::new(
+    [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+    3,
+  )
+  let bary = @math.Vector3::new(x=0.0, y=0.5, z=0.5)
+  let target = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
+  ignore(colors.interpolate_vector3(0, 1, 2, bary, target))
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.5)
+  assert_eq(target.z, 0.5)
+  assert_eq(colors.get_x(0), 1.0)
+  assert_eq(colors.get_y(1), 1.0)
+  assert_eq(colors.get_z(2), 1.0)
+  assert_eq(bary.y, 0.5)
+}
+
+///|
 test "fromBufferAttribute reads xy and skips later components" {
   let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2)
   let v = @math.Vector2::new(x=9.0, y=8.0)

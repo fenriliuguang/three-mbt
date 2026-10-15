@@ -112,6 +112,26 @@ pub fn BufferAttribute::set_box3(
 }
 
 ///|
+/// 按重心坐标混合三个顶点的 xyz。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `getInterpolatedAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L195
+pub fn BufferAttribute::interpolate_vector3(
+  self : BufferAttribute,
+  i1 : Int,
+  i2 : Int,
+  i3 : Int,
+  barycoord : @math.Vector3,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  let v1 = self.copy_to_vector3(i1, @math.Vector3::new())
+  let v2 = self.copy_to_vector3(i2, @math.Vector3::new())
+  let v3 = self.copy_to_vector3(i3, @math.Vector3::new())
+  ignore(target.set_scalar(0.0))
+  ignore(target.add_scaled_vector(v1, barycoord.x))
+  ignore(target.add_scaled_vector(v2, barycoord.y))
+  target.add_scaled_vector(v3, barycoord.z)
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,
