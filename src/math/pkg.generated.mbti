@@ -206,6 +206,7 @@ pub fn Vector2::add_scalar(Self, Double) -> Self
 pub fn Vector2::add_scaled_vector(Self, Self, Double) -> Self
 pub fn Vector2::add_vectors(Self, Self, Self) -> Self
 pub fn Vector2::apply_matrix3(Self, Matrix3) -> Self
+pub fn Vector2::ceil(Self) -> Self
 pub fn Vector2::clamp(Self, Self, Self) -> Self
 pub fn Vector2::clamp_length(Self, Double, Double) -> Self
 pub fn Vector2::clamp_scalar(Self, Double, Double) -> Self
