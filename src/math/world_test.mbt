@@ -572,6 +572,22 @@ test "setFromCartesianCoords recovers y-up spherical coordinates" {
 }
 
 ///|
+test "setFromVector3 reads the vector components" {
+  let s = @math.Spherical::new(radius=9.0, phi=1.0, theta=1.0)
+  let up = @math.Vector3::new(y=5.0)
+  ignore(s.set_from_vector3(up))
+  assert_eq(s.radius, 5.0)
+  assert_eq(s.phi, 0.0)
+  assert_eq(s.theta, 0.0)
+  assert_eq(up.y, 5.0)
+  let origin = @math.Vector3::new()
+  ignore(s.set_from_vector3(origin))
+  assert_eq(s.radius, 0.0)
+  assert_eq(s.phi, 0.0)
+  assert_eq(s.theta, 0.0)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))

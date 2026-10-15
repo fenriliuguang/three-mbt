@@ -182,6 +182,7 @@ pub fn Spherical::make_safe(Self) -> Self
 pub fn Spherical::new(radius? : Double, phi? : Double, theta? : Double) -> Self
 pub fn Spherical::set(Self, Double, Double, Double) -> Self
 pub fn Spherical::set_from_cartesian_coords(Self, Double, Double, Double) -> Self
+pub fn Spherical::set_from_vector3(Self, Vector3) -> Self
 
 pub(all) struct Vector2 {
   mut x : Double

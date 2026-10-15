@@ -53,6 +53,13 @@ pub fn Spherical::make_safe(self : Spherical) -> Spherical {
 }
 
 ///|
+/// 从向量的三个分量写入球坐标。向量本身不改。
+/// r186: `setFromVector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L100
+pub fn Spherical::set_from_vector3(self : Spherical, v : Vector3) -> Spherical {
+  self.set_from_cartesian_coords(v.x, v.y, v.z)
+}
+
+///|
 /// 从直角坐标写入半径和两个角。原点的两个角都是 0。
 /// r186: `setFromCartesianCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L114
 pub fn Spherical::set_from_cartesian_coords(
