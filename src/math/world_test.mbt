@@ -997,6 +997,15 @@ test "Vector2.cross returns the z component" {
 }
 
 ///|
+test "Vector2.manhattanLength sums the absolute components" {
+  let v = @math.Vector2::new(x=3.0, y=-4.0)
+  assert_eq(v.manhattan_length(), 7.0)
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, -4.0)
+  assert_eq(@math.Vector2::new().manhattan_length(), 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
