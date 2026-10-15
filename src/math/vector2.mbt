@@ -371,6 +371,27 @@ pub fn Vector2::from_array(
 }
 
 ///|
+/// 省略数组时新建一个。短于 `offset + 2` 的数组会补零再写入。向量本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L800
+pub fn Vector2::to_array(
+  self : Vector2,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 2
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.x
+  target[offset + 1] = self.y
+  target
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

@@ -248,6 +248,7 @@ pub fn Vector2::set_y(Self, Double) -> Self
 pub fn Vector2::sub(Self, Self) -> Self
 pub fn Vector2::sub_scalar(Self, Double) -> Self
 pub fn Vector2::sub_vectors(Self, Self, Self) -> Self
+pub fn Vector2::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 
 pub(all) struct Vector3 {
   mut x : Double
