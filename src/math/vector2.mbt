@@ -205,6 +205,15 @@ pub fn Vector2::max(self : Vector2, v : Vector2) -> Vector2 {
 }
 
 ///|
+/// 假定每个分量都是 `min` 小于 `max`。两个边界向量不改。
+/// r186: `clamp` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L451
+pub fn Vector2::clamp(self : Vector2, min : Vector2, max : Vector2) -> Vector2 {
+  self.x = self.x.clamp(min=min.x, max=max.x)
+  self.y = self.y.clamp(min=min.y, max=max.y)
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

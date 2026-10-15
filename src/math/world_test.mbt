@@ -896,6 +896,24 @@ test "Vector2.max keeps the larger component" {
 }
 
 ///|
+test "Vector2.clamp limits each component" {
+  let v = @math.Vector2::new(x=0.0, y=5.0)
+  let low = @math.Vector2::new(x=1.0, y=0.0)
+  let high = @math.Vector2::new(x=3.0, y=4.0)
+  ignore(v.clamp(low, high))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(low.x, 1.0)
+  assert_eq(high.y, 4.0)
+  let inside = @math.Vector2::new(x=2.0, y=2.0)
+  ignore(
+    inside.clamp(@math.Vector2::new(), @math.Vector2::new(x=3.0, y=3.0)),
+  )
+  assert_eq(inside.x, 2.0)
+  assert_eq(inside.y, 2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
