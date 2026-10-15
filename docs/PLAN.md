@@ -419,6 +419,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector2.clampLength` has landed. It rescales the vector so its length lies between `min` and `max`, which are assumed to be ordered. Length 4 clamped to `[1, 2]` becomes 2, and length 0.5 becomes 1, both along the original direction. Length 4 inside `[1, 8]` stays 4. A zero vector stays zero.
 
+`Vector2.floor` has landed. Each component rounds toward negative infinity. `(1.2, -1.2)` becomes `(1, -2)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -569,6 +571,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector2.clamp` | `math` |
 | planned | 7 | `Vector2.clampScalar` | `math` |
 | planned | 7 | `Vector2.clampLength` | `math` |
+| planned | 7 | `Vector2.floor` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

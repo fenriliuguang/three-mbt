@@ -240,6 +240,14 @@ pub fn Vector2::clamp_length(
 }
 
 ///|
+/// r186: `floor` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L504
+pub fn Vector2::floor(self : Vector2) -> Vector2 {
+  self.x = self.x.floor()
+  self.y = self.y.floor()
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

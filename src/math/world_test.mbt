@@ -945,6 +945,14 @@ test "Vector2.clampLength limits the vector length" {
 }
 
 ///|
+test "Vector2.floor rounds toward negative infinity" {
+  let v = @math.Vector2::new(x=1.2, y=-1.2)
+  ignore(v.floor())
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, -2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

@@ -215,6 +215,7 @@ pub fn Vector2::divide(Self, Self) -> Self
 pub fn Vector2::divide_scalar(Self, Double) -> Self
 pub fn Vector2::dot(Self, Self) -> Double
 pub fn Vector2::equals(Self, Self) -> Bool
+pub fn Vector2::floor(Self) -> Self
 pub fn Vector2::get_component(Self, Int) -> Double
 pub fn Vector2::length(Self) -> Double
 pub fn Vector2::length_sq(Self) -> Double
