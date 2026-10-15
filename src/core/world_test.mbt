@@ -85,6 +85,23 @@ test "getInterpolatedAttribute blends three vertices" {
 }
 
 ///|
+test "setFromAttributeAndIndices copies three indexed vertices" {
+  let positions = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 0.0, 0.0, 1.0],
+    3,
+  )
+  let triangle = @math.Triangle::new()
+  ignore(positions.set_triangle(triangle, 3, 0, 1))
+  assert_eq(triangle.a.z, 1.0)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.b.y, 2.0)
+  assert_eq(triangle.c.y, 5.0)
+  assert_eq(triangle.c.z, 6.0)
+  assert_eq(positions.get_x(0), 1.0)
+  assert_eq(positions.get_z(3), 1.0)
+}
+
+///|
 test "fromBufferAttribute reads xy and skips later components" {
   let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2)
   let v = @math.Vector2::new(x=9.0, y=8.0)

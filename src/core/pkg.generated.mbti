@@ -30,6 +30,7 @@ pub fn BufferAttribute::get_z(Self, Int) -> Double
 pub fn BufferAttribute::interpolate_vector3(Self, Int, Int, Int, @math.Vector3, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::new(Array[Double], Int, normalized? : Bool) -> Self
 pub fn BufferAttribute::set_box3(Self, @math.Box3) -> @math.Box3
+pub fn BufferAttribute::set_triangle(Self, @math.Triangle, Int, Int, Int) -> @math.Triangle
 pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
 
 pub(all) struct BufferGeometry {

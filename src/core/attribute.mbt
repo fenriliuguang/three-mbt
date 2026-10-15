@@ -132,6 +132,22 @@ pub fn BufferAttribute::interpolate_vector3(
 }
 
 ///|
+/// 按三个下标写入三角形的三个角。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `setFromAttributeAndIndices` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L279
+pub fn BufferAttribute::set_triangle(
+  self : BufferAttribute,
+  target : @math.Triangle,
+  i0 : Int,
+  i1 : Int,
+  i2 : Int,
+) -> @math.Triangle {
+  ignore(self.copy_to_vector3(i0, target.a))
+  ignore(self.copy_to_vector3(i1, target.b))
+  ignore(self.copy_to_vector3(i2, target.c))
+  target
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,
