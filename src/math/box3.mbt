@@ -199,6 +199,18 @@ pub fn Box3::get_bounding_sphere(self : Box3, target : Sphere) -> Sphere {
 }
 
 ///|
+/// 收成两个盒子的重叠部分。没有重叠则清空。另一个盒子不改。
+/// r186: `intersect` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L638
+pub fn Box3::intersect(self : Box3, box : Box3) -> Box3 {
+  ignore(self.min.max(box.min))
+  ignore(self.max.min(box.max))
+  if self.is_empty() {
+    ignore(self.make_empty())
+  }
+  self
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

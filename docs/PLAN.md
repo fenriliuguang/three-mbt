@@ -611,6 +611,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.getBoundingSphere` has landed. It writes a sphere around the box. A box from `(0, 0, 0)` to `(2, 0, 0)` becomes a sphere at `(1, 0, 0)` with radius `1`. An empty box writes an empty sphere, center `(0, 0, 0)` and radius `-1`. The box is unchanged.
 
+`Box3.intersect` has landed. It keeps the overlap of the two boxes. A box from `(1, 2, 3)` to `(5, 6, 7)` intersected with `(3, 0, 4)` to `(4, 4, 8)` becomes `(3, 2, 4)` to `(4, 4, 7)`. A box with no overlap becomes empty. The other box is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -857,6 +859,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box3.intersectsPlane` | `math` |
 | planned | 7 | `Box3.distanceToPoint` | `math` |
 | planned | 7 | `Box3.getBoundingSphere` | `math` |
+| planned | 7 | `Box3.intersect` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

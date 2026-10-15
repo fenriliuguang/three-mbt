@@ -2544,6 +2544,41 @@ test "Box3.getBoundingSphere uses the center and half diagonal" {
 }
 
 ///|
+test "Box3.intersect keeps the overlap" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=5.0, y=6.0, z=7.0),
+  )
+  let other = @math.Box3::new(
+    @math.Vector3::new(x=3.0, y=0.0, z=4.0),
+    @math.Vector3::new(x=4.0, y=4.0, z=8.0),
+  )
+  ignore(box.intersect(other))
+  assert_eq(box.min.x, 3.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 4.0)
+  assert_eq(box.max.x, 4.0)
+  assert_eq(box.max.y, 4.0)
+  assert_eq(box.max.z, 7.0)
+  assert_eq(other.min.x, 3.0)
+  assert_eq(other.max.z, 8.0)
+  let apart = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=3.0, y=4.0, z=5.0),
+  )
+  ignore(
+    apart.intersect(
+      @math.Box3::new(
+        @math.Vector3::new(x=5.0, y=6.0, z=7.0),
+        @math.Vector3::new(x=7.0, y=8.0, z=9.0),
+      ),
+    ),
+  )
+  assert_eq(apart.min.x > 1.0e308, true)
+  assert_eq(apart.max.x < -1.0e308, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
