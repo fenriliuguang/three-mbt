@@ -519,6 +519,17 @@ pub fn Vector4::set_length(self : Vector4, length : Double) -> Vector4 {
 }
 
 ///|
+/// 另一个向量不改。
+/// r186: `lerp` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L935
+pub fn Vector4::lerp(self : Vector4, v : Vector4, alpha : Double) -> Vector4 {
+  self.x += (v.x - self.x) * alpha
+  self.y += (v.y - self.y) * alpha
+  self.z += (v.z - self.z) * alpha
+  self.w += (v.w - self.w) * alpha
+  self
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x

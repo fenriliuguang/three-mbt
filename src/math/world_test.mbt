@@ -1680,6 +1680,27 @@ test "Vector4.setLength scales to the requested length" {
 }
 
 ///|
+test "Vector4.lerp moves toward another vector" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let other = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  ignore(v.lerp(other, 0.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.w, 4.0)
+  ignore(v.lerp(other, 0.25))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+  assert_eq(v.w, 5.0)
+  assert_eq(other.x, 5.0)
+  assert_eq(other.w, 8.0)
+  ignore(v.lerp(other, 1.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 6.0)
+  assert_eq(v.z, 7.0)
+  assert_eq(v.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
