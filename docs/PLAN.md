@@ -677,6 +677,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Plane.negate` has landed. It flips both the normal and the constant. Normal `(0, 1, 0)` and constant `-2` become `(0, -1, 0)` and `2`. The point `(1, 2, 3)` stays on the plane.
 
+`Plane.distanceToSphere` has landed. It subtracts the radius from the signed distance of the center. The plane `x = 0` and a sphere at `(3, 0, 0)` with radius `1` are distance `2` apart. The sphere and the plane are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -956,6 +958,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.equals` | `math` |
 | planned | 7 | `Plane.set` | `math` |
 | planned | 7 | `Plane.negate` | `math` |
+| planned | 7 | `Plane.distanceToSphere` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

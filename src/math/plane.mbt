@@ -99,3 +99,10 @@ pub fn Plane::negate(self : Plane) -> Plane {
   ignore(self.normal.negate())
   self
 }
+
+///|
+/// 返回球心到平面的有符号距离再减去半径。球和平面都不改。
+/// r186: `distanceToSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L187
+pub fn Plane::distance_to_sphere(self : Plane, sphere : Sphere) -> Double {
+  self.distance_to_point(sphere.center) - sphere.radius
+}

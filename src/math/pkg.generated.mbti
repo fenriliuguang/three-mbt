@@ -191,6 +191,7 @@ pub(all) struct Plane {
 }
 pub fn Plane::copy(Self, Self) -> Self
 pub fn Plane::distance_to_point(Self, Vector3) -> Double
+pub fn Plane::distance_to_sphere(Self, Sphere) -> Double
 pub fn Plane::negate(Self) -> Self
 pub fn Plane::new(normal? : Vector3, constant? : Double) -> Self
 pub fn Plane::normalize(Self) -> Self
