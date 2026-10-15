@@ -60,3 +60,10 @@ pub fn Line3::delta(self : Line3, target : Vector3) -> Vector3 {
 pub fn Line3::distance_sq(self : Line3) -> Double {
   self.start.distance_to_squared(self.end)
 }
+
+///|
+/// 返回两端的距离。线段不改。
+/// r186: `distance` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L113
+pub fn Line3::distance(self : Line3) -> Double {
+  self.start.distance_to(self.end)
+}
