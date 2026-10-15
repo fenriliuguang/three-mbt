@@ -240,6 +240,27 @@ pub fn Vector4::divide_scalar(self : Vector4, scalar : Double) -> Vector4 {
 }
 
 ///|
+/// 把四元数的旋转轴写入 x、y、z，把转角写入 w。四元数应当已归一化。
+/// r186: `setAxisAngleFromQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L494
+pub fn Vector4::set_axis_angle_from_quaternion(
+  self : Vector4,
+  q : Quaternion,
+) -> Vector4 {
+  self.w = 2.0 * @std.acos(q.w)
+  let s = (1.0 - q.w * q.w).sqrt()
+  if s < 0.0001 {
+    self.x = 1.0
+    self.y = 0.0
+    self.z = 0.0
+  } else {
+    self.x = q.x / s
+    self.y = q.y / s
+    self.z = q.z / s
+  }
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

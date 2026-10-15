@@ -1428,6 +1428,31 @@ test "Vector4.divideScalar divides every component" {
 }
 
 ///|
+test "Vector4.setAxisAngleFromQuaternion reads axis and angle" {
+  let identity = @math.Quaternion::new()
+  let still = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(still.set_axis_angle_from_quaternion(identity))
+  assert_eq(still.x, 1.0)
+  assert_eq(still.y, 0.0)
+  assert_eq(still.z, 0.0)
+  assert_eq(still.w, 0.0)
+  assert_eq(identity.x, 0.0)
+  assert_eq(identity.w, 1.0)
+  let yaw = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    1.5707963267948966,
+  )
+  let turned = @math.Vector4::new()
+  ignore(turned.set_axis_angle_from_quaternion(yaw))
+  assert_close(turned.x, 0.0)
+  assert_close(turned.y, 1.0)
+  assert_close(turned.z, 0.0)
+  assert_close(turned.w, 1.5707963267948966)
+  assert_close(yaw.y, 0.7071067811865476)
+  assert_close(yaw.w, 0.7071067811865476)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
