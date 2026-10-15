@@ -157,3 +157,17 @@ pub fn Box2::contains_box(self : Box2, box : Box2) -> Bool {
   self.min.y <= box.min.y &&
   box.max.y <= self.max.y
 }
+
+///|
+/// 把点写成相对宽高的比例，写入 target。点和盒子都不改。
+/// r186: `getParameter` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L261
+pub fn Box2::get_parameter(
+  self : Box2,
+  point : Vector2,
+  target : Vector2,
+) -> Vector2 {
+  target.set(
+    (point.x - self.min.x) / (self.max.x - self.min.x),
+    (point.y - self.min.y) / (self.max.y - self.min.y),
+  )
+}

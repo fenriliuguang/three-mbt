@@ -29,6 +29,7 @@ pub fn Box2::expand_by_point(Self, Vector2) -> Self
 pub fn Box2::expand_by_scalar(Self, Double) -> Self
 pub fn Box2::expand_by_vector(Self, Vector2) -> Self
 pub fn Box2::get_center(Self, Vector2) -> Vector2
+pub fn Box2::get_parameter(Self, Vector2, Vector2) -> Vector2
 pub fn Box2::get_size(Self, Vector2) -> Vector2
 pub fn Box2::is_empty(Self) -> Bool
 pub fn Box2::make_empty(Self) -> Self
