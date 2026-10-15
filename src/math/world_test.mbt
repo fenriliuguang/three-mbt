@@ -2656,6 +2656,29 @@ test "Box3.fromJSON reads both corners" {
 }
 
 ///|
+test "Triangle starts at the origin and copies its corners" {
+  let empty = @math.Triangle::new()
+  assert_eq(empty.a.x, 0.0)
+  assert_eq(empty.a.y, 0.0)
+  assert_eq(empty.a.z, 0.0)
+  assert_eq(empty.b.x, 0.0)
+  assert_eq(empty.c.z, 0.0)
+  let a = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let b = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
+  let c = @math.Vector3::new(x=7.0, y=8.0, z=9.0)
+  let triangle = @math.Triangle::new(a=a, b=b, c=c)
+  assert_eq(triangle.a.x, 1.0)
+  assert_eq(triangle.a.y, 2.0)
+  assert_eq(triangle.a.z, 3.0)
+  assert_eq(triangle.b.y, 5.0)
+  assert_eq(triangle.c.z, 9.0)
+  a.x = 9.0
+  c.z = 0.0
+  assert_eq(triangle.a.x, 1.0)
+  assert_eq(triangle.c.z, 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
