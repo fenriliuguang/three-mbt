@@ -2057,6 +2057,31 @@ test "Box2.getParameter writes the point as a proportion" {
 }
 
 ///|
+test "Box2.intersectsBox counts a shared edge" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let overlap = @math.Box2::new(
+    min=@math.Vector2::new(x=2.0, y=3.0),
+    max=@math.Vector2::new(x=4.0, y=5.0),
+  )
+  let touch = @math.Box2::new(
+    min=@math.Vector2::new(x=3.0, y=2.0),
+    max=@math.Vector2::new(x=5.0, y=4.0),
+  )
+  let apart = @math.Box2::new(
+    min=@math.Vector2::new(x=4.0, y=2.0),
+    max=@math.Vector2::new(x=5.0, y=4.0),
+  )
+  assert_eq(box.intersects_box(overlap), true)
+  assert_eq(box.intersects_box(touch), true)
+  assert_eq(box.intersects_box(apart), false)
+  assert_eq(overlap.min.x, 2.0)
+  assert_eq(box.max.x, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

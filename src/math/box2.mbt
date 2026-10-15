@@ -171,3 +171,13 @@ pub fn Box2::get_parameter(
     (point.y - self.min.y) / (self.max.y - self.min.y),
   )
 }
+
+///|
+/// 两个盒子有重叠或贴边则为真。两个盒子都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L279
+pub fn Box2::intersects_box(self : Box2, box : Box2) -> Bool {
+  box.max.x >= self.min.x &&
+  box.min.x <= self.max.x &&
+  box.max.y >= self.min.y &&
+  box.min.y <= self.max.y
+}
