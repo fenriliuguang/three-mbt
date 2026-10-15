@@ -51,6 +51,7 @@ pub(all) struct Cylindrical {
   mut theta : Double
   mut y : Double
 }
+pub fn Cylindrical::copy(Self, Self) -> Self
 pub fn Cylindrical::new(radius? : Double, theta? : Double, y? : Double) -> Self
 pub fn Cylindrical::set(Self, Double, Double, Double) -> Self
 
