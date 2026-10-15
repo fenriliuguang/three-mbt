@@ -1845,6 +1845,22 @@ test "Box2.setFromPoints fits the given points" {
 }
 
 ///|
+test "Box2.setFromCenterAndSize uses center and size" {
+  let box = @math.Box2::new()
+  let center = @math.Vector2::new(x=5.0, y=6.0)
+  let size = @math.Vector2::new(x=2.0, y=4.0)
+  ignore(box.set_from_center_and_size(center, size))
+  assert_eq(box.min.x, 4.0)
+  assert_eq(box.min.y, 4.0)
+  assert_eq(box.max.x, 6.0)
+  assert_eq(box.max.y, 8.0)
+  assert_eq(center.x, 5.0)
+  assert_eq(center.y, 6.0)
+  assert_eq(size.x, 2.0)
+  assert_eq(size.y, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
