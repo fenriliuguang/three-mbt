@@ -161,3 +161,10 @@ pub fn Plane::intersects_line(self : Plane, line : Line3) -> Bool {
 pub fn Plane::intersects_box(self : Plane, box : Box3) -> Bool {
   box.intersects_plane(self)
 }
+
+///|
+/// 平面与球相交或相切则为真。平面和球都不改。
+/// r186: `intersectsSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L283
+pub fn Plane::intersects_sphere(self : Plane, sphere : Sphere) -> Bool {
+  sphere.intersects_plane(self)
+}
