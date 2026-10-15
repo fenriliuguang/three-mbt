@@ -343,6 +343,21 @@ pub fn Vector4::set_axis_angle_from_rotation_matrix(
 }
 
 ///|
+/// 复制矩阵最后一列。矩阵不改。
+/// r186: `setFromMatrixPosition` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L662
+pub fn Vector4::set_from_matrix_position(
+  self : Vector4,
+  m : Matrix4,
+) -> Vector4 {
+  let e = m.elements
+  self.x = e[12]
+  self.y = e[13]
+  self.z = e[14]
+  self.w = e[15]
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

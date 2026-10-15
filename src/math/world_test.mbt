@@ -1487,6 +1487,27 @@ test "Vector4.setAxisAngleFromRotationMatrix reads axis and angle" {
 }
 
 ///|
+test "Vector4.setFromMatrixPosition copies the last column" {
+  let identity = @math.Matrix4::new()
+  let origin = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(origin.set_from_matrix_position(identity))
+  assert_eq(origin.x, 0.0)
+  assert_eq(origin.y, 0.0)
+  assert_eq(origin.z, 0.0)
+  assert_eq(origin.w, 1.0)
+  let placed = @math.Matrix4::new().set(
+    1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 6.0,
+  )
+  ignore(origin.set_from_matrix_position(placed))
+  assert_eq(origin.x, 3.0)
+  assert_eq(origin.y, 4.0)
+  assert_eq(origin.z, 5.0)
+  assert_eq(origin.w, 6.0)
+  assert_eq(placed.elements[12], 3.0)
+  assert_eq(placed.elements[15], 6.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
