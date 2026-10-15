@@ -1651,6 +1651,17 @@ test "Vector4.negate flips the sign of every component" {
 }
 
 ///|
+test "Vector4.manhattanLength sums the absolute components" {
+  let v = @math.Vector4::new(x=3.0, y=-4.0, z=5.0, w=-6.0)
+  assert_eq(v.manhattan_length(), 18.0)
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, -4.0)
+  assert_eq(v.z, 5.0)
+  assert_eq(v.w, -6.0)
+  assert_eq(@math.Vector4::new(w=0.0).manhattan_length(), 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

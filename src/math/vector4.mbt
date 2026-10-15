@@ -486,6 +486,12 @@ pub fn Vector4::length(self : Vector4) -> Double {
 }
 
 ///|
+/// r186: `manhattanLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L895
+pub fn Vector4::manhattan_length(self : Vector4) -> Double {
+  self.x.abs() + self.y.abs() + self.z.abs() + self.w.abs()
+}
+
+///|
 pub fn Vector4::normalize(self : Vector4) -> Vector4 {
   let len = self.length()
   if len == 0.0 {
