@@ -97,3 +97,10 @@ pub fn Sphere::set(self : Sphere, center : Vector3, radius : Double) -> Sphere {
 pub fn Sphere::distance_to_point(self : Sphere, point : Vector3) -> Double {
   point.distance_to(self.center) - self.radius
 }
+
+///|
+/// 球与盒子相交或相切则为真。球和盒子都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L191
+pub fn Sphere::intersects_box(self : Sphere, box : Box3) -> Bool {
+  box.intersects_sphere(self)
+}
