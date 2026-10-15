@@ -1277,6 +1277,29 @@ test "Vector4.addScalar adds one number to every component" {
 }
 
 ///|
+test "Vector4.addVectors stores the sum of two vectors" {
+  let a = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let b = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  let sum = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(sum.add_vectors(a, b))
+  assert_eq(sum.x, 6.0)
+  assert_eq(sum.y, 8.0)
+  assert_eq(sum.z, 10.0)
+  assert_eq(sum.w, 12.0)
+  assert_eq(a.x, 1.0)
+  assert_eq(b.w, 8.0)
+  ignore(a.add_vectors(a, b))
+  assert_eq(a.x, 6.0)
+  assert_eq(a.y, 8.0)
+  assert_eq(a.z, 10.0)
+  assert_eq(a.w, 12.0)
+  assert_eq(b.x, 5.0)
+  assert_eq(b.y, 6.0)
+  assert_eq(b.z, 7.0)
+  assert_eq(b.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
