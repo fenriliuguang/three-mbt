@@ -1453,6 +1453,40 @@ test "Vector4.setAxisAngleFromQuaternion reads axis and angle" {
 }
 
 ///|
+test "Vector4.setAxisAngleFromRotationMatrix reads axis and angle" {
+  let identity = @math.Matrix4::new()
+  let still = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(still.set_axis_angle_from_rotation_matrix(identity))
+  assert_eq(still.x, 1.0)
+  assert_eq(still.y, 0.0)
+  assert_eq(still.z, 0.0)
+  assert_eq(still.w, 0.0)
+  assert_eq(identity.elements[0], 1.0)
+  assert_eq(identity.elements[5], 1.0)
+  let yaw = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    1.5707963267948966,
+  )
+  let turned = @math.Matrix4::new().make_rotation_from_quaternion(yaw)
+  let quarter = @math.Vector4::new()
+  ignore(quarter.set_axis_angle_from_rotation_matrix(turned))
+  assert_close(quarter.x, 0.0)
+  assert_close(quarter.y, 1.0)
+  assert_close(quarter.z, 0.0)
+  assert_close(quarter.w, 1.5707963267948966)
+  let half = @math.Matrix4::new().set(
+    1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
+  let flip = @math.Vector4::new()
+  ignore(flip.set_axis_angle_from_rotation_matrix(half))
+  assert_eq(flip.x, 1.0)
+  assert_eq(flip.y, 0.0)
+  assert_eq(flip.z, 0.0)
+  assert_close(flip.w, 3.141592653589793)
+  assert_eq(half.elements[5], -1.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

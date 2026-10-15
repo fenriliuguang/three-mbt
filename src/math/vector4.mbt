@@ -261,6 +261,88 @@ pub fn Vector4::set_axis_angle_from_quaternion(
 }
 
 ///|
+/// 把旋转矩阵的轴写入 x、y、z，把转角写入 w。左上 3×3 应当是纯旋转。
+/// r186: `setAxisAngleFromRotationMatrix` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L527
+pub fn Vector4::set_axis_angle_from_rotation_matrix(
+  self : Vector4,
+  m : Matrix4,
+) -> Vector4 {
+  let epsilon = 0.01
+  let epsilon2 = 0.1
+  let te = m.elements
+  let m11 = te[0]
+  let m12 = te[4]
+  let m13 = te[8]
+  let m21 = te[1]
+  let m22 = te[5]
+  let m23 = te[9]
+  let m31 = te[2]
+  let m32 = te[6]
+  let m33 = te[10]
+  if (m12 - m21).abs() < epsilon &&
+    (m13 - m31).abs() < epsilon &&
+    (m23 - m32).abs() < epsilon {
+    if (m12 + m21).abs() < epsilon2 &&
+      (m13 + m31).abs() < epsilon2 &&
+      (m23 + m32).abs() < epsilon2 &&
+      (m11 + m22 + m33 - 3.0).abs() < epsilon2 {
+      return self.set(1.0, 0.0, 0.0, 0.0)
+    }
+    let angle = @std.PI
+    let xx = (m11 + 1.0) / 2.0
+    let yy = (m22 + 1.0) / 2.0
+    let zz = (m33 + 1.0) / 2.0
+    let xy = (m12 + m21) / 4.0
+    let xz = (m13 + m31) / 4.0
+    let yz = (m23 + m32) / 4.0
+    let mut x = 0.0
+    let mut y = 0.0
+    let mut z = 0.0
+    if xx > yy && xx > zz {
+      if xx < epsilon {
+        x = 0.0
+        y = 0.707106781
+        z = 0.707106781
+      } else {
+        x = xx.sqrt()
+        y = xy / x
+        z = xz / x
+      }
+    } else if yy > zz {
+      if yy < epsilon {
+        x = 0.707106781
+        y = 0.0
+        z = 0.707106781
+      } else {
+        y = yy.sqrt()
+        x = xy / y
+        z = yz / y
+      }
+    } else if zz < epsilon {
+      x = 0.707106781
+      y = 0.707106781
+      z = 0.0
+    } else {
+      z = zz.sqrt()
+      x = xz / z
+      y = yz / z
+    }
+    return self.set(x, y, z, angle)
+  }
+  let mut s = ((m32 - m23) * (m32 - m23) +
+    (m13 - m31) * (m13 - m31) +
+    (m21 - m12) * (m21 - m12)).sqrt()
+  if s.abs() < 0.001 {
+    s = 1.0
+  }
+  self.x = (m32 - m23) / s
+  self.y = (m13 - m31) / s
+  self.z = (m21 - m12) / s
+  self.w = @std.acos((m11 + m22 + m33 - 1.0) / 2.0)
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
