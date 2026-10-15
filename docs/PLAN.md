@@ -541,6 +541,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box2.expandByPoint` has landed. It widens the box to include the point. An empty box expanded by `(1, 2)` becomes that point. Expanding it by `(0, 5)` reaches from `(0, 2)` to `(1, 5)`. The point is unchanged.
 
+`Box2.setFromPoints` has landed. It empties the box, then expands it by each point. Points `(1, 2)` and `(0, 5)` become a box from `(0, 2)` to `(1, 5)`. An empty list leaves the box empty. The points are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -752,6 +754,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box2.set` | `math` |
 | planned | 7 | `Box2.makeEmpty` | `math` |
 | planned | 7 | `Box2.expandByPoint` | `math` |
+| planned | 7 | `Box2.setFromPoints` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

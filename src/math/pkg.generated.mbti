@@ -25,6 +25,7 @@ pub fn Box2::expand_by_point(Self, Vector2) -> Self
 pub fn Box2::make_empty(Self) -> Self
 pub fn Box2::new(min? : Vector2, max? : Vector2) -> Self
 pub fn Box2::set(Self, Vector2, Vector2) -> Self
+pub fn Box2::set_from_points(Self, Array[Vector2]) -> Self
 
 pub(all) struct Box3 {
   min : Vector3

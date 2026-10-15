@@ -49,3 +49,14 @@ pub fn Box2::expand_by_point(self : Box2, point : Vector2) -> Box2 {
   ignore(self.max.max(point))
   self
 }
+
+///|
+/// 先清空，再纳入每个点。点本身不改。
+/// r186: `setFromPoints` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L67
+pub fn Box2::set_from_points(self : Box2, points : Array[Vector2]) -> Box2 {
+  ignore(self.make_empty())
+  for point in points {
+    ignore(self.expand_by_point(point))
+  }
+  self
+}

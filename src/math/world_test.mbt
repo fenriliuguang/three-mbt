@@ -1825,6 +1825,26 @@ test "Box2.expandByPoint includes a point" {
 }
 
 ///|
+test "Box2.setFromPoints fits the given points" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=9.0, y=9.0),
+    max=@math.Vector2::new(x=8.0, y=8.0),
+  )
+  let a = @math.Vector2::new(x=1.0, y=2.0)
+  let b = @math.Vector2::new(x=0.0, y=5.0)
+  ignore(box.set_from_points([a, b]))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(a.x, 1.0)
+  assert_eq(b.y, 5.0)
+  ignore(box.set_from_points([]))
+  assert_eq(box.min.x > 1.0e308, true)
+  assert_eq(box.max.x < -1.0e308, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
