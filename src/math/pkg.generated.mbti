@@ -146,6 +146,7 @@ pub(all) struct Line3 {
   end : Vector3
 }
 pub fn Line3::new(start? : Vector3, end? : Vector3) -> Self
+pub fn Line3::set(Self, Vector3, Vector3) -> Self
 
 pub(all) struct Matrix3 {
   elements : FixedArray[Double]

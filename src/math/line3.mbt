@@ -20,3 +20,12 @@ pub fn Line3::new(start? : Vector3, end? : Vector3) -> Line3 {
   }
   { start, end }
 }
+
+///|
+/// 把起点和终点拷进线段。之后改来源向量不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L49
+pub fn Line3::set(self : Line3, start : Vector3, end : Vector3) -> Line3 {
+  ignore(self.start.copy(start))
+  ignore(self.end.copy(end))
+  self
+}
