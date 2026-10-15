@@ -1050,6 +1050,18 @@ test "Vector2.distanceTo is the straight-line separation" {
 }
 
 ///|
+test "Vector2.manhattanDistanceTo sums the absolute differences" {
+  let origin = @math.Vector2::new()
+  let point = @math.Vector2::new(x=3.0, y=4.0)
+  let signed = @math.Vector2::new(x=1.0, y=-2.0)
+  assert_eq(origin.manhattan_distance_to(point), 7.0)
+  assert_eq(origin.manhattan_distance_to(signed), 3.0)
+  assert_eq(signed.manhattan_distance_to(signed), 0.0)
+  assert_eq(point.x, 3.0)
+  assert_eq(signed.y, -2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

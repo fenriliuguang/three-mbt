@@ -330,6 +330,13 @@ pub fn Vector2::distance_to_squared(self : Vector2, v : Vector2) -> Double {
 }
 
 ///|
+/// 两个向量都不改。
+/// r186: `manhattanDistanceTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L707
+pub fn Vector2::manhattan_distance_to(self : Vector2, v : Vector2) -> Double {
+  (self.x - v.x).abs() + (self.y - v.y).abs()
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
