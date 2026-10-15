@@ -194,3 +194,10 @@ pub fn Triangle::get_midpoint(self : Triangle, target : Vector3) -> Vector3 {
   ignore(target.add(self.c))
   target.multiply_scalar(1.0 / 3.0)
 }
+
+///|
+/// 把单位法线写入 target。退化三角形写入 (0, 0, 0)。角点不改。
+/// r186: `getNormal` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L348
+pub fn Triangle::normal(self : Triangle, target : Vector3) -> Vector3 {
+  Triangle::get_normal(self.a, self.b, self.c, target)
+}

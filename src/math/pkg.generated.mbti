@@ -260,6 +260,7 @@ pub fn Triangle::get_midpoint(Self, Vector3) -> Vector3
 pub fn Triangle::get_normal(Vector3, Vector3, Vector3, Vector3) -> Vector3
 pub fn Triangle::is_front_facing(Vector3, Vector3, Vector3, Vector3) -> Bool
 pub fn Triangle::new(a? : Vector3, b? : Vector3, c? : Vector3) -> Self
+pub fn Triangle::normal(Self, Vector3) -> Vector3
 pub fn Triangle::set(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Triangle::set_from_points_and_indices(Self, Array[Vector3], Int, Int, Int) -> Self
 

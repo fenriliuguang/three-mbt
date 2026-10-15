@@ -2905,6 +2905,32 @@ test "Triangle.getMidpoint averages the three corners" {
 }
 
 ///|
+test "Triangle.getNormal on an instance writes a unit normal" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let normal = triangle.normal(target)
+  assert_eq(physical_equal(normal, target), true)
+  assert_eq(normal.x, 0.0)
+  assert_eq(normal.y, 0.0)
+  assert_eq(normal.z, 1.0)
+  let flat = @math.Triangle::new(
+    a=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    b=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    c=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  ignore(flat.normal(target))
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
