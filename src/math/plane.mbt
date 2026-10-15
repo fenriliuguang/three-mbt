@@ -175,3 +175,21 @@ pub fn Plane::intersects_sphere(self : Plane, sphere : Sphere) -> Bool {
 pub fn Plane::coplanar_point(self : Plane, target : Vector3) -> Vector3 {
   target.copy(self.normal).multiply_scalar(-self.constant)
 }
+
+///|
+/// 用矩阵变换平面。缺省时由矩阵自己算出法线矩阵。
+/// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L314
+pub fn Plane::apply_matrix4(
+  self : Plane,
+  matrix : Matrix4,
+  normal_matrix? : Matrix3,
+) -> Plane {
+  let normal_matrix = match normal_matrix {
+    None => Matrix3::new().get_normal_matrix(matrix)
+    Some(normal_matrix) => normal_matrix
+  }
+  let reference = self.coplanar_point(Vector3::new()).apply_matrix4(matrix)
+  ignore(self.normal.apply_matrix3(normal_matrix).normalize())
+  self.constant = -reference.dot(self.normal)
+  self
+}
