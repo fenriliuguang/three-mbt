@@ -397,6 +397,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector2.addScaledVector` has landed. It adds `v * s` to this vector. `(1, 2)` plus `(4, 5)` scaled by 2 is `(9, 12)`. The other vector is not modified.
 
+`Vector2.subScalar` has landed. It subtracts one number from both components. `(5, 6)` minus 4 is `(1, 2)`. Subtracting `-1` then yields `(2, 3)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -536,6 +538,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector2.addScalar` | `math` |
 | planned | 7 | `Vector2.addVectors` | `math` |
 | planned | 7 | `Vector2.addScaledVector` | `math` |
+| planned | 7 | `Vector2.subScalar` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

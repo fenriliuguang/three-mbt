@@ -795,6 +795,17 @@ test "Vector2.addScaledVector adds a scaled vector" {
 }
 
 ///|
+test "Vector2.subScalar subtracts one number from both components" {
+  let v = @math.Vector2::new(x=5.0, y=6.0)
+  ignore(v.sub_scalar(4.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  ignore(v.sub_scalar(-1.0))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

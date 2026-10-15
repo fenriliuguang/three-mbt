@@ -130,6 +130,14 @@ pub fn Vector2::sub(self : Vector2, v : Vector2) -> Vector2 {
 }
 
 ///|
+/// r186: `subScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L308
+pub fn Vector2::sub_scalar(self : Vector2, s : Double) -> Vector2 {
+  self.x -= s
+  self.y -= s
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
