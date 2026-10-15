@@ -367,6 +367,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Spherical.setFromVector3` has landed. It reads the vector's three components and passes them to `setFromCartesianCoords`. `(0, 5, 0)` is radius 5 at `phi` 0. The zero vector is radius 0 with both angles 0. The vector is not modified. `clone` stays later.
 
+`Spherical.clone` has landed. It returns a new spherical value with the same radius, `phi`, and `theta`. Cloning radius 2, `phi` 0.5, and `theta` -0.3 yields that triple. Changing the clone leaves the source alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -491,6 +493,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Spherical.makeSafe` | `math` |
 | planned | 7 | `Spherical.setFromCartesianCoords` | `math` |
 | planned | 7 | `Spherical.setFromVector3` | `math` |
+| planned | 7 | `Spherical.clone` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

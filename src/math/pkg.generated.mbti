@@ -177,6 +177,7 @@ pub(all) struct Spherical {
   mut phi : Double
   mut theta : Double
 }
+pub fn Spherical::clone(Self) -> Self
 pub fn Spherical::copy(Self, Self) -> Self
 pub fn Spherical::make_safe(Self) -> Self
 pub fn Spherical::new(radius? : Double, phi? : Double, theta? : Double) -> Self

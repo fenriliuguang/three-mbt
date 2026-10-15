@@ -588,6 +588,19 @@ test "setFromVector3 reads the vector components" {
 }
 
 ///|
+test "Spherical.clone copies radius phi and theta" {
+  let source = @math.Spherical::new(radius=2.0, phi=0.5, theta=-0.3)
+  let cloned = source.clone()
+  assert_eq(cloned.radius, 2.0)
+  assert_eq(cloned.phi, 0.5)
+  assert_eq(cloned.theta, -0.3)
+  ignore(cloned.set(1.0, 0.0, 0.0))
+  assert_eq(source.radius, 2.0)
+  assert_eq(source.phi, 0.5)
+  assert_eq(source.theta, -0.3)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))

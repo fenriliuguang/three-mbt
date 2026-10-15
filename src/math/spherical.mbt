@@ -78,3 +78,10 @@ pub fn Spherical::set_from_cartesian_coords(
   }
   self
 }
+
+///|
+/// 返回一份新的球坐标。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L139
+pub fn Spherical::clone(self : Spherical) -> Spherical {
+  Spherical::new().copy(self)
+}
