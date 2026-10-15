@@ -239,6 +239,7 @@ pub fn Vector2::round(Self) -> Self
 pub fn Vector2::round_to_zero(Self) -> Self
 pub fn Vector2::set(Self, Double, Double) -> Self
 pub fn Vector2::set_component(Self, Int, Double) -> Self
+pub fn Vector2::set_length(Self, Double) -> Self
 pub fn Vector2::set_scalar(Self, Double) -> Self
 pub fn Vector2::set_x(Self, Double) -> Self
 pub fn Vector2::set_y(Self, Double) -> Self

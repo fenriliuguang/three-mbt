@@ -1062,6 +1062,21 @@ test "Vector2.manhattanDistanceTo sums the absolute differences" {
 }
 
 ///|
+test "Vector2.setLength rescales along the same direction" {
+  let v = @math.Vector2::new(y=4.0)
+  ignore(v.set_length(2.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 2.0)
+  ignore(v.set_length(0.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 0.0)
+  let zero = @math.Vector2::new()
+  ignore(zero.set_length(5.0))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

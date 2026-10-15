@@ -337,6 +337,13 @@ pub fn Vector2::manhattan_distance_to(self : Vector2, v : Vector2) -> Double {
 }
 
 ///|
+/// 零向量保持为零。
+/// r186: `setLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L720
+pub fn Vector2::set_length(self : Vector2, length : Double) -> Vector2 {
+  self.normalize().multiply_scalar(length)
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
