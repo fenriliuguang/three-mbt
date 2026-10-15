@@ -1345,6 +1345,29 @@ test "Vector4.subScalar subtracts one number from every component" {
 }
 
 ///|
+test "Vector4.subVectors stores the difference of two vectors" {
+  let a = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  let b = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let diff = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(diff.sub_vectors(a, b))
+  assert_eq(diff.x, 4.0)
+  assert_eq(diff.y, 4.0)
+  assert_eq(diff.z, 4.0)
+  assert_eq(diff.w, 4.0)
+  assert_eq(a.x, 5.0)
+  assert_eq(b.w, 4.0)
+  ignore(a.sub_vectors(a, b))
+  assert_eq(a.x, 4.0)
+  assert_eq(a.y, 4.0)
+  assert_eq(a.z, 4.0)
+  assert_eq(a.w, 4.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(b.y, 2.0)
+  assert_eq(b.z, 3.0)
+  assert_eq(b.w, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
