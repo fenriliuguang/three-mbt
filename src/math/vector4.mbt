@@ -461,6 +461,16 @@ pub fn Vector4::round_to_zero(self : Vector4) -> Vector4 {
 }
 
 ///|
+/// r186: `negate` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L843
+pub fn Vector4::negate(self : Vector4) -> Vector4 {
+  self.x = -self.x
+  self.y = -self.y
+  self.z = -self.z
+  self.w = -self.w
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

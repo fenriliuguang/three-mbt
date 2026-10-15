@@ -354,6 +354,7 @@ pub fn Vector4::max(Self, Self) -> Self
 pub fn Vector4::min(Self, Self) -> Self
 pub fn Vector4::multiply(Self, Self) -> Self
 pub fn Vector4::multiply_scalar(Self, Double) -> Self
+pub fn Vector4::negate(Self) -> Self
 pub fn Vector4::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
 pub fn Vector4::normalize(Self) -> Self
 pub fn Vector4::round(Self) -> Self
