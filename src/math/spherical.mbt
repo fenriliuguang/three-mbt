@@ -32,3 +32,13 @@ pub fn Spherical::set(
   self.theta = theta
   self
 }
+
+///|
+/// 复制另一组球坐标。来源不改。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L68
+pub fn Spherical::copy(self : Spherical, other : Spherical) -> Spherical {
+  self.radius = other.radius
+  self.phi = other.phi
+  self.theta = other.theta
+  self
+}
