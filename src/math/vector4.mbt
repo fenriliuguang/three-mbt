@@ -406,6 +406,19 @@ pub fn Vector4::clamp_scalar(
 }
 
 ///|
+/// 假定 `min` 小于 `max`。零向量保持为零。
+/// r186: `clampLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L765
+pub fn Vector4::clamp_length(
+  self : Vector4,
+  min : Double,
+  max : Double,
+) -> Vector4 {
+  let length = self.length()
+  let divisor = if length == 0.0 { 1.0 } else { length }
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

@@ -1579,6 +1579,28 @@ test "Vector4.clampScalar limits every component" {
 }
 
 ///|
+test "Vector4.clampLength limits the vector length" {
+  let long = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=4.0)
+  ignore(long.clamp_length(1.0, 2.0))
+  assert_eq(long.x, 0.0)
+  assert_eq(long.y, 0.0)
+  assert_eq(long.z, 0.0)
+  assert_eq(long.w, 2.0)
+  let short = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=0.5)
+  ignore(short.clamp_length(1.0, 2.0))
+  assert_eq(short.w, 1.0)
+  let kept = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=4.0)
+  ignore(kept.clamp_length(1.0, 8.0))
+  assert_eq(kept.w, 4.0)
+  let zero = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=0.0)
+  ignore(zero.clamp_length(1.0, 2.0))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+  assert_eq(zero.z, 0.0)
+  assert_eq(zero.w, 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
