@@ -199,3 +199,15 @@ pub fn Box2::clamp_point(
 pub fn Box2::distance_to_point(self : Box2, point : Vector2) -> Double {
   self.clamp_point(point, Vector2::new()).distance_to(point)
 }
+
+///|
+/// 收成两个盒子的重叠部分。没有重叠则清空。另一个盒子不改。
+/// r186: `intersect` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L323
+pub fn Box2::intersect(self : Box2, box : Box2) -> Box2 {
+  ignore(self.min.max(box.min))
+  ignore(self.max.min(box.max))
+  if self.is_empty() {
+    ignore(self.make_empty())
+  }
+  self
+}
