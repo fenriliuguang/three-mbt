@@ -1398,6 +1398,21 @@ test "Vector4.multiplyScalar multiplies every component" {
 }
 
 ///|
+test "Vector4.divide divides matching components" {
+  let v = @math.Vector4::new(x=10.0, y=24.0, z=42.0, w=64.0)
+  let factor = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  ignore(v.divide(factor))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 6.0)
+  assert_eq(v.w, 8.0)
+  assert_eq(factor.x, 5.0)
+  assert_eq(factor.y, 6.0)
+  assert_eq(factor.z, 7.0)
+  assert_eq(factor.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

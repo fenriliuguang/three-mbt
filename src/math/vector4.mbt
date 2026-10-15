@@ -223,6 +223,17 @@ pub fn Vector4::multiply_scalar(self : Vector4, scalar : Double) -> Vector4 {
 }
 
 ///|
+/// 按分量相除。另一个向量不改。
+/// r186: `divide` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L464
+pub fn Vector4::divide(self : Vector4, v : Vector4) -> Vector4 {
+  self.x /= v.x
+  self.y /= v.y
+  self.z /= v.z
+  self.w /= v.w
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
