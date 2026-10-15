@@ -17,3 +17,18 @@ pub fn Cylindrical::new(
 ) -> Cylindrical {
   { radius, theta, y }
 }
+
+///|
+/// 写入半径、方位角和高度。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L50
+pub fn Cylindrical::set(
+  self : Cylindrical,
+  radius : Double,
+  theta : Double,
+  y : Double,
+) -> Cylindrical {
+  self.radius = radius
+  self.theta = theta
+  self.y = y
+  self
+}

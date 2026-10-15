@@ -52,6 +52,7 @@ pub(all) struct Cylindrical {
   mut y : Double
 }
 pub fn Cylindrical::new(radius? : Double, theta? : Double, y? : Double) -> Self
+pub fn Cylindrical::set(Self, Double, Double, Double) -> Self
 
 pub(all) struct Euler {
   mut x : Double

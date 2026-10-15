@@ -635,6 +635,15 @@ test "setFromCylindrical copies radius theta and height" {
 }
 
 ///|
+test "Cylindrical.set writes radius theta and height" {
+  let c = @math.Cylindrical::new()
+  ignore(c.set(2.0, -0.3, 5.0))
+  assert_eq(c.radius, 2.0)
+  assert_eq(c.theta, -0.3)
+  assert_eq(c.y, 5.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(
