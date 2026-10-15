@@ -110,3 +110,64 @@ pub fn Line3::closest_point_to_point(
   ignore(self.delta(target).multiply_scalar(t))
   target.add(self.start)
 }
+
+///|
+/// 返回两条线段的最近平方距离。传入的点会写成两条线上的最近点。线段本身不改。
+/// r186: `distanceSqToLine3` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L186
+pub fn Line3::distance_sq_to_line3(
+  self : Line3,
+  line : Line3,
+  c1? : Vector3,
+  c2? : Vector3,
+) -> Double {
+  let out1 = match c1 {
+    None => Vector3::new()
+    Some(c1) => c1
+  }
+  let out2 = match c2 {
+    None => Vector3::new()
+    Some(c2) => c2
+  }
+  let epsilon = 1.0e-16
+  let p1 = self.start
+  let p2 = line.start
+  let d1 = Vector3::new().sub_vectors(self.end, p1)
+  let d2 = Vector3::new().sub_vectors(line.end, p2)
+  let r = Vector3::new().sub_vectors(p1, p2)
+  let a = d1.dot(d1)
+  let e = d2.dot(d2)
+  let f = d2.dot(r)
+  if a <= epsilon && e <= epsilon {
+    ignore(out1.copy(p1))
+    ignore(out2.copy(p2))
+    ignore(out1.sub(out2))
+    return out1.dot(out1)
+  }
+  let mut s = 0.0
+  let mut t = 0.0
+  if a <= epsilon {
+    t = (f / e).clamp(min=0.0, max=1.0)
+  } else {
+    let c = d1.dot(r)
+    if e <= epsilon {
+      s = (-c / a).clamp(min=0.0, max=1.0)
+    } else {
+      let b = d1.dot(d2)
+      let denom = a * e - b * b
+      if denom != 0.0 {
+        s = ((b * f - c * e) / denom).clamp(min=0.0, max=1.0)
+      }
+      t = (b * s + f) / e
+      if t < 0.0 {
+        t = 0.0
+        s = (-c / a).clamp(min=0.0, max=1.0)
+      } else if t > 1.0 {
+        t = 1.0
+        s = ((b - c) / a).clamp(min=0.0, max=1.0)
+      }
+    }
+  }
+  ignore(out1.copy(p1).add_scaled_vector(d1, s))
+  ignore(out2.copy(p2).add_scaled_vector(d2, t))
+  out1.distance_to_squared(out2)
+}

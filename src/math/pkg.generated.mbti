@@ -152,6 +152,7 @@ pub fn Line3::copy(Self, Self) -> Self
 pub fn Line3::delta(Self, Vector3) -> Vector3
 pub fn Line3::distance(Self) -> Double
 pub fn Line3::distance_sq(Self) -> Double
+pub fn Line3::distance_sq_to_line3(Self, Self, c1? : Vector3, c2? : Vector3) -> Double
 pub fn Line3::get_center(Self, Vector3) -> Vector3
 pub fn Line3::new(start? : Vector3, end? : Vector3) -> Self
 pub fn Line3::set(Self, Vector3, Vector3) -> Self

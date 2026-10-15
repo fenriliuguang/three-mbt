@@ -3411,6 +3411,36 @@ test "Line3.closestPointToPoint writes the nearest point" {
 }
 
 ///|
+test "distanceSqToLine3 measures the gap between two segments" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(),
+    end=@math.Vector3::new(x=2.0),
+  )
+  let other = @math.Line3::new(
+    start=@math.Vector3::new(y=1.0),
+    end=@math.Vector3::new(x=2.0, y=1.0),
+  )
+  let c1 = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let c2 = @math.Vector3::new(x=8.0, y=8.0, z=8.0)
+  assert_eq(line.distance_sq_to_line3(other, c1=c1, c2=c2), 1.0)
+  assert_eq(c1.x, 0.0)
+  assert_eq(c1.y, 0.0)
+  assert_eq(c1.z, 0.0)
+  assert_eq(c2.x, 0.0)
+  assert_eq(c2.y, 1.0)
+  assert_eq(c2.z, 0.0)
+  assert_eq(line.distance_sq_to_line3(line), 0.0)
+  let point = @math.Line3::new(
+    start=@math.Vector3::new(x=3.0),
+    end=@math.Vector3::new(x=3.0),
+  )
+  let here = @math.Line3::new()
+  assert_eq(here.distance_sq_to_line3(point), 9.0)
+  assert_eq(line.end.x, 2.0)
+  assert_eq(other.start.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
