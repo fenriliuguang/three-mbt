@@ -29,3 +29,12 @@ pub fn Line3::set(self : Line3, start : Vector3, end : Vector3) -> Line3 {
   ignore(self.end.copy(end))
   self
 }
+
+///|
+/// 把另一条线段的两端拷过来。之后改来源不影响这里。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L64
+pub fn Line3::copy(self : Line3, line : Line3) -> Line3 {
+  ignore(self.start.copy(line.start))
+  ignore(self.end.copy(line.end))
+  self
+}
