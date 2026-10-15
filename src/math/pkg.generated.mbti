@@ -215,6 +215,7 @@ pub fn Vector2::normalize(Self) -> Self
 pub fn Vector2::set(Self, Double, Double) -> Self
 pub fn Vector2::set_scalar(Self, Double) -> Self
 pub fn Vector2::set_x(Self, Double) -> Self
+pub fn Vector2::set_y(Self, Double) -> Self
 pub fn Vector2::sub(Self, Self) -> Self
 
 pub(all) struct Vector3 {

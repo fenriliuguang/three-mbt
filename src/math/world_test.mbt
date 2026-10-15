@@ -724,6 +724,14 @@ test "Vector2.setX writes x and leaves y" {
 }
 
 ///|
+test "Vector2.setY writes y and leaves x" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(v.set_y(8.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 8.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(
