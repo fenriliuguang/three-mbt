@@ -336,6 +336,7 @@ pub fn Vector4::apply_matrix4(Self, Matrix4) -> Self
 pub fn Vector4::clone(Self) -> Self
 pub fn Vector4::copy(Self, Self) -> Self
 pub fn Vector4::dot(Self, Self) -> Double
+pub fn Vector4::get_component(Self, Int) -> Double
 pub fn Vector4::length(Self) -> Double
 pub fn Vector4::length_sq(Self) -> Double
 pub fn Vector4::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
