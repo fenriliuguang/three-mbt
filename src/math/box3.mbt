@@ -148,6 +148,37 @@ pub fn Box3::intersects_sphere(self : Box3, sphere : Sphere) -> Bool {
 }
 
 ///|
+/// 平面穿过盒子或贴到面上则为真。平面和盒子都不改。
+/// r186: `intersectsPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L473
+pub fn Box3::intersects_plane(self : Box3, plane : Plane) -> Bool {
+  let mut min = 0.0
+  let mut max = 0.0
+  if plane.normal.x > 0.0 {
+    min = plane.normal.x * self.min.x
+    max = plane.normal.x * self.max.x
+  } else {
+    min = plane.normal.x * self.max.x
+    max = plane.normal.x * self.min.x
+  }
+  if plane.normal.y > 0.0 {
+    min = min + plane.normal.y * self.min.y
+    max = max + plane.normal.y * self.max.y
+  } else {
+    min = min + plane.normal.y * self.max.y
+    max = max + plane.normal.y * self.min.y
+  }
+  if plane.normal.z > 0.0 {
+    min = min + plane.normal.z * self.min.z
+    max = max + plane.normal.z * self.max.z
+  } else {
+    min = min + plane.normal.z * self.max.z
+    max = max + plane.normal.z * self.min.z
+  }
+  let limit = -plane.constant
+  min <= limit && max >= limit
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
