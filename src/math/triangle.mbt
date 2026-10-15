@@ -208,3 +208,14 @@ pub fn Triangle::normal(self : Triangle, target : Vector3) -> Vector3 {
 pub fn Triangle::get_plane(self : Triangle, target : Plane) -> Plane {
   target.set_from_coplanar_points(self.a, self.b, self.c)
 }
+
+///|
+/// 把重心坐标写入 target。退化三角形写入 (0, 0, 0) 并返回空。点和角点都不改。
+/// r186: `getBarycoord` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L374
+pub fn Triangle::barycoord(
+  self : Triangle,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3? {
+  Triangle::get_barycoord(point, self.a, self.b, self.c, target)
+}

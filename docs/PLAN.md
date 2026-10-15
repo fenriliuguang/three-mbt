@@ -657,6 +657,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Triangle.getPlane` has landed. It writes the plane through the three corners. Corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)` give normal `(0, 0, 1)` and constant `0`. The corners are unchanged.
 
+`Triangle.barycoord` has landed. It is the instance form of `getBarycoord`. For corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)`, the point `(1, 0, 0)` is `(0, 1, 0)`. A triangle with three identical corners writes `(0, 0, 0)` and returns nothing. The point and the corners are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -926,6 +928,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Plane.setFromNormalAndCoplanarPoint` | `math` |
 | planned | 7 | `Plane.setFromCoplanarPoints` | `math` |
 | planned | 7 | `Triangle.getPlane` | `math` |
+| planned | 7 | `Triangle.barycoord`, the instance `getBarycoord` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
