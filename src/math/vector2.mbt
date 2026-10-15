@@ -29,6 +29,13 @@ pub fn Vector2::set_scalar(self : Vector2, scalar : Double) -> Vector2 {
 }
 
 ///|
+/// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L138
+pub fn Vector2::set_x(self : Vector2, x : Double) -> Vector2 {
+  self.x = x
+  self
+}
+
+///|
 pub fn Vector2::copy(self : Vector2, v : Vector2) -> Vector2 {
   self.x = v.x
   self.y = v.y
