@@ -3105,6 +3105,29 @@ test "Triangle.front_facing is true when the normal opposes the direction" {
 }
 
 ///|
+test "intersectsTriangle accepts a triangle on the box and rejects a distant one" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(),
+    @math.Vector3::new(x=1.0, y=1.0, z=1.0),
+  )
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  assert_eq(box.intersects_triangle(triangle), true)
+  let far = @math.Triangle::new(
+    a=@math.Vector3::new(z=5.0),
+    b=@math.Vector3::new(x=1.0, z=5.0),
+    c=@math.Vector3::new(y=1.0, z=5.0),
+  )
+  assert_eq(box.intersects_triangle(far), false)
+  assert_eq(@math.Box3::empty().intersects_triangle(triangle), false)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(box.max.z, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

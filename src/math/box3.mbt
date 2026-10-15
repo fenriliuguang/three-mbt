@@ -342,3 +342,64 @@ pub fn Box3::union(self : Box3, box : Box3) -> Box3 {
   ignore(self.max.max(box.max))
   self
 }
+
+///|
+/// 沿一组分离轴测试。出现分离轴时返回假。
+/// r186: `satForAxes` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L784
+fn sat_for_axes(
+  axes : Array[Double],
+  v0 : Vector3,
+  v1 : Vector3,
+  v2 : Vector3,
+  extents : Vector3,
+) -> Bool {
+  let test_axis = Vector3::new()
+  let mut i = 0
+  while i <= axes.length() - 3 {
+    ignore(test_axis.from_array(axes, offset=i))
+    let r = extents.x * test_axis.x.abs() +
+      extents.y * test_axis.y.abs() +
+      extents.z * test_axis.z.abs()
+    let p0 = v0.dot(test_axis)
+    let p1 = v1.dot(test_axis)
+    let p2 = v2.dot(test_axis)
+    let highest = p0.max(p1).max(p2)
+    let lowest = p0.min(p1).min(p2)
+    if (-highest).max(lowest) > r {
+      return false
+    }
+    i = i + 3
+  }
+  true
+}
+
+///|
+/// 三角形与盒子相交或贴在边界上则为真。空盒为假。三角形和盒子都不改。
+/// r186: `intersectsTriangle` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L526
+pub fn Box3::intersects_triangle(self : Box3, triangle : Triangle) -> Bool {
+  if self.is_empty() {
+    return false
+  }
+  let center = self.get_center(Vector3::new())
+  let extents = Vector3::new().sub_vectors(self.max, center)
+  let v0 = Vector3::new().sub_vectors(triangle.a, center)
+  let v1 = Vector3::new().sub_vectors(triangle.b, center)
+  let v2 = Vector3::new().sub_vectors(triangle.c, center)
+  let f0 = Vector3::new().sub_vectors(v1, v0)
+  let f1 = Vector3::new().sub_vectors(v2, v1)
+  let f2 = Vector3::new().sub_vectors(v0, v2)
+  let edges = [
+    0.0, -f0.z, f0.y, 0.0, -f1.z, f1.y, 0.0, -f2.z, f2.y, f0.z, 0.0, -f0.x,
+    f1.z, 0.0, -f1.x, f2.z, 0.0, -f2.x, -f0.y, f0.x, 0.0, -f1.y, f1.x, 0.0,
+    -f2.y, f2.x, 0.0,
+  ]
+  if sat_for_axes(edges, v0, v1, v2, extents) == false {
+    return false
+  }
+  let faces = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+  if sat_for_axes(faces, v0, v1, v2, extents) == false {
+    return false
+  }
+  let normal = Vector3::new().cross_vectors(f0, f1)
+  sat_for_axes([normal.x, normal.y, normal.z], v0, v1, v2, extents)
+}
