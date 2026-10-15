@@ -529,6 +529,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.fromArray` has landed. Offset defaults to 0. `[1, 2, 3, 4, 5, 6, 7]` at offset 0 becomes `(1, 2, 3, 4)`, and at offset 2 becomes `(3, 4, 5, 6)`. The array is unchanged.
 
+`Vector4.toArray` has landed. A missing array becomes `[x, y, z, w]`. `[9, 8, 7, 6, 5]` at offset 1 becomes `[9, 1, 2, 3, 4]` for `(1, 2, 3, 4)`. A short array is padded with zeros up to `offset + 4`. The same array is returned. The vector is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -734,6 +736,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.lerpVectors` | `math` |
 | planned | 7 | `Vector4.equals` | `math` |
 | planned | 7 | `Vector4.fromArray` | `math` |
+| planned | 7 | `Vector4.toArray` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

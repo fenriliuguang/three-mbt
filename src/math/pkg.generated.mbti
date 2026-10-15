@@ -378,6 +378,7 @@ pub fn Vector4::set_z(Self, Double) -> Self
 pub fn Vector4::sub(Self, Self) -> Self
 pub fn Vector4::sub_scalar(Self, Double) -> Self
 pub fn Vector4::sub_vectors(Self, Self, Self) -> Self
+pub fn Vector4::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 
 // Type aliases
 

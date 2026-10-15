@@ -1756,6 +1756,35 @@ test "Vector4.fromArray reads four components at an offset" {
 }
 
 ///|
+test "Vector4.toArray writes four components at an offset" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let fresh = v.to_array()
+  assert_eq(fresh.length(), 4)
+  assert_eq(fresh[0], 1.0)
+  assert_eq(fresh[1], 2.0)
+  assert_eq(fresh[2], 3.0)
+  assert_eq(fresh[3], 4.0)
+  let array = [9.0, 8.0, 7.0, 6.0, 5.0]
+  let written = v.to_array(array=array, offset=1)
+  assert_eq(physical_equal(written, array), true)
+  assert_eq(written[0], 9.0)
+  assert_eq(written[1], 1.0)
+  assert_eq(written[2], 2.0)
+  assert_eq(written[3], 3.0)
+  assert_eq(written[4], 4.0)
+  let short = [9.0]
+  let padded = v.to_array(array=short, offset=1)
+  assert_eq(padded.length(), 5)
+  assert_eq(padded[0], 9.0)
+  assert_eq(padded[1], 1.0)
+  assert_eq(padded[2], 2.0)
+  assert_eq(padded[3], 3.0)
+  assert_eq(padded[4], 4.0)
+  assert_eq(v.x, 1.0)
+  assert_eq(v.w, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

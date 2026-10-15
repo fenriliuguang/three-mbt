@@ -567,6 +567,29 @@ pub fn Vector4::from_array(
 }
 
 ///|
+/// 省略数组时新建一个。短于 `offset + 4` 的数组会补零再写入。向量本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L1006
+pub fn Vector4::to_array(
+  self : Vector4,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 4
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.x
+  target[offset + 1] = self.y
+  target[offset + 2] = self.z
+  target[offset + 3] = self.w
+  target
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x
