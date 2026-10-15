@@ -90,3 +90,12 @@ pub fn Plane::set(
   self.constant = constant
   self
 }
+
+///|
+/// 把法线和常数同时取反。
+/// r186: `negate` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L160
+pub fn Plane::negate(self : Plane) -> Plane {
+  self.constant = -self.constant
+  ignore(self.normal.negate())
+  self
+}
