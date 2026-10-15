@@ -969,6 +969,14 @@ test "Vector2.round rounds halfway toward positive infinity" {
 }
 
 ///|
+test "Vector2.roundToZero drops the fraction toward zero" {
+  let v = @math.Vector2::new(x=1.8, y=-1.8)
+  ignore(v.round_to_zero())
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, -1.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
