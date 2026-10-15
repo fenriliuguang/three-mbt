@@ -768,6 +768,22 @@ test "Vector2.addScalar adds one number to both components" {
 }
 
 ///|
+test "Vector2.addVectors stores the sum of two vectors" {
+  let a = @math.Vector2::new(x=1.0, y=2.0)
+  let b = @math.Vector2::new(x=3.0, y=4.0)
+  let sum = @math.Vector2::new(x=9.0, y=9.0)
+  ignore(sum.add_vectors(a, b))
+  assert_eq(sum.x, 4.0)
+  assert_eq(sum.y, 6.0)
+  assert_eq(a.x, 1.0)
+  assert_eq(b.y, 4.0)
+  ignore(a.add_vectors(a, b))
+  assert_eq(a.x, 4.0)
+  assert_eq(a.y, 6.0)
+  assert_eq(b.x, 3.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

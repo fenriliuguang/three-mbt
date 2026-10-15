@@ -97,6 +97,19 @@ pub fn Vector2::add_scalar(self : Vector2, s : Double) -> Vector2 {
 }
 
 ///|
+/// 把两个向量的和写入自身。两个来源不改。
+/// r186: `addVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L262
+pub fn Vector2::add_vectors(
+  self : Vector2,
+  a : Vector2,
+  b : Vector2,
+) -> Vector2 {
+  self.x = a.x + b.x
+  self.y = a.y + b.y
+  self
+}
+
+///|
 pub fn Vector2::sub(self : Vector2, v : Vector2) -> Vector2 {
   self.x -= v.x
   self.y -= v.y
