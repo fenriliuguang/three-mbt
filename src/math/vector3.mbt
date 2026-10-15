@@ -367,6 +367,16 @@ pub fn Vector3::round(self : Vector3) -> Vector3 {
 }
 
 ///|
+/// 朝零取整。
+/// r186: `roundToZero` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L714
+pub fn Vector3::round_to_zero(self : Vector3) -> Vector3 {
+  self.x = self.x.trunc()
+  self.y = self.y.trunc()
+  self.z = self.z.trunc()
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y

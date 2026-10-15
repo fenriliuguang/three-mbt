@@ -236,6 +236,15 @@ test "round sends halfway cases toward positive infinity" {
 }
 
 ///|
+test "roundToZero drops the fraction toward zero" {
+  let v = @math.Vector3::new(x=1.8, y=-1.8, z=3.0)
+  ignore(v.round_to_zero())
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, -1.0)
+  assert_eq(v.z, 3.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)
