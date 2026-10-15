@@ -2729,6 +2729,25 @@ test "Triangle.getBarycoord writes weights that sum to one" {
 }
 
 ///|
+test "Triangle.containsPoint includes the boundary" {
+  let a = @math.Vector3::new(x=0.0, y=0.0, z=0.0)
+  let b = @math.Vector3::new(x=1.0, y=0.0, z=0.0)
+  let c = @math.Vector3::new(x=0.0, y=1.0, z=0.0)
+  let inside = @math.Vector3::new(x=0.25, y=0.25, z=0.0)
+  let corner = @math.Vector3::new(x=1.0, y=0.0, z=0.0)
+  let outside = @math.Vector3::new(x=2.0, y=0.0, z=0.0)
+  assert_eq(@math.Triangle::contains_point(inside, a, b, c), true)
+  assert_eq(@math.Triangle::contains_point(corner, a, b, c), true)
+  assert_eq(@math.Triangle::contains_point(outside, a, b, c), false)
+  let flat = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  assert_eq(@math.Triangle::contains_point(flat, flat, flat, flat), false)
+  assert_eq(inside.x, 0.25)
+  assert_eq(a.x, 0.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

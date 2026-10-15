@@ -75,3 +75,18 @@ pub fn Triangle::get_barycoord(
     Some(target.set(1.0 - u - v, v, u))
   }
 }
+
+///|
+/// 点投影到三角形所在平面后落在三角形内或边上则为真。点和角点都不改。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L136
+pub fn Triangle::contains_point(
+  point : Vector3,
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+) -> Bool {
+  match Triangle::get_barycoord(point, a, b, c, Vector3::new()) {
+    None => false
+    Some(coord) => coord.x >= 0.0 && coord.y >= 0.0 && coord.x + coord.y <= 1.0
+  }
+}
