@@ -2679,6 +2679,27 @@ test "Triangle starts at the origin and copies its corners" {
 }
 
 ///|
+test "Triangle.getNormal writes a unit normal" {
+  let a = @math.Vector3::new(x=0.0, y=0.0, z=0.0)
+  let b = @math.Vector3::new(x=1.0, y=0.0, z=0.0)
+  let c = @math.Vector3::new(x=0.0, y=1.0, z=0.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let normal = @math.Triangle::get_normal(a, b, c, target)
+  assert_eq(physical_equal(normal, target), true)
+  assert_eq(normal.x, 0.0)
+  assert_eq(normal.y, 0.0)
+  assert_eq(normal.z, 1.0)
+  let flat = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(@math.Triangle::get_normal(flat, flat, flat, target))
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(a.x, 0.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
