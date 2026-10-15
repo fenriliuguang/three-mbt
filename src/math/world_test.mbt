@@ -657,6 +657,32 @@ test "Cylindrical.copy copies radius theta and height" {
 }
 
 ///|
+test "setFromCartesianCoords recovers a y-up cylinder" {
+  let forward = @math.Cylindrical::new()
+  ignore(forward.set_from_cartesian_coords(0.0, 5.0, 2.0))
+  assert_eq(forward.radius, 2.0)
+  assert_eq(forward.theta, 0.0)
+  assert_eq(forward.y, 5.0)
+  let right = @math.Cylindrical::new()
+  ignore(right.set_from_cartesian_coords(2.0, -1.0, 0.0))
+  assert_eq(right.radius, 2.0)
+  assert_close(right.theta, 1.5707963267948966)
+  assert_eq(right.y, -1.0)
+  let origin = @math.Cylindrical::new(radius=9.0, theta=1.0, y=4.0)
+  ignore(origin.set_from_cartesian_coords(0.0, 0.0, 0.0))
+  assert_eq(origin.radius, 0.0)
+  assert_eq(origin.theta, 0.0)
+  assert_eq(origin.y, 0.0)
+  let tilted = @math.Cylindrical::new()
+  ignore(
+    tilted.set_from_cartesian_coords(-0.8865606199840186, 1.0, 2.866009467376818),
+  )
+  assert_close(tilted.radius, 3.0)
+  assert_close(tilted.theta, -0.3)
+  assert_eq(tilted.y, 1.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(

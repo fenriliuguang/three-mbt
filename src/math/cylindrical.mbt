@@ -42,3 +42,18 @@ pub fn Cylindrical::copy(self : Cylindrical, other : Cylindrical) -> Cylindrical
   self.y = other.y
   self
 }
+
+///|
+/// 从直角坐标写入半径、方位角和高度。半径是 xz 平面上到原点的距离。
+/// r186: `setFromCartesianCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L97
+pub fn Cylindrical::set_from_cartesian_coords(
+  self : Cylindrical,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> Cylindrical {
+  self.radius = (x * x + z * z).sqrt()
+  self.theta = @std.atan2(x, z)
+  self.y = y
+  self
+}
