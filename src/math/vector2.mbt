@@ -358,6 +358,19 @@ pub fn Vector2::lerp_vectors(
 }
 
 ///|
+/// `offset` 默认是 0。数组本身不改。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L783
+pub fn Vector2::from_array(
+  self : Vector2,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Vector2 {
+  self.x = array[offset]
+  self.y = array[offset + 1]
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

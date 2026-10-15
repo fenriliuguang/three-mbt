@@ -1095,6 +1095,20 @@ test "Vector2.lerpVectors stores a blend of two vectors" {
 }
 
 ///|
+test "Vector2.fromArray reads two components at an offset" {
+  let array = [1.0, 2.0, 3.0, 4.0, 5.0]
+  let v = @math.Vector2::new(x=9.0, y=9.0)
+  ignore(v.from_array(array))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  ignore(v.from_array(array, offset=2))
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(array[0], 1.0)
+  assert_eq(array[4], 5.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
