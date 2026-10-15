@@ -2637,6 +2637,25 @@ test "Box3.toJSON writes both corners" {
 }
 
 ///|
+test "Box3.fromJSON reads both corners" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=9.0, y=9.0, z=9.0),
+    @math.Vector3::new(x=8.0, y=8.0, z=8.0),
+  )
+  let low = [1.0, 2.0, 3.0]
+  let high = [4.0, 5.0, 6.0]
+  ignore(box.from_json(low, high))
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 4.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 6.0)
+  assert_eq(low[0], 1.0)
+  assert_eq(high[2], 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

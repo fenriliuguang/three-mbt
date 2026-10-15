@@ -234,6 +234,19 @@ pub fn Box3::to_json(self : Box3) -> (Array[Double], Array[Double]) {
 }
 
 ///|
+/// 从两个数组读入角点。数组不改。
+/// r186: `fromJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L742
+pub fn Box3::from_json(
+  self : Box3,
+  min : Array[Double],
+  max : Array[Double],
+) -> Box3 {
+  ignore(self.min.from_array(min))
+  ignore(self.max.from_array(max))
+  self
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
