@@ -732,6 +732,22 @@ test "Vector2.setY writes y and leaves x" {
 }
 
 ///|
+test "Vector2.setComponent writes x or y" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(v.set_component(1, 8.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 8.0)
+  ignore(v.set_component(0, 9.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 8.0)
+}
+
+///|
+test "panic Vector2 component index past y" {
+  ignore(@math.Vector2::new().set_component(2, 1.0))
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(

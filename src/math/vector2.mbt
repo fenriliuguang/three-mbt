@@ -43,6 +43,22 @@ pub fn Vector2::set_y(self : Vector2, y : Double) -> Vector2 {
 }
 
 ///|
+/// 0 是 x，1 是 y。其他下标中止。
+/// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L167
+pub fn Vector2::set_component(
+  self : Vector2,
+  index : Int,
+  value : Double,
+) -> Vector2 {
+  match index {
+    0 => self.x = value
+    1 => self.y = value
+    _ => abort("Vector2 index is out of range")
+  }
+  self
+}
+
+///|
 pub fn Vector2::copy(self : Vector2, v : Vector2) -> Vector2 {
   self.x = v.x
   self.y = v.y
