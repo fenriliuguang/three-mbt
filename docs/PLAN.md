@@ -667,6 +667,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.intersectsTriangle` has landed. It uses the separating-axis test. The box `(0, 0, 0)`–`(1, 1, 1)` meets the triangle with corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)`, and misses the same triangle shifted to `z = 5`. An empty box misses the triangle. The box and the triangle are unchanged.
 
+`Triangle.intersectsBox` has landed. It asks the box whether it meets this triangle. Corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)` meet the box `(0, 0, 0)`–`(1, 1, 1)`, and miss the box `(0, 0, 5)`–`(1, 1, 6)`. An empty box misses the triangle. The triangle and the box are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -941,6 +943,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.contains`, the instance `containsPoint` | `math` |
 | planned | 7 | `Triangle.front_facing`, the instance `isFrontFacing` | `math` |
 | planned | 7 | `Box3.intersectsTriangle` | `math` |
+| planned | 7 | `Triangle.intersectsBox` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

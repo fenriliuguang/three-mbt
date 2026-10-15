@@ -3128,6 +3128,28 @@ test "intersectsTriangle accepts a triangle on the box and rejects a distant one
 }
 
 ///|
+test "Triangle.intersectsBox matches the box test" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let box = @math.Box3::new(
+    @math.Vector3::new(),
+    @math.Vector3::new(x=1.0, y=1.0, z=1.0),
+  )
+  assert_eq(triangle.intersects_box(box), true)
+  let far = @math.Box3::new(
+    @math.Vector3::new(z=5.0),
+    @math.Vector3::new(x=1.0, y=1.0, z=6.0),
+  )
+  assert_eq(triangle.intersects_box(far), false)
+  assert_eq(triangle.intersects_box(@math.Box3::empty()), false)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(box.max.z, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -247,3 +247,10 @@ pub fn Triangle::contains(self : Triangle, point : Vector3) -> Bool {
 pub fn Triangle::front_facing(self : Triangle, direction : Vector3) -> Bool {
   Triangle::is_front_facing(self.a, self.b, self.c, direction)
 }
+
+///|
+/// 三角形与盒子相交或贴在边界上则为真。空盒为假。三角形和盒子都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L429
+pub fn Triangle::intersects_box(self : Triangle, box : Box3) -> Bool {
+  box.intersects_triangle(self)
+}
