@@ -1995,6 +1995,23 @@ test "Box2.expandByScalar grows or shrinks each side" {
 }
 
 ///|
+test "Box2.containsPoint includes the boundary" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let inside = @math.Vector2::new(x=2.0, y=3.0)
+  let corner = @math.Vector2::new(x=1.0, y=2.0)
+  let outside = @math.Vector2::new(x=0.0, y=3.0)
+  assert_eq(box.contains_point(inside), true)
+  assert_eq(box.contains_point(corner), true)
+  assert_eq(box.contains_point(outside), false)
+  assert_eq(inside.x, 2.0)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.y, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

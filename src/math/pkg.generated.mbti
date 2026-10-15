@@ -22,6 +22,7 @@ pub(all) struct Box2 {
   max : Vector2
 }
 pub fn Box2::clone(Self) -> Self
+pub fn Box2::contains_point(Self, Vector2) -> Bool
 pub fn Box2::copy(Self, Self) -> Self
 pub fn Box2::expand_by_point(Self, Vector2) -> Self
 pub fn Box2::expand_by_scalar(Self, Double) -> Self

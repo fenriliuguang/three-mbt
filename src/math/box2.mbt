@@ -137,3 +137,13 @@ pub fn Box2::expand_by_scalar(self : Box2, scalar : Double) -> Box2 {
   ignore(self.max.add_scalar(scalar))
   self
 }
+
+///|
+/// 点在盒内或边界上则为真。点和盒子都不改。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L233
+pub fn Box2::contains_point(self : Box2, point : Vector2) -> Bool {
+  point.x >= self.min.x &&
+  point.x <= self.max.x &&
+  point.y >= self.min.y &&
+  point.y <= self.max.y
+}
