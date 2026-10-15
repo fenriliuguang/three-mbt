@@ -53,6 +53,13 @@ pub fn Vector4::set_x(self : Vector4, x : Double) -> Vector4 {
 }
 
 ///|
+/// r186: `setY` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L173
+pub fn Vector4::set_y(self : Vector4, y : Double) -> Vector4 {
+  self.y = y
+  self
+}
+
+///|
 pub fn Vector4::copy(self : Vector4, v : Vector4) -> Vector4 {
   self.x = v.x
   self.y = v.y

@@ -343,6 +343,7 @@ pub fn Vector4::normalize(Self) -> Self
 pub fn Vector4::set(Self, Double, Double, Double, Double) -> Self
 pub fn Vector4::set_scalar(Self, Double) -> Self
 pub fn Vector4::set_x(Self, Double) -> Self
+pub fn Vector4::set_y(Self, Double) -> Self
 
 // Type aliases
 
