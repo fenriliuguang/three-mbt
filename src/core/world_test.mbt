@@ -34,6 +34,39 @@ test "fromBufferAttribute reads xyz and skips a fourth component" {
 }
 
 ///|
+test "setFromBufferAttribute fits each vertex" {
+  let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 0.0, 5.0, 4.0], 3)
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=9.0, y=9.0, z=9.0),
+    @math.Vector3::new(x=8.0, y=8.0, z=8.0),
+  )
+  ignore(positions.set_box3(box))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 4.0)
+  assert_eq(positions.get_x(0), 1.0)
+  let wide = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 9.0, 0.0, 5.0, 4.0, 8.0],
+    4,
+  )
+  ignore(wide.set_box3(box))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 4.0)
+  assert_eq(wide.get_component(0, 3), 9.0)
+  let empty = @core.BufferAttribute::new([], 3)
+  ignore(empty.set_box3(box))
+  assert_eq(box.min.x > 1.0e308, true)
+  assert_eq(box.max.x < -1.0e308, true)
+}
+
+///|
 test "fromBufferAttribute reads xy and skips later components" {
   let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2)
   let v = @math.Vector2::new(x=9.0, y=8.0)

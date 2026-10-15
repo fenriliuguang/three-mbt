@@ -94,6 +94,24 @@ pub fn BufferAttribute::copy_to_vector4(
 }
 
 ///|
+/// 先清空 `target`，再纳入每个顶点的 xyz。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `setFromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L86
+pub fn BufferAttribute::set_box3(
+  self : BufferAttribute,
+  target : @math.Box3,
+) -> @math.Box3 {
+  ignore(target.make_empty())
+  let point = @math.Vector3::new()
+  let mut index = 0
+  while index < self.count {
+    ignore(self.copy_to_vector3(index, point))
+    ignore(target.expand_by_point(point))
+    index = index + 1
+  }
+  target
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,
