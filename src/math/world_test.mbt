@@ -271,6 +271,27 @@ test "setLength rescales the vector and leaves zero unchanged" {
 }
 
 ///|
+test "lerpVectors stores the blend of two vectors" {
+  let start = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let end = @math.Vector3::new(x=5.0, y=6.0, z=7.0)
+  let out = @math.Vector3::new(x=9.0)
+  ignore(out.lerp_vectors(start, end, 0.25))
+  assert_eq(out.x, 2.0)
+  assert_eq(out.y, 3.0)
+  assert_eq(out.z, 4.0)
+  assert_eq(start.x, 1.0)
+  assert_eq(end.z, 7.0)
+  ignore(out.lerp_vectors(start, end, 0.0))
+  assert_eq(out.x, 1.0)
+  assert_eq(out.y, 2.0)
+  assert_eq(out.z, 3.0)
+  ignore(out.lerp_vectors(start, end, 1.0))
+  assert_eq(out.x, 5.0)
+  assert_eq(out.y, 6.0)
+  assert_eq(out.z, 7.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)

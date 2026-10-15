@@ -299,6 +299,20 @@ pub fn Vector3::lerp(self : Vector3, v : Vector3, t : Double) -> Vector3 {
 }
 
 ///|
+/// r186: `lerpVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L840
+pub fn Vector3::lerp_vectors(
+  self : Vector3,
+  v1 : Vector3,
+  v2 : Vector3,
+  alpha : Double,
+) -> Vector3 {
+  self.x = v1.x + (v2.x - v1.x) * alpha
+  self.y = v1.y + (v2.y - v1.y) * alpha
+  self.z = v1.z + (v2.z - v1.z) * alpha
+  self
+}
+
+///|
 pub fn Vector3::min(self : Vector3, v : Vector3) -> Vector3 {
   self.x = self.x.min(v.x)
   self.y = self.y.min(v.y)
