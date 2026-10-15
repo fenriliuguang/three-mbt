@@ -117,6 +117,18 @@ pub fn Box3::get_parameter(
 }
 
 ///|
+/// 两个盒子有重叠或贴边则为真。两个盒子都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L442
+pub fn Box3::intersects_box(self : Box3, box : Box3) -> Bool {
+  box.max.x >= self.min.x &&
+  box.min.x <= self.max.x &&
+  box.max.y >= self.min.y &&
+  box.min.y <= self.max.y &&
+  box.max.z >= self.min.z &&
+  box.min.z <= self.max.z
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
