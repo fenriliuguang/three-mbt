@@ -67,6 +67,17 @@ pub fn BufferAttribute::copy_to_vector3(
 }
 
 ///|
+/// 写入 `target` 的 x 和 y。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L816
+pub fn BufferAttribute::copy_to_vector2(
+  self : BufferAttribute,
+  index : Int,
+  target : @math.Vector2,
+) -> @math.Vector2 {
+  target.set(self.get_x(index), self.get_y(index))
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,

@@ -19,6 +19,7 @@ pub(all) struct BufferAttribute {
   mut normalized : Bool
   count : Int
 }
+pub fn BufferAttribute::copy_to_vector2(Self, Int, @math.Vector2) -> @math.Vector2
 pub fn BufferAttribute::copy_to_vector3(Self, Int, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::from_ints(Array[Int], Int) -> Self
 pub fn BufferAttribute::get_component(Self, Int, Int) -> Double
