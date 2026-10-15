@@ -482,6 +482,23 @@ test "setFromSphericalCoords uses y-up spherical coordinates" {
 }
 
 ///|
+test "setFromSpherical copies radius phi and theta" {
+  let v = @math.Vector3::new(x=9.0)
+  let s = @math.Spherical::new(radius=5.0, phi=0.0, theta=1.0)
+  ignore(v.set_from_spherical(s))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 0.0)
+  assert_eq(s.radius, 5.0)
+  assert_eq(s.phi, 0.0)
+  assert_eq(s.theta, 1.0)
+  let defaults = @math.Spherical::new()
+  assert_eq(defaults.radius, 1.0)
+  assert_eq(defaults.phi, 0.0)
+  assert_eq(defaults.theta, 0.0)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))

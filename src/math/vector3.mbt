@@ -456,6 +456,13 @@ pub fn Vector3::manhattan_distance_to(self : Vector3, v : Vector3) -> Double {
 }
 
 ///|
+/// 读取球坐标的半径和两个角。球坐标本身不改。
+/// r186: `setFromSpherical` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L993
+pub fn Vector3::set_from_spherical(self : Vector3, s : Spherical) -> Vector3 {
+  self.set_from_spherical_coords(s.radius, s.phi, s.theta)
+}
+
+///|
 /// `phi` 是相对正 Y 轴的夹角，`theta` 绕 Y 轴、从正 Z 转向正 X。
 /// r186: `setFromSphericalCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1007
 pub fn Vector3::set_from_spherical_coords(

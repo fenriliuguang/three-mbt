@@ -172,6 +172,13 @@ pub fn Sphere::make_empty(Self) -> Self
 pub fn Sphere::new(center? : Vector3, radius? : Double) -> Self
 pub fn Sphere::set_from_points(Self, Array[Vector3], optional_center? : Vector3) -> Self
 
+pub(all) struct Spherical {
+  mut radius : Double
+  mut phi : Double
+  mut theta : Double
+}
+pub fn Spherical::new(radius? : Double, phi? : Double, theta? : Double) -> Self
+
 pub(all) struct Vector2 {
   mut x : Double
   mut y : Double
@@ -251,6 +258,7 @@ pub fn Vector3::set_from_matrix3_column(Self, Matrix3, Int) -> Self
 pub fn Vector3::set_from_matrix_column(Self, Matrix4, Int) -> Self
 pub fn Vector3::set_from_matrix_position(Self, Matrix4) -> Self
 pub fn Vector3::set_from_matrix_scale(Self, Matrix4) -> Self
+pub fn Vector3::set_from_spherical(Self, Spherical) -> Self
 pub fn Vector3::set_from_spherical_coords(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_length(Self, Double) -> Self
 pub fn Vector3::set_scalar(Self, Double) -> Self
