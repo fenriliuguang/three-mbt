@@ -220,6 +220,13 @@ pub fn Box3::translate(self : Box3, offset : Vector3) -> Box3 {
 }
 
 ///|
+/// 两个角点都相同则为真。两个盒子都不改。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L716
+pub fn Box3::equals(self : Box3, box : Box3) -> Bool {
+  box.min.equals(self.min) && box.max.equals(self.max)
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
