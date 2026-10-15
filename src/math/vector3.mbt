@@ -312,6 +312,20 @@ pub fn Vector3::clamp(self : Vector3, min : Vector3, max : Vector3) -> Vector3 {
 }
 
 ///|
+/// 假定 `min_val` 小于 `max_val`。
+/// r186: `clampScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L635
+pub fn Vector3::clamp_scalar(
+  self : Vector3,
+  min_val : Double,
+  max_val : Double,
+) -> Vector3 {
+  self.x = self.x.clamp(min=min_val, max=max_val)
+  self.y = self.y.clamp(min=min_val, max=max_val)
+  self.z = self.z.clamp(min=min_val, max=max_val)
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y

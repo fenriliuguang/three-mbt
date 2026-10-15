@@ -171,6 +171,20 @@ test "clamp keeps each component inside its own range" {
 }
 
 ///|
+test "clampScalar uses one range for every component" {
+  let v = @math.Vector3::new(x=0.0, y=5.0, z=-2.0)
+  ignore(v.clamp_scalar(1.0, 4.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 1.0)
+  let inside = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  ignore(inside.clamp_scalar(0.0, 5.0))
+  assert_eq(inside.x, 2.0)
+  assert_eq(inside.y, 3.0)
+  assert_eq(inside.z, 4.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)
