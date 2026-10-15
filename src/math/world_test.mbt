@@ -1413,6 +1413,21 @@ test "Vector4.divide divides matching components" {
 }
 
 ///|
+test "Vector4.divideScalar divides every component" {
+  let v = @math.Vector4::new(x=2.0, y=4.0, z=6.0, w=8.0)
+  ignore(v.divide_scalar(2.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 4.0)
+  ignore(v.divide_scalar(-1.0))
+  assert_eq(v.x, -1.0)
+  assert_eq(v.y, -2.0)
+  assert_eq(v.z, -3.0)
+  assert_eq(v.w, -4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
