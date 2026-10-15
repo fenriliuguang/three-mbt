@@ -42,3 +42,12 @@ pub fn Spherical::copy(self : Spherical, other : Spherical) -> Spherical {
   self.theta = other.theta
   self
 }
+
+///|
+/// 把 `phi` 限制在 `0.000001` 和 `π - 0.000001` 之间。半径和 `theta` 不改。
+/// r186: `makeSafe` https://github.com/mrdoob/three.js/blob/r186/src/math/Spherical.js#L84
+pub fn Spherical::make_safe(self : Spherical) -> Spherical {
+  let eps = 0.000001
+  self.phi = self.phi.clamp(min=eps, max=@std.PI - eps)
+  self
+}

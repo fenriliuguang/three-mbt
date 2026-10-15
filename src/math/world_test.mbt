@@ -521,6 +521,22 @@ test "Spherical.copy copies radius phi and theta" {
 }
 
 ///|
+test "Spherical.makeSafe clamps phi away from the poles" {
+  let eps = 0.000001
+  let low = @math.Spherical::new(radius=2.0, phi=0.0, theta=-0.3)
+  ignore(low.make_safe())
+  assert_eq(low.phi, eps)
+  assert_eq(low.radius, 2.0)
+  assert_eq(low.theta, -0.3)
+  let high = @math.Spherical::new(phi=3.141592653589793)
+  ignore(high.make_safe())
+  assert_eq(high.phi, 3.141592653589793 - eps)
+  let kept = @math.Spherical::new(phi=0.5)
+  ignore(kept.make_safe())
+  assert_eq(kept.phi, 0.5)
+}
+
+///|
 test "setFromCylindricalCoords uses a y-up cylinder" {
   let v = @math.Vector3::new(x=9.0)
   ignore(v.set_from_cylindrical_coords(2.0, 0.0, 5.0))
