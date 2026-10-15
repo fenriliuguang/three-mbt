@@ -128,3 +128,12 @@ pub fn Box2::expand_by_vector(self : Box2, vector : Vector2) -> Box2 {
   ignore(self.max.add(vector))
   self
 }
+
+///|
+/// 每个方向都按标量扩张。负数则收缩。
+/// r186: `expandByScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L218
+pub fn Box2::expand_by_scalar(self : Box2, scalar : Double) -> Box2 {
+  ignore(self.min.add_scalar(-scalar))
+  ignore(self.max.add_scalar(scalar))
+  self
+}
