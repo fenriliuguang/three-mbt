@@ -1723,6 +1723,21 @@ test "Vector4.lerpVectors stores the interpolation of two vectors" {
 }
 
 ///|
+test "Vector4.equals compares every component" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let same = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  assert_eq(v.equals(same), true)
+  assert_eq(v.equals(v), true)
+  assert_eq(v.equals(@math.Vector4::new(x=9.0, y=2.0, z=3.0, w=4.0)), false)
+  assert_eq(v.equals(@math.Vector4::new(x=1.0, y=9.0, z=3.0, w=4.0)), false)
+  assert_eq(v.equals(@math.Vector4::new(x=1.0, y=2.0, z=9.0, w=4.0)), false)
+  assert_eq(v.equals(@math.Vector4::new(x=1.0, y=2.0, z=3.0, w=9.0)), false)
+  assert_eq(v.x, 1.0)
+  assert_eq(v.w, 4.0)
+  assert_eq(same.y, 2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

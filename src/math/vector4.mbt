@@ -546,6 +546,12 @@ pub fn Vector4::lerp_vectors(
 }
 
 ///|
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L973
+pub fn Vector4::equals(self : Vector4, v : Vector4) -> Bool {
+  self.x == v.x && self.y == v.y && self.z == v.z && self.w == v.w
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x
