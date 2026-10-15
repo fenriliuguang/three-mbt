@@ -240,3 +240,10 @@ pub fn Triangle::interpolation(
 pub fn Triangle::contains(self : Triangle, point : Vector3) -> Bool {
   Triangle::contains_point(point, self.a, self.b, self.c)
 }
+
+///|
+/// 法线与方向的点积小于 0 时为正面。角点和方向都不改。
+/// r186: `isFrontFacing` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L417
+pub fn Triangle::front_facing(self : Triangle, direction : Vector3) -> Bool {
+  Triangle::is_front_facing(self.a, self.b, self.c, direction)
+}

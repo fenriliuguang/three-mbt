@@ -3089,6 +3089,22 @@ test "Triangle.contains accepts the interior and the boundary" {
 }
 
 ///|
+test "Triangle.front_facing is true when the normal opposes the direction" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let toward = @math.Vector3::new(z=-1.0)
+  let away = @math.Vector3::new(z=1.0)
+  assert_eq(triangle.front_facing(toward), true)
+  assert_eq(triangle.front_facing(away), false)
+  assert_eq(triangle.b.x, 1.0)
+  assert_eq(triangle.c.y, 1.0)
+  assert_eq(toward.z, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
