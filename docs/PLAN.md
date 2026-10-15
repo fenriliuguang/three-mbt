@@ -597,6 +597,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.containsBox` has landed. The other box must lie entirely on or inside the bounds. A box from `(1, 2, 3)` to `(7, 8, 9)` contains `(2, 3, 4)` to `(6, 7, 8)` and an identical copy of itself. A box from `(0, 3, 4)` to `(6, 7, 8)` sticks out, so it is not contained. Neither box changes.
 
+`Box3.getParameter` has landed. It writes the point as a fraction of the box width, height, and depth. In a box from `(1, 2, 3)` to `(3, 6, 5)`, the point `(2, 4, 4)` is `(0.5, 0.5, 0.5)` and the lower corner `(1, 2, 3)` is `(0, 0, 0)`. The point and the box are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -836,6 +838,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box3.expandByScalar` | `math` |
 | planned | 7 | `Box3.containsPoint` | `math` |
 | planned | 7 | `Box3.containsBox` | `math` |
+| planned | 7 | `Box3.getParameter` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

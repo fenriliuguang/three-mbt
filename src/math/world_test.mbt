@@ -2378,6 +2378,28 @@ test "Box3.containsBox includes an identical box" {
 }
 
 ///|
+test "Box3.getParameter writes the point as a proportion" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=3.0, y=6.0, z=5.0),
+  )
+  let point = @math.Vector3::new(x=2.0, y=4.0, z=4.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let parameter = box.get_parameter(point, target)
+  assert_eq(physical_equal(parameter, target), true)
+  assert_eq(parameter.x, 0.5)
+  assert_eq(parameter.y, 0.5)
+  assert_eq(parameter.z, 0.5)
+  ignore(box.get_parameter(@math.Vector3::new(x=1.0, y=2.0, z=3.0), target))
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(point.x, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.y, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

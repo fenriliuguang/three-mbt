@@ -102,6 +102,21 @@ pub fn Box3::contains_box(self : Box3, box : Box3) -> Bool {
 }
 
 ///|
+/// 把点写成相对宽高深的比例，写入 target。点和盒子都不改。
+/// r186: `getParameter` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L423
+pub fn Box3::get_parameter(
+  self : Box3,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  target.set(
+    (point.x - self.min.x) / (self.max.x - self.min.x),
+    (point.y - self.min.y) / (self.max.y - self.min.y),
+    (point.z - self.min.z) / (self.max.z - self.min.z),
+  )
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
