@@ -75,3 +75,24 @@ pub fn Line3::at(self : Line3, t : Double, target : Vector3) -> Vector3 {
   ignore(self.delta(target).multiply_scalar(t))
   target.add(self.start)
 }
+
+///|
+/// 返回点在线段方向上的参数。退化线段返回 0。点和线段都不改。
+/// r186: `closestPointToPointParameter` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L139
+pub fn Line3::closest_point_to_point_parameter(
+  self : Line3,
+  point : Vector3,
+  clamp_to_line : Bool,
+) -> Double {
+  let start_p = Vector3::new().sub_vectors(point, self.start)
+  let start_end = Vector3::new().sub_vectors(self.end, self.start)
+  let start_end2 = start_end.dot(start_end)
+  if start_end2 == 0.0 {
+    return 0.0
+  }
+  let mut t = start_end.dot(start_p) / start_end2
+  if clamp_to_line {
+    t = t.clamp(min=0.0, max=1.0)
+  }
+  t
+}

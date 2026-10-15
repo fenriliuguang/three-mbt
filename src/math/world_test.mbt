@@ -3368,6 +3368,26 @@ test "Line3.at samples a point along the segment" {
 }
 
 ///|
+test "closestPointToPointParameter clamps when asked" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(),
+    end=@math.Vector3::new(x=2.0),
+  )
+  let mid = @math.Vector3::new(x=1.0, y=5.0)
+  let past = @math.Vector3::new(x=4.0)
+  assert_eq(line.closest_point_to_point_parameter(mid, false), 0.5)
+  assert_eq(line.closest_point_to_point_parameter(past, false), 2.0)
+  assert_eq(line.closest_point_to_point_parameter(past, true), 1.0)
+  let flat = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  assert_eq(flat.closest_point_to_point_parameter(past, true), 0.0)
+  assert_eq(line.end.x, 2.0)
+  assert_eq(past.x, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
