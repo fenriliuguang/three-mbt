@@ -69,6 +69,21 @@ pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
 }
 
 ///|
+/// 先清空，再纳入数组里每三个数组成的点。数组不改。
+/// r186: `setFromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L65
+pub fn Box3::set_from_array(self : Box3, array : Array[Double]) -> Box3 {
+  ignore(self.make_empty())
+  let point = Vector3::new()
+  let mut i = 0
+  while i + 2 < array.length() {
+    ignore(point.from_array(array, offset=i))
+    ignore(self.expand_by_point(point))
+    i = i + 3
+  }
+  self
+}
+
+///|
 pub fn Box3::get_center(self : Box3, target : Vector3) -> Vector3 {
   if self.is_empty() {
     target.set(0.0, 0.0, 0.0)

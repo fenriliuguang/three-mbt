@@ -2214,6 +2214,27 @@ test "Box2.equals compares both corners" {
 }
 
 ///|
+test "Box3.setFromArray fits each triple" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=9.0, y=9.0, z=9.0),
+    @math.Vector3::new(x=8.0, y=8.0, z=8.0),
+  )
+  let array = [1.0, 2.0, 3.0, 0.0, 5.0, 4.0]
+  ignore(box.set_from_array(array))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 4.0)
+  assert_eq(array[0], 1.0)
+  assert_eq(array[5], 4.0)
+  ignore(box.set_from_array([]))
+  assert_eq(box.min.x > 1.0e308, true)
+  assert_eq(box.max.x < -1.0e308, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

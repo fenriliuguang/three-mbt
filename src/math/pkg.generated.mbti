@@ -58,6 +58,7 @@ pub fn Box3::is_empty(Self) -> Bool
 pub fn Box3::make_empty(Self) -> Self
 pub fn Box3::new(Vector3, Vector3) -> Self
 pub fn Box3::set(Self, Vector3, Vector3) -> Self
+pub fn Box3::set_from_array(Self, Array[Double]) -> Self
 pub fn Box3::set_from_points(Self, Array[Vector3]) -> Self
 pub fn Box3::union(Self, Self) -> Self
 
