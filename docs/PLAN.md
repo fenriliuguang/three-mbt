@@ -719,6 +719,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Plane.intersectsSphere` has landed. It asks the sphere whether it meets this plane. On the plane `x = 0`, a sphere at `(1, 0, 0)` with radius `1` touches, a sphere at `(3, 0, 0)` with radius `1` stays apart, and an empty sphere misses. The plane and the sphere are unchanged.
 
+`Plane.coplanarPoint` has landed. It writes the normal scaled by the negated constant. The plane `x = 2`, with normal `(1, 0, 0)` and constant `-2`, gives `(2, 0, 0)`. That point lies on the plane. The plane is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1019,6 +1021,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Plane.intersectsBox` | `math` |
 | planned | 7 | `Sphere.intersectsPlane` | `math` |
 | planned | 7 | `Plane.intersectsSphere` | `math` |
+| planned | 7 | `Plane.coplanarPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

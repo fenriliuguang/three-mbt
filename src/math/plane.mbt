@@ -168,3 +168,10 @@ pub fn Plane::intersects_box(self : Plane, box : Box3) -> Bool {
 pub fn Plane::intersects_sphere(self : Plane, sphere : Sphere) -> Bool {
   sphere.intersects_plane(self)
 }
+
+///|
+/// 把法线乘以常数的相反数写入 target。平面不改。
+/// r186: `coplanarPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L296
+pub fn Plane::coplanar_point(self : Plane, target : Vector3) -> Vector3 {
+  target.copy(self.normal).multiply_scalar(-self.constant)
+}

@@ -3585,6 +3585,20 @@ test "Plane.intersectsSphere matches the sphere test" {
 }
 
 ///|
+test "coplanarPoint scales the normal by the negated constant" {
+  let plane = @math.Plane::new(constant=-2.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let point = plane.coplanar_point(target)
+  assert_eq(physical_equal(point, target), true)
+  assert_eq(point.x, 2.0)
+  assert_eq(point.y, 0.0)
+  assert_eq(point.z, 0.0)
+  assert_eq(plane.distance_to_point(point), 0.0)
+  assert_eq(plane.constant, -2.0)
+  assert_eq(plane.normal.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

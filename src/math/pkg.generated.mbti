@@ -208,6 +208,7 @@ pub(all) struct Plane {
   normal : Vector3
   mut constant : Double
 }
+pub fn Plane::coplanar_point(Self, Vector3) -> Vector3
 pub fn Plane::copy(Self, Self) -> Self
 pub fn Plane::distance_to_point(Self, Vector3) -> Double
 pub fn Plane::distance_to_sphere(Self, Sphere) -> Double
