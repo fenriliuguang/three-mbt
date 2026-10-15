@@ -695,6 +695,19 @@ test "Cylindrical.setFromVector3 reads the vector components" {
 }
 
 ///|
+test "Cylindrical.clone copies radius theta and height" {
+  let source = @math.Cylindrical::new(radius=2.0, theta=-0.3, y=5.0)
+  let cloned = source.clone()
+  assert_eq(cloned.radius, 2.0)
+  assert_eq(cloned.theta, -0.3)
+  assert_eq(cloned.y, 5.0)
+  ignore(cloned.set(1.0, 0.0, 0.0))
+  assert_eq(source.radius, 2.0)
+  assert_eq(source.theta, -0.3)
+  assert_eq(source.y, 5.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(

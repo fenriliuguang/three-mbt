@@ -67,3 +67,10 @@ pub fn Cylindrical::set_from_cartesian_coords(
   self.y = y
   self
 }
+
+///|
+/// 返回一份新的柱坐标。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L112
+pub fn Cylindrical::clone(self : Cylindrical) -> Cylindrical {
+  Cylindrical::new().copy(self)
+}
