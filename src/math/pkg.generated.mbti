@@ -215,6 +215,7 @@ pub fn Plane::copy(Self, Self) -> Self
 pub fn Plane::distance_to_point(Self, Vector3) -> Double
 pub fn Plane::distance_to_sphere(Self, Sphere) -> Double
 pub fn Plane::equals(Self, Self) -> Bool
+pub fn Plane::from_json(Self, Array[Double], Double) -> Self
 pub fn Plane::intersect_line(Self, Line3, Vector3, clamp_to_line? : Bool) -> Vector3?
 pub fn Plane::intersects_box(Self, Box3) -> Bool
 pub fn Plane::intersects_line(Self, Line3) -> Bool

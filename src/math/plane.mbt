@@ -222,3 +222,16 @@ pub fn Plane::clone(self : Plane) -> Plane {
 pub fn Plane::to_json(self : Plane) -> (Array[Double], Double) {
   (self.normal.to_array(), self.constant)
 }
+
+///|
+/// 从数组和常数读入平面。数组不改。
+/// r186: `fromJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L386
+pub fn Plane::from_json(
+  self : Plane,
+  normal : Array[Double],
+  constant : Double,
+) -> Plane {
+  ignore(self.normal.from_array(normal))
+  self.constant = constant
+  self
+}
