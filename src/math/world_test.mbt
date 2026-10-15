@@ -255,6 +255,22 @@ test "manhattanLength sums the absolute components" {
 }
 
 ///|
+test "setLength rescales the vector and leaves zero unchanged" {
+  let v = @math.Vector3::new(z=4.0)
+  ignore(v.set_length(2.0))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 2.0)
+  ignore(v.set_length(0.0))
+  assert_eq(v.z, 0.0)
+  let zero = @math.Vector3::new()
+  ignore(zero.set_length(5.0))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+  assert_eq(zero.z, 0.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)

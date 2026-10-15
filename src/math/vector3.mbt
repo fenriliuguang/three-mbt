@@ -284,6 +284,13 @@ pub fn Vector3::normalize(self : Vector3) -> Vector3 {
 }
 
 ///|
+/// 零向量保持为零。
+/// r186: `setLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L805
+pub fn Vector3::set_length(self : Vector3, length : Double) -> Vector3 {
+  self.normalize().multiply_scalar(length)
+}
+
+///|
 pub fn Vector3::lerp(self : Vector3, v : Vector3, t : Double) -> Vector3 {
   self.x += (v.x - self.x) * t
   self.y += (v.y - self.y) * t
