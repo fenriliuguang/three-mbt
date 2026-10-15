@@ -282,6 +282,13 @@ pub fn Vector2::negate(self : Vector2) -> Vector2 {
 }
 
 ///|
+/// 返回叉积的 z 分量。两个向量都不改。
+/// r186: `cross` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L588
+pub fn Vector2::cross(self : Vector2, v : Vector2) -> Double {
+  self.x * v.y - self.y * v.x
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

@@ -985,6 +985,18 @@ test "Vector2.negate flips both components" {
 }
 
 ///|
+test "Vector2.cross returns the z component" {
+  let a = @math.Vector2::new(x=2.0, y=3.0)
+  let b = @math.Vector2::new(x=4.0, y=5.0)
+  assert_eq(a.cross(b), -2.0)
+  assert_eq(a.x, 2.0)
+  assert_eq(a.y, 3.0)
+  assert_eq(b.x, 4.0)
+  assert_eq(b.y, 5.0)
+  assert_eq(@math.Vector2::new(x=1.0).cross(@math.Vector2::new(y=1.0)), 1.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
