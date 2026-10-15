@@ -104,3 +104,25 @@ pub fn Sphere::distance_to_point(self : Sphere, point : Vector3) -> Double {
 pub fn Sphere::intersects_box(self : Sphere, box : Box3) -> Bool {
   box.intersects_sphere(self)
 }
+
+///|
+/// 把点夹进球内，写入 target。球外的点落到球面上最近点，球内的点原样写入。点和球都不改。
+/// r186: `clampPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L218
+pub fn Sphere::clamp_point(
+  self : Sphere,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let delta_length_sq = self.center.distance_to_squared(point)
+  ignore(target.copy(point))
+  if delta_length_sq > self.radius * self.radius {
+    ignore(
+      target
+      .sub(self.center)
+      .normalize()
+      .multiply_scalar(self.radius)
+      .add(self.center),
+    )
+  }
+  target
+}

@@ -3736,6 +3736,26 @@ test "Sphere.intersectsBox counts a tangent box" {
 }
 
 ///|
+test "Sphere.clampPoint pulls an outside point onto the sphere" {
+  let sphere = @math.Sphere::new(radius=1.0)
+  let outside = @math.Vector3::new(x=2.0)
+  let inside = @math.Vector3::new(x=0.5)
+  let target = @math.Vector3::new(x=9.0)
+  ignore(sphere.clamp_point(outside, target))
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  ignore(sphere.clamp_point(inside, target))
+  assert_eq(target.x, 0.5)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(outside.x, 2.0)
+  assert_eq(inside.x, 0.5)
+  assert_eq(sphere.radius, 1.0)
+  assert_eq(sphere.center.x, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
