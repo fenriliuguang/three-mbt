@@ -237,6 +237,7 @@ pub fn Vector3::multiply_vectors(Self, Self, Self) -> Self
 pub fn Vector3::negate(Self) -> Self
 pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
 pub fn Vector3::normalize(Self) -> Self
+pub fn Vector3::project_on_plane(Self, Self) -> Self
 pub fn Vector3::project_on_vector(Self, Self) -> Self
 pub fn Vector3::round(Self) -> Self
 pub fn Vector3::round_to_zero(Self) -> Self

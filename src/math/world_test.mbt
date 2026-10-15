@@ -307,6 +307,22 @@ test "projectOnVector keeps the component along the target" {
 }
 
 ///|
+test "projectOnPlane removes the component along the normal" {
+  let v = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  let normal = @math.Vector3::new(y=4.0)
+  ignore(v.project_on_plane(normal))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 0.0)
+  assert_eq(v.z, 4.0)
+  assert_eq(normal.y, 4.0)
+  let kept = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
+  ignore(kept.project_on_plane(@math.Vector3::new()))
+  assert_eq(kept.x, 2.0)
+  assert_eq(kept.y, 3.0)
+  assert_eq(kept.z, 4.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)

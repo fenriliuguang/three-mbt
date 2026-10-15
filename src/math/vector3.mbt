@@ -269,6 +269,17 @@ pub fn Vector3::project_on_vector(self : Vector3, v : Vector3) -> Vector3 {
 }
 
 ///|
+/// 法线不必是单位长度。零法线让向量保持不变。
+/// r186: `projectOnPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L908
+pub fn Vector3::project_on_plane(
+  self : Vector3,
+  plane_normal : Vector3,
+) -> Vector3 {
+  let projected = Vector3::new().copy(self).project_on_vector(plane_normal)
+  self.sub(projected)
+}
+
+///|
 pub fn Vector3::length_sq(self : Vector3) -> Double {
   self.x * self.x + self.y * self.y + self.z * self.z
 }
