@@ -96,3 +96,17 @@ pub fn Line3::closest_point_to_point_parameter(
   }
   t
 }
+
+///|
+/// 把线段上离给定点最近的点写入 target。点和线段都不改。
+/// r186: `closestPointToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L170
+pub fn Line3::closest_point_to_point(
+  self : Line3,
+  point : Vector3,
+  clamp_to_line : Bool,
+  target : Vector3,
+) -> Vector3 {
+  let t = self.closest_point_to_point_parameter(point, clamp_to_line)
+  ignore(self.delta(target).multiply_scalar(t))
+  target.add(self.start)
+}

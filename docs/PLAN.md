@@ -699,6 +699,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Line3.closestPointToPointParameter` has landed. It returns where the point projects along the segment. On the segment from `(0, 0, 0)` to `(2, 0, 0)`, `(1, 5, 0)` is `0.5` and `(4, 0, 0)` is `2`. Clamping that last value gives `1`. A segment with equal ends returns `0`. The point and the line are unchanged.
 
+`Line3.closestPointToPoint` has landed. It writes the nearest point on the line. On the segment from `(0, 0, 0)` to `(2, 0, 0)`, `(1, 5, 0)` lands on `(1, 0, 0)`. `(4, 0, 0)` stays at `(4, 0, 0)` without clamping and becomes `(2, 0, 0)` with clamping. The point and the line are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -989,6 +991,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Line3.distance` | `math` |
 | planned | 7 | `Line3.at` | `math` |
 | planned | 7 | `Line3.closestPointToPointParameter` | `math` |
+| planned | 7 | `Line3.closestPointToPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

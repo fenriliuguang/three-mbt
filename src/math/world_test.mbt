@@ -3388,6 +3388,29 @@ test "closestPointToPointParameter clamps when asked" {
 }
 
 ///|
+test "Line3.closestPointToPoint writes the nearest point" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(),
+    end=@math.Vector3::new(x=2.0),
+  )
+  let above = @math.Vector3::new(x=1.0, y=5.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let nearest = line.closest_point_to_point(above, true, target)
+  assert_eq(physical_equal(nearest, target), true)
+  assert_eq(nearest.x, 1.0)
+  assert_eq(nearest.y, 0.0)
+  assert_eq(nearest.z, 0.0)
+  let past = @math.Vector3::new(x=4.0)
+  ignore(line.closest_point_to_point(past, false, target))
+  assert_eq(target.x, 4.0)
+  assert_eq(target.y, 0.0)
+  ignore(line.closest_point_to_point(past, true, target))
+  assert_eq(target.x, 2.0)
+  assert_eq(line.end.x, 2.0)
+  assert_eq(above.y, 5.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
