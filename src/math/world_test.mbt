@@ -1077,6 +1077,24 @@ test "Vector2.setLength rescales along the same direction" {
 }
 
 ///|
+test "Vector2.lerpVectors stores a blend of two vectors" {
+  let a = @math.Vector2::new(x=1.0, y=2.0)
+  let b = @math.Vector2::new(x=5.0, y=6.0)
+  let v = @math.Vector2::new(x=9.0, y=9.0)
+  ignore(v.lerp_vectors(a, b, 0.25))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(a.x, 1.0)
+  assert_eq(b.y, 6.0)
+  ignore(v.lerp_vectors(a, b, 0.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  ignore(v.lerp_vectors(a, b, 1.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 6.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

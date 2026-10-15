@@ -344,6 +344,20 @@ pub fn Vector2::set_length(self : Vector2, length : Double) -> Vector2 {
 }
 
 ///|
+/// 两个来源不改。
+/// r186: `lerpVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L754
+pub fn Vector2::lerp_vectors(
+  self : Vector2,
+  v1 : Vector2,
+  v2 : Vector2,
+  alpha : Double,
+) -> Vector2 {
+  self.x = v1.x + (v2.x - v1.x) * alpha
+  self.y = v1.y + (v2.y - v1.y) * alpha
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

@@ -226,6 +226,7 @@ pub fn Vector2::get_component(Self, Int) -> Double
 pub fn Vector2::length(Self) -> Double
 pub fn Vector2::length_sq(Self) -> Double
 pub fn Vector2::lerp(Self, Self, Double) -> Self
+pub fn Vector2::lerp_vectors(Self, Self, Self, Double) -> Self
 pub fn Vector2::manhattan_distance_to(Self, Self) -> Double
 pub fn Vector2::manhattan_length(Self) -> Double
 pub fn Vector2::max(Self, Self) -> Self
