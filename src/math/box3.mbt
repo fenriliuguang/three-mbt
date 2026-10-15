@@ -69,6 +69,15 @@ pub fn Box3::expand_by_vector(self : Box3, vector : Vector3) -> Box3 {
 }
 
 ///|
+/// 每个方向都按标量扩张。负数则收缩。
+/// r186: `expandByScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L283
+pub fn Box3::expand_by_scalar(self : Box3, scalar : Double) -> Box3 {
+  ignore(self.min.add_scalar(-scalar))
+  ignore(self.max.add_scalar(scalar))
+  self
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

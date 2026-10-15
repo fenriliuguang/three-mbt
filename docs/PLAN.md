@@ -591,6 +591,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.expandByVector` has landed. It moves the lower corner back by the vector and the upper corner forward by the same vector. A box from `(1, 2, 3)` to `(4, 5, 6)` expanded by `(1, 2, 3)` reaches from `(0, 0, 0)` to `(5, 7, 9)`. The vector is unchanged.
 
+`Box3.expandByScalar` has landed. It grows each side by the scalar. A negative scalar shrinks the box. A box from `(1, 2, 3)` to `(4, 5, 6)` expanded by `1` reaches from `(0, 1, 2)` to `(5, 6, 7)`, and expanding by `-1` returns it to `(1, 2, 3)` and `(4, 5, 6)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -827,6 +829,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box3.copy` | `math` |
 | planned | 7 | `Box3.clone` | `math` |
 | planned | 7 | `Box3.expandByVector` | `math` |
+| planned | 7 | `Box3.expandByScalar` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

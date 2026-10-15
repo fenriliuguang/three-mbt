@@ -2314,6 +2314,28 @@ test "Box3.expandByVector grows both sides" {
 }
 
 ///|
+test "Box3.expandByScalar grows or shrinks each side" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  ignore(box.expand_by_scalar(1.0))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 1.0)
+  assert_eq(box.min.z, 2.0)
+  assert_eq(box.max.x, 5.0)
+  assert_eq(box.max.y, 6.0)
+  assert_eq(box.max.z, 7.0)
+  ignore(box.expand_by_scalar(-1.0))
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 4.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
