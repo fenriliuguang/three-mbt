@@ -926,6 +926,25 @@ test "Vector2.clampScalar limits both components" {
 }
 
 ///|
+test "Vector2.clampLength limits the vector length" {
+  let long = @math.Vector2::new(y=4.0)
+  ignore(long.clamp_length(1.0, 2.0))
+  assert_eq(long.x, 0.0)
+  assert_eq(long.y, 2.0)
+  let short = @math.Vector2::new(y=0.5)
+  ignore(short.clamp_length(1.0, 2.0))
+  assert_eq(short.x, 0.0)
+  assert_eq(short.y, 1.0)
+  let kept = @math.Vector2::new(y=4.0)
+  ignore(kept.clamp_length(1.0, 8.0))
+  assert_eq(kept.y, 4.0)
+  let zero = @math.Vector2::new()
+  ignore(zero.clamp_length(1.0, 2.0))
+  assert_eq(zero.x, 0.0)
+  assert_eq(zero.y, 0.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

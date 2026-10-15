@@ -227,6 +227,19 @@ pub fn Vector2::clamp_scalar(
 }
 
 ///|
+/// 假定 `min` 小于 `max`。零向量保持为零。
+/// r186: `clampLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L491
+pub fn Vector2::clamp_length(
+  self : Vector2,
+  min : Double,
+  max : Double,
+) -> Vector2 {
+  let length = self.length()
+  let divisor = if length == 0.0 { 1.0 } else { length }
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
