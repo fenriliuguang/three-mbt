@@ -171,3 +171,12 @@ pub fn Line3::distance_sq_to_line3(
   ignore(out2.copy(p2).add_scaled_vector(d2, t))
   out1.distance_to_squared(out2)
 }
+
+///|
+/// 用矩阵变换两端。
+/// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L303
+pub fn Line3::apply_matrix4(self : Line3, matrix : Matrix4) -> Line3 {
+  ignore(self.start.apply_matrix4(matrix))
+  ignore(self.end.apply_matrix4(matrix))
+  self
+}
