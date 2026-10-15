@@ -280,6 +280,15 @@ pub fn Vector3::project_on_plane(
 }
 
 ///|
+/// 法线按单位长度使用。法线本身不改。
+/// r186: `reflect` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L922
+pub fn Vector3::reflect(self : Vector3, normal : Vector3) -> Vector3 {
+  let factor = 2.0 * self.dot(normal)
+  let scaled = Vector3::new().copy(normal).multiply_scalar(factor)
+  self.sub(scaled)
+}
+
+///|
 pub fn Vector3::length_sq(self : Vector3) -> Double {
   self.x * self.x + self.y * self.y + self.z * self.z
 }
