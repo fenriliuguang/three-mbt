@@ -1155,6 +1155,16 @@ test "Vector2.rotateAround turns counterclockwise about a center" {
 }
 
 ///|
+test "Vector4.setScalar writes the same value into every component" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  ignore(v.set_scalar(5.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 5.0)
+  assert_eq(v.w, 5.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

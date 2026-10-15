@@ -453,7 +453,9 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector2.fromBufferAttribute` has landed as `BufferAttribute.copy_to_vector2`, because `math` does not import `core`. It writes `getX` and `getY` into the target vector. Index 1 of `[1, 2, 3, 4, 5, 6]` with item size 2 is `(3, 4)`. Item size 3 skips the third component, so index 1 of the same array is `(4, 5)`. The attribute is not modified.
 
-`Vector2.rotateAround` has landed. It rotates this vector counterclockwise around a center. Angle 0 leaves `(1, 2)` unchanged. A right angle around the origin turns `(1, 0)` into `(0, 1)`. The same turn around `(1, 1)` takes `(2, 1)` to `(1, 2)`. The center is not modified.
+`Vector2.rotateAround` has landed. It rotates this vector counterclockwise around a center. Angle 0 leaves `(1, 2)` unchanged. A right angle around the origin turns `(1, 0)` into `(0, 1)`. The same turn around `(1, 1)` takes `(2, 1)` to `(1, 2)`. The center is not modified. `Vector2.random` stays out, because it draws from `Math.random`.
+
+`Vector4.setScalar` has landed. It writes the same value into x, y, z, and w. `(1, 2, 3, 4)` set to 5 becomes `(5, 5, 5, 5)`.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -623,6 +625,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector2.toArray` | `math` |
 | planned | 7 | `Vector2.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | `Vector2.rotateAround` | `math` |
+| planned | 7 | `Vector4.setScalar` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

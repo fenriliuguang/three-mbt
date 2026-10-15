@@ -36,6 +36,16 @@ pub fn Vector4::set(
 }
 
 ///|
+/// r186: `setScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L142
+pub fn Vector4::set_scalar(self : Vector4, scalar : Double) -> Vector4 {
+  self.x = scalar
+  self.y = scalar
+  self.z = scalar
+  self.w = scalar
+  self
+}
+
+///|
 pub fn Vector4::copy(self : Vector4, v : Vector4) -> Vector4 {
   self.x = v.x
   self.y = v.y

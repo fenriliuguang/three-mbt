@@ -341,6 +341,7 @@ pub fn Vector4::length_sq(Self) -> Double
 pub fn Vector4::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
 pub fn Vector4::normalize(Self) -> Self
 pub fn Vector4::set(Self, Double, Double, Double, Double) -> Self
+pub fn Vector4::set_scalar(Self, Double) -> Self
 
 // Type aliases
 
