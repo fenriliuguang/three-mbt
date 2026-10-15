@@ -2579,6 +2579,24 @@ test "Box3.intersect keeps the overlap" {
 }
 
 ///|
+test "Box3.translate moves both corners" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let offset = @math.Vector3::new(x=1.0, y=-2.0, z=3.0)
+  ignore(box.translate(offset))
+  assert_eq(box.min.x, 2.0)
+  assert_eq(box.min.y, 0.0)
+  assert_eq(box.min.z, 6.0)
+  assert_eq(box.max.x, 5.0)
+  assert_eq(box.max.y, 3.0)
+  assert_eq(box.max.z, 9.0)
+  assert_eq(offset.x, 1.0)
+  assert_eq(offset.z, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

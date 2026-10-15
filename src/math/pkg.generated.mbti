@@ -75,6 +75,7 @@ pub fn Box3::set(Self, Vector3, Vector3) -> Self
 pub fn Box3::set_from_array(Self, Array[Double]) -> Self
 pub fn Box3::set_from_center_and_size(Self, Vector3, Vector3) -> Self
 pub fn Box3::set_from_points(Self, Array[Vector3]) -> Self
+pub fn Box3::translate(Self, Vector3) -> Self
 pub fn Box3::union(Self, Self) -> Self
 
 pub(all) struct Color {

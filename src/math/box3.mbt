@@ -211,6 +211,15 @@ pub fn Box3::intersect(self : Box3, box : Box3) -> Box3 {
 }
 
 ///|
+/// 上下界都加上偏移。偏移本身不改。
+/// r186: `translate` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L701
+pub fn Box3::translate(self : Box3, offset : Vector3) -> Box3 {
+  ignore(self.min.add(offset))
+  ignore(self.max.add(offset))
+  self
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
