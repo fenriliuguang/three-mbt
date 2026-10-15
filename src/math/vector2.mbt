@@ -138,6 +138,19 @@ pub fn Vector2::sub_scalar(self : Vector2, s : Double) -> Vector2 {
 }
 
 ///|
+/// 把两个向量的差写入自身。两个来源不改。
+/// r186: `subVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L324
+pub fn Vector2::sub_vectors(
+  self : Vector2,
+  a : Vector2,
+  b : Vector2,
+) -> Vector2 {
+  self.x = a.x - b.x
+  self.y = a.y - b.y
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
