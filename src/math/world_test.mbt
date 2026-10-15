@@ -1247,6 +1247,21 @@ test "panic Vector4 getComponent index past w" {
 }
 
 ///|
+test "Vector4.add adds another vector" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let other = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  ignore(v.add(other))
+  assert_eq(v.x, 6.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 10.0)
+  assert_eq(v.w, 12.0)
+  assert_eq(other.x, 5.0)
+  assert_eq(other.y, 6.0)
+  assert_eq(other.z, 7.0)
+  assert_eq(other.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

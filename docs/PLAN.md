@@ -469,6 +469,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector4.getComponent` has landed. Index 0 is x, 1 is y, 2 is z, and 3 is w. `(1, 2, 3, 4)` returns 1, 2, 3, and 4. The vector is not modified. Any other index aborts.
 
+`Vector4.add` has landed. It adds another vector into this one. `(1, 2, 3, 4)` plus `(5, 6, 7, 8)` becomes `(6, 8, 10, 12)`. The other vector is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -644,6 +646,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector4.setW` | `math` |
 | planned | 7 | `Vector4.setComponent` | `math` |
 | planned | 7 | `Vector4.getComponent` | `math` |
+| planned | 7 | `Vector4.add` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

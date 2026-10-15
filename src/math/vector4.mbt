@@ -119,6 +119,15 @@ pub fn Vector4::clone(self : Vector4) -> Vector4 {
 }
 
 ///|
+pub fn Vector4::add(self : Vector4, v : Vector4) -> Vector4 {
+  self.x += v.x
+  self.y += v.y
+  self.z += v.z
+  self.w += v.w
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
