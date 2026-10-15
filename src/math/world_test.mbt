@@ -708,6 +708,14 @@ test "Cylindrical.clone copies radius theta and height" {
 }
 
 ///|
+test "Vector2.setScalar writes the same value into both components" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(v.set_scalar(4.0))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 4.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(
