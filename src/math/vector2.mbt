@@ -302,6 +302,18 @@ pub fn Vector2::angle(self : Vector2) -> Double {
 }
 
 ///|
+/// 零长度向量返回 π/2。两个向量都不改。
+/// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L660
+pub fn Vector2::angle_to(self : Vector2, v : Vector2) -> Double {
+  let denominator = (self.length_sq() * v.length_sq()).sqrt()
+  if denominator == 0.0 {
+    return @std.PI / 2.0
+  }
+  let theta = self.dot(v) / denominator
+  @std.acos(theta.clamp(min=-1.0, max=1.0))
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

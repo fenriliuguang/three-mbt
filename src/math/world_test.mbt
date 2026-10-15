@@ -1016,6 +1016,20 @@ test "Vector2.angle is measured from the positive x axis" {
 }
 
 ///|
+test "Vector2.angleTo is the angle between two vectors" {
+  let axis = @math.Vector2::new(x=1.0)
+  assert_eq(axis.angle_to(axis), 0.0)
+  assert_eq(axis.x, 1.0)
+  assert_close(axis.angle_to(@math.Vector2::new(y=1.0)), 1.5707963267948966)
+  assert_close(axis.angle_to(@math.Vector2::new(x=-1.0)), 3.141592653589793)
+  assert_close(
+    axis.angle_to(@math.Vector2::new(x=1.0, y=1.0)),
+    0.7853981633974483,
+  )
+  assert_close(@math.Vector2::new().angle_to(axis), 1.5707963267948966)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
