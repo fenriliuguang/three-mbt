@@ -201,3 +201,10 @@ pub fn Plane::translate(self : Plane, offset : Vector3) -> Plane {
   self.constant = self.constant - offset.dot(self.normal)
   self
 }
+
+///|
+/// 法线和常数都相等则为真。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L349
+pub fn Plane::equals(self : Plane, plane : Plane) -> Bool {
+  plane.normal.equals(self.normal) && plane.constant == self.constant
+}

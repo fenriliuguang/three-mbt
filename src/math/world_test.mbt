@@ -3623,6 +3623,21 @@ test "Plane.translate shifts the constant along the normal" {
 }
 
 ///|
+test "Plane.equals compares the normal and the constant" {
+  let plane = @math.Plane::new(constant=-2.0)
+  let same = @math.Plane::new(constant=-2.0)
+  let other = @math.Plane::new(constant=-1.0)
+  assert_eq(plane.equals(same), true)
+  assert_eq(plane.equals(plane), true)
+  assert_eq(plane.equals(other), false)
+  other.constant = -2.0
+  other.normal.y = 1.0
+  assert_eq(plane.equals(other), false)
+  assert_eq(plane.constant, -2.0)
+  assert_eq(plane.normal.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
