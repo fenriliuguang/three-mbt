@@ -263,6 +263,7 @@ pub(all) struct Sphere {
 pub fn Sphere::apply_matrix4(Self, Matrix4) -> Self
 pub fn Sphere::contains_point(Self, Vector3) -> Bool
 pub fn Sphere::copy(Self, Self) -> Self
+pub fn Sphere::distance_to_point(Self, Vector3) -> Double
 pub fn Sphere::intersects_plane(Self, Plane) -> Bool
 pub fn Sphere::intersects_sphere(Self, Self) -> Bool
 pub fn Sphere::is_empty(Self) -> Bool

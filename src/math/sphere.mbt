@@ -90,3 +90,10 @@ pub fn Sphere::set(self : Sphere, center : Vector3, radius : Double) -> Sphere {
   self.radius = radius
   self
 }
+
+///|
+/// 返回点到球面的有符号距离。球内为负。点和球都不改。
+/// r186: `distanceToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L165
+pub fn Sphere::distance_to_point(self : Sphere, point : Vector3) -> Double {
+  point.distance_to(self.center) - self.radius
+}
