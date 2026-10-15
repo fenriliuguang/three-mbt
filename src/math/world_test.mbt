@@ -3026,6 +3026,45 @@ test "Triangle.barycoord writes weights that sum to one" {
 }
 
 ///|
+test "Triangle.interpolation blends three values" {
+  let triangle = @math.Triangle::new(
+    a=@math.Vector3::new(),
+    b=@math.Vector3::new(x=1.0),
+    c=@math.Vector3::new(y=1.0),
+  )
+  let point = @math.Vector3::new(x=0.5, y=0.5)
+  let v1 = @math.Vector3::new(x=1.0)
+  let v2 = @math.Vector3::new(y=1.0)
+  let v3 = @math.Vector3::new(z=1.0)
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  match triangle.interpolation(point, v1, v2, v3, target) {
+    None => assert_eq(true, false)
+    Some(value) => {
+      assert_eq(physical_equal(value, target), true)
+      assert_eq(value.x, 0.0)
+      assert_eq(value.y, 0.5)
+      assert_eq(value.z, 0.5)
+    }
+  }
+  let flat = @math.Triangle::new(
+    a=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    b=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    c=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  match flat.interpolation(point, v1, v2, v3, target) {
+    None => {
+      assert_eq(target.x, 0.0)
+      assert_eq(target.y, 0.0)
+      assert_eq(target.z, 0.0)
+    }
+    Some(_) => assert_eq(true, false)
+  }
+  assert_eq(point.x, 0.5)
+  assert_eq(v2.y, 1.0)
+  assert_eq(triangle.b.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

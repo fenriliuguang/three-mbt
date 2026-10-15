@@ -219,3 +219,17 @@ pub fn Triangle::barycoord(
 ) -> Vector3? {
   Triangle::get_barycoord(point, self.a, self.b, self.c, target)
 }
+
+///|
+/// 按重心坐标插值。退化三角形写入 (0, 0, 0) 并返回空。来源不改。
+/// r186: `getInterpolation` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L391
+pub fn Triangle::interpolation(
+  self : Triangle,
+  point : Vector3,
+  v1 : Vector3,
+  v2 : Vector3,
+  v3 : Vector3,
+  target : Vector3,
+) -> Vector3? {
+  Triangle::get_interpolation(point, self.a, self.b, self.c, v1, v2, v3, target)
+}
