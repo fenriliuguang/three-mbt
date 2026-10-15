@@ -583,6 +583,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box3.setFromBufferAttribute` has landed as `BufferAttribute.set_box3`, because `math` does not import `core`. It empties the box, then expands it by each vertex. Item size 3 of `[1, 2, 3, 0, 5, 4]` becomes a box from `(0, 2, 3)` to `(1, 5, 4)`. Item size 4 still reads only xyz, so the fourth components `9` and `8` stay out of the box. An empty attribute leaves the box empty. The attribute is unchanged.
 
+`Box3.setFromCenterAndSize` has landed. Center `(5, 6, 7)` and size `(2, 4, 6)` become a box from `(4, 4, 4)` to `(6, 8, 10)`. The center and the size are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -815,6 +817,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box2.equals` | `math` |
 | planned | 7 | `Box3.setFromArray` | `math` |
 | planned | 7 | `Box3.setFromBufferAttribute` on `BufferAttribute` | `core` |
+| planned | 7 | `Box3.setFromCenterAndSize` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

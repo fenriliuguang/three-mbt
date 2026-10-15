@@ -84,6 +84,20 @@ pub fn Box3::set_from_array(self : Box3, array : Array[Double]) -> Box3 {
 }
 
 ///|
+/// 以中心和尺寸重设盒子。中心和尺寸不改。
+/// r186: `setFromCenterAndSize` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L129
+pub fn Box3::set_from_center_and_size(
+  self : Box3,
+  center : Vector3,
+  size : Vector3,
+) -> Box3 {
+  let half_size = size.clone().multiply_scalar(0.5)
+  ignore(self.min.copy(center).sub(half_size))
+  ignore(self.max.copy(center).add(half_size))
+  self
+}
+
+///|
 pub fn Box3::get_center(self : Box3, target : Vector3) -> Vector3 {
   if self.is_empty() {
     target.set(0.0, 0.0, 0.0)
