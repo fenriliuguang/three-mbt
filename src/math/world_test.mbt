@@ -1776,6 +1776,24 @@ test "Box2 starts empty and copies its corners" {
 }
 
 ///|
+test "Box2.set copies both corners" {
+  let box = @math.Box2::new()
+  let low = @math.Vector2::new(x=1.0, y=2.0)
+  let high = @math.Vector2::new(x=3.0, y=4.0)
+  ignore(box.set(low, high))
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 3.0)
+  assert_eq(box.max.y, 4.0)
+  low.x = 9.0
+  high.y = 8.0
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.y, 4.0)
+  assert_eq(low.x, 9.0)
+  assert_eq(high.y, 8.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

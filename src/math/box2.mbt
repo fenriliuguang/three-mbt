@@ -20,3 +20,12 @@ pub fn Box2::new(min? : Vector2, max? : Vector2) -> Box2 {
   }
   { min, max }
 }
+
+///|
+/// 复制两个角点。来源不改。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L51
+pub fn Box2::set(self : Box2, min : Vector2, max : Vector2) -> Box2 {
+  ignore(self.min.copy(min))
+  ignore(self.max.copy(max))
+  self
+}
