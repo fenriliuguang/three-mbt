@@ -1165,6 +1165,16 @@ test "Vector4.setScalar writes the same value into every component" {
 }
 
 ///|
+test "Vector4.setX writes x and leaves the rest" {
+  let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  ignore(v.set_x(9.0))
+  assert_eq(v.x, 9.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 4.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
