@@ -108,3 +108,14 @@ pub fn Box2::get_center(self : Box2, target : Vector2) -> Vector2 {
     target.add_vectors(self.min, self.max).multiply_scalar(0.5)
   }
 }
+
+///|
+/// 把尺寸写入 target。空盒写入 (0, 0)。盒子本身不改。
+/// r186: `getSize` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L172
+pub fn Box2::get_size(self : Box2, target : Vector2) -> Vector2 {
+  if self.is_empty() {
+    target.set(0.0, 0.0)
+  } else {
+    target.sub_vectors(self.max, self.min)
+  }
+}

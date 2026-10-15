@@ -1942,6 +1942,25 @@ test "Box2.getCenter writes the midpoint" {
 }
 
 ///|
+test "Box2.getSize writes the width and height" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let target = @math.Vector2::new(x=9.0, y=9.0)
+  let size = box.get_size(target)
+  assert_eq(physical_equal(size, target), true)
+  assert_eq(size.x, 2.0)
+  assert_eq(size.y, 2.0)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.y, 4.0)
+  let empty = @math.Box2::new()
+  ignore(empty.get_size(target))
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
