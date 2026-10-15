@@ -196,6 +196,15 @@ pub fn Vector2::min(self : Vector2, v : Vector2) -> Vector2 {
 }
 
 ///|
+/// 每个分量取较大值。另一个向量不改。
+/// r186: `max` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L432
+pub fn Vector2::max(self : Vector2, v : Vector2) -> Vector2 {
+  self.x = self.x.max(v.x)
+  self.y = self.y.max(v.y)
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

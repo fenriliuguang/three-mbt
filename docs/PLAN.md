@@ -411,6 +411,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector2.min` has landed. Each component becomes the smaller of the two vectors. `(0, 5)` against `(1, 4)` becomes `(0, 4)`. The other vector is not modified.
 
+`Vector2.max` has landed. Each component becomes the larger of the two vectors. `(0, 5)` against `(1, 4)` becomes `(1, 5)`. The other vector is not modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -557,6 +559,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector2.divideScalar` | `math` |
 | planned | 7 | `Vector2.applyMatrix3` | `math` |
 | planned | 7 | `Vector2.min` | `math` |
+| planned | 7 | `Vector2.max` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
