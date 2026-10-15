@@ -256,6 +256,15 @@ pub fn Vector2::ceil(self : Vector2) -> Vector2 {
 }
 
 ///|
+/// 一半时朝正无穷取整。
+/// r186: `round` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L532
+pub fn Vector2::round(self : Vector2) -> Vector2 {
+  self.x = self.x.round()
+  self.y = self.y.round()
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

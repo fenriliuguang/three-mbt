@@ -961,6 +961,14 @@ test "Vector2.ceil rounds toward positive infinity" {
 }
 
 ///|
+test "Vector2.round rounds halfway toward positive infinity" {
+  let v = @math.Vector2::new(x=1.5, y=-1.5)
+  ignore(v.round())
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, -1.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
