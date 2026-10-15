@@ -337,6 +337,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.floor` has landed. Each component rounds toward negative infinity. `(1.2, -1.2, 3)` becomes `(1, -2, 3)`.
 
+`Vector3.ceil` has landed. Each component rounds toward positive infinity. `(1.2, -1.2, 3)` becomes `(2, -1, 3)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -446,6 +448,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Vector3.clampScalar` | `math` |
 | planned | 7 | `Vector3.clampLength` | `math` |
 | planned | 7 | `Vector3.floor` | `math` |
+| planned | 7 | `Vector3.ceil` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

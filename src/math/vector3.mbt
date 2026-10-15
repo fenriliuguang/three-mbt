@@ -348,6 +348,15 @@ pub fn Vector3::floor(self : Vector3) -> Vector3 {
 }
 
 ///|
+/// r186: `ceil` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L683
+pub fn Vector3::ceil(self : Vector3) -> Vector3 {
+  self.x = self.x.ceil()
+  self.y = self.y.ceil()
+  self.z = self.z.ceil()
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y

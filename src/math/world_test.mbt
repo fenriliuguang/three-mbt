@@ -218,6 +218,15 @@ test "floor rounds each component toward negative infinity" {
 }
 
 ///|
+test "ceil rounds each component toward positive infinity" {
+  let v = @math.Vector3::new(x=1.2, y=-1.2, z=3.0)
+  ignore(v.ceil())
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, -1.0)
+  assert_eq(v.z, 3.0)
+}
+
+///|
 test "applyEuler rotates by the euler quaternion" {
   let right_angle = 1.5707963267948966
   let v = @math.Vector3::new(x=1.0)
