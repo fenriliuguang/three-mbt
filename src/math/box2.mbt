@@ -97,3 +97,14 @@ pub fn Box2::clone(self : Box2) -> Box2 {
 pub fn Box2::is_empty(self : Box2) -> Bool {
   self.max.x < self.min.x || self.max.y < self.min.y
 }
+
+///|
+/// 把中心写入 target。空盒写入 (0, 0)。盒子本身不改。
+/// r186: `getCenter` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L160
+pub fn Box2::get_center(self : Box2, target : Vector2) -> Vector2 {
+  if self.is_empty() {
+    target.set(0.0, 0.0)
+  } else {
+    target.add_vectors(self.min, self.max).multiply_scalar(0.5)
+  }
+}
