@@ -479,6 +479,16 @@ pub fn Vector3::set_from_spherical_coords(
 }
 
 ///|
+/// 读取柱坐标的半径、方位角和高度。柱坐标本身不改。
+/// r186: `setFromCylindrical` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1025
+pub fn Vector3::set_from_cylindrical(
+  self : Vector3,
+  c : Cylindrical,
+) -> Vector3 {
+  self.set_from_cylindrical_coords(c.radius, c.theta, c.y)
+}
+
+///|
 /// `theta` 绕 Y 轴、从正 Z 转向正 X，`y` 是高度。
 /// r186: `setFromCylindricalCoords` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1039
 pub fn Vector3::set_from_cylindrical_coords(

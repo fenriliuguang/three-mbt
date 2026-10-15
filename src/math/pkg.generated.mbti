@@ -46,6 +46,13 @@ pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self
 pub fn Color::set_hex(Self, Int) -> Self
 pub fn Color::set_rgb(Self, Double, Double, Double) -> Self
 
+pub(all) struct Cylindrical {
+  mut radius : Double
+  mut theta : Double
+  mut y : Double
+}
+pub fn Cylindrical::new(radius? : Double, theta? : Double, y? : Double) -> Self
+
 pub(all) struct Euler {
   mut x : Double
   mut y : Double
@@ -258,6 +265,7 @@ pub fn Vector3::round_to_zero(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_component(Self, Int, Double) -> Self
 pub fn Vector3::set_from_color(Self, Color) -> Self
+pub fn Vector3::set_from_cylindrical(Self, Cylindrical) -> Self
 pub fn Vector3::set_from_cylindrical_coords(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_from_euler(Self, Euler) -> Self
 pub fn Vector3::set_from_matrix3_column(Self, Matrix3, Int) -> Self

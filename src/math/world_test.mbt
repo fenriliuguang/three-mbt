@@ -618,6 +618,23 @@ test "setFromCylindricalCoords uses a y-up cylinder" {
 }
 
 ///|
+test "setFromCylindrical copies radius theta and height" {
+  let v = @math.Vector3::new(x=9.0)
+  let c = @math.Cylindrical::new(radius=2.0, theta=0.0, y=5.0)
+  ignore(v.set_from_cylindrical(c))
+  assert_eq(v.x, 0.0)
+  assert_eq(v.y, 5.0)
+  assert_eq(v.z, 2.0)
+  assert_eq(c.radius, 2.0)
+  assert_eq(c.theta, 0.0)
+  assert_eq(c.y, 5.0)
+  let defaults = @math.Cylindrical::new()
+  assert_eq(defaults.radius, 1.0)
+  assert_eq(defaults.theta, 0.0)
+  assert_eq(defaults.y, 0.0)
+}
+
+///|
 test "setFromMatrixScale reads the column lengths" {
   let scale = @math.Vector3::new(x=2.0, y=3.0, z=4.0)
   let matrix = @math.Matrix4::new().compose(
