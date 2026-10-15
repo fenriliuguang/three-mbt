@@ -67,3 +67,11 @@ pub fn Line3::distance_sq(self : Line3) -> Double {
 pub fn Line3::distance(self : Line3) -> Double {
   self.start.distance_to(self.end)
 }
+
+///|
+/// 把参数 t 处的点写入 target。t 为 0 是起点，为 1 是终点。线段不改。
+/// r186: `at` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L126
+pub fn Line3::at(self : Line3, t : Double, target : Vector3) -> Vector3 {
+  ignore(self.delta(target).multiply_scalar(t))
+  target.add(self.start)
+}

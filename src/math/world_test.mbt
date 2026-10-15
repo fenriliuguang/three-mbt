@@ -3349,6 +3349,25 @@ test "Line3.distance is the length" {
 }
 
 ///|
+test "Line3.at samples a point along the segment" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=5.0, y=6.0, z=7.0),
+  )
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let mid = line.at(0.5, target)
+  assert_eq(physical_equal(mid, target), true)
+  assert_eq(mid.x, 3.0)
+  assert_eq(mid.y, 4.0)
+  assert_eq(mid.z, 5.0)
+  ignore(line.at(0.0, target))
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 2.0)
+  assert_eq(target.z, 3.0)
+  assert_eq(line.end.z, 7.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
