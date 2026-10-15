@@ -348,6 +348,7 @@ pub fn Vector4::divide_scalar(Self, Double) -> Self
 pub fn Vector4::dot(Self, Self) -> Double
 pub fn Vector4::equals(Self, Self) -> Bool
 pub fn Vector4::floor(Self) -> Self
+pub fn Vector4::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Vector4::get_component(Self, Int) -> Double
 pub fn Vector4::length(Self) -> Double
 pub fn Vector4::length_sq(Self) -> Double

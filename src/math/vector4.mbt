@@ -552,6 +552,21 @@ pub fn Vector4::equals(self : Vector4, v : Vector4) -> Bool {
 }
 
 ///|
+/// `offset` 默认是 0。数组本身不改。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L987
+pub fn Vector4::from_array(
+  self : Vector4,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Vector4 {
+  self.x = array[offset]
+  self.y = array[offset + 1]
+  self.z = array[offset + 2]
+  self.w = array[offset + 3]
+  self
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x

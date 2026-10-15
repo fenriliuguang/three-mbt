@@ -1738,6 +1738,24 @@ test "Vector4.equals compares every component" {
 }
 
 ///|
+test "Vector4.fromArray reads four components at an offset" {
+  let array = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
+  let v = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(v.from_array(array))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, 4.0)
+  ignore(v.from_array(array, offset=2))
+  assert_eq(v.x, 3.0)
+  assert_eq(v.y, 4.0)
+  assert_eq(v.z, 5.0)
+  assert_eq(v.w, 6.0)
+  assert_eq(array[0], 1.0)
+  assert_eq(array[6], 7.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
