@@ -3838,6 +3838,32 @@ test "Sphere.union encloses both spheres" {
 }
 
 ///|
+test "Sphere.equals matches center and radius" {
+  let sphere = @math.Sphere::new(
+    center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    radius=4.0,
+  )
+  let same = @math.Sphere::new(
+    center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    radius=4.0,
+  )
+  let other_radius = @math.Sphere::new(
+    center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    radius=5.0,
+  )
+  let other_center = @math.Sphere::new(
+    center=@math.Vector3::new(x=0.0, y=2.0, z=3.0),
+    radius=4.0,
+  )
+  assert_eq(sphere.equals(same), true)
+  assert_eq(sphere.equals(other_radius), false)
+  assert_eq(sphere.equals(other_center), false)
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.radius, 4.0)
+  assert_eq(same.radius, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

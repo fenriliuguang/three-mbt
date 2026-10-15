@@ -265,6 +265,7 @@ pub fn Sphere::clamp_point(Self, Vector3, Vector3) -> Vector3
 pub fn Sphere::contains_point(Self, Vector3) -> Bool
 pub fn Sphere::copy(Self, Self) -> Self
 pub fn Sphere::distance_to_point(Self, Vector3) -> Double
+pub fn Sphere::equals(Self, Self) -> Bool
 pub fn Sphere::expand_by_point(Self, Vector3) -> Self
 pub fn Sphere::get_bounding_box(Self, Box3) -> Box3
 pub fn Sphere::intersects_box(Self, Box3) -> Bool

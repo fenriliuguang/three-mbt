@@ -192,3 +192,10 @@ pub fn Sphere::union(self : Sphere, sphere : Sphere) -> Sphere {
   }
   self
 }
+
+///|
+/// 球心和半径都相同则为真。两个球都不改。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L373
+pub fn Sphere::equals(self : Sphere, sphere : Sphere) -> Bool {
+  sphere.center.equals(self.center) && sphere.radius == self.radius
+}
