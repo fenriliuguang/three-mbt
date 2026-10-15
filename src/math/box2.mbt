@@ -181,3 +181,14 @@ pub fn Box2::intersects_box(self : Box2, box : Box2) -> Bool {
   box.max.y >= self.min.y &&
   box.min.y <= self.max.y
 }
+
+///|
+/// 把点夹进盒子，写入 target。点和盒子都不改。
+/// r186: `clampPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L295
+pub fn Box2::clamp_point(
+  self : Box2,
+  point : Vector2,
+  target : Vector2,
+) -> Vector2 {
+  target.copy(point).clamp(self.min, self.max)
+}

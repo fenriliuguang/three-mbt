@@ -567,6 +567,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box2.intersectsBox` has landed. Overlap and a shared edge both count. A box from `(1, 2)` to `(3, 4)` meets `(2, 3)` to `(4, 5)` and the edge-touching box from `(3, 2)` to `(5, 4)`. The box from `(4, 2)` to `(5, 4)` stays apart. Neither box changes.
 
+`Box2.clampPoint` has landed. It writes the point clamped into the box. For a box from `(1, 2)` to `(3, 4)`, `(0, 5)` becomes `(1, 4)` and `(2, 3)` stays `(2, 3)`. The point and the box are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -791,6 +793,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box2.containsBox` | `math` |
 | planned | 7 | `Box2.getParameter` | `math` |
 | planned | 7 | `Box2.intersectsBox` | `math` |
+| planned | 7 | `Box2.clampPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

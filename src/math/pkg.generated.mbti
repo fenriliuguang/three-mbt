@@ -21,6 +21,7 @@ pub(all) struct Box2 {
   min : Vector2
   max : Vector2
 }
+pub fn Box2::clamp_point(Self, Vector2, Vector2) -> Vector2
 pub fn Box2::clone(Self) -> Self
 pub fn Box2::contains_box(Self, Self) -> Bool
 pub fn Box2::contains_point(Self, Vector2) -> Bool
