@@ -577,6 +577,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Box2.translate` has landed. It adds the offset to both corners. A box from `(1, 2)` to `(3, 4)` moved by `(1, -2)` reaches from `(2, 0)` to `(4, 2)`. The offset is unchanged.
 
+`Box2.equals` has landed. Both corners must match. A box from `(1, 2)` to `(3, 4)` equals a copy of itself and does not equal a box whose upper corner is `(3, 5)`. Neither box changes.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -806,6 +808,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Box2.intersect` | `math` |
 | planned | 7 | `Box2.union` | `math` |
 | planned | 7 | `Box2.translate` | `math` |
+| planned | 7 | `Box2.equals` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

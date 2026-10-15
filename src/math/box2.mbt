@@ -229,3 +229,10 @@ pub fn Box2::translate(self : Box2, offset : Vector2) -> Box2 {
   ignore(self.max.add(offset))
   self
 }
+
+///|
+/// 两个角点都相同则为真。两个盒子都不改。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L373
+pub fn Box2::equals(self : Box2, box : Box2) -> Bool {
+  box.min.equals(self.min) && box.max.equals(self.max)
+}

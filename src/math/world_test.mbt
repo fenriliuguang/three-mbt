@@ -2194,6 +2194,26 @@ test "Box2.translate moves both corners" {
 }
 
 ///|
+test "Box2.equals compares both corners" {
+  let box = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=4.0),
+  )
+  let same = box.clone()
+  let other = @math.Box2::new(
+    min=@math.Vector2::new(x=1.0, y=2.0),
+    max=@math.Vector2::new(x=3.0, y=5.0),
+  )
+  assert_eq(box.equals(same), true)
+  assert_eq(box.equals(box), true)
+  assert_eq(box.equals(other), false)
+  same.max.y = 5.0
+  assert_eq(box.equals(same), false)
+  assert_eq(box.max.y, 4.0)
+  assert_eq(other.max.y, 5.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
