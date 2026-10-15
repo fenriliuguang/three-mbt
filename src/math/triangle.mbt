@@ -185,3 +185,12 @@ pub fn Triangle::get_area(self : Triangle) -> Double {
   let edge1 = Vector3::new().sub_vectors(self.a, self.b)
   edge0.cross(edge1).length() * 0.5
 }
+
+///|
+/// 把三个角的平均值写入 target。角点不改。
+/// r186: `getMidpoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L336
+pub fn Triangle::get_midpoint(self : Triangle, target : Vector3) -> Vector3 {
+  ignore(target.add_vectors(self.a, self.b))
+  ignore(target.add(self.c))
+  target.multiply_scalar(1.0 / 3.0)
+}
