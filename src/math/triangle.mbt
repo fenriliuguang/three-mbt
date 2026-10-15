@@ -117,3 +117,17 @@ pub fn Triangle::get_interpolation(
     }
   }
 }
+
+///|
+/// 法线与方向的点积小于 0 时为正面。角点和方向都不改。
+/// r186: `isFrontFacing` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L223
+pub fn Triangle::is_front_facing(
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+  direction : Vector3,
+) -> Bool {
+  let edge0 = Vector3::new().sub_vectors(c, b)
+  let edge1 = Vector3::new().sub_vectors(a, b)
+  edge0.cross(edge1).dot(direction) < 0.0
+}

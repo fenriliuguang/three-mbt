@@ -254,6 +254,7 @@ pub fn Triangle::contains_point(Vector3, Vector3, Vector3, Vector3) -> Bool
 pub fn Triangle::get_barycoord(Vector3, Vector3, Vector3, Vector3, Vector3) -> Vector3?
 pub fn Triangle::get_interpolation(Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3) -> Vector3?
 pub fn Triangle::get_normal(Vector3, Vector3, Vector3, Vector3) -> Vector3
+pub fn Triangle::is_front_facing(Vector3, Vector3, Vector3, Vector3) -> Bool
 pub fn Triangle::new(a? : Vector3, b? : Vector3, c? : Vector3) -> Self
 
 pub(all) struct Vector2 {

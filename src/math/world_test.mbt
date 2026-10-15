@@ -2781,6 +2781,21 @@ test "Triangle.getInterpolation blends the vertex values" {
 }
 
 ///|
+test "isFrontFacing is true when the normal opposes the direction" {
+  let a = @math.Vector3::new()
+  let b = @math.Vector3::new(x=1.0)
+  let c = @math.Vector3::new(y=1.0)
+  let toward = @math.Vector3::new(z=-1.0)
+  let away = @math.Vector3::new(z=1.0)
+  assert_eq(@math.Triangle::is_front_facing(a, b, c, toward), true)
+  assert_eq(@math.Triangle::is_front_facing(a, b, c, away), false)
+  assert_eq(a.x, 0.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(c.y, 1.0)
+  assert_eq(toward.z, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -633,6 +633,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Triangle.getInterpolatedAttribute` has landed on `BufferAttribute`. It reads three vertices and blends their xyz with the barycentric weights. For the attribute `[1, 0, 0, 0, 1, 0, 0, 0, 1]`, barycentric `(0, 0.5, 0.5)` writes `(0, 0.5, 0.5)`. The attribute and the weights are unchanged.
 
+`Triangle.isFrontFacing` has landed. It is true when the cross product of `(c - b)` and `(a - b)` points against the direction. For corners `(0, 0, 0)`, `(1, 0, 0)`, and `(0, 1, 0)`, direction `(0, 0, -1)` is front facing and `(0, 0, 1)` is not. The corners and the direction are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -890,6 +892,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.containsPoint` | `math` |
 | planned | 7 | `Triangle.getInterpolation` | `math` |
 | planned | 7 | `Triangle.getInterpolatedAttribute` on `BufferAttribute` | `core` |
+| planned | 7 | `Triangle.isFrontFacing` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
