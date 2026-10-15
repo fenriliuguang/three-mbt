@@ -1807,6 +1807,24 @@ test "Box2.makeEmpty clears both corners" {
 }
 
 ///|
+test "Box2.expandByPoint includes a point" {
+  let box = @math.Box2::new()
+  let point = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(box.expand_by_point(point))
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 2.0)
+  assert_eq(point.x, 1.0)
+  assert_eq(point.y, 2.0)
+  ignore(box.expand_by_point(@math.Vector2::new(x=0.0, y=5.0)))
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

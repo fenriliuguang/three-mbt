@@ -40,3 +40,12 @@ pub fn Box2::make_empty(self : Box2) -> Box2 {
   self.max.y = @double.neg_infinity
   self
 }
+
+///|
+/// 把盒子扩到包含这个点。点本身不改。
+/// r186: `expandByPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L184
+pub fn Box2::expand_by_point(self : Box2, point : Vector2) -> Box2 {
+  ignore(self.min.min(point))
+  ignore(self.max.max(point))
+  self
+}
