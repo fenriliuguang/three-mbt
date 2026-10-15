@@ -914,6 +914,18 @@ test "Vector2.clamp limits each component" {
 }
 
 ///|
+test "Vector2.clampScalar limits both components" {
+  let v = @math.Vector2::new(x=0.0, y=5.0)
+  ignore(v.clamp_scalar(1.0, 4.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 4.0)
+  let inside = @math.Vector2::new(x=2.0, y=3.0)
+  ignore(inside.clamp_scalar(0.0, 5.0))
+  assert_eq(inside.x, 2.0)
+  assert_eq(inside.y, 3.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

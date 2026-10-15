@@ -214,6 +214,19 @@ pub fn Vector2::clamp(self : Vector2, min : Vector2, max : Vector2) -> Vector2 {
 }
 
 ///|
+/// 假定 `min_val` 小于 `max_val`。
+/// r186: `clampScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L472
+pub fn Vector2::clamp_scalar(
+  self : Vector2,
+  min_val : Double,
+  max_val : Double,
+) -> Vector2 {
+  self.x = self.x.clamp(min=min_val, max=max_val)
+  self.y = self.y.clamp(min=min_val, max=max_val)
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s
