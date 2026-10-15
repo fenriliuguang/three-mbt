@@ -78,6 +78,18 @@ pub fn Box3::expand_by_scalar(self : Box3, scalar : Double) -> Box3 {
 }
 
 ///|
+/// 点在盒内或边界上则为真。点和盒子都不改。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L393
+pub fn Box3::contains_point(self : Box3, point : Vector3) -> Bool {
+  point.x >= self.min.x &&
+  point.x <= self.max.x &&
+  point.y >= self.min.y &&
+  point.y <= self.max.y &&
+  point.z >= self.min.z &&
+  point.z <= self.max.z
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {

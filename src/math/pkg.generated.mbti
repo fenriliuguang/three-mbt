@@ -51,6 +51,7 @@ pub(all) struct Box3 {
 }
 pub fn Box3::apply_matrix4(Self, Matrix4) -> Self
 pub fn Box3::clone(Self) -> Self
+pub fn Box3::contains_point(Self, Vector3) -> Bool
 pub fn Box3::copy(Self, Self) -> Self
 pub fn Box3::empty() -> Self
 pub fn Box3::expand_by_point(Self, Vector3) -> Self
