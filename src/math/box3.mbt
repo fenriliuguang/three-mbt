@@ -98,6 +98,15 @@ pub fn Box3::set_from_center_and_size(
 }
 
 ///|
+/// 复制另一个盒子的两个角点。来源不改。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L180
+pub fn Box3::copy(self : Box3, box : Box3) -> Box3 {
+  ignore(self.min.copy(box.min))
+  ignore(self.max.copy(box.max))
+  self
+}
+
+///|
 pub fn Box3::get_center(self : Box3, target : Vector3) -> Vector3 {
   if self.is_empty() {
     target.set(0.0, 0.0, 0.0)
