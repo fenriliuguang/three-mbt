@@ -118,3 +118,30 @@ pub fn Plane::project_point(
   let distance = self.distance_to_point(point)
   target.copy(point).add_scaled_vector(self.normal, -distance)
 }
+
+///|
+/// 把线段与平面的交点写入 target。平行且不在平面上时返回空。线段和平面都不改。
+/// r186: `intersectLine` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L216
+pub fn Plane::intersect_line(
+  self : Plane,
+  line : Line3,
+  target : Vector3,
+  clamp_to_line? : Bool = true,
+) -> Vector3? {
+  let direction = line.delta(Vector3::new())
+  let denominator = self.normal.dot(direction)
+  if denominator == 0.0 {
+    if self.distance_to_point(line.start) == 0.0 {
+      Some(target.copy(line.start))
+    } else {
+      None
+    }
+  } else {
+    let t = -(line.start.dot(self.normal) + self.constant) / denominator
+    if clamp_to_line && (t < 0.0 || t > 1.0) {
+      None
+    } else {
+      Some(target.copy(line.start).add_scaled_vector(direction, t))
+    }
+  }
+}

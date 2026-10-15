@@ -3488,6 +3488,44 @@ test "Line3.clone copies both endpoints" {
 }
 
 ///|
+test "intersectLine writes the crossing and skips a miss" {
+  let plane = @math.Plane::new()
+  let crossing = @math.Line3::new(
+    start=@math.Vector3::new(x=-1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+  )
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  match plane.intersect_line(crossing, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(physical_equal(hit, target), true)
+      assert_eq(hit.x, 0.0)
+      assert_eq(hit.y, 2.0)
+      assert_eq(hit.z, 3.0)
+    }
+  }
+  let miss = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0),
+    end=@math.Vector3::new(x=2.0),
+  )
+  match plane.intersect_line(miss, target) {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(true, false)
+  }
+  let on_plane = @math.Line3::new(end=@math.Vector3::new(y=1.0))
+  match plane.intersect_line(on_plane, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(hit.x, 0.0)
+      assert_eq(hit.y, 0.0)
+      assert_eq(hit.z, 0.0)
+    }
+  }
+  assert_eq(crossing.start.x, -1.0)
+  assert_eq(plane.normal.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

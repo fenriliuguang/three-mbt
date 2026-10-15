@@ -709,6 +709,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Line3.clone` has landed. It returns a new segment with the same ends. Cloning `(1, 2, 3)` to `(4, 5, 6)` stores those points. Later changes to either segment leave the other alone.
 
+`Plane.intersectLine` has landed. It writes where a segment crosses the plane. On the plane `x = 0`, the segment from `(-1, 2, 3)` to `(1, 2, 3)` hits `(0, 2, 3)`. The segment from `(1, 0, 0)` to `(2, 0, 0)` misses. A segment lying on the plane returns its start. The segment and the plane are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1004,6 +1006,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Line3.applyMatrix4` | `math` |
 | planned | 7 | `Line3.equals` | `math` |
 | planned | 7 | `Line3.clone` | `math` |
+| planned | 7 | `Plane.intersectLine` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
