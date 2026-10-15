@@ -175,6 +175,18 @@ pub fn Vector2::divide_scalar(self : Vector2, scalar : Double) -> Vector2 {
 }
 
 ///|
+/// 第三分量按 1 参与乘法，结果只保留 x 和 y。
+/// r186: `applyMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L397
+pub fn Vector2::apply_matrix3(self : Vector2, m : Matrix3) -> Vector2 {
+  let x = self.x
+  let y = self.y
+  let e = m.elements
+  self.x = e[0] * x + e[3] * y + e[6]
+  self.y = e[1] * x + e[4] * y + e[7]
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

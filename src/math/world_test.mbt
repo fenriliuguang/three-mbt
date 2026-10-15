@@ -855,6 +855,25 @@ test "Vector2.divideScalar divides both components" {
 }
 
 ///|
+test "Vector2.applyMatrix3 uses an implicit z of 1" {
+  let v = @math.Vector2::new(x=1.0, y=2.0)
+  ignore(v.apply_matrix3(@math.Matrix3::new()))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  let shift = @math.Matrix3::new().set(1.0, 0.0, 3.0, 0.0, 1.0, 4.0, 0.0, 0.0, 1.0)
+  ignore(v.apply_matrix3(shift))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 6.0)
+  let mixed = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
+  let axis = @math.Vector2::new(x=1.0)
+  ignore(axis.apply_matrix3(mixed))
+  assert_eq(axis.x, 4.0)
+  assert_eq(axis.y, 10.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
