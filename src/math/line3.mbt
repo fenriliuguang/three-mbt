@@ -53,3 +53,10 @@ pub fn Line3::get_center(self : Line3, target : Vector3) -> Vector3 {
 pub fn Line3::delta(self : Line3, target : Vector3) -> Vector3 {
   target.sub_vectors(self.end, self.start)
 }
+
+///|
+/// 返回两端的平方距离。线段不改。
+/// r186: `distanceSq` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L102
+pub fn Line3::distance_sq(self : Line3) -> Double {
+  self.start.distance_to_squared(self.end)
+}
