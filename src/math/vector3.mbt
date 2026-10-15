@@ -267,6 +267,12 @@ pub fn Vector3::length(self : Vector3) -> Double {
 }
 
 ///|
+/// r186: `manhattanLength` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L780
+pub fn Vector3::manhattan_length(self : Vector3) -> Double {
+  self.x.abs() + self.y.abs() + self.z.abs()
+}
+
+///|
 /// r186: `normalize` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L439
 pub fn Vector3::normalize(self : Vector3) -> Vector3 {
   let len = self.length()
