@@ -2275,6 +2275,27 @@ test "Box3.copy copies both corners" {
 }
 
 ///|
+test "Box3.clone copies both corners into a new box" {
+  let source = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let box = source.clone()
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.min.y, 2.0)
+  assert_eq(box.min.z, 3.0)
+  assert_eq(box.max.x, 4.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 6.0)
+  source.min.x = 9.0
+  source.max.z = 8.0
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.z, 6.0)
+  assert_eq(source.min.x, 9.0)
+  assert_eq(source.max.z, 8.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

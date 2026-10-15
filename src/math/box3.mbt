@@ -107,6 +107,13 @@ pub fn Box3::copy(self : Box3, box : Box3) -> Box3 {
 }
 
 ///|
+/// 返回一份新的盒子。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L168
+pub fn Box3::clone(self : Box3) -> Box3 {
+  Box3::empty().copy(self)
+}
+
+///|
 pub fn Box3::get_center(self : Box3, target : Vector3) -> Vector3 {
   if self.is_empty() {
     target.set(0.0, 0.0, 0.0)
