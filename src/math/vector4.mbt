@@ -213,6 +213,16 @@ pub fn Vector4::multiply(self : Vector4, v : Vector4) -> Vector4 {
 }
 
 ///|
+/// r186: `multiplyScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L427
+pub fn Vector4::multiply_scalar(self : Vector4, scalar : Double) -> Vector4 {
+  self.x *= scalar
+  self.y *= scalar
+  self.z *= scalar
+  self.w *= scalar
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }

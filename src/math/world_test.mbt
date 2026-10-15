@@ -1383,6 +1383,21 @@ test "Vector4.multiply multiplies matching components" {
 }
 
 ///|
+test "Vector4.multiplyScalar multiplies every component" {
+  let v = @math.Vector4::new(x=2.0, y=4.0, z=6.0, w=8.0)
+  ignore(v.multiply_scalar(2.0))
+  assert_eq(v.x, 4.0)
+  assert_eq(v.y, 8.0)
+  assert_eq(v.z, 12.0)
+  assert_eq(v.w, 16.0)
+  ignore(v.multiply_scalar(-1.0))
+  assert_eq(v.x, -4.0)
+  assert_eq(v.y, -8.0)
+  assert_eq(v.z, -12.0)
+  assert_eq(v.w, -16.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
