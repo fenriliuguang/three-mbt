@@ -208,6 +208,7 @@ pub fn Vector2::add_vectors(Self, Self, Self) -> Self
 pub fn Vector2::clone(Self) -> Self
 pub fn Vector2::copy(Self, Self) -> Self
 pub fn Vector2::divide(Self, Self) -> Self
+pub fn Vector2::divide_scalar(Self, Double) -> Self
 pub fn Vector2::dot(Self, Self) -> Double
 pub fn Vector2::equals(Self, Self) -> Bool
 pub fn Vector2::get_component(Self, Int) -> Double

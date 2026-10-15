@@ -844,6 +844,17 @@ test "Vector2.divide divides matching components" {
 }
 
 ///|
+test "Vector2.divideScalar divides both components" {
+  let v = @math.Vector2::new(x=2.0, y=4.0)
+  ignore(v.divide_scalar(2.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.y, 2.0)
+  ignore(v.divide_scalar(-1.0))
+  assert_eq(v.x, -1.0)
+  assert_eq(v.y, -2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
