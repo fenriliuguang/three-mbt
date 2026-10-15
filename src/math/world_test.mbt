@@ -3189,6 +3189,20 @@ test "Triangle.equals compares the three corners" {
 }
 
 ///|
+test "Plane.set copies the normal and stores the constant" {
+  let plane = @math.Plane::new()
+  let normal = @math.Vector3::new(y=1.0)
+  ignore(plane.set(normal, -2.0))
+  assert_eq(plane.normal.x, 0.0)
+  assert_eq(plane.normal.y, 1.0)
+  assert_eq(plane.normal.z, 0.0)
+  assert_eq(plane.constant, -2.0)
+  normal.y = 0.0
+  assert_eq(plane.normal.y, 1.0)
+  assert_eq(plane.constant, -2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

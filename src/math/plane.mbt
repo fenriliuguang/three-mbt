@@ -77,3 +77,16 @@ pub fn Plane::set_from_coplanar_points(
   ignore(normal.cross(edge).normalize())
   self.set_from_normal_and_coplanar_point(normal, a)
 }
+
+///|
+/// 拷贝法线并写入常数。之后改来源法线不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L56
+pub fn Plane::set(
+  self : Plane,
+  normal : Vector3,
+  constant : Double,
+) -> Plane {
+  ignore(self.normal.copy(normal))
+  self.constant = constant
+  self
+}

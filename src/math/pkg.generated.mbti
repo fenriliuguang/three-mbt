@@ -193,6 +193,7 @@ pub fn Plane::copy(Self, Self) -> Self
 pub fn Plane::distance_to_point(Self, Vector3) -> Double
 pub fn Plane::new(normal? : Vector3, constant? : Double) -> Self
 pub fn Plane::normalize(Self) -> Self
+pub fn Plane::set(Self, Vector3, Double) -> Self
 pub fn Plane::set_components(Self, Double, Double, Double, Double) -> Self
 pub fn Plane::set_from_coplanar_points(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Plane::set_from_normal_and_coplanar_point(Self, Vector3, Vector3) -> Self
