@@ -26,6 +26,7 @@ pub fn Box2::clone(Self) -> Self
 pub fn Box2::contains_box(Self, Self) -> Bool
 pub fn Box2::contains_point(Self, Vector2) -> Bool
 pub fn Box2::copy(Self, Self) -> Self
+pub fn Box2::distance_to_point(Self, Vector2) -> Double
 pub fn Box2::expand_by_point(Self, Vector2) -> Self
 pub fn Box2::expand_by_scalar(Self, Double) -> Self
 pub fn Box2::expand_by_vector(Self, Vector2) -> Self

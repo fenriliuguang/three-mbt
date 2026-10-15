@@ -192,3 +192,10 @@ pub fn Box2::clamp_point(
 ) -> Vector2 {
   target.copy(point).clamp(self.min, self.max)
 }
+
+///|
+/// 盒外点到最近边界的距离。盒内为 0。点和盒子都不改。
+/// r186: `distanceToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Box2.js#L308
+pub fn Box2::distance_to_point(self : Box2, point : Vector2) -> Double {
+  self.clamp_point(point, Vector2::new()).distance_to(point)
+}
