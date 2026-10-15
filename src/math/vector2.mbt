@@ -274,6 +274,14 @@ pub fn Vector2::round_to_zero(self : Vector2) -> Vector2 {
 }
 
 ///|
+/// r186: `negate` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L561
+pub fn Vector2::negate(self : Vector2) -> Vector2 {
+  self.x = -self.x
+  self.y = -self.y
+  self
+}
+
+///|
 pub fn Vector2::multiply_scalar(self : Vector2, s : Double) -> Vector2 {
   self.x *= s
   self.y *= s

@@ -977,6 +977,14 @@ test "Vector2.roundToZero drops the fraction toward zero" {
 }
 
 ///|
+test "Vector2.negate flips both components" {
+  let v = @math.Vector2::new(x=1.0, y=-2.0)
+  ignore(v.negate())
+  assert_eq(v.x, -1.0)
+  assert_eq(v.y, 2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }
