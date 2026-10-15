@@ -2353,6 +2353,31 @@ test "Box3.containsPoint includes the boundary" {
 }
 
 ///|
+test "Box3.containsBox includes an identical box" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=7.0, y=8.0, z=9.0),
+  )
+  let inner = @math.Box3::new(
+    @math.Vector3::new(x=2.0, y=3.0, z=4.0),
+    @math.Vector3::new(x=6.0, y=7.0, z=8.0),
+  )
+  let same = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=7.0, y=8.0, z=9.0),
+  )
+  let overflow = @math.Box3::new(
+    @math.Vector3::new(x=0.0, y=3.0, z=4.0),
+    @math.Vector3::new(x=6.0, y=7.0, z=8.0),
+  )
+  assert_eq(box.contains_box(inner), true)
+  assert_eq(box.contains_box(same), true)
+  assert_eq(box.contains_box(overflow), false)
+  assert_eq(inner.min.x, 2.0)
+  assert_eq(box.max.z, 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

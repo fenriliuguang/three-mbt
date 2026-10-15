@@ -90,6 +90,18 @@ pub fn Box3::contains_point(self : Box3, point : Vector3) -> Bool {
 }
 
 ///|
+/// 整个盒子都在内部或边界上则为真。两个盒子都不改。
+/// r186: `containsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L408
+pub fn Box3::contains_box(self : Box3, box : Box3) -> Bool {
+  self.min.x <= box.min.x &&
+  box.max.x <= self.max.x &&
+  self.min.y <= box.min.y &&
+  box.max.y <= self.max.y &&
+  self.min.z <= box.min.z &&
+  box.max.z <= self.max.z
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
