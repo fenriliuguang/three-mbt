@@ -262,6 +262,7 @@ pub(all) struct Sphere {
 }
 pub fn Sphere::apply_matrix4(Self, Matrix4) -> Self
 pub fn Sphere::clamp_point(Self, Vector3, Vector3) -> Vector3
+pub fn Sphere::clone(Self) -> Self
 pub fn Sphere::contains_point(Self, Vector3) -> Bool
 pub fn Sphere::copy(Self, Self) -> Self
 pub fn Sphere::distance_to_point(Self, Vector3) -> Double

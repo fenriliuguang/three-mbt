@@ -199,3 +199,10 @@ pub fn Sphere::union(self : Sphere, sphere : Sphere) -> Sphere {
 pub fn Sphere::equals(self : Sphere, sphere : Sphere) -> Bool {
   sphere.center.equals(self.center) && sphere.radius == self.radius
 }
+
+///|
+/// 返回一个新球。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L384
+pub fn Sphere::clone(self : Sphere) -> Sphere {
+  Sphere::new().copy(self)
+}

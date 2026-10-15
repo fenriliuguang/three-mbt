@@ -3864,6 +3864,23 @@ test "Sphere.equals matches center and radius" {
 }
 
 ///|
+test "Sphere.clone copies the center and the radius" {
+  let source = @math.Sphere::new(
+    center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    radius=4.0,
+  )
+  let sphere = source.clone()
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 2.0)
+  assert_eq(sphere.center.z, 3.0)
+  assert_eq(sphere.radius, 4.0)
+  source.center.x = 0.0
+  sphere.radius = 0.0
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(source.radius, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
