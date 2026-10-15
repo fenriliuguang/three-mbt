@@ -38,3 +38,11 @@ pub fn Line3::copy(self : Line3, line : Line3) -> Line3 {
   ignore(self.end.copy(line.end))
   self
 }
+
+///|
+/// 把两端的中点写入 target。线段不改。
+/// r186: `getCenter` https://github.com/mrdoob/three.js/blob/r186/src/math/Line3.js#L79
+pub fn Line3::get_center(self : Line3, target : Vector3) -> Vector3 {
+  ignore(target.add_vectors(self.start, self.end))
+  target.multiply_scalar(0.5)
+}

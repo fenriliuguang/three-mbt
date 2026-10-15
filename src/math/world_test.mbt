@@ -3295,6 +3295,22 @@ test "Line3.copy copies both endpoints" {
 }
 
 ///|
+test "Line3.getCenter averages the endpoints" {
+  let line = @math.Line3::new(
+    start=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    end=@math.Vector3::new(x=3.0, y=6.0, z=9.0),
+  )
+  let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
+  let center = line.get_center(target)
+  assert_eq(physical_equal(center, target), true)
+  assert_eq(center.x, 2.0)
+  assert_eq(center.y, 4.0)
+  assert_eq(center.z, 6.0)
+  assert_eq(line.start.x, 1.0)
+  assert_eq(line.end.z, 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
