@@ -235,6 +235,7 @@ pub fn Vector3::multiply_vectors(Self, Self, Self) -> Self
 pub fn Vector3::negate(Self) -> Self
 pub fn Vector3::new(x? : Double, y? : Double, z? : Double) -> Self
 pub fn Vector3::normalize(Self) -> Self
+pub fn Vector3::round(Self) -> Self
 pub fn Vector3::set(Self, Double, Double, Double) -> Self
 pub fn Vector3::set_component(Self, Int, Double) -> Self
 pub fn Vector3::set_from_color(Self, Color) -> Self

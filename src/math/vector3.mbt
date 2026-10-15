@@ -357,6 +357,16 @@ pub fn Vector3::ceil(self : Vector3) -> Vector3 {
 }
 
 ///|
+/// 一半时朝正无穷取整。
+/// r186: `round` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L698
+pub fn Vector3::round(self : Vector3) -> Vector3 {
+  self.x = self.x.round()
+  self.y = self.y.round()
+  self.z = self.z.round()
+  self
+}
+
+///|
 pub fn Vector3::distance_to_squared(self : Vector3, v : Vector3) -> Double {
   let dx = self.x - v.x
   let dy = self.y - v.y
