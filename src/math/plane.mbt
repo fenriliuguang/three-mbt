@@ -193,3 +193,11 @@ pub fn Plane::apply_matrix4(
   self.constant = -reference.dot(self.normal)
   self
 }
+
+///|
+/// 按偏移在法线方向上移动平面。法线不改。
+/// r186: `translate` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L335
+pub fn Plane::translate(self : Plane, offset : Vector3) -> Plane {
+  self.constant = self.constant - offset.dot(self.normal)
+  self
+}

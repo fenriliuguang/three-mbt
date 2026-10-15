@@ -3611,6 +3611,18 @@ test "Plane.applyMatrix4 translates the plane" {
 }
 
 ///|
+test "Plane.translate shifts the constant along the normal" {
+  let plane = @math.Plane::new()
+  let offset = @math.Vector3::new(x=2.0, y=3.0)
+  ignore(plane.translate(offset))
+  assert_eq(plane.normal.x, 1.0)
+  assert_eq(plane.normal.y, 0.0)
+  assert_eq(plane.constant, -2.0)
+  assert_eq(offset.x, 2.0)
+  assert_eq(offset.y, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
