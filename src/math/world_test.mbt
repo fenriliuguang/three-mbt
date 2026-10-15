@@ -1701,6 +1701,28 @@ test "Vector4.lerp moves toward another vector" {
 }
 
 ///|
+test "Vector4.lerpVectors stores the interpolation of two vectors" {
+  let a = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
+  let b = @math.Vector4::new(x=5.0, y=6.0, z=7.0, w=8.0)
+  let v = @math.Vector4::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  ignore(v.lerp_vectors(a, b, 0.25))
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, 3.0)
+  assert_eq(v.z, 4.0)
+  assert_eq(v.w, 5.0)
+  ignore(v.lerp_vectors(a, b, 0.0))
+  assert_eq(v.x, 1.0)
+  assert_eq(v.w, 4.0)
+  ignore(v.lerp_vectors(a, b, 1.0))
+  assert_eq(v.x, 5.0)
+  assert_eq(v.w, 8.0)
+  assert_eq(a.x, 1.0)
+  assert_eq(a.w, 4.0)
+  assert_eq(b.x, 5.0)
+  assert_eq(b.w, 8.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

@@ -351,6 +351,7 @@ pub fn Vector4::get_component(Self, Int) -> Double
 pub fn Vector4::length(Self) -> Double
 pub fn Vector4::length_sq(Self) -> Double
 pub fn Vector4::lerp(Self, Self, Double) -> Self
+pub fn Vector4::lerp_vectors(Self, Self, Self, Double) -> Self
 pub fn Vector4::manhattan_length(Self) -> Double
 pub fn Vector4::max(Self, Self) -> Self
 pub fn Vector4::min(Self, Self) -> Self

@@ -530,6 +530,22 @@ pub fn Vector4::lerp(self : Vector4, v : Vector4, alpha : Double) -> Vector4 {
 }
 
 ///|
+/// 两个来源不改。
+/// r186: `lerpVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L956
+pub fn Vector4::lerp_vectors(
+  self : Vector4,
+  v1 : Vector4,
+  v2 : Vector4,
+  alpha : Double,
+) -> Vector4 {
+  self.x = v1.x + (v2.x - v1.x) * alpha
+  self.y = v1.y + (v2.y - v1.y) * alpha
+  self.z = v1.z + (v2.z - v1.z) * alpha
+  self.w = v1.w + (v2.w - v1.w) * alpha
+  self
+}
+
+///|
 /// 用矩阵乘这个齐次坐标，不做透视除法。对齐 r186 `Vector4.applyMatrix4`。
 pub fn Vector4::apply_matrix4(self : Vector4, m : Matrix4) -> Vector4 {
   let x = self.x
