@@ -3776,6 +3776,20 @@ test "Sphere.getBoundingBox encloses the sphere" {
 }
 
 ///|
+test "Sphere.translate moves the center and keeps the radius" {
+  let sphere = @math.Sphere::new(radius=1.0)
+  let offset = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(sphere.translate(offset))
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 2.0)
+  assert_eq(sphere.center.z, 3.0)
+  assert_eq(sphere.radius, 1.0)
+  assert_eq(offset.x, 1.0)
+  assert_eq(offset.y, 2.0)
+  assert_eq(offset.z, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

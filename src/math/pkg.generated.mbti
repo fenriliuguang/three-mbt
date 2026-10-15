@@ -274,6 +274,7 @@ pub fn Sphere::make_empty(Self) -> Self
 pub fn Sphere::new(center? : Vector3, radius? : Double) -> Self
 pub fn Sphere::set(Self, Vector3, Double) -> Self
 pub fn Sphere::set_from_points(Self, Array[Vector3], optional_center? : Vector3) -> Self
+pub fn Sphere::translate(Self, Vector3) -> Self
 
 pub(all) struct Spherical {
   mut radius : Double

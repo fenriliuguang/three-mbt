@@ -138,3 +138,11 @@ pub fn Sphere::get_bounding_box(self : Sphere, target : Box3) -> Box3 {
   ignore(target.set(self.center, self.center))
   target.expand_by_scalar(self.radius)
 }
+
+///|
+/// 把球心按偏移平移。半径不变。偏移不改。
+/// r186: `translate` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L279
+pub fn Sphere::translate(self : Sphere, offset : Vector3) -> Sphere {
+  ignore(self.center.add(offset))
+  self
+}
