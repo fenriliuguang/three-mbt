@@ -2948,6 +2948,29 @@ test "setFromNormalAndCoplanarPoint stores the normal and offset" {
 }
 
 ///|
+test "setFromCoplanarPoints builds the plane through three points" {
+  let plane = @math.Plane::new()
+  let a = @math.Vector3::new()
+  let b = @math.Vector3::new(x=1.0)
+  let c = @math.Vector3::new(y=1.0)
+  ignore(plane.set_from_coplanar_points(a, b, c))
+  assert_eq(plane.normal.x, 0.0)
+  assert_eq(plane.normal.y, 0.0)
+  assert_eq(plane.normal.z, 1.0)
+  assert_eq(plane.constant, 0.0)
+  assert_eq(plane.distance_to_point(c), 0.0)
+  let flat = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(plane.set_from_coplanar_points(flat, flat, flat))
+  assert_eq(plane.normal.x, 0.0)
+  assert_eq(plane.normal.y, 0.0)
+  assert_eq(plane.normal.z, 0.0)
+  assert_eq(plane.constant, 0.0)
+  assert_eq(a.x, 0.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(c.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

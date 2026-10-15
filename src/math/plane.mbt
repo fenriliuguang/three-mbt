@@ -62,3 +62,18 @@ pub fn Plane::set_from_normal_and_coplanar_point(
   self.constant = -point.dot(self.normal)
   self
 }
+
+///|
+/// 用三个共面点重设平面。法线由 `(c - b)` 与 `(a - b)` 的叉积归一化得到。三点不改。
+/// r186: `setFromCoplanarPoints` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L111
+pub fn Plane::set_from_coplanar_points(
+  self : Plane,
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+) -> Plane {
+  let normal = Vector3::new().sub_vectors(c, b)
+  let edge = Vector3::new().sub_vectors(a, b)
+  ignore(normal.cross(edge).normalize())
+  self.set_from_normal_and_coplanar_point(normal, a)
+}
