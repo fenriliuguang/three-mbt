@@ -1621,6 +1621,16 @@ test "Vector4.ceil rounds each component up" {
 }
 
 ///|
+test "Vector4.round rounds half toward positive infinity" {
+  let v = @math.Vector4::new(x=1.5, y=-1.5, z=2.5, w=-2.5)
+  ignore(v.round())
+  assert_eq(v.x, 2.0)
+  assert_eq(v.y, -1.0)
+  assert_eq(v.z, 3.0)
+  assert_eq(v.w, -2.0)
+}
+
+///|
 test "panic Vector2 getComponent index past y" {
   ignore(@math.Vector2::new().get_component(2))
 }

@@ -439,6 +439,17 @@ pub fn Vector4::ceil(self : Vector4) -> Vector4 {
 }
 
 ///|
+/// 一半时朝正无穷取整。
+/// r186: `round` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L810
+pub fn Vector4::round(self : Vector4) -> Vector4 {
+  self.x = self.x.round()
+  self.y = self.y.round()
+  self.z = self.z.round()
+  self.w = self.w.round()
+  self
+}
+
+///|
 pub fn Vector4::dot(self : Vector4, v : Vector4) -> Double {
   self.x * v.x + self.y * v.y + self.z * v.z + self.w * v.w
 }
