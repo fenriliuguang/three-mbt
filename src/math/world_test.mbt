@@ -2449,6 +2449,33 @@ test "Box3.clampPoint keeps the point inside the box" {
 }
 
 ///|
+test "Box3.intersectsSphere counts a tangent sphere" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let touch = @math.Sphere::new(
+    center=@math.Vector3::new(x=0.0, y=3.0, z=4.0),
+    radius=1.0,
+  )
+  let apart = @math.Sphere::new(
+    center=@math.Vector3::new(x=0.0, y=3.0, z=4.0),
+    radius=0.5,
+  )
+  let inside = @math.Sphere::new(
+    center=@math.Vector3::new(x=2.0, y=3.0, z=4.0),
+    radius=0.0,
+  )
+  assert_eq(box.intersects_sphere(touch), true)
+  assert_eq(box.intersects_sphere(apart), false)
+  assert_eq(box.intersects_sphere(inside), true)
+  assert_eq(touch.center.x, 0.0)
+  assert_eq(touch.radius, 1.0)
+  assert_eq(box.min.x, 1.0)
+  assert_eq(box.max.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

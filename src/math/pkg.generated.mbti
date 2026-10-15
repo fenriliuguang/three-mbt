@@ -63,6 +63,7 @@ pub fn Box3::get_center(Self, Vector3) -> Vector3
 pub fn Box3::get_parameter(Self, Vector3, Vector3) -> Vector3
 pub fn Box3::get_size(Self, Vector3) -> Vector3
 pub fn Box3::intersects_box(Self, Self) -> Bool
+pub fn Box3::intersects_sphere(Self, Sphere) -> Bool
 pub fn Box3::is_empty(Self) -> Bool
 pub fn Box3::make_empty(Self) -> Self
 pub fn Box3::new(Vector3, Vector3) -> Self

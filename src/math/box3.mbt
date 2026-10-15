@@ -140,6 +140,14 @@ pub fn Box3::clamp_point(
 }
 
 ///|
+/// 球与盒子相交或相切则为真。球和盒子都不改。
+/// r186: `intersectsSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L457
+pub fn Box3::intersects_sphere(self : Box3, sphere : Sphere) -> Bool {
+  let closest = self.clamp_point(sphere.center, Vector3::new())
+  closest.distance_to_squared(sphere.center) <= sphere.radius * sphere.radius
+}
+
+///|
 pub fn Box3::set_from_points(self : Box3, points : Array[Vector3]) -> Box3 {
   ignore(self.make_empty())
   for point in points {
