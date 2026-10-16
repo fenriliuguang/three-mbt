@@ -326,3 +326,17 @@ pub fn Matrix3::translate(self : Matrix3, tx : Double, ty : Double) -> Matrix3 {
   let m = Matrix3::new().make_translation(tx, ty)
   self.premultiply(m)
 }
+
+///|
+/// 逐个元素比较是否相等。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L551
+pub fn Matrix3::equals(self : Matrix3, matrix : Matrix3) -> Bool {
+  let te = self.elements
+  let me = matrix.elements
+  for i in 0..<9 {
+    if te[i] != me[i] {
+      return false
+    }
+  }
+  true
+}

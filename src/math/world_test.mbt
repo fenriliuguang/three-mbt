@@ -5240,6 +5240,15 @@ test "Matrix3.translate premultiplies a 2D translation" {
 }
 
 ///|
+test "Matrix3.equals compares every element" {
+  let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let same = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  assert_eq(m.equals(same), true)
+  same.elements[0] = 0.0
+  assert_eq(m.equals(same), false)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
