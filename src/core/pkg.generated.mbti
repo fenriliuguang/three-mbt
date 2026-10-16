@@ -20,14 +20,15 @@ pub(all) struct AttributeJson {
 }
 
 pub(all) struct BufferAttribute {
-  array : Array[Double]
-  item_size : Int
+  mut array : Array[Double]
+  mut item_size : Int
   mut normalized : Bool
-  count : Int
+  mut count : Int
 }
 pub fn BufferAttribute::apply_matrix3(Self, @math.Matrix3) -> Self
 pub fn BufferAttribute::apply_matrix4(Self, @math.Matrix4) -> Self
 pub fn BufferAttribute::apply_normal_matrix(Self, @math.Matrix3) -> Self
+pub fn BufferAttribute::copy(Self, Self) -> Self
 pub fn BufferAttribute::copy_to_color(Self, Int, @math.Color) -> @math.Color
 pub fn BufferAttribute::copy_to_quaternion(Self, Int, @math.Quaternion) -> @math.Quaternion
 pub fn BufferAttribute::copy_to_vector2(Self, Int, @math.Vector2) -> @math.Vector2

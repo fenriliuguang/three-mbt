@@ -1202,3 +1202,17 @@ test "toJSON copies item size, values, and normalized" {
   data.array[0] = 9.0
   assert_eq(attribute.get_x(0), 1.0)
 }
+
+///|
+test "copy replaces an attribute with an independent buffer" {
+  let source = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3, normalized=true)
+  let destination = @core.BufferAttribute::new([9.0], 1)
+  let written = destination.copy(source)
+  assert_eq(physical_equal(written, destination), true)
+  assert_eq(destination.item_size, 3)
+  assert_eq(destination.count, 1)
+  assert_eq(destination.normalized, true)
+  assert_eq(destination.array, [1.0, 2.0, 3.0])
+  destination.array[0] = 8.0
+  assert_eq(source.get_x(0), 1.0)
+}

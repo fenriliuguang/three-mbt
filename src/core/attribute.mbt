@@ -4,10 +4,10 @@
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
 /// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 pub(all) struct BufferAttribute {
-  array : Array[Double]
-  item_size : Int
+  mut array : Array[Double]
+  mut item_size : Int
   mut normalized : Bool
-  count : Int
+  mut count : Int
 }
 
 ///|
@@ -29,6 +29,20 @@ pub fn BufferAttribute::from_ints(
     array.push(value.to_double())
   }
   BufferAttribute::new(array, item_size)
+}
+
+///|
+/// 用源属性的数值、分量个数和归一化标记替换当前属性。数值是一份副本。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
+pub fn BufferAttribute::copy(
+  self : BufferAttribute,
+  source : BufferAttribute,
+) -> BufferAttribute {
+  self.array = source.array.copy()
+  self.item_size = source.item_size
+  self.count = source.count
+  self.normalized = source.normalized
+  self
 }
 
 ///|
