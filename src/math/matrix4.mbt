@@ -584,6 +584,30 @@ pub fn Matrix4::multiply_matrices(
 }
 
 ///|
+/// 每个元素乘以一个标量。
+/// r186: `multiplyScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L608
+pub fn Matrix4::multiply_scalar(self : Matrix4, s : Double) -> Matrix4 {
+  let te = self.elements
+  te[0] *= s
+  te[4] *= s
+  te[8] *= s
+  te[12] *= s
+  te[1] *= s
+  te[5] *= s
+  te[9] *= s
+  te[13] *= s
+  te[2] *= s
+  te[6] *= s
+  te[10] *= s
+  te[14] *= s
+  te[3] *= s
+  te[7] *= s
+  te[11] *= s
+  te[15] *= s
+  self
+}
+
+///|
 pub fn Matrix4::invert(self : Matrix4) -> Matrix4 {
   let te = self.elements
   let n11 = te[0]

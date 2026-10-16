@@ -5393,6 +5393,20 @@ test "Matrix4.makeBasis stores three axes" {
 }
 
 ///|
+test "Matrix4.multiplyScalar scales every element" {
+  let m = @math.Matrix4::new().make_translation(0.25, 0.5, 0.75)
+  ignore(m.multiply_scalar(2.0))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[5], 2.0)
+  assert_eq(m.elements[10], 2.0)
+  assert_eq(m.elements[15], 2.0)
+  assert_eq(m.elements[12], 0.5)
+  assert_eq(m.elements[13], 1.0)
+  assert_eq(m.elements[14], 1.5)
+  assert_eq(m.elements[1], 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
