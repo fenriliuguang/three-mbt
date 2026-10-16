@@ -781,6 +781,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.intersectsSphere` has landed. It is true when the squared distance from the ray to the center is within the squared radius. A ray from `(-2, 0, 0)` along `(1, 0, 0)` meets the unit sphere. A ray from `(0, 3, 0)` misses, and a ray from `(2, 0, 0)` along `(1, 0, 0)` leaves the sphere behind. The default ray starts inside. An empty sphere misses. The ray and the sphere are unchanged.
 
+`Ray.distanceToPlane` has landed. It returns the distance from the origin to the plane, or nothing when the ray misses. A ray from `(-2, 0, 0)` along `(1, 0, 0)` meets the plane `x = 0` at distance `2`. A ray pointing the other way from `(1, 0, 0)` misses. A ray parallel to the plane misses unless it already lies on it, in which case the distance is `0`. The ray and the plane are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1112,6 +1114,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.distanceSqToSegment` | `math` |
 | planned | 7 | `Ray.intersectSphere` | `math` |
 | planned | 7 | `Ray.intersectsSphere` | `math` |
+| planned | 7 | `Ray.distanceToPlane` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

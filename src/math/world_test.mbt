@@ -4164,6 +4164,43 @@ test "Ray.intersectsSphere counts a sphere in front of the ray" {
 }
 
 ///|
+test "Ray.distanceToPlane is the distance to the first hit" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let plane = @math.Plane::new()
+  match ray.distance_to_plane(plane) {
+    None => assert_eq(true, false)
+    Some(t) => assert_eq(t, 2.0)
+  }
+  let away = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  match away.distance_to_plane(plane) {
+    None => assert_eq(plane.constant, 0.0)
+    Some(_) => assert_eq(true, false)
+  }
+  let parallel = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0),
+    direction=@math.Vector3::new(y=1.0),
+  )
+  match parallel.distance_to_plane(plane) {
+    None => assert_eq(plane.normal.x, 1.0)
+    Some(_) => assert_eq(true, false)
+  }
+  let on_plane = @math.Ray::new(direction=@math.Vector3::new(y=1.0))
+  match on_plane.distance_to_plane(plane) {
+    None => assert_eq(true, false)
+    Some(t) => assert_eq(t, 0.0)
+  }
+  assert_eq(ray.origin.x, -2.0)
+  assert_eq(ray.direction.x, 1.0)
+  assert_eq(plane.constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -227,3 +227,24 @@ pub fn Ray::intersects_sphere(self : Ray, sphere : Sphere) -> Bool {
   }
   self.distance_sq_to_point(sphere.center) <= sphere.radius * sphere.radius
 }
+
+///|
+/// 返回原点到平面的距离。射线背离平面、或平行且不在平面上时返回 None。平面和射线都不改。
+/// r186: `distanceToPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L360
+pub fn Ray::distance_to_plane(self : Ray, plane : Plane) -> Double? {
+  let denominator = plane.normal.dot(self.direction)
+  if denominator == 0.0 {
+    if plane.distance_to_point(self.origin) == 0.0 {
+      Some(0.0)
+    } else {
+      None
+    }
+  } else {
+    let t = -(self.origin.dot(plane.normal) + plane.constant) / denominator
+    if t >= 0.0 {
+      Some(t)
+    } else {
+      None
+    }
+  }
+}
