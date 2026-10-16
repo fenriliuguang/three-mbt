@@ -30,6 +30,64 @@ fn Quaternion::emit(self : Quaternion) -> Unit {
 }
 
 ///|
+/// 在扁平数组上做球面插值。两个四元数相同时直接复制第一个。
+/// r186: `slerpFlat` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L60
+pub fn Quaternion::slerp_flat(
+  dst : Array[Double],
+  dst_offset : Int,
+  src0 : Array[Double],
+  src_offset0 : Int,
+  src1 : Array[Double],
+  src_offset1 : Int,
+  t : Double,
+) -> Unit {
+  let mut x0 = src0[src_offset0]
+  let mut y0 = src0[src_offset0 + 1]
+  let mut z0 = src0[src_offset0 + 2]
+  let mut w0 = src0[src_offset0 + 3]
+  let mut x1 = src1[src_offset1]
+  let mut y1 = src1[src_offset1 + 1]
+  let mut z1 = src1[src_offset1 + 2]
+  let mut w1 = src1[src_offset1 + 3]
+  if w0 != w1 || x0 != x1 || y0 != y1 || z0 != z1 {
+    let mut dot = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1
+    if dot < 0.0 {
+      x1 = -x1
+      y1 = -y1
+      z1 = -z1
+      w1 = -w1
+      dot = -dot
+    }
+    let mut s = 1.0 - t
+    let mut factor = t
+    if dot < 0.9995 {
+      let theta = @std.acos(dot)
+      let sin_theta = @std.sin(theta)
+      s = @std.sin(s * theta) / sin_theta
+      factor = @std.sin(factor * theta) / sin_theta
+      x0 = x0 * s + x1 * factor
+      y0 = y0 * s + y1 * factor
+      z0 = z0 * s + z1 * factor
+      w0 = w0 * s + w1 * factor
+    } else {
+      x0 = x0 * s + x1 * factor
+      y0 = y0 * s + y1 * factor
+      z0 = z0 * s + z1 * factor
+      w0 = w0 * s + w1 * factor
+      let f = 1.0 / (x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0).sqrt()
+      x0 *= f
+      y0 *= f
+      z0 *= f
+      w0 *= f
+    }
+  }
+  dst[dst_offset] = x0
+  dst[dst_offset + 1] = y0
+  dst[dst_offset + 2] = z0
+  dst[dst_offset + 3] = w0
+}
+
+///|
 pub fn Quaternion::set(
   self : Quaternion,
   x : Double,

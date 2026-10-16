@@ -5538,6 +5538,20 @@ test "Matrix4.toArray writes sixteen column-major elements" {
 }
 
 ///|
+test "Quaternion.slerpFlat copies identical quaternions" {
+  let src0 = [9.0, 0.0, 0.0, 0.0, 1.0]
+  let src1 = [8.0, 0.0, 0.0, 0.0, 1.0]
+  let dst = [1.0, 2.0, 3.0, 4.0]
+  @math.Quaternion::slerp_flat(dst, 0, src0, 1, src1, 1, 0.25)
+  assert_eq(dst[0], 0.0)
+  assert_eq(dst[1], 0.0)
+  assert_eq(dst[2], 0.0)
+  assert_eq(dst[3], 1.0)
+  assert_eq(src0[1], 0.0)
+  assert_eq(src1[1], 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
