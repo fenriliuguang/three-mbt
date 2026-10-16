@@ -4978,6 +4978,29 @@ test "Frustum.intersectsBox accepts a box inside the unit cube" {
 }
 
 ///|
+test "Frustum.containsPoint accepts a point inside the unit cube" {
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  let inside = @math.Vector3::new(x=0.5, y=0.5, z=0.5)
+  assert_eq(frustum.contains_point(inside), true)
+  let face = @math.Vector3::new(x=0.0, y=0.5, z=0.5)
+  assert_eq(frustum.contains_point(face), true)
+  let outside = @math.Vector3::new(x=-1.0, y=0.5, z=0.5)
+  assert_eq(frustum.contains_point(outside), false)
+  assert_eq(outside.x, -1.0)
+  assert_eq(frustum.planes[1].constant, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

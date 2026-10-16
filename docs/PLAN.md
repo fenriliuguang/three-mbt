@@ -873,6 +873,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Frustum.intersectsObject` needs `Object3D`, and `Frustum.intersectsSprite` needs a sprite, so they stay later. `Frustum.intersectsBox` has landed. It rejects a box only when that box lies fully outside one plane. The unit-cube frustum accepts the box from `(0.25, 0.25, 0.25)` to `(0.75, 0.75, 0.75)` and rejects the box from `(-2, -2, -2)` to `(-1, -1, -1)`. The box and the frustum are unchanged.
 
+`Frustum.containsPoint` has landed. A point is inside when it is on the inner side of every plane, including the plane itself. The unit-cube frustum accepts `(0.5, 0.5, 0.5)` and `(0, 0.5, 0.5)`, and rejects `(-1, 0.5, 0.5)`. The point and the frustum are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1250,6 +1252,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Frustum.set` | `math` |
 | planned | 7 | `Frustum.copy` | `math` |
 | planned | 7 | `Frustum.intersectsBox` | `math` |
+| planned | 7 | `Frustum.containsPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

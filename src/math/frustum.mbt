@@ -157,3 +157,15 @@ pub fn Frustum::intersects_box(self : Frustum, box : Box3) -> Bool {
   }
   true
 }
+
+///|
+/// 点在每个裁剪面的内侧或面上才算在视锥里。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L262
+pub fn Frustum::contains_point(self : Frustum, point : Vector3) -> Bool {
+  for i in 0..<6 {
+    if self.planes[i].distance_to_point(point) < 0.0 {
+      return false
+    }
+  }
+  true
+}
