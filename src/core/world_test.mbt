@@ -1390,6 +1390,18 @@ test "onUpload stores a callback that runs once" {
 }
 
 ///|
+test "addEventListener keeps one copy of a listener" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let listener = fn() {}
+  attribute.add_event_listener("dispose", listener)
+  attribute.add_event_listener("dispose", listener)
+  match attribute.listeners.get("dispose") {
+    None => assert_eq(false, true)
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

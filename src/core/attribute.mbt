@@ -20,6 +20,7 @@ pub(all) struct BufferAttribute {
   mut usage : Int
   update_ranges : Array[UpdateRange]
   mut on_upload_callback : (() -> Unit)?
+  listeners : Map[String, Array[() -> Unit]]
 }
 
 ///|
@@ -37,6 +38,7 @@ pub fn BufferAttribute::new(
     usage: @constants.STATIC_DRAW_USAGE,
     update_ranges: [],
     on_upload_callback: None,
+    listeners: Map([]),
   }
 }
 
@@ -102,6 +104,26 @@ pub fn BufferAttribute::on_upload(
 ) -> BufferAttribute {
   self.on_upload_callback = Some(callback)
   self
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn BufferAttribute::add_event_listener(
+  self : BufferAttribute,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
 }
 
 ///|

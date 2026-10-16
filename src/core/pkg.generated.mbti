@@ -28,7 +28,9 @@ pub(all) struct BufferAttribute {
   mut usage : Int
   update_ranges : Array[UpdateRange]
   mut on_upload_callback : (() -> Unit)?
+  listeners : Map[String, Array[() -> Unit]]
 }
+pub fn BufferAttribute::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn BufferAttribute::add_update_range(Self, Int, Int) -> Unit
 pub fn BufferAttribute::apply_matrix3(Self, @math.Matrix3) -> Self
 pub fn BufferAttribute::apply_matrix4(Self, @math.Matrix4) -> Self
