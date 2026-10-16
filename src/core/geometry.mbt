@@ -122,6 +122,13 @@ pub fn BufferGeometry::has_attribute(self : BufferGeometry, name : String) -> Bo
 }
 
 ///|
+/// 返回索引。没有设置时是空。
+/// r186: `getIndex` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L218
+pub fn BufferGeometry::get_index(self : BufferGeometry) -> BufferAttribute? {
+  self.index
+}
+
+///|
 pub fn BufferGeometry::set_index(
   self : BufferGeometry,
   index : BufferAttribute,

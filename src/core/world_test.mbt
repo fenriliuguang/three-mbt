@@ -1763,3 +1763,17 @@ test "transformed starts false and applyMatrix4 sets it" {
   ignore(destination.copy(source))
   assert_eq(destination.transformed, true)
 }
+
+///|
+test "getIndex returns the stored index" {
+  let geometry = @core.BufferGeometry::new()
+  match geometry.get_index() {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  ignore(geometry.set_index_array([0]))
+  match geometry.get_index() {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index.get_x(0), 0.0)
+  }
+}
