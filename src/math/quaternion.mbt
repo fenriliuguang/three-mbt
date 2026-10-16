@@ -88,6 +88,32 @@ pub fn Quaternion::slerp_flat(
 }
 
 ///|
+/// 在扁平数组上相乘两个四元数，返回目标数组。
+/// r186: `multiplyQuaternionsFlat` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L144
+pub fn Quaternion::multiply_quaternions_flat(
+  dst : Array[Double],
+  dst_offset : Int,
+  src0 : Array[Double],
+  src_offset0 : Int,
+  src1 : Array[Double],
+  src_offset1 : Int,
+) -> Array[Double] {
+  let x0 = src0[src_offset0]
+  let y0 = src0[src_offset0 + 1]
+  let z0 = src0[src_offset0 + 2]
+  let w0 = src0[src_offset0 + 3]
+  let x1 = src1[src_offset1]
+  let y1 = src1[src_offset1 + 1]
+  let z1 = src1[src_offset1 + 2]
+  let w1 = src1[src_offset1 + 3]
+  dst[dst_offset] = x0 * w1 + w0 * x1 + y0 * z1 - z0 * y1
+  dst[dst_offset + 1] = y0 * w1 + w0 * y1 + z0 * x1 - x0 * z1
+  dst[dst_offset + 2] = z0 * w1 + w0 * z1 + x0 * y1 - y0 * x1
+  dst[dst_offset + 3] = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
+  dst
+}
+
+///|
 pub fn Quaternion::set(
   self : Quaternion,
   x : Double,

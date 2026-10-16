@@ -318,6 +318,7 @@ pub fn Quaternion::invert(Self) -> Self
 pub fn Quaternion::length(Self) -> Double
 pub fn Quaternion::multiply(Self, Self) -> Self
 pub fn Quaternion::multiply_quaternions(Self, Self, Self) -> Self
+pub fn Quaternion::multiply_quaternions_flat(Array[Double], Int, Array[Double], Int, Array[Double], Int) -> Array[Double]
 pub fn Quaternion::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
 pub fn Quaternion::normalize(Self) -> Self
 pub fn Quaternion::premultiply(Self, Self) -> Self

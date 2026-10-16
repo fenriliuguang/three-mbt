@@ -937,6 +937,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion.slerpFlat` has landed. It writes a spherical interpolation of two flat quaternions. Identical quaternions `(0, 0, 0, 1)` at offset `1`, with factor `0.25`, write `[0, 0, 0, 1]`. Both source arrays stay unchanged.
 
+`Quaternion.multiplyQuaternionsFlat` has landed. It multiplies two flat quaternions into an array and returns that array. The identity `(0, 0, 0, 1)` times `(0.25, 0.5, 0.75, 1)` at offset `1` writes `[0.25, 0.5, 0.75, 1]`. Both source arrays stay unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1346,6 +1348,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix4.fromArray` | `math` |
 | planned | 7 | `Matrix4.toArray` | `math` |
 | planned | 7 | `Quaternion.slerpFlat` | `math` |
+| planned | 7 | `Quaternion.multiplyQuaternionsFlat` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
