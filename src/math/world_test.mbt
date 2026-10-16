@@ -7027,6 +7027,23 @@ test "QuaternionLinearInterpolant.interpolate_ slerps one quaternion" {
 }
 
 ///|
+test "Color.setColorName reads X11 names" {
+  let color = @math.Color::new()
+  ignore(color.set_color_name("red"))
+  assert_eq(color.r, 1.0)
+  assert_eq(color.g, 0.0)
+  assert_eq(color.b, 0.0)
+  assert_eq(color.get_hex(), 0xFF0000)
+  ignore(color.set_color_name("AliceBlue"))
+  assert_eq(color.get_hex(), 0xF0F8FF)
+  ignore(color.set_rgb(0.25, 0.5, 0.75))
+  ignore(color.set_color_name("not-a-color"))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

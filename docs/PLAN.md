@@ -809,7 +809,7 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Color.setHSL` has landed. It writes linear channels from hue, saturation, and lightness, already in the linear working space. Hue `0`, saturation `1`, lightness `0.5` is `(1, 0, 0)`. Saturation `0` and lightness `0.25` is `(0.25, 0.25, 0.25)`. Hue `1` wraps to the same red.
 
-`Color.setStyle` and `Color.setColorName` parse CSS strings and the 140 X11 names, so they stay later. `Color.copySRGBToLinear` has landed. It copies a color and converts each channel from sRGB to linear. `(0, 0.5, 1)` becomes `(0, 0.2140411404715882, 1)`. The source color stays `(0, 0.5, 1)`.
+`Color.setStyle` parses CSS strings, so it stays later. `Color.copySRGBToLinear` has landed. It copies a color and converts each channel from sRGB to linear. `(0, 0.5, 1)` becomes `(0, 0.2140411404715882, 1)`. The source color stays `(0, 0.5, 1)`.
 
 `Color.copyLinearToSRGB` has landed. It copies a color and converts each channel from linear to sRGB. `(0, 0.5, 1)` becomes `(0, 0.7353606352856507, 0.9999999999999999)`. The source color stays `(0, 0.5, 1)`.
 
@@ -1090,6 +1090,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 `QuaternionLinearInterpolant` has landed. `new` stores positions `(0, 1)` and two quaternions `(0, 0, 0, 1)` and `(0, 0, 1, 0)`. The sample size is `4`, the cached index is `0`, and the result buffer is four zeros. A supplied result buffer `(4, 5, 6, 8)` is stored as given.
 
 `QuaternionLinearInterpolant.interpolate_` has landed. From `(0, 0, 0, 1)` to `(0, 0, 1, 0)`, time `0` is the first quaternion, time `1` is the second, and time `0.5` is about `(0, 0, 0.707106781, 0.707106781)`. A longer buffer's fifth value stays `4`.
+
+`Color.setColorName` has landed. It reads the 148 X11 names, ignoring case. `red` is `(1, 0, 0)` and hex `0xFF0000`. `AliceBlue` is hex `0xF0F8FF`. An unknown name leaves `(0.25, 0.5, 0.75)` unchanged. `setStyle` stays later.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -1577,6 +1579,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LinearInterpolant.interpolate_` | `math` |
 | planned | 7 | `QuaternionLinearInterpolant` | `math` |
 | planned | 7 | `QuaternionLinearInterpolant.interpolate_` | `math` |
+| planned | 7 | `Color.setColorName` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
