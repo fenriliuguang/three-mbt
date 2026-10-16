@@ -1001,6 +1001,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.generateUUID` has landed. It returns a 36-character lowercase UUID. The hyphens sit at indexes `8`, `13`, `18`, and `23`. The version character is `4`. The variant character is `8`, `9`, `a`, or `b`.
 
+`Matrix2` has landed. `new` stores the column-major identity `[1, 0, 0, 1]`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1442,6 +1444,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `MathUtils.denormalize` | `math` |
 | planned | 7 | `MathUtils.normalize` | `math` |
 | planned | 7 | `MathUtils.generateUUID` | `math` |
+| planned | 7 | `Matrix2` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

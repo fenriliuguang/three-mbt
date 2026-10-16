@@ -5972,6 +5972,15 @@ test "MathUtils.generateUUID writes a version-4 UUID" {
 }
 
 ///|
+test "Matrix2.new stores the identity" {
+  let m = @math.Matrix2::new()
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[1], 0.0)
+  assert_eq(m.elements[2], 0.0)
+  assert_eq(m.elements[3], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
