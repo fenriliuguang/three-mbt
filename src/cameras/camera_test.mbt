@@ -404,3 +404,35 @@ test "orthographic projection matches r186 WebGPU" {
       }
   }
 }
+
+///|
+test "Vector3.project maps a world point into NDC" {
+  let camera = @cameras.OrthographicCamera::new(
+    left=-2.0,
+    right=2.0,
+    top=1.0,
+    bottom=-1.0,
+    near=0.1,
+    far=10.0,
+  )
+  camera.node.update_matrix_world()
+  let point = @math.Vector3::new(x=2.0, y=1.0, z=-0.1)
+  let written = camera.node.project_point(point)
+  assert_eq(physical_equal(written, point), true)
+  assert_eq(point.x, 1.0)
+  assert_eq(point.y, 1.0)
+  assert_eq(point.z, 0.0)
+  ignore(camera.node.position.set(10.0, 0.0, 0.0))
+  camera.node.update_matrix_world()
+  ignore(point.set(12.0, 1.0, -0.1))
+  ignore(camera.node.project_point(point))
+  assert_eq(point.x, 1.0)
+  assert_eq(point.y, 1.0)
+  assert_eq(point.z, 0.0)
+}
+
+///|
+test "panic Vector3.project requires a camera" {
+  let node = @core.Object3D::new()
+  ignore(node.project_point(@math.Vector3::new()))
+}

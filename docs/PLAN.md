@@ -1099,6 +1099,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion.fromBufferAttribute` has landed as `BufferAttribute.copy_to_quaternion`, because `math` does not import `core`. It writes x, y, z, and w and notifies once. Index 1 of `[1, 2, 3, 4, 5, 6, 7, 8]` with item size 4 is `(5, 6, 7, 8)`. Item size 3 still reads a fourth value, so index 0 of `[1, 2, 3, 4, 5, 6]` is `(1, 2, 3, 4)`. The attribute is not modified.
 
+`Vector3.project` has landed as `Object3D.project_point`, because `math` does not import cameras. It multiplies by the view inverse, then by the projection. On the wide orthographic camera, world `(2, 1, -0.1)` becomes NDC `(1, 1, 0)`. The same NDC comes from `(12, 1, -0.1)` when the camera sits at x `10`. A node without a camera aborts.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1589,6 +1591,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Color.setStyle` | `math` |
 | planned | 7 | `Color.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | `Quaternion.fromBufferAttribute` on `BufferAttribute` | `core` |
+| planned | 7 | `Vector3.project` on `Object3D` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

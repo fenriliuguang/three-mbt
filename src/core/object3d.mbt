@@ -228,6 +228,22 @@ fn Object3D::update_view_inverse(self : Object3D) -> Unit {
 }
 
 ///|
+/// 把世界坐标投到这台相机的 NDC。先乘视图逆矩阵，再乘投影。调用前要先更新世界矩阵。
+/// r186: `project` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L499
+pub fn Object3D::project_point(
+  self : Object3D,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  match self.camera {
+    None => abort("Object3D.project_point requires a camera")
+    Some(camera) =>
+      target
+      .apply_matrix4(camera.matrix_world_inverse)
+      .apply_matrix4(camera.projection)
+  }
+}
+
+///|
 /// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1176
 pub fn Object3D::update_matrix_world(
   self : Object3D,
