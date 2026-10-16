@@ -189,3 +189,42 @@ pub fn ceil_power_of_two(value : Double) -> Double {
 pub fn floor_power_of_two(value : Double) -> Double {
   @std.pow(2.0, @std.log2(value).floor())
 }
+
+///|
+/// 内禀正常欧拉角的轴序。
+pub(all) enum ProperEulerOrder {
+  XYX
+  YZY
+  ZXZ
+  XZX
+  YXY
+  ZYZ
+}
+
+///|
+/// 用内禀正常欧拉角写入四元数，并通知。
+/// r186: `setQuaternionFromProperEuler` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L331
+pub fn set_quaternion_from_proper_euler(
+  q : Quaternion,
+  a : Double,
+  b : Double,
+  c : Double,
+  order : ProperEulerOrder,
+) -> Unit {
+  let c2 = @std.cos(b / 2.0)
+  let s2 = @std.sin(b / 2.0)
+  let c13 = @std.cos((a + c) / 2.0)
+  let s13 = @std.sin((a + c) / 2.0)
+  let c1_3 = @std.cos((a - c) / 2.0)
+  let s1_3 = @std.sin((a - c) / 2.0)
+  let c3_1 = @std.cos((c - a) / 2.0)
+  let s3_1 = @std.sin((c - a) / 2.0)
+  match order {
+    XYX => ignore(q.set(c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13))
+    YZY => ignore(q.set(s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13))
+    ZXZ => ignore(q.set(s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13))
+    XZX => ignore(q.set(c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13))
+    YXY => ignore(q.set(s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13))
+    ZYZ => ignore(q.set(s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13))
+  }
+}

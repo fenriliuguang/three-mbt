@@ -40,6 +40,8 @@ pub fn rand_int(Double, Double) -> Double
 
 pub fn seeded_random(s? : Int) -> Double
 
+pub fn set_quaternion_from_proper_euler(Quaternion, Double, Double, Double, ProperEulerOrder) -> Unit
+
 pub fn smootherstep(Double, Double, Double) -> Double
 
 pub fn smoothstep(Double, Double, Double) -> Double
@@ -327,6 +329,15 @@ pub fn Plane::set_from_coplanar_points(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Plane::set_from_normal_and_coplanar_point(Self, Vector3, Vector3) -> Self
 pub fn Plane::to_json(Self) -> (Array[Double], Double)
 pub fn Plane::translate(Self, Vector3) -> Self
+
+pub(all) enum ProperEulerOrder {
+  XYX
+  YZY
+  ZXZ
+  XZX
+  YXY
+  ZYZ
+}
 
 pub(all) struct Quaternion {
   mut x : Double

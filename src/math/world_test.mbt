@@ -5890,6 +5890,46 @@ test "MathUtils.floorPowerOfTwo rounds down to a power of two" {
 }
 
 ///|
+test "MathUtils.setQuaternionFromProperEuler writes a proper Euler rotation" {
+  let q = @math.Quaternion::new(x=1.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  @math.set_quaternion_from_proper_euler(q, 0.0, 0.0, 0.0, @math.ProperEulerOrder::XYX)
+  assert_eq(q.x, 0.0)
+  assert_eq(q.y, 0.0)
+  assert_eq(q.z, 0.0)
+  assert_eq(q.w, 1.0)
+  assert_eq(hits[0], 1)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::XYX)
+  assert_close(q.x, 0.3050397769831039)
+  assert_close(q.y, 0.12248959836900034)
+  assert_close(q.z, 0.023239781325963473)
+  assert_close(q.w, 0.9441434982635958)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::YZY)
+  assert_close(q.x, 0.023239781325963473)
+  assert_close(q.y, 0.3050397769831039)
+  assert_close(q.z, 0.12248959836900034)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::ZXZ)
+  assert_close(q.x, 0.12248959836900034)
+  assert_close(q.y, 0.023239781325963473)
+  assert_close(q.z, 0.3050397769831039)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::XZX)
+  assert_close(q.x, 0.3050397769831039)
+  assert_close(q.y, -0.023239781325963473)
+  assert_close(q.z, 0.12248959836900034)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::YXY)
+  assert_close(q.x, 0.12248959836900034)
+  assert_close(q.y, 0.3050397769831039)
+  assert_close(q.z, -0.023239781325963473)
+  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::ZYZ)
+  assert_close(q.x, -0.023239781325963473)
+  assert_close(q.y, 0.12248959836900034)
+  assert_close(q.z, 0.3050397769831039)
+  assert_close(q.w, 0.9441434982635958)
+  assert_eq(hits[0], 7)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
