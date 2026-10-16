@@ -114,6 +114,13 @@ pub fn Color::copy_linear_to_srgb(self : Color, color : Color) -> Color {
 }
 
 ///|
+/// 把自身的 sRGB 通道转成线性。
+/// r186: `convertSRGBToLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L512
+pub fn Color::convert_srgb_to_linear(self : Color) -> Color {
+  self.copy_srgb_to_linear(self)
+}
+
+///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()

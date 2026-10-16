@@ -4499,6 +4499,15 @@ test "Color.copyLinearToSRGB converts copied channels" {
 }
 
 ///|
+test "Color.convertSRGBToLinear converts its own channels" {
+  let color = @math.Color::new(r=0.0, g=0.5, b=1.0)
+  ignore(color.convert_srgb_to_linear())
+  assert_eq(color.r, 0.0)
+  assert_close(color.g, 0.2140411404715882)
+  assert_eq(color.b, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
