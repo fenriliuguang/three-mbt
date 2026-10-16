@@ -61,3 +61,28 @@ pub fn cubic_bezier_slope(
   let k = 1.0 - s
   3.0 * k * k * (p1 - p0) + 6.0 * k * s * (p2 - p1) + 3.0 * s * s * (p3 - p2)
 }
+
+///|
+/// 求三次贝塞尔横坐标等于 `x` 时的参数。最多迭代 8 次。
+/// r186: `solveBezierParameter` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/BezierInterpolant.js#L99
+pub fn solve_bezier_parameter(
+  x : Double,
+  x0 : Double,
+  x1 : Double,
+  x2 : Double,
+  x3 : Double,
+) -> Double {
+  let mut s = (x - x0) / (x3 - x0)
+  for _ in 0..<8 {
+    let error = cubic_bezier(s, x0, x1, x2, x3) - x
+    if error.abs() < 1.0e-10 {
+      break
+    }
+    let slope = cubic_bezier_slope(s, x0, x1, x2, x3)
+    if slope.abs() < 1.0e-10 {
+      break
+    }
+    s = 0.0.max(1.0.min(s - error / slope))
+  }
+  s
+}

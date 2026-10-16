@@ -1069,6 +1069,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `cubicBezierSlope` has landed. Controls `(0, 0, 0, 1)` have slope `0` at parameter `0`, `0.75` at `0.5`, and `3` at `1`. Controls `(10, 20, 30, 40)` have slope `30` at `0.5`.
 
+`solveBezierParameter` has landed. On controls `(0, 10, 20, 30)`, the parameter for `0` is `0`, for `30` is `1`, and for `15` is `0.5`. On controls `(0, 0, 0, 1)`, the parameter for `0.5` is about `0.793700526`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1544,6 +1546,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BezierInterpolant` | `math` |
 | planned | 7 | `cubicBezier` | `math` |
 | planned | 7 | `cubicBezierSlope` | `math` |
+| planned | 7 | `solveBezierParameter` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
