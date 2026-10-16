@@ -268,3 +268,23 @@ pub fn InterleavedBufferAttribute::set_w(
   self.data.array[index * self.data.stride + self.offset + 3] = w
   self
 }
+
+///|
+/// 把交错属性拆成一份普通属性。每个顶点只复制 `item_size` 个分量，从 `offset` 起。数值与源独立。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L439
+pub fn InterleavedBufferAttribute::clone(
+  self : InterleavedBufferAttribute,
+) -> BufferAttribute {
+  let array = []
+  let mut index = 0
+  while index < self.count() {
+    let start = index * self.data.stride + self.offset
+    let mut component = 0
+    while component < self.item_size {
+      array.push(self.data.array[start + component])
+      component = component + 1
+    }
+    index = index + 1
+  }
+  BufferAttribute::new(array, self.item_size, normalized=self.normalized)
+}

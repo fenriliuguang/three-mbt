@@ -2401,6 +2401,22 @@ test "setComponent writes an interleaved component by index" {
 }
 
 ///|
+test "clone de-interleaves an attribute" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1, normalized=true)
+  let cloned = attribute.clone()
+  assert_eq(cloned.item_size, 2)
+  assert_eq(cloned.normalized, true)
+  assert_eq(cloned.count, 2)
+  assert_eq(cloned.get_x(0), 2.0)
+  assert_eq(cloned.get_y(0), 3.0)
+  assert_eq(cloned.get_x(1), 5.0)
+  assert_eq(cloned.get_y(1), 6.0)
+  cloned.array[0] = 8.0
+  assert_eq(buffer.array[1], 2.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
