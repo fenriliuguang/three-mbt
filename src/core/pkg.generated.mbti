@@ -219,6 +219,7 @@ pub(all) struct InterleavedBuffer {
   update_ranges : Array[UpdateRange]
 }
 pub fn InterleavedBuffer::add_update_range(Self, Int, Int) -> Unit
+pub fn InterleavedBuffer::clear_update_ranges(Self) -> Unit
 pub fn InterleavedBuffer::new(Array[Double], Int) -> Self
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
 

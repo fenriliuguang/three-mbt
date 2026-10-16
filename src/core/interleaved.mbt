@@ -51,3 +51,10 @@ pub fn InterleavedBuffer::add_update_range(
 ) -> Unit {
   self.update_ranges.push({ start, count })
 }
+
+///|
+/// 清空待上传区间。
+/// r186: `clearUpdateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L136
+pub fn InterleavedBuffer::clear_update_ranges(self : InterleavedBuffer) -> Unit {
+  self.update_ranges.clear()
+}
