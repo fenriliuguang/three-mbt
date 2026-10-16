@@ -354,6 +354,185 @@ pub fn BufferGeometry::compute_bounding_sphere(self : BufferGeometry) -> Unit {
 }
 
 ///|
+fn accumulate_tangent_triangle(
+  position : BufferAttribute,
+  uv : BufferAttribute,
+  a : Int,
+  b : Int,
+  c : Int,
+  tan1 : Array[@math.Vector3],
+  tan2 : Array[@math.Vector3],
+) -> Unit {
+  let v_a = @math.Vector3::new()
+  let v_b = @math.Vector3::new()
+  let v_c = @math.Vector3::new()
+  let uv_a = @math.Vector2::new()
+  let uv_b = @math.Vector2::new()
+  let uv_c = @math.Vector2::new()
+  ignore(position.copy_to_vector3(a, v_a))
+  ignore(position.copy_to_vector3(b, v_b))
+  ignore(position.copy_to_vector3(c, v_c))
+  ignore(uv.copy_to_vector2(a, uv_a))
+  ignore(uv.copy_to_vector2(b, uv_b))
+  ignore(uv.copy_to_vector2(c, uv_c))
+  ignore(v_b.sub(v_a))
+  ignore(v_c.sub(v_a))
+  ignore(uv_b.sub(uv_a))
+  ignore(uv_c.sub(uv_a))
+  let r = 1.0 / (uv_b.x * uv_c.y - uv_c.x * uv_b.y)
+  if r.is_nan() || r.is_inf() {
+    return
+  }
+  let sdir = @math.Vector3::new()
+    .copy(v_b)
+    .multiply_scalar(uv_c.y)
+    .add_scaled_vector(v_c, -uv_b.y)
+    .multiply_scalar(r)
+  let tdir = @math.Vector3::new()
+    .copy(v_c)
+    .multiply_scalar(uv_b.x)
+    .add_scaled_vector(v_b, -uv_c.x)
+    .multiply_scalar(r)
+  ignore(tan1[a].add(sdir))
+  ignore(tan1[b].add(sdir))
+  ignore(tan1[c].add(sdir))
+  ignore(tan2[a].add(tdir))
+  ignore(tan2[b].add(tdir))
+  ignore(tan2[c].add(tdir))
+}
+
+///|
+fn write_tangent_vertex(
+  normal : BufferAttribute,
+  tangent : BufferAttribute,
+  tan1 : Array[@math.Vector3],
+  tan2 : Array[@math.Vector3],
+  vertex : Int,
+) -> Unit {
+  let n = @math.Vector3::new()
+  ignore(normal.copy_to_vector3(vertex, n))
+  let n2 = @math.Vector3::new().copy(n)
+  let t = tan1[vertex]
+  let tmp = @math.Vector3::new().copy(t)
+  ignore(tmp.sub(n.multiply_scalar(n.dot(t))).normalize())
+  let tmp2 = @math.Vector3::new().cross_vectors(n2, t)
+  let w = if tmp2.dot(tan2[vertex]) < 0.0 { -1.0 } else { 1.0 }
+  ignore(tangent.set_xyzw(vertex, tmp.x, tmp.y, tmp.z, w))
+}
+
+///|
+fn BufferGeometry::tangent_attribute(
+  self : BufferGeometry,
+  vertex_count : Int,
+) -> BufferAttribute {
+  match self.get_attribute("tangent") {
+    Some(existing) =>
+      if existing.count == vertex_count {
+        existing
+      } else {
+        self.replace_tangent_attribute(vertex_count)
+      }
+    None => self.replace_tangent_attribute(vertex_count)
+  }
+}
+
+///|
+fn BufferGeometry::replace_tangent_attribute(
+  self : BufferGeometry,
+  vertex_count : Int,
+) -> BufferAttribute {
+  let values = []
+  let mut index = 0
+  while index < vertex_count * 4 {
+    values.push(0.0)
+    index = index + 1
+  }
+  let tangent = BufferAttribute::new(values, 4)
+  ignore(self.set_attribute("tangent", tangent))
+  tangent
+}
+
+///|
+/// 为带索引、位置、法线和 uv 的几何体计算切线。缺任一属性时不改动。
+/// r186: `computeTangents` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L837
+pub fn BufferGeometry::compute_tangents(self : BufferGeometry) -> Unit {
+  match (
+    self.index,
+    self.get_attribute("position"),
+    self.get_attribute("normal"),
+    self.get_attribute("uv"),
+  ) {
+    (Some(index), Some(position), Some(normal), Some(uv)) => {
+      let tangent = self.tangent_attribute(position.count)
+      let tan1 = []
+      let tan2 = []
+      let mut vertex = 0
+      while vertex < position.count {
+        tan1.push(@math.Vector3::new())
+        tan2.push(@math.Vector3::new())
+        vertex = vertex + 1
+      }
+      let groups : Array[GeometryGroup] = if self.groups.length() == 0 {
+        [{ start: 0, count: index.count, material_index: 0 }]
+      } else {
+        self.groups
+      }
+      let mut group_index = 0
+      while group_index < groups.length() {
+        let group = groups[group_index]
+        let mut cursor = group.start
+        let end = group.start + group.count
+        while cursor < end {
+          accumulate_tangent_triangle(
+            position,
+            uv,
+            index.get_x(cursor).to_int(),
+            index.get_x(cursor + 1).to_int(),
+            index.get_x(cursor + 2).to_int(),
+            tan1,
+            tan2,
+          )
+          cursor = cursor + 3
+        }
+        group_index = group_index + 1
+      }
+      group_index = 0
+      while group_index < groups.length() {
+        let group = groups[group_index]
+        let mut cursor = group.start
+        let end = group.start + group.count
+        while cursor < end {
+          write_tangent_vertex(
+            normal,
+            tangent,
+            tan1,
+            tan2,
+            index.get_x(cursor).to_int(),
+          )
+          write_tangent_vertex(
+            normal,
+            tangent,
+            tan1,
+            tan2,
+            index.get_x(cursor + 1).to_int(),
+          )
+          write_tangent_vertex(
+            normal,
+            tangent,
+            tan1,
+            tan2,
+            index.get_x(cursor + 2).to_int(),
+          )
+          cursor = cursor + 3
+        }
+        group_index = group_index + 1
+      }
+    }
+    _ => ()
+  }
+}
+
+///|
 /// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
 pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
   let geometry = BufferGeometry::new()

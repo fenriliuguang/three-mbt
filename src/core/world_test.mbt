@@ -997,3 +997,54 @@ test "setXYZW writes four components" {
   assert_eq(attribute.get_z(1), 4.0)
   assert_eq(attribute.get_component(1, 3), 5.0)
 }
+
+///|
+test "computeTangents writes a +X tangent for an xy triangle" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "normal",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "uv",
+      @core.BufferAttribute::new([0.0, 0.0, 1.0, 0.0, 0.0, 1.0], 2),
+    ),
+  )
+  ignore(geometry.set_index_array([0, 1, 2]))
+  geometry.compute_tangents()
+  match geometry.get_attribute("tangent") {
+    None => assert_eq(false, true)
+    Some(tangent) => {
+      assert_eq(tangent.count, 3)
+      let mut vertex = 0
+      while vertex < 3 {
+        assert_eq(tangent.get_x(vertex), 1.0)
+        assert_eq(tangent.get_y(vertex), 0.0)
+        assert_eq(tangent.get_z(vertex), 0.0)
+        assert_eq(tangent.get_component(vertex, 3), 1.0)
+        vertex = vertex + 1
+      }
+    }
+  }
+  let bare = @core.BufferGeometry::new()
+  ignore(
+    bare.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 0.0], 3)),
+  )
+  bare.compute_tangents()
+  assert_eq(bare.has_attribute("tangent"), false)
+}

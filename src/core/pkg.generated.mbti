@@ -57,6 +57,7 @@ pub fn BufferGeometry::clear_groups(Self) -> Unit
 pub fn BufferGeometry::clone(Self) -> Self
 pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
 pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
+pub fn BufferGeometry::compute_tangents(Self) -> Unit
 pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
