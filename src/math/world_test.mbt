@@ -5643,6 +5643,16 @@ test "Quaternion.setFromUnitVectors rotates one direction onto another" {
 }
 
 ///|
+test "Quaternion.angleTo is zero for a quaternion and its negative" {
+  let q = @math.Quaternion::new()
+  let flipped = @math.Quaternion::new(w=-1.0)
+  assert_eq(q.angle_to(q), 0.0)
+  assert_eq(q.angle_to(flipped), 0.0)
+  assert_eq(q.w, 1.0)
+  assert_eq(flipped.w, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -309,6 +309,7 @@ pub(all) struct Quaternion {
   mut w : Double
   mut on_change : (() -> Unit)?
 }
+pub fn Quaternion::angle_to(Self, Self) -> Double
 pub fn Quaternion::clone(Self) -> Self
 pub fn Quaternion::conjugate(Self) -> Self
 pub fn Quaternion::copy(Self, Self) -> Self

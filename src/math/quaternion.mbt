@@ -338,6 +338,13 @@ pub fn Quaternion::set_from_unit_vectors(
 }
 
 ///|
+/// 返回与另一个四元数之间的夹角，单位是弧度。
+/// r186: `angleTo` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L512
+pub fn Quaternion::angle_to(self : Quaternion, q : Quaternion) -> Double {
+  2.0 * @std.acos(clamp(self.dot(q), -1.0, 1.0).abs())
+}
+
+///|
 pub fn Quaternion::conjugate(self : Quaternion) -> Quaternion {
   self.x = -self.x
   self.y = -self.y
