@@ -1752,3 +1752,14 @@ test "userData starts empty and copy shares the map" {
     Some(label) => assert_eq(label, "cube")
   }
 }
+
+///|
+test "transformed starts false and applyMatrix4 sets it" {
+  let source = @core.BufferGeometry::new()
+  assert_eq(source.transformed, false)
+  ignore(source.apply_matrix4(@math.Matrix4::new()))
+  assert_eq(source.transformed, true)
+  let destination = @core.BufferGeometry::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.transformed, true)
+}

@@ -39,6 +39,7 @@ pub(all) struct DrawRange {
 /// r186: `morphAttributes` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L141
 /// r186: `morphTargetsRelative` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L151
 /// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L196
+/// r186: `_transformed` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L209
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
@@ -51,6 +52,7 @@ pub(all) struct BufferGeometry {
   morph_attributes : Map[String, Array[BufferAttribute]]
   mut morph_targets_relative : Bool
   mut user_data : Map[String, String]
+  mut transformed : Bool
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
@@ -73,6 +75,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     morph_attributes: Map([]),
     morph_targets_relative: false,
     user_data: Map([]),
+    transformed: false,
     groups: [],
     draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
@@ -212,6 +215,7 @@ pub fn BufferGeometry::apply_matrix4(
   if self.bounding_sphere is Some(_) {
     self.compute_bounding_sphere()
   }
+  self.transformed = true
   self
 }
 
@@ -874,6 +878,7 @@ pub fn BufferGeometry::copy(
   self.draw_range.start = source.draw_range.start
   self.draw_range.count = source.draw_range.count
   self.user_data = source.user_data
+  self.transformed = source.transformed
   self
 }
 
