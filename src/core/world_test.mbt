@@ -1229,3 +1229,49 @@ test "clone makes an independent attribute" {
   cloned.array[0] = 8.0
   assert_eq(source.get_x(0), 1.0)
 }
+
+///|
+test "copy replaces a geometry with independent data" {
+  let source = @core.BufferGeometry::new()
+  ignore(
+    source.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+  )
+  ignore(source.set_index_array([0]))
+  source.add_group(0, 3, material_index=1)
+  source.bounding_sphere = Some(
+    @math.Sphere::new(center=@math.Vector3::new(x=1.0, y=2.0, z=3.0), radius=4.0),
+  )
+  source.set_draw_range(2.0, 4.0)
+  let destination = @core.BufferGeometry::new()
+  ignore(
+    destination.set_attribute("uv", @core.BufferAttribute::new([9.0, 9.0], 2)),
+  )
+  let written = destination.copy(source)
+  assert_eq(physical_equal(written, destination), true)
+  assert_eq(destination.has_attribute("uv"), false)
+  match destination.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.get_x(0), 1.0)
+      assert_eq(position.get_y(0), 2.0)
+      assert_eq(position.get_z(0), 3.0)
+      position.array[0] = 8.0
+    }
+  }
+  match destination.index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index.get_x(0), 0.0)
+  }
+  assert_eq(destination.groups.length(), 1)
+  assert_eq(destination.groups[0].material_index, 1)
+  match destination.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => assert_eq(sphere.radius, 4.0)
+  }
+  assert_eq(destination.draw_range.start, 2.0)
+  assert_eq(destination.draw_range.count, 4.0)
+  match source.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => assert_eq(position.get_x(0), 1.0)
+  }
+}

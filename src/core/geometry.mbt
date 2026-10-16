@@ -807,3 +807,42 @@ fn copy_attribute(
       )
   }
 }
+
+///|
+/// 把源几何体的属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1357
+pub fn BufferGeometry::copy(
+  self : BufferGeometry,
+  source : BufferGeometry,
+) -> BufferGeometry {
+  self.index = None
+  self.attributes.clear()
+  self.groups.clear()
+  self.bounding_box = None
+  self.bounding_sphere = None
+  match source.index {
+    None => ()
+    Some(index) => ignore(self.set_index(index.clone()))
+  }
+  for pair in source.attributes.iter() {
+    let (name, attribute) = pair
+    ignore(self.set_attribute(name, attribute.clone()))
+  }
+  let mut group_index = 0
+  while group_index < source.groups.length() {
+    let group = source.groups[group_index]
+    self.add_group(group.start, group.count, material_index=group.material_index)
+    group_index = group_index + 1
+  }
+  match source.bounding_box {
+    None => ()
+    Some(box) => self.bounding_box = Some(box.clone())
+  }
+  match source.bounding_sphere {
+    None => ()
+    Some(sphere) => self.bounding_sphere = Some(sphere.clone())
+  }
+  self.draw_range.start = source.draw_range.start
+  self.draw_range.count = source.draw_range.count
+  self
+}
