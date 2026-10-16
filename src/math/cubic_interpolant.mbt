@@ -112,3 +112,39 @@ pub fn CubicInterpolant::interval_changed(
   self.offset_prev = i_prev * stride
   self.offset_next = i_next * stride
 }
+
+///|
+/// 用已记下的邻域权重做三次样条。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L120
+pub fn CubicInterpolant::interpolate(
+  self : CubicInterpolant,
+  i1 : Int,
+  t0 : Double,
+  t : Double,
+  t1 : Double,
+) -> Array[Double] {
+  let result = self.interpolant.result_buffer
+  let values = self.interpolant.sample_values
+  let stride = self.interpolant.value_size
+  let o1 = i1 * stride
+  let o0 = o1 - stride
+  let weight_prev = self.weight_prev
+  let weight_next = self.weight_next
+  let p = (t - t0) / (t1 - t0)
+  let pp = p * p
+  let ppp = pp * p
+  let s_prev = -weight_prev * ppp + 2.0 * weight_prev * pp - weight_prev * p
+  let s0 = (1.0 + weight_prev) * ppp +
+    (-1.5 - 2.0 * weight_prev) * pp +
+    (-0.5 + weight_prev) * p +
+    1.0
+  let s1 = (-1.0 - weight_next) * ppp + (1.5 + weight_next) * pp + 0.5 * p
+  let s_next = weight_next * ppp - weight_next * pp
+  for i in 0..<stride {
+    result[i] = s_prev * values[self.offset_prev + i] +
+      s0 * values[o0 + i] +
+      s1 * values[o1 + i] +
+      s_next * values[self.offset_next + i]
+  }
+  result
+}

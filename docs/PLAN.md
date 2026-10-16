@@ -1077,6 +1077,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `CubicInterpolant.intervalChanged_` has landed. For sample size `2` and positions `(0, 1, 2, 3)`, the interval from `1` to `2` stores weights `0.5` and `0.5`, with offsets `0` and `6`. A zero-curvature start gives previous weight `-0.5`. Zero slope and wrap-around both give `0.5`, with offsets `2` and `4`. A zero-curvature end gives next weight `-0.5`. Zero slope and wrap-around give `0.5`, with offsets `6` and `2`.
 
+`CubicInterpolant.interpolate_` has landed. After that same interval is recorded for samples `(10, 20, 30, 40)`, time `1` is `20`, time `1.5` is `25`, and time `2` is `30`. The samples stay unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1556,6 +1558,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BezierInterpolant.interpolate_` | `math` |
 | planned | 7 | `CubicInterpolant` | `math` |
 | planned | 7 | `CubicInterpolant.intervalChanged_` | `math` |
+| planned | 7 | `CubicInterpolant.interpolate_` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
