@@ -4231,6 +4231,30 @@ test "Ray.intersectPlane writes the hit on the plane" {
 }
 
 ///|
+test "Ray.intersectsPlane is true when the ray heads toward the plane" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let plane = @math.Plane::new()
+  let away = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let parallel = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0),
+    direction=@math.Vector3::new(y=1.0),
+  )
+  let on_plane = @math.Ray::new(direction=@math.Vector3::new(y=1.0))
+  assert_eq(ray.intersects_plane(plane), true)
+  assert_eq(away.intersects_plane(plane), false)
+  assert_eq(parallel.intersects_plane(plane), false)
+  assert_eq(on_plane.intersects_plane(plane), true)
+  assert_eq(ray.origin.x, -2.0)
+  assert_eq(plane.constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

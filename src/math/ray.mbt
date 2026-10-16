@@ -262,3 +262,15 @@ pub fn Ray::intersect_plane(
     Some(t) => Some(self.at(t, target))
   }
 }
+
+///|
+/// 原点在平面上，或射线朝向平面，则为真。平面和射线都不改。
+/// r186: `intersectsPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L415
+pub fn Ray::intersects_plane(self : Ray, plane : Plane) -> Bool {
+  let dist_to_point = plane.distance_to_point(self.origin)
+  if dist_to_point == 0.0 {
+    return true
+  }
+  let denominator = plane.normal.dot(self.direction)
+  denominator * dist_to_point < 0.0
+}
