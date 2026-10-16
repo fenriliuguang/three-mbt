@@ -470,6 +470,11 @@ pub fn Spherical::set(Self, Double, Double, Double) -> Self
 pub fn Spherical::set_from_cartesian_coords(Self, Double, Double, Double) -> Self
 pub fn Spherical::set_from_vector3(Self, Vector3) -> Self
 
+pub(all) struct SphericalHarmonics3 {
+  coefficients : Array[Vector3]
+}
+pub fn SphericalHarmonics3::new() -> Self
+
 pub(all) struct Triangle {
   a : Vector3
   b : Vector3

@@ -6018,6 +6018,18 @@ test "Matrix2.fromArray reads four column-major elements" {
 }
 
 ///|
+test "SphericalHarmonics3.new stores nine zero coefficients" {
+  let sh = @math.SphericalHarmonics3::new()
+  assert_eq(sh.coefficients.length(), 9)
+  assert_eq(sh.coefficients[0].x, 0.0)
+  assert_eq(sh.coefficients[0].y, 0.0)
+  assert_eq(sh.coefficients[0].z, 0.0)
+  assert_eq(sh.coefficients[8].x, 0.0)
+  assert_eq(sh.coefficients[8].y, 0.0)
+  assert_eq(sh.coefficients[8].z, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
