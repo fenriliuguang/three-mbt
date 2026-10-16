@@ -26,6 +26,8 @@ pub fn pingpong(Double, length? : Double) -> Double
 
 pub fn rad_to_deg(Double) -> Double
 
+pub fn smootherstep(Double, Double, Double) -> Double
+
 pub fn smoothstep(Double, Double, Double) -> Double
 
 pub fn srgb_to_linear(Double) -> Double

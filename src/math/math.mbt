@@ -108,3 +108,17 @@ pub fn smoothstep(x : Double, min : Double, max : Double) -> Double {
     t * t * (3.0 - 2.0 * t)
   }
 }
+
+///|
+/// 两端一阶、二阶导数都为零的平滑插值。低于 `min` 是 0，高于 `max` 是 1。
+/// r186: `smootherstep` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L187
+pub fn smootherstep(x : Double, min : Double, max : Double) -> Double {
+  if x <= min {
+    0.0
+  } else if x >= max {
+    1.0
+  } else {
+    let t = (x - min) / (max - min)
+    t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+  }
+}
