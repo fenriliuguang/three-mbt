@@ -303,6 +303,400 @@ fn color_keyword(name : String) -> Int? {
 }
 
 ///|
+/// 从 CSS 字符串写颜色。`rgb`、`#hex` 和颜色名按 sRGB 转成线性。透明度忽略。
+/// r186: `setStyle` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L286
+pub fn Color::set_style(self : Color, style : String) -> Color {
+  match css_color_function(style) {
+    Some((name, components)) =>
+      if name == "rgb" || name == "rgba" {
+        match rgb_channels(components) {
+          Some((r, g, b)) => self.set_rgb(r, g, b).convert_srgb_to_linear()
+          None => self
+        }
+      } else if name == "hsl" || name == "hsla" {
+        match hsl_channels(components) {
+          Some((h, s, l)) => self.set_hsl(h, s, l).convert_srgb_to_linear()
+          None => self
+        }
+      } else {
+        self
+      }
+    None =>
+      match css_hex_digits(style) {
+        Some(hex) =>
+          if hex.length() == 3 {
+            self
+              .set_rgb(
+                hex_nibble_at(hex, 0) / 15.0,
+                hex_nibble_at(hex, 1) / 15.0,
+                hex_nibble_at(hex, 2) / 15.0,
+              )
+              .convert_srgb_to_linear()
+          } else if hex.length() == 6 {
+            self.set_hex(hex_int(hex))
+          } else {
+            self
+          }
+        None =>
+          if style.length() > 0 {
+            self.set_color_name(style)
+          } else {
+            self
+          }
+      }
+  }
+}
+
+///|
+fn is_css_word(c : Char) -> Bool {
+  c.is_ascii_alphabetic() || c.is_ascii_digit() || c == '_'
+}
+
+///|
+fn css_color_function(style : String) -> (String, String)? {
+  let n = style.length()
+  let mut i = 0
+  while i < n {
+    match style.get_char(i) {
+      Some(c) =>
+        if is_css_word(c) {
+          i = i + 1
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+  if i == 0 {
+    return None
+  }
+  let opened = match style.get_char(i) {
+    Some('(') => true
+    _ => false
+  }
+  if !opened {
+    return None
+  }
+  let mut j = i + 1
+  let mut closed = false
+  while j < n {
+    match style.get_char(j) {
+      Some(')') => {
+        closed = true
+        break
+      }
+      Some(_) => j = j + 1
+      None => break
+    }
+  }
+  if !closed {
+    return None
+  }
+  Some((style[0:i].to_owned(), style[i + 1:j].to_owned()))
+}
+
+///|
+fn css_hex_digits(style : String) -> String? {
+  let n = style.length()
+  if n < 2 {
+    return None
+  }
+  let hashed = match style.get_char(0) {
+    Some('#') => true
+    _ => false
+  }
+  if !hashed {
+    return None
+  }
+  let mut i = 1
+  while i < n {
+    match style.get_char(i) {
+      Some(c) =>
+        if c.is_ascii_hexdigit() {
+          i = i + 1
+        } else {
+          return None
+        }
+      None => return None
+    }
+  }
+  Some(style[1:i].to_owned())
+}
+
+///|
+fn skip_css_space(text : String, index : Int) -> Int {
+  let mut index = index
+  let n = text.length()
+  while index < n {
+    match text.get_char(index) {
+      Some(c) =>
+        if c.is_ascii_whitespace() {
+          index = index + 1
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+  index
+}
+
+///|
+fn take_css_char(text : String, index : Int, expect : Char) -> Int? {
+  match text.get_char(index) {
+    Some(c) => if c == expect { Some(index + 1) } else { None }
+    None => None
+  }
+}
+
+///|
+fn take_css_digits(text : String, index : Int) -> (Int, Double)? {
+  let starts = match text.get_char(index) {
+    Some(c) => c.is_ascii_digit()
+    None => false
+  }
+  if !starts {
+    return None
+  }
+  let mut index = index
+  let mut value = 0.0
+  let n = text.length()
+  while index < n {
+    match text.get_char(index) {
+      Some(c) =>
+        if c.is_ascii_digit() {
+          value = value * 10.0 + (c.to_int() - '0'.to_int()).to_double()
+          index = index + 1
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+  Some((index, value))
+}
+
+///|
+fn take_css_float(text : String, index : Int) -> (Int, Double)? {
+  let mut index = index
+  let mut value = 0.0
+  let mut saw_digit = false
+  let n = text.length()
+  while index < n {
+    match text.get_char(index) {
+      Some(c) =>
+        if c.is_ascii_digit() {
+          value = value * 10.0 + (c.to_int() - '0'.to_int()).to_double()
+          saw_digit = true
+          index = index + 1
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+  match text.get_char(index) {
+    Some('.') => {
+      index = index + 1
+      let mut scale = 0.1
+      let mut saw_frac = false
+      while index < n {
+        match text.get_char(index) {
+          Some(c) =>
+            if c.is_ascii_digit() {
+              value = value + (c.to_int() - '0'.to_int()).to_double() * scale
+              scale = scale * 0.1
+              saw_frac = true
+              index = index + 1
+            } else {
+              break
+            }
+          None => break
+        }
+      }
+      if saw_frac {
+        Some((index, value))
+      } else {
+        None
+      }
+    }
+    _ => if saw_digit { Some((index, value)) } else { None }
+  }
+}
+
+///|
+fn take_css_alpha(text : String, index : Int) -> Bool {
+  let index = skip_css_space(text, index)
+  if index >= text.length() {
+    return true
+  }
+  match take_css_char(text, index, ',') {
+    None => false
+    Some(index) => {
+      let index = skip_css_space(text, index)
+      match take_css_float(text, index) {
+        None => false
+        Some((index, _)) => {
+          let index = skip_css_space(text, index)
+          index == text.length()
+        }
+      }
+    }
+  }
+}
+
+///|
+fn rgb_channels(components : String) -> (Double, Double, Double)? {
+  match rgb_byte_channels(components) {
+    Some(channels) => Some(channels)
+    None => rgb_percent_channels(components)
+  }
+}
+
+///|
+fn rgb_byte_channels(components : String) -> (Double, Double, Double)? {
+  let i0 = skip_css_space(components, 0)
+  let (i1, r) = match take_css_digits(components, i0) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i2 = match take_css_char(components, skip_css_space(components, i1), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i3, g) = match take_css_digits(components, skip_css_space(components, i2)) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i4 = match take_css_char(components, skip_css_space(components, i3), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i5, b) = match take_css_digits(components, skip_css_space(components, i4)) {
+    Some(pair) => pair
+    None => return None
+  }
+  if take_css_alpha(components, i5) {
+    Some((255.0.min(r) / 255.0, 255.0.min(g) / 255.0, 255.0.min(b) / 255.0))
+  } else {
+    None
+  }
+}
+
+///|
+fn rgb_percent_channels(components : String) -> (Double, Double, Double)? {
+  let i0 = skip_css_space(components, 0)
+  let (i1, r) = match take_css_digits(components, i0) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i2 = match take_css_char(components, i1, '%') {
+    Some(index) => index
+    None => return None
+  }
+  let i3 = match take_css_char(components, skip_css_space(components, i2), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i4, g) = match take_css_digits(components, skip_css_space(components, i3)) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i5 = match take_css_char(components, i4, '%') {
+    Some(index) => index
+    None => return None
+  }
+  let i6 = match take_css_char(components, skip_css_space(components, i5), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i7, b) = match take_css_digits(components, skip_css_space(components, i6)) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i8 = match take_css_char(components, i7, '%') {
+    Some(index) => index
+    None => return None
+  }
+  if take_css_alpha(components, i8) {
+    Some((100.0.min(r) / 100.0, 100.0.min(g) / 100.0, 100.0.min(b) / 100.0))
+  } else {
+    None
+  }
+}
+
+///|
+fn hsl_channels(components : String) -> (Double, Double, Double)? {
+  let i0 = skip_css_space(components, 0)
+  let (i1, h) = match take_css_float(components, i0) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i2 = match take_css_char(components, skip_css_space(components, i1), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i3, s) = match take_css_float(components, skip_css_space(components, i2)) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i4 = match take_css_char(components, i3, '%') {
+    Some(index) => index
+    None => return None
+  }
+  let i5 = match take_css_char(components, skip_css_space(components, i4), ',') {
+    Some(index) => index
+    None => return None
+  }
+  let (i6, l) = match take_css_float(components, skip_css_space(components, i5)) {
+    Some(pair) => pair
+    None => return None
+  }
+  let i7 = match take_css_char(components, i6, '%') {
+    Some(index) => index
+    None => return None
+  }
+  if take_css_alpha(components, i7) {
+    Some((h / 360.0, s / 100.0, l / 100.0))
+  } else {
+    None
+  }
+}
+
+///|
+fn hex_nibble(c : Char) -> Int {
+  if c.is_ascii_digit() {
+    c.to_int() - '0'.to_int()
+  } else {
+    c.to_ascii_lowercase().to_int() - 'a'.to_int() + 10
+  }
+}
+
+///|
+fn hex_nibble_at(hex : String, index : Int) -> Double {
+  match hex.get_char(index) {
+    Some(c) => hex_nibble(c).to_double()
+    None => 0.0
+  }
+}
+
+///|
+fn hex_int(hex : String) -> Int {
+  let mut value = 0
+  let mut index = 0
+  while index < hex.length() {
+    match hex.get_char(index) {
+      Some(c) => {
+        value = value * 16 + hex_nibble(c)
+        index = index + 1
+      }
+      None => break
+    }
+  }
+  value
+}
+
+///|
 pub fn Color::copy(self : Color, color : Color) -> Color {
   self.r = color.r
   self.g = color.g
