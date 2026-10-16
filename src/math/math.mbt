@@ -164,3 +164,14 @@ pub fn seeded_random(s? : Int) -> Double {
   t = t ^ (t + ((t ^ (t >> 7)) * (t | 61U)))
   (t ^ (t >> 14)).to_double() / 4294967296.0
 }
+
+///|
+/// 正整数且恰好是 2 的幂才返回 true。
+/// r186: `isPowerOfTwo` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L288
+pub fn is_power_of_two(value : Double) -> Bool {
+  if value <= 0.0 || value.is_nan() || value.is_inf() || value != value.floor() {
+    false
+  } else {
+    @std.pow(2.0, @std.log2(value).round()) == value
+  }
+}

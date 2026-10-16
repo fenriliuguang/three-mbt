@@ -5857,6 +5857,18 @@ test "MathUtils.seededRandom repeats a seed" {
 }
 
 ///|
+test "MathUtils.isPowerOfTwo recognizes powers of two" {
+  assert_eq(@math.is_power_of_two(1.0), true)
+  assert_eq(@math.is_power_of_two(2.0), true)
+  assert_eq(@math.is_power_of_two(8.0), true)
+  assert_eq(@math.is_power_of_two(3.0), false)
+  assert_eq(@math.is_power_of_two(6.0), false)
+  assert_eq(@math.is_power_of_two(0.0), false)
+  assert_eq(@math.is_power_of_two(-2.0), false)
+  assert_eq(@math.is_power_of_two(1.5), false)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

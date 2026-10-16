@@ -16,6 +16,8 @@ pub fn euclidean_modulo(Double, Double) -> Double
 
 pub fn inverse_lerp(Double, Double, Double) -> Double
 
+pub fn is_power_of_two(Double) -> Bool
+
 pub fn lerp(Double, Double, Double) -> Double
 
 pub fn linear_to_srgb(Double) -> Double

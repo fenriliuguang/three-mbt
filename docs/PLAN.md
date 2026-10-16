@@ -987,6 +987,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.seededRandom` has landed. It draws from the Mulberry32 sequence in `[0, 1)`. The default seed `1234567` starts at `0.6074679309967905`. Seed `1` starts at `0.6270739405881613`, then `0.002735721180215478`, then `0.5274470399599522`. Passing seed `1` again repeats the first value.
 
+`MathUtils.isPowerOfTwo` has landed. It accepts a positive integer that is a power of two. `1`, `2`, and `8` are powers of two. `3`, `6`, `0`, `-2`, and `1.5` are not.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1421,6 +1423,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `MathUtils.randFloat` | `math` |
 | planned | 7 | `MathUtils.randFloatSpread` | `math` |
 | planned | 7 | `MathUtils.seededRandom` | `math` |
+| planned | 7 | `MathUtils.isPowerOfTwo` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
