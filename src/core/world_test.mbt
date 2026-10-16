@@ -1346,6 +1346,19 @@ test "needsUpdate increments version only when true" {
 }
 
 ///|
+test "setUsage switches static draw to dynamic draw" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  assert_eq(attribute.usage, @constants.STATIC_DRAW_USAGE)
+  assert_eq(attribute.usage, 35044)
+  let written = attribute.set_usage(@constants.DYNAMIC_DRAW_USAGE)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.usage, 35048)
+  let destination = @core.BufferAttribute::new([0.0], 1)
+  ignore(destination.copy(attribute))
+  assert_eq(destination.usage, 35048)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

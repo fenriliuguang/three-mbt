@@ -9,6 +9,7 @@ pub(all) struct BufferAttribute {
   mut normalized : Bool
   mut count : Int
   mut version : Int
+  mut usage : Int
 }
 
 ///|
@@ -17,7 +18,7 @@ pub fn BufferAttribute::new(
   item_size : Int,
   normalized? : Bool = false,
 ) -> BufferAttribute {
-  { array, item_size, normalized, count: array.length() / item_size, version: 0, }
+  { array, item_size, normalized, count: array.length() / item_size, version: 0, usage: @constants.STATIC_DRAW_USAGE, }
 }
 
 ///|
@@ -45,7 +46,18 @@ pub fn BufferAttribute::set_needs_update(
 }
 
 ///|
-/// 用源属性的数值、分量个数和归一化标记替换当前属性。数值是一份副本。
+/// 设置缓冲区的使用方式。默认是 `StaticDrawUsage`。
+/// r186: `setUsage` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L167
+pub fn BufferAttribute::set_usage(
+  self : BufferAttribute,
+  value : Int,
+) -> BufferAttribute {
+  self.usage = value
+  self
+}
+
+///|
+/// 用源属性的数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
 pub fn BufferAttribute::copy(
   self : BufferAttribute,
@@ -55,6 +67,7 @@ pub fn BufferAttribute::copy(
   self.item_size = source.item_size
   self.count = source.count
   self.normalized = source.normalized
+  self.usage = source.usage
   self
 }
 

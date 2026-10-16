@@ -385,3 +385,48 @@ pub fn ToneMapping::to_int(self : ToneMapping) -> Int {
     Neutral => NEUTRAL_TONE_MAPPING
   }
 }
+
+///|
+/// 缓冲区静态绘制。对齐 `StaticDrawUsage`（35044）。
+/// r186: `StaticDrawUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1560
+pub const STATIC_DRAW_USAGE : Int = 35044
+
+///|
+/// 缓冲区动态绘制。对齐 `DynamicDrawUsage`（35048）。
+/// r186: `DynamicDrawUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1569
+pub const DYNAMIC_DRAW_USAGE : Int = 35048
+
+///|
+/// 缓冲区流式绘制。对齐 `StreamDrawUsage`（35040）。
+/// r186: `StreamDrawUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1578
+pub const STREAM_DRAW_USAGE : Int = 35040
+
+///|
+/// 缓冲区静态读取。对齐 `StaticReadUsage`（35045）。
+/// r186: `StaticReadUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1587
+pub const STATIC_READ_USAGE : Int = 35045
+
+///|
+/// 缓冲区动态读取。对齐 `DynamicReadUsage`（35049）。
+/// r186: `DynamicReadUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1596
+pub const DYNAMIC_READ_USAGE : Int = 35049
+
+///|
+/// 缓冲区流式读取。对齐 `StreamReadUsage`（35041）。
+/// r186: `StreamReadUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1605
+pub const STREAM_READ_USAGE : Int = 35041
+
+///|
+/// 缓冲区静态复制。对齐 `StaticCopyUsage`（35046）。
+/// r186: `StaticCopyUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1614
+pub const STATIC_COPY_USAGE : Int = 35046
+
+///|
+/// 缓冲区动态复制。对齐 `DynamicCopyUsage`（35050）。
+/// r186: `DynamicCopyUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1623
+pub const DYNAMIC_COPY_USAGE : Int = 35050
+
+///|
+/// 缓冲区流式复制。对齐 `StreamCopyUsage`（35042）。
+/// r186: `StreamCopyUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1632
+pub const STREAM_COPY_USAGE : Int = 35042
