@@ -1339,6 +1339,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `InterleavedBufferAttribute.toJSON` has landed. The same attribute serializes as item size `2`, `normalized` true, and array `[2, 3, 5, 6]`. Changing the copied array leaves the source at `2`.
 
+`InstancedInterleavedBuffer.meshPerAttribute` has landed on `InterleavedBuffer`. It defaults to `1`. Constructing with `2` and copying carries `2`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1949,6 +1951,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InterleavedBufferAttribute.setComponent` | `core` |
 | planned | 7 | `InterleavedBufferAttribute.clone` | `core` |
 | planned | 7 | `InterleavedBufferAttribute.toJSON` | `core` |
+| planned | 7 | `InstancedInterleavedBuffer.meshPerAttribute` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

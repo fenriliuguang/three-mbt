@@ -2476,3 +2476,14 @@ test "setW writes an interleaved component" {
   assert_eq(buffer.array[6], 9.0)
   assert_eq(buffer.array[7], 4.0)
 }
+
+///|
+test "meshPerAttribute defaults to one on an interleaved buffer" {
+  let plain = @core.InterleavedBuffer::new([1.0], 1)
+  assert_eq(plain.mesh_per_attribute, 1)
+  let source = @core.InterleavedBuffer::new([1.0], 1, mesh_per_attribute=2)
+  assert_eq(source.mesh_per_attribute, 2)
+  let destination = @core.InterleavedBuffer::new([9.0], 1)
+  ignore(destination.copy(source))
+  assert_eq(destination.mesh_per_attribute, 2)
+}

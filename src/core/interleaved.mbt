@@ -1,7 +1,7 @@
 // r186: `InterleavedBuffer` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L10
 
 ///|
-/// 多个属性共用的交错缓冲。数值用 `Double` 保存。`count` 是数组长度除以步长。`usage` 默认是 `StaticDrawUsage`。待上传区间一开始是空的。`version` 从 0 起，只有 `needsUpdate` 为真时加一。`uuid` 在新建时生成，`copy` 不改写它。
+/// 多个属性共用的交错缓冲。数值用 `Double` 保存。`count` 是数组长度除以步长。`usage` 默认是 `StaticDrawUsage`。待上传区间一开始是空的。`version` 从 0 起，只有 `needsUpdate` 为真时加一。`uuid` 在新建时生成，`copy` 不改写它。`mesh_per_attribute` 来自 `InstancedInterleavedBuffer`，默认是 `1`。
 /// r186: `InterleavedBuffer` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L10
 /// r186: `array` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L34
 /// r186: `stride` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L41
@@ -10,6 +10,7 @@
 /// r186: `updateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L68
 /// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L75
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L83
+/// r186: `meshPerAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedInterleavedBuffer.js#L37
 pub(all) struct InterleavedBuffer {
   uuid : String
   mut array : Array[Double]
@@ -19,12 +20,14 @@ pub(all) struct InterleavedBuffer {
   update_ranges : Array[UpdateRange]
   mut version : Int
   mut on_upload_callback : (() -> Unit)?
+  mut mesh_per_attribute : Int
 }
 
 ///|
 pub fn InterleavedBuffer::new(
   array : Array[Double],
   stride : Int,
+  mesh_per_attribute? : Int = 1,
 ) -> InterleavedBuffer {
   {
     uuid: @math.generate_uuid(),
@@ -35,6 +38,7 @@ pub fn InterleavedBuffer::new(
     update_ranges: [],
     version: 0,
     on_upload_callback: None,
+    mesh_per_attribute,
   }
 }
 
@@ -80,7 +84,7 @@ pub fn InterleavedBuffer::clear_update_ranges(self : InterleavedBuffer) -> Unit 
 }
 
 ///|
-/// 用源缓冲的数值、步长、顶点数和使用方式替换当前缓冲。数值是一份副本。待上传区间保留目标自己的。
+/// 用源缓冲的数值、步长、顶点数、使用方式和实例重复次数替换当前缓冲。数值是一份副本。待上传区间保留目标自己的。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L148
 pub fn InterleavedBuffer::copy(
   self : InterleavedBuffer,
@@ -90,6 +94,7 @@ pub fn InterleavedBuffer::copy(
   self.count = source.count
   self.stride = source.stride
   self.usage = source.usage
+  self.mesh_per_attribute = source.mesh_per_attribute
   self
 }
 
