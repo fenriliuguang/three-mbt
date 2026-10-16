@@ -38,6 +38,7 @@ pub(all) struct DrawRange {
 /// r186: `indirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L112
 /// r186: `morphAttributes` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L141
 /// r186: `morphTargetsRelative` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L151
+/// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L196
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
@@ -49,6 +50,7 @@ pub(all) struct BufferGeometry {
   mut indirect_offset : Int
   morph_attributes : Map[String, Array[BufferAttribute]]
   mut morph_targets_relative : Bool
+  mut user_data : Map[String, String]
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
@@ -70,6 +72,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     indirect_offset: 0,
     morph_attributes: Map([]),
     morph_targets_relative: false,
+    user_data: Map([]),
     groups: [],
     draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
@@ -824,7 +827,7 @@ pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
-/// 把源几何体的名字、属性、形变属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。
+/// 把源几何体的名字、属性、形变属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。`user_data` 与源共用同一张表。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1357
 pub fn BufferGeometry::copy(
   self : BufferGeometry,
@@ -870,6 +873,7 @@ pub fn BufferGeometry::copy(
   }
   self.draw_range.start = source.draw_range.start
   self.draw_range.count = source.draw_range.count
+  self.user_data = source.user_data
   self
 }
 

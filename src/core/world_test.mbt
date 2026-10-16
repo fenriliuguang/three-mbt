@@ -1731,3 +1731,24 @@ test "morphTargetsRelative defaults to false and copy carries it" {
   ignore(destination.copy(source))
   assert_eq(destination.morph_targets_relative, true)
 }
+
+///|
+test "userData starts empty and copy shares the map" {
+  let source = @core.BufferGeometry::new()
+  match source.user_data.get("label") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  source.user_data.set("label", "square")
+  let destination = @core.BufferGeometry::new()
+  ignore(destination.copy(source))
+  match destination.user_data.get("label") {
+    None => assert_eq(false, true)
+    Some(label) => assert_eq(label, "square")
+  }
+  destination.user_data.set("label", "cube")
+  match source.user_data.get("label") {
+    None => assert_eq(false, true)
+    Some(label) => assert_eq(label, "cube")
+  }
+}
