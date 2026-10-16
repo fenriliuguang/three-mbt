@@ -6137,6 +6137,26 @@ test "SphericalHarmonics3.add sums nine coefficients" {
 }
 
 ///|
+test "SphericalHarmonics3.addScaledSH adds a scaled copy" {
+  let sh = @math.SphericalHarmonics3::new()
+  let other = @math.SphericalHarmonics3::new()
+  ignore(sh.coefficients[0].set(1.0, 2.0, 3.0))
+  ignore(sh.coefficients[8].set(1.0, 0.0, 0.0))
+  ignore(other.coefficients[0].set(4.0, 5.0, 6.0))
+  ignore(other.coefficients[8].set(0.0, 1.0, 0.0))
+  ignore(sh.add_scaled_sh(other, 2.0))
+  assert_eq(sh.coefficients[0].x, 9.0)
+  assert_eq(sh.coefficients[0].y, 12.0)
+  assert_eq(sh.coefficients[0].z, 15.0)
+  assert_eq(sh.coefficients[4].x, 0.0)
+  assert_eq(sh.coefficients[8].x, 1.0)
+  assert_eq(sh.coefficients[8].y, 2.0)
+  assert_eq(sh.coefficients[8].z, 0.0)
+  assert_eq(other.coefficients[0].x, 4.0)
+  assert_eq(other.coefficients[8].y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
