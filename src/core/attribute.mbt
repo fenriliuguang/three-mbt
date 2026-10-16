@@ -127,6 +127,28 @@ pub fn BufferAttribute::add_event_listener(
 }
 
 ///|
+/// 同一种事件里是否已经有这个监听。
+/// r186: `hasEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L58
+pub fn BufferAttribute::has_event_listener(
+  self : BufferAttribute,
+  kind : String,
+  listener : () -> Unit,
+) -> Bool {
+  match self.listeners.get(kind) {
+    None => false
+    Some(listeners) => {
+      let mut found = false
+      for existing in listeners {
+        if physical_equal(existing, listener) {
+          found = true
+        }
+      }
+      found
+    }
+  }
+}
+
+///|
 /// 通知 `dispose` 监听。其它事件不动。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L684
 pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {

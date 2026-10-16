@@ -1402,6 +1402,15 @@ test "addEventListener keeps one copy of a listener" {
 }
 
 ///|
+test "hasEventListener reports a registered listener" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let listener = fn() {}
+  assert_eq(attribute.has_event_listener("dispose", listener), false)
+  attribute.add_event_listener("dispose", listener)
+  assert_eq(attribute.has_event_listener("dispose", listener), true)
+}
+
+///|
 test "dispose runs only dispose listeners" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
   let hits = Ref::Ref(0)
