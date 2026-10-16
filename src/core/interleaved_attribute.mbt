@@ -32,3 +32,12 @@ pub fn InterleavedBufferAttribute::new(
 pub fn InterleavedBufferAttribute::count(self : InterleavedBufferAttribute) -> Int {
   self.data.count
 }
+
+///|
+/// 交错缓冲里的数值。改这里会改到同一份数组。
+/// r186: `array` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L88
+pub fn InterleavedBufferAttribute::array(
+  self : InterleavedBufferAttribute,
+) -> Array[Double] {
+  self.data.array
+}

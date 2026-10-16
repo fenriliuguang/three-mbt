@@ -240,6 +240,7 @@ pub(all) struct InterleavedBufferAttribute {
   offset : Int
   mut normalized : Bool
 }
+pub fn InterleavedBufferAttribute::array(Self) -> Array[Double]
 pub fn InterleavedBufferAttribute::count(Self) -> Int
 pub fn InterleavedBufferAttribute::new(InterleavedBuffer, Int, Int, normalized? : Bool) -> Self
 

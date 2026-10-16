@@ -2238,3 +2238,12 @@ test "InterleavedBufferAttribute count comes from its buffer" {
   assert_eq(attribute.count(), 2)
   assert_eq(attribute.data.array[1], 2.0)
 }
+
+///|
+test "array returns the interleaved storage" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1)
+  assert_eq(attribute.array()[1], 2.0)
+  attribute.array()[1] = 8.0
+  assert_eq(buffer.array[1], 8.0)
+}
