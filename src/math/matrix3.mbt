@@ -228,3 +228,26 @@ pub fn Matrix3::transpose(self : Matrix3) -> Matrix3 {
 pub fn Matrix3::get_normal_matrix(self : Matrix3, matrix4 : Matrix4) -> Matrix3 {
   self.set_from_matrix4(matrix4).invert().transpose()
 }
+
+///|
+/// 把转置写入数组，矩阵本身不变。
+/// r186: `transposeIntoArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L364
+pub fn Matrix3::transpose_into_array(
+  self : Matrix3,
+  array : Array[Double],
+) -> Matrix3 {
+  while array.length() < 9 {
+    array.push(0.0)
+  }
+  let m = self.elements
+  array[0] = m[0]
+  array[1] = m[3]
+  array[2] = m[6]
+  array[3] = m[1]
+  array[4] = m[4]
+  array[5] = m[7]
+  array[6] = m[2]
+  array[7] = m[5]
+  array[8] = m[8]
+  self
+}
