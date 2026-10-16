@@ -206,6 +206,16 @@ pub fn Color::get_rgb(self : Color, target : Color) -> Color {
 }
 
 ///|
+/// 写成 sRGB 的 `rgb()` 字符串。
+/// r186: `getStyle` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L637
+pub fn Color::get_style(self : Color) -> String {
+  let r = (linear_to_srgb(self.r) * 255.0).round().to_int()
+  let g = (linear_to_srgb(self.g) * 255.0).round().to_int()
+  let b = (linear_to_srgb(self.b) * 255.0).round().to_int()
+  "rgb(\{r},\{g},\{b})"
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
