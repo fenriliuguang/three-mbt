@@ -709,6 +709,58 @@ pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
+/// `BufferGeometry.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
+pub(all) struct GeometryJson {
+  version : Double
+  type_name : String
+  generator : String
+  index : Array[Double]?
+  attributes : Map[String, AttributeJson]
+  groups : Array[GeometryGroup]
+  bounding_sphere : (Array[Double], Double)?
+}
+
+///|
+/// 序列化元数据、属性、索引、分组和包围球。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
+pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
+  let attributes : Map[String, AttributeJson] = Map([])
+  for pair in self.attributes.iter() {
+    let (name, attribute) = pair
+    attributes.set(name, attribute.to_json())
+  }
+  let groups = []
+  let mut group_index = 0
+  while group_index < self.groups.length() {
+    let group = self.groups[group_index]
+    groups.push({
+      start: group.start,
+      count: group.count,
+      material_index: group.material_index,
+    })
+    group_index = group_index + 1
+  }
+  let index = match self.index {
+    None => None
+    Some(index) => Some(index.array.copy())
+  }
+  let bounding_sphere = match self.bounding_sphere {
+    None => None
+    Some(sphere) => Some(sphere.to_json())
+  }
+  {
+    version: 4.7,
+    type_name: "BufferGeometry",
+    generator: "BufferGeometry.toJSON",
+    index,
+    attributes,
+    groups,
+    bounding_sphere,
+  }
+}
+
+///|
 /// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
 pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
   let geometry = BufferGeometry::new()

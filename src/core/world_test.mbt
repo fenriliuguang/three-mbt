@@ -1149,6 +1149,50 @@ test "toNonIndexed expands vertices in index order" {
 }
 
 ///|
+test "toJSON records attributes, index, groups, and the bounding sphere" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+  )
+  ignore(geometry.set_index_array([0]))
+  geometry.add_group(0, 3, material_index=1)
+  geometry.bounding_sphere = Some(
+    @math.Sphere::new(center=@math.Vector3::new(x=1.0, y=2.0, z=3.0), radius=4.0),
+  )
+  let data = geometry.to_json()
+  assert_eq(data.version, 4.7)
+  assert_eq(data.type_name, "BufferGeometry")
+  assert_eq(data.generator, "BufferGeometry.toJSON")
+  match data.index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, [0.0])
+  }
+  match data.attributes.get("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.item_size, 3)
+      assert_eq(position.array, [1.0, 2.0, 3.0])
+      position.array[0] = 9.0
+    }
+  }
+  assert_eq(data.groups.length(), 1)
+  assert_eq(data.groups[0].start, 0)
+  assert_eq(data.groups[0].count, 3)
+  assert_eq(data.groups[0].material_index, 1)
+  match data.bounding_sphere {
+    None => assert_eq(false, true)
+    Some((center, radius)) => {
+      assert_eq(center, [1.0, 2.0, 3.0])
+      assert_eq(radius, 4.0)
+    }
+  }
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => assert_eq(position.get_x(0), 1.0)
+  }
+}
+
+///|
 test "toJSON copies item size, values, and normalized" {
   let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3, normalized=true)
   let data = attribute.to_json()
