@@ -475,6 +475,7 @@ pub(all) struct SphericalHarmonics3 {
 }
 pub fn SphericalHarmonics3::new() -> Self
 pub fn SphericalHarmonics3::set(Self, Array[Vector3]) -> Self
+pub fn SphericalHarmonics3::zero(Self) -> Self
 
 pub(all) struct Triangle {
   a : Vector3

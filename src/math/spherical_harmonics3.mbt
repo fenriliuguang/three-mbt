@@ -34,3 +34,13 @@ pub fn SphericalHarmonics3::set(
   }
   self
 }
+
+///|
+/// 把九个系数都写成零。
+/// r186: `zero` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L65
+pub fn SphericalHarmonics3::zero(self : SphericalHarmonics3) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].set(0.0, 0.0, 0.0))
+  }
+  self
+}
