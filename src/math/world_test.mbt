@@ -5318,6 +5318,33 @@ test "Matrix4.copyPosition copies only the translation" {
 }
 
 ///|
+test "Matrix4.setFromMatrix3 copies the upper 3x3" {
+  let source = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
+  let m = @math.Matrix4::new()
+  ignore(m.set_from_matrix3(source))
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[1], 4.0)
+  assert_eq(m.elements[2], 7.0)
+  assert_eq(m.elements[3], 0.0)
+  assert_eq(m.elements[4], 2.0)
+  assert_eq(m.elements[5], 5.0)
+  assert_eq(m.elements[6], 8.0)
+  assert_eq(m.elements[7], 0.0)
+  assert_eq(m.elements[8], 3.0)
+  assert_eq(m.elements[9], 6.0)
+  assert_eq(m.elements[10], 9.0)
+  assert_eq(m.elements[11], 0.0)
+  assert_eq(m.elements[12], 0.0)
+  assert_eq(m.elements[13], 0.0)
+  assert_eq(m.elements[14], 0.0)
+  assert_eq(m.elements[15], 1.0)
+  source.elements[0] = 0.0
+  assert_eq(m.elements[0], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

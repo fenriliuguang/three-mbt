@@ -259,6 +259,7 @@ pub fn Matrix4::new() -> Self
 pub fn Matrix4::premultiply(Self, Self) -> Self
 pub fn Matrix4::scale(Self, Vector3) -> Self
 pub fn Matrix4::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
+pub fn Matrix4::set_from_matrix3(Self, Matrix3) -> Self
 pub fn Matrix4::set_position(Self, Double, Double, Double) -> Self
 pub fn Matrix4::set_position_vector(Self, Vector3) -> Self
 pub fn Matrix4::transpose(Self) -> Self

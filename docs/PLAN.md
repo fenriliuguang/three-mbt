@@ -911,6 +911,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Matrix4.copyPosition` has landed. It copies only the translation. A translation of `(0.25, 0.5, 0.75)` is stored in elements `12`, `13`, and `14`, while element `0` and element `15` stay `1`. Later changes to the source leave the copy alone.
 
+`Matrix4.setFromMatrix3` has landed. It copies a 3×3 matrix into the upper left and writes a homogeneous last row and column. The matrix with rows `(1, 2, 3)`, `(4, 5, 6)`, `(7, 8, 9)` writes `[1, 4, 7, 0, 2, 5, 8, 0, 3, 6, 9, 0, 0, 0, 0, 1]`. Later changes to the 3×3 matrix leave the 4×4 matrix alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1307,6 +1309,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix3.fromArray` | `math` |
 | planned | 7 | `Matrix3.toArray` | `math` |
 | planned | 7 | `Matrix4.copyPosition` | `math` |
+| planned | 7 | `Matrix4.setFromMatrix3` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

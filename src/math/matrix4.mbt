@@ -97,6 +97,17 @@ pub fn Matrix4::copy_position(self : Matrix4, m : Matrix4) -> Matrix4 {
 }
 
 ///|
+/// 把 3×3 矩阵写入左上角，其余补成齐次坐标。
+/// r186: `setFromMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L214
+pub fn Matrix4::set_from_matrix3(self : Matrix4, m : Matrix3) -> Matrix4 {
+  let me = m.elements
+  self.set(
+    me[0], me[3], me[6], 0.0, me[1], me[4], me[7], 0.0, me[2], me[5], me[8],
+    0.0, 0.0, 0.0, 0.0, 1.0,
+  )
+}
+
+///|
 pub fn Matrix4::make_translation(
   self : Matrix4,
   x : Double,
