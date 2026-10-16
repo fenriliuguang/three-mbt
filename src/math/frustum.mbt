@@ -169,3 +169,10 @@ pub fn Frustum::contains_point(self : Frustum, point : Vector3) -> Bool {
   }
   true
 }
+
+///|
+/// 复制出一份新的视锥。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L285
+pub fn Frustum::clone(self : Frustum) -> Frustum {
+  Frustum::new().copy(self)
+}

@@ -5001,6 +5001,31 @@ test "Frustum.containsPoint accepts a point inside the unit cube" {
 }
 
 ///|
+test "Frustum.clone copies six planes into a new frustum" {
+  let source = @math.Frustum::new()
+  ignore(
+    source.set(
+      @math.Plane::new(constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=2.0),
+      @math.Plane::new(constant=3.0),
+      @math.Plane::new(constant=4.0),
+      @math.Plane::new(constant=5.0),
+      @math.Plane::new(constant=6.0),
+    ),
+  )
+  let cloned = source.clone()
+  assert_eq(cloned.planes[0].constant, 1.0)
+  assert_eq(cloned.planes[1].normal.y, 1.0)
+  assert_eq(cloned.planes[5].constant, 6.0)
+  source.planes[0].constant = 0.0
+  source.planes[1].normal.y = 0.0
+  cloned.planes[5].constant = 9.0
+  assert_eq(cloned.planes[0].constant, 1.0)
+  assert_eq(cloned.planes[1].normal.y, 1.0)
+  assert_eq(source.planes[5].constant, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
