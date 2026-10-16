@@ -57,3 +57,21 @@ pub fn FrustumArray::contains_point(
   }
   false
 }
+
+///|
+/// 复制坐标系和已用视锥。目标更短时补上新视锥，更长时多出来的视锥留在原处。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L194
+pub fn FrustumArray::copy(
+  self : FrustumArray,
+  source : FrustumArray,
+) -> FrustumArray {
+  self.coordinate_system = source.coordinate_system
+  for i in 0..<source.count {
+    if i >= self.frustums.length() {
+      self.frustums.push(Frustum::new())
+    }
+    ignore(self.frustums[i].copy(source.frustums[i]))
+  }
+  self.count = source.count
+  self
+}

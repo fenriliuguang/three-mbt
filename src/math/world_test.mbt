@@ -6476,6 +6476,71 @@ test "FrustumArray.containsPoint uses only the counted frustums" {
 }
 
 ///|
+test "FrustumArray.copy copies the counted frustums" {
+  let source = @math.FrustumArray::new()
+  source.coordinate_system = @constants.WebGPU
+  let first = @math.Frustum::new()
+  ignore(
+    first.set(
+      @math.Plane::new(constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=2.0),
+      @math.Plane::new(constant=3.0),
+      @math.Plane::new(constant=4.0),
+      @math.Plane::new(constant=5.0),
+      @math.Plane::new(constant=6.0),
+    ),
+  )
+  source.frustums.push(first)
+  source.count = 1
+  let dest = @math.FrustumArray::new()
+  ignore(dest.copy(source))
+  assert_eq(dest.count, 1)
+  assert_eq(dest.frustums.length(), 1)
+  assert_eq(dest.frustums[0].planes[0].constant, 1.0)
+  assert_eq(dest.frustums[0].planes[1].normal.y, 1.0)
+  assert_eq(dest.frustums[0].planes[5].constant, 6.0)
+  match dest.coordinate_system {
+    @constants.WebGPU => assert_eq(true, true)
+    @constants.WebGL => assert_eq(true, false)
+  }
+  source.frustums[0].planes[0].constant = 0.0
+  source.frustums[0].planes[1].normal.y = 0.0
+  assert_eq(dest.frustums[0].planes[0].constant, 1.0)
+  assert_eq(dest.frustums[0].planes[1].normal.y, 1.0)
+  source.frustums[0].planes[0].constant = 1.0
+  source.frustums[0].planes[1].normal.y = 1.0
+  let second = @math.Frustum::new()
+  ignore(
+    second.set(
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+    ),
+  )
+  source.frustums.push(second)
+  source.count = 2
+  ignore(dest.copy(source))
+  assert_eq(dest.count, 2)
+  assert_eq(dest.frustums.length(), 2)
+  assert_eq(dest.frustums[1].planes[0].constant, 10.0)
+  source.frustums[1].planes[0].constant = 0.0
+  assert_eq(dest.frustums[1].planes[0].constant, 10.0)
+  let empty = @math.FrustumArray::new()
+  ignore(dest.copy(empty))
+  assert_eq(dest.count, 0)
+  assert_eq(dest.frustums.length(), 2)
+  assert_eq(dest.frustums[0].planes[0].constant, 1.0)
+  assert_eq(dest.frustums[1].planes[0].constant, 10.0)
+  match dest.coordinate_system {
+    @constants.WebGL => assert_eq(true, true)
+    @constants.WebGPU => assert_eq(true, false)
+  }
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
