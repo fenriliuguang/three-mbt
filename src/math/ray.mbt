@@ -61,3 +61,21 @@ pub fn Ray::recast(self : Ray, t : Double) -> Ray {
   ignore(self.origin.copy(self.at(t, Vector3::new())))
   self
 }
+
+///|
+/// 把射线上离点最近的位置写入 target。点在射线反方向时结果是原点。点和射线都不改。
+/// r186: `closestPointToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L119
+pub fn Ray::closest_point_to_point(
+  self : Ray,
+  point : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let direction_distance = target
+    .sub_vectors(point, self.origin)
+    .dot(self.direction)
+  if direction_distance < 0.0 {
+    target.copy(self.origin)
+  } else {
+    target.copy(self.origin).add_scaled_vector(self.direction, direction_distance)
+  }
+}

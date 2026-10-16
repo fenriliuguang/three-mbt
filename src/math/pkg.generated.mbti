@@ -261,6 +261,7 @@ pub(all) struct Ray {
   direction : Vector3
 }
 pub fn Ray::at(Self, Double, Vector3) -> Vector3
+pub fn Ray::closest_point_to_point(Self, Vector3, Vector3) -> Vector3
 pub fn Ray::copy(Self, Self) -> Self
 pub fn Ray::look_at(Self, Vector3) -> Self
 pub fn Ray::new(origin? : Vector3, direction? : Vector3) -> Self
