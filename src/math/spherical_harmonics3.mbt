@@ -140,3 +140,17 @@ pub fn SphericalHarmonics3::scale(
   }
   self
 }
+
+///|
+/// 向另一组球谐插值。来源不改。
+/// r186: `lerp` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L210
+pub fn SphericalHarmonics3::lerp(
+  self : SphericalHarmonics3,
+  sh : SphericalHarmonics3,
+  alpha : Double,
+) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].lerp(sh.coefficients[i], alpha))
+  }
+  self
+}

@@ -477,6 +477,7 @@ pub fn SphericalHarmonics3::add(Self, Self) -> Self
 pub fn SphericalHarmonics3::add_scaled_sh(Self, Self, Double) -> Self
 pub fn SphericalHarmonics3::get_at(Self, Vector3, Vector3) -> Vector3
 pub fn SphericalHarmonics3::get_irradiance_at(Self, Vector3, Vector3) -> Vector3
+pub fn SphericalHarmonics3::lerp(Self, Self, Double) -> Self
 pub fn SphericalHarmonics3::new() -> Self
 pub fn SphericalHarmonics3::scale(Self, Double) -> Self
 pub fn SphericalHarmonics3::set(Self, Array[Vector3]) -> Self
