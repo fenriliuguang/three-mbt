@@ -5345,6 +5345,37 @@ test "Matrix4.setFromMatrix3 copies the upper 3x3" {
 }
 
 ///|
+test "Matrix4.extractBasis writes the first three columns" {
+  let m = @math.Matrix4::new().set(
+    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0,
+    1.0,
+  )
+  let x_axis = @math.Vector3::new()
+  let y_axis = @math.Vector3::new()
+  let z_axis = @math.Vector3::new()
+  ignore(m.extract_basis(x_axis, y_axis, z_axis))
+  assert_eq(x_axis.x, 2.0)
+  assert_eq(x_axis.y, 0.0)
+  assert_eq(x_axis.z, 0.0)
+  assert_eq(y_axis.x, 0.0)
+  assert_eq(y_axis.y, 3.0)
+  assert_eq(y_axis.z, 0.0)
+  assert_eq(z_axis.x, 0.0)
+  assert_eq(z_axis.y, 0.0)
+  assert_eq(z_axis.z, 4.0)
+  x_axis.x = 0.0
+  assert_eq(m.elements[0], 2.0)
+  let flat = @math.Matrix4::new().set(
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0,
+  )
+  ignore(flat.extract_basis(x_axis, y_axis, z_axis))
+  assert_eq(x_axis.x, 1.0)
+  assert_eq(y_axis.y, 1.0)
+  assert_eq(z_axis.z, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

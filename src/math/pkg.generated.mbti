@@ -243,6 +243,7 @@ pub fn Matrix4::decompose(Self, Vector3, Quaternion, Vector3) -> Self
 pub fn Matrix4::determinant(Self) -> Double
 pub fn Matrix4::determinant_affine(Self) -> Double
 pub fn Matrix4::equals(Self, Self) -> Bool
+pub fn Matrix4::extract_basis(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Matrix4::extract_rotation(Self, Self) -> Self
 pub fn Matrix4::get_max_scale_on_axis(Self) -> Double
 pub fn Matrix4::identity(Self) -> Self

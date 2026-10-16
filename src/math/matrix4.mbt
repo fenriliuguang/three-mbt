@@ -108,6 +108,27 @@ pub fn Matrix4::set_from_matrix3(self : Matrix4, m : Matrix3) -> Matrix4 {
 }
 
 ///|
+/// 把前三列写进三个轴向量。仿射行列式为 0 时改写单位轴。
+/// r186: `extractBasis` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L239
+pub fn Matrix4::extract_basis(
+  self : Matrix4,
+  x_axis : Vector3,
+  y_axis : Vector3,
+  z_axis : Vector3,
+) -> Matrix4 {
+  if self.determinant_affine() == 0.0 {
+    ignore(x_axis.set(1.0, 0.0, 0.0))
+    ignore(y_axis.set(0.0, 1.0, 0.0))
+    ignore(z_axis.set(0.0, 0.0, 1.0))
+    return self
+  }
+  ignore(x_axis.set_from_matrix_column(self, 0))
+  ignore(y_axis.set_from_matrix_column(self, 1))
+  ignore(z_axis.set_from_matrix_column(self, 2))
+  self
+}
+
+///|
 pub fn Matrix4::make_translation(
   self : Matrix4,
   x : Double,
