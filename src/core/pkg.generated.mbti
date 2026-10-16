@@ -216,7 +216,9 @@ pub(all) struct InterleavedBuffer {
   stride : Int
   count : Int
   mut usage : Int
+  update_ranges : Array[UpdateRange]
 }
+pub fn InterleavedBuffer::add_update_range(Self, Int, Int) -> Unit
 pub fn InterleavedBuffer::new(Array[Double], Int) -> Self
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
 

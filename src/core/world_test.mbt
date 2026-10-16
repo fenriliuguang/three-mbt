@@ -2100,3 +2100,13 @@ test "setUsage stores DynamicDrawUsage on an interleaved buffer" {
   assert_eq(physical_equal(written, buffer), true)
   assert_eq(buffer.usage, 35048)
 }
+
+///|
+test "addUpdateRange stores one span on an interleaved buffer" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3)
+  assert_eq(buffer.update_ranges.length(), 0)
+  buffer.add_update_range(1, 2)
+  assert_eq(buffer.update_ranges.length(), 1)
+  assert_eq(buffer.update_ranges[0].start, 1)
+  assert_eq(buffer.update_ranges[0].count, 2)
+}
