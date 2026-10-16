@@ -46,6 +46,13 @@ pub fn BufferAttribute::copy(
 }
 
 ///|
+/// 新建一份属性，数值与源独立。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L653
+pub fn BufferAttribute::clone(self : BufferAttribute) -> BufferAttribute {
+  BufferAttribute::new(self.array, self.item_size, normalized=self.normalized).copy(self)
+}
+
+///|
 pub fn BufferAttribute::get_component(
   self : BufferAttribute,
   index : Int,

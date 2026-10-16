@@ -1216,3 +1216,16 @@ test "copy replaces an attribute with an independent buffer" {
   destination.array[0] = 8.0
   assert_eq(source.get_x(0), 1.0)
 }
+
+///|
+test "clone makes an independent attribute" {
+  let source = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3, normalized=true)
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.item_size, 3)
+  assert_eq(cloned.count, 1)
+  assert_eq(cloned.normalized, true)
+  assert_eq(cloned.array, [1.0, 2.0, 3.0])
+  cloned.array[0] = 8.0
+  assert_eq(source.get_x(0), 1.0)
+}

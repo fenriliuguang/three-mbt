@@ -28,6 +28,7 @@ pub(all) struct BufferAttribute {
 pub fn BufferAttribute::apply_matrix3(Self, @math.Matrix3) -> Self
 pub fn BufferAttribute::apply_matrix4(Self, @math.Matrix4) -> Self
 pub fn BufferAttribute::apply_normal_matrix(Self, @math.Matrix3) -> Self
+pub fn BufferAttribute::clone(Self) -> Self
 pub fn BufferAttribute::copy(Self, Self) -> Self
 pub fn BufferAttribute::copy_to_color(Self, Int, @math.Color) -> @math.Color
 pub fn BufferAttribute::copy_to_quaternion(Self, Int, @math.Quaternion) -> @math.Quaternion
