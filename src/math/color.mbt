@@ -305,3 +305,12 @@ pub fn Color::lerp_colors(
   self.b = color1.b + (color2.b - color1.b) * alpha
   self
 }
+
+///|
+/// 在色相、饱和度、亮度上向另一个颜色插值，再写回线性通道。
+/// r186: `lerpHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L819
+pub fn Color::lerp_hsl(self : Color, color : Color, alpha : Double) -> Color {
+  let (h1, s1, l1) = self.get_hsl()
+  let (h2, s2, l2) = color.get_hsl()
+  self.set_hsl(lerp(h1, h2, alpha), lerp(s1, s2, alpha), lerp(l1, l2, alpha))
+}
