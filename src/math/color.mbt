@@ -324,3 +324,17 @@ pub fn Color::set_from_vector3(self : Color, v : Vector3) -> Color {
   self.b = v.z
   self
 }
+
+///|
+/// 用 3×3 矩阵变换三个通道。
+/// r186: `applyMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L856
+pub fn Color::apply_matrix3(self : Color, m : Matrix3) -> Color {
+  let r = self.r
+  let g = self.g
+  let b = self.b
+  let e = m.elements
+  self.r = e[0] * r + e[3] * g + e[6] * b
+  self.g = e[1] * r + e[4] * g + e[7] * b
+  self.b = e[2] * r + e[5] * g + e[8] * b
+  self
+}

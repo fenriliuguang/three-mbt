@@ -4706,6 +4706,18 @@ test "Color.setFromVector3 copies the vector components" {
 }
 
 ///|
+test "Color.applyMatrix3 transforms the channels" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let swap = @math.Matrix3::new().set(0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  ignore(color.apply_matrix3(swap))
+  assert_eq(color.r, 0.5)
+  assert_eq(color.g, 0.25)
+  assert_eq(color.b, 0.75)
+  assert_eq(swap.elements[0], 0.0)
+  assert_eq(swap.elements[3], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
