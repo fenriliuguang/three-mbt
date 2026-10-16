@@ -157,6 +157,17 @@ pub fn BufferGeometry::apply_matrix4(
 }
 
 ///|
+/// 把四元数转成旋转矩阵再作用于几何体。
+/// r186: `applyQuaternion` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L434
+pub fn BufferGeometry::apply_quaternion(
+  self : BufferGeometry,
+  q : @math.Quaternion,
+) -> BufferGeometry {
+  let matrix = @math.Matrix4::new().make_rotation_from_quaternion(q)
+  self.apply_matrix4(matrix)
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None

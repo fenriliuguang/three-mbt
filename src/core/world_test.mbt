@@ -784,3 +784,30 @@ test "applyMatrix4 transforms position, normal, and tangent" {
     }
   }
 }
+
+///|
+test "applyQuaternion yaws a position a right angle around Y" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+  )
+  let half = 0.7071067811865476
+  let q = @math.Quaternion::new().set_from_axis_angle(
+    @math.Vector3::new(y=1.0),
+    @std.PI / 2.0,
+  )
+  let written = geometry.apply_quaternion(q)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_close(position.get_x(0), 0.0)
+      assert_eq(position.get_y(0), 0.0)
+      assert_close(position.get_z(0), -1.0)
+    }
+  }
+  assert_eq(q.x, 0.0)
+  assert_close(q.y, half)
+  assert_eq(q.z, 0.0)
+  assert_close(q.w, half)
+}

@@ -50,6 +50,7 @@ pub(all) struct BufferGeometry {
 }
 pub fn BufferGeometry::add_group(Self, Int, Int, material_index? : Int) -> Unit
 pub fn BufferGeometry::apply_matrix4(Self, @math.Matrix4) -> Self
+pub fn BufferGeometry::apply_quaternion(Self, @math.Quaternion) -> Self
 pub fn BufferGeometry::clear_groups(Self) -> Unit
 pub fn BufferGeometry::clone(Self) -> Self
 pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
