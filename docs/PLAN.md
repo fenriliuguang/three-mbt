@@ -1263,6 +1263,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Timer.setTimescale` has landed. Setting the timescale to `2` and updating at `1000` makes `getDelta` `2`.
 
+`Timer.reset` has landed. After an update at `1000`, resetting at `4000` and updating at `5000` makes `getDelta` `1`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1835,6 +1837,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Timer.getElapsed` | `core` |
 | planned | 7 | `Timer.getTimescale` | `core` |
 | planned | 7 | `Timer.setTimescale` | `core` |
+| planned | 7 | `Timer.reset` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

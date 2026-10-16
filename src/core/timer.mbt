@@ -54,6 +54,14 @@ pub fn Timer::set_timescale(self : Timer, timescale : Double) -> Timer {
 }
 
 ///|
+/// 把当前时间设成时间戳减去时间原点。下一次 `update` 从这个时间接着算。
+/// r186: `reset` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L128
+pub fn Timer::reset(self : Timer, timestamp : Double) -> Timer {
+  self.current_time = timestamp - self.start_time
+  self
+}
+
+///|
 /// 用毫秒时间戳更新内部时间。时间戳减去时间原点。
 /// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L156
 pub fn Timer::update(self : Timer, timestamp : Double) -> Timer {

@@ -2003,3 +2003,13 @@ test "setTimescale scales the next delta" {
   ignore(timer.update(1000.0))
   assert_eq(timer.get_delta(), 2.0)
 }
+
+///|
+test "reset skips the gap before the next update" {
+  let timer = @core.Timer::new()
+  ignore(timer.update(1000.0))
+  let written = timer.reset(4000.0)
+  assert_eq(physical_equal(written, timer), true)
+  ignore(timer.update(5000.0))
+  assert_eq(timer.get_delta(), 1.0)
+}
