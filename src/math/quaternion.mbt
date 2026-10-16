@@ -307,6 +307,37 @@ pub fn Quaternion::set_from_rotation_matrix(
 }
 
 ///|
+/// 用两个单位方向向量组成把前者转到后者的旋转。
+/// r186: `setFromUnitVectors` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L463
+pub fn Quaternion::set_from_unit_vectors(
+  self : Quaternion,
+  v_from : Vector3,
+  v_to : Vector3,
+) -> Quaternion {
+  let mut r = v_from.dot(v_to) + 1.0
+  if r < 1.0e-8 {
+    r = 0.0
+    if v_from.x.abs() > v_from.z.abs() {
+      self.x = -v_from.y
+      self.y = v_from.x
+      self.z = 0.0
+      self.w = r
+    } else {
+      self.x = 0.0
+      self.y = -v_from.z
+      self.z = v_from.y
+      self.w = r
+    }
+  } else {
+    self.x = v_from.y * v_to.z - v_from.z * v_to.y
+    self.y = v_from.z * v_to.x - v_from.x * v_to.z
+    self.z = v_from.x * v_to.y - v_from.y * v_to.x
+    self.w = r
+  }
+  self.normalize()
+}
+
+///|
 pub fn Quaternion::conjugate(self : Quaternion) -> Quaternion {
   self.x = -self.x
   self.y = -self.y

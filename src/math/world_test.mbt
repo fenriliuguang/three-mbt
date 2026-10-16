@@ -5621,6 +5621,28 @@ test "Quaternion.setW writes w and notifies" {
 }
 
 ///|
+test "Quaternion.setFromUnitVectors rotates one direction onto another" {
+  let q = @math.Quaternion::new(x=1.0)
+  let from = @math.Vector3::new(x=1.0)
+  let to = @math.Vector3::new(x=1.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  ignore(q.set_from_unit_vectors(from, to))
+  assert_eq(q.x, 0.0)
+  assert_eq(q.y, 0.0)
+  assert_eq(q.z, 0.0)
+  assert_eq(q.w, 1.0)
+  assert_eq(hits[0], 1)
+  to.x = -1.0
+  ignore(q.set_from_unit_vectors(from, to))
+  assert_eq(q.x, 0.0)
+  assert_eq(q.y, 1.0)
+  assert_eq(q.z, 0.0)
+  assert_eq(q.w, 0.0)
+  assert_eq(from.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
