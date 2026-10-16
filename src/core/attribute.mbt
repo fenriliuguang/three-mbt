@@ -174,10 +174,13 @@ pub fn BufferAttribute::remove_event_listener(
 }
 
 ///|
-/// 通知 `dispose` 监听。其它事件不动。
-/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L684
-pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
-  match self.listeners.get("dispose") {
+/// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
+pub fn BufferAttribute::dispatch_event(
+  self : BufferAttribute,
+  kind : String,
+) -> Unit {
+  match self.listeners.get(kind) {
     None => ()
     Some(listeners) => {
       let snapshot = listeners.copy()
@@ -186,6 +189,13 @@ pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
       }
     }
   }
+}
+
+///|
+/// 通知 `dispose` 监听。其它事件不动。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L684
+pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
+  self.dispatch_event("dispose")
 }
 
 ///|

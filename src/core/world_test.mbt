@@ -1420,6 +1420,16 @@ test "removeEventListener drops a registered listener" {
 }
 
 ///|
+test "dispatchEvent runs listeners of one kind" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let hits = Ref::Ref(0)
+  attribute.add_event_listener("change", fn() { hits.val = hits.val + 1 })
+  attribute.add_event_listener("dispose", fn() { hits.val = hits.val + 10 })
+  attribute.dispatch_event("change")
+  assert_eq(hits.val, 1)
+}
+
+///|
 test "dispose runs only dispose listeners" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
   let hits = Ref::Ref(0)
