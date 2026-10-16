@@ -876,7 +876,7 @@ pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
-/// `BufferGeometry.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。`geometry_type` 对应数据上的 `type`。
+/// `BufferGeometry.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。`geometry_type` 对应数据上的 `type`。实例数量不是正无穷时带上实例字段。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
 pub(all) struct GeometryJson {
   version : Double
@@ -892,6 +892,8 @@ pub(all) struct GeometryJson {
   morph_targets_relative : Bool?
   groups : Array[GeometryGroup]
   bounding_sphere : (Array[Double], Double)?
+  instance_count : Double?
+  is_instanced_buffer_geometry : Bool?
 }
 
 ///|
@@ -903,8 +905,9 @@ fn user_data_is_empty(user_data : Map[String, String]) -> Bool {
 }
 
 ///|
-/// 序列化标识、类型、名字、用户数据、属性、形变属性、索引、分组和包围球。用户数据和空的形变属性省略。
+/// 序列化标识、类型、名字、用户数据、属性、形变属性、索引、分组和包围球。用户数据和空的形变属性省略。没有单独的 `InstancedBufferGeometry` 类型，实例数量不是正无穷时再写出 `instanceCount` 和 `isInstancedBufferGeometry`。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedBufferGeometry.js#L46
 pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
   let attributes : Map[String, AttributeJson] = Map([])
   for pair in self.attributes.iter() {
@@ -958,6 +961,9 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
   } else {
     None
   }
+  let instanced = !self.instance_count.is_inf()
+  let instance_count = if instanced { Some(self.instance_count) } else { None }
+  let is_instanced_buffer_geometry = if instanced { Some(true) } else { None }
   {
     version: 4.7,
     type_name: "BufferGeometry",
@@ -972,6 +978,8 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
     morph_targets_relative: morph_relative,
     groups,
     bounding_sphere,
+    instance_count,
+    is_instanced_buffer_geometry,
   }
 }
 

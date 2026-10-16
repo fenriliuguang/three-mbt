@@ -200,6 +200,8 @@ pub(all) struct GeometryJson {
   morph_targets_relative : Bool?
   groups : Array[GeometryGroup]
   bounding_sphere : (Array[Double], Double)?
+  instance_count : Double?
+  is_instanced_buffer_geometry : Bool?
 }
 
 pub(all) struct InstanceData {

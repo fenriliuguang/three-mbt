@@ -2058,3 +2058,27 @@ test "instanceCount defaults to infinity and copy carries it" {
   assert_eq(destination.instance_count, 4.0)
   assert_eq(geometry.instance_count, 4.0)
 }
+
+///|
+test "toJSON writes instanceCount when it is finite" {
+  let plain = @core.BufferGeometry::new().to_json()
+  match plain.instance_count {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  match plain.is_instanced_buffer_geometry {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  let geometry = @core.BufferGeometry::new()
+  geometry.instance_count = 4.0
+  let data = geometry.to_json()
+  match data.instance_count {
+    None => assert_eq(false, true)
+    Some(count) => assert_eq(count, 4.0)
+  }
+  match data.is_instanced_buffer_geometry {
+    None => assert_eq(false, true)
+    Some(flag) => assert_eq(flag, true)
+  }
+}
