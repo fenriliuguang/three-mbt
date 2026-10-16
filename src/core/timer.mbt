@@ -32,6 +32,13 @@ pub fn Timer::get_delta(self : Timer) -> Double {
 }
 
 ///|
+/// 返回累计时间，单位是秒。
+/// r186: `getElapsed` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L91
+pub fn Timer::get_elapsed(self : Timer) -> Double {
+  self.elapsed / 1000.0
+}
+
+///|
 /// 用毫秒时间戳更新内部时间。时间戳减去时间原点。
 /// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L156
 pub fn Timer::update(self : Timer, timestamp : Double) -> Timer {

@@ -446,6 +446,7 @@ pub(all) struct Timer {
   mut timescale : Double
 }
 pub fn Timer::get_delta(Self) -> Double
+pub fn Timer::get_elapsed(Self) -> Double
 pub fn Timer::new(start_time? : Double) -> Self
 pub fn Timer::update(Self, Double) -> Self
 

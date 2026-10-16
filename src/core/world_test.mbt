@@ -1978,3 +1978,12 @@ test "update advances the timer delta" {
   ignore(timer.update(2500.0))
   assert_eq(timer.get_delta(), 1.5)
 }
+
+///|
+test "getElapsed accumulates timer updates" {
+  let timer = @core.Timer::new()
+  ignore(timer.update(1000.0))
+  assert_eq(timer.get_elapsed(), 1.0)
+  ignore(timer.update(2500.0))
+  assert_eq(timer.get_elapsed(), 2.5)
+}
