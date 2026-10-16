@@ -217,6 +217,7 @@ pub(all) struct InterleavedBuffer {
   mut count : Int
   mut usage : Int
   update_ranges : Array[UpdateRange]
+  mut version : Int
   mut on_upload_callback : (() -> Unit)?
 }
 pub fn InterleavedBuffer::add_update_range(Self, Int, Int) -> Unit
@@ -227,6 +228,7 @@ pub fn InterleavedBuffer::copy_at(Self, Int, Self, Int) -> Self
 pub fn InterleavedBuffer::new(Array[Double], Int) -> Self
 pub fn InterleavedBuffer::on_upload(Self, () -> Unit) -> Self
 pub fn InterleavedBuffer::set(Self, Array[Double], offset? : Int) -> Self
+pub fn InterleavedBuffer::set_needs_update(Self, Bool) -> Unit
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
 
 pub(all) struct Layers {

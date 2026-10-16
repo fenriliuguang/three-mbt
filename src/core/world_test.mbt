@@ -2190,3 +2190,14 @@ test "onUpload stores a callback on an interleaved buffer" {
   }
   assert_eq(hits.val, 1)
 }
+
+///|
+test "needsUpdate increments an interleaved buffer version only when true" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3)
+  assert_eq(buffer.version, 0)
+  buffer.set_needs_update(false)
+  assert_eq(buffer.version, 0)
+  buffer.set_needs_update(true)
+  buffer.set_needs_update(true)
+  assert_eq(buffer.version, 2)
+}
