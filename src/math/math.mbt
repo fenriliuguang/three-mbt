@@ -69,3 +69,14 @@ pub fn map_linear(
 ) -> Double {
   b1 + (x - a1) * (b2 - b1) / (a2 - a1)
 }
+
+///|
+/// 求一个数在区间里的位置。两端相同返回 0。
+/// r186: `inverseLerp` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L91
+pub fn inverse_lerp(x : Double, y : Double, value : Double) -> Double {
+  if x != y {
+    (value - x) / (y - x)
+  } else {
+    0.0
+  }
+}
