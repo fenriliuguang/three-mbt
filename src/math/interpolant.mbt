@@ -51,3 +51,21 @@ pub fn Interpolant::copy_sample_value(
   }
   self.result_buffer
 }
+
+///|
+/// 基类不插值。子类覆盖这个方法。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L298
+pub fn Interpolant::interpolate(
+  self : Interpolant,
+  i1 : Int,
+  t0 : Double,
+  t : Double,
+  t1 : Double,
+) -> Array[Double] {
+  ignore(self)
+  ignore(i1)
+  ignore(t0)
+  ignore(t)
+  ignore(t1)
+  abort("THREE.Interpolant: Call to abstract method.")
+}

@@ -1055,6 +1055,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Interpolant.copySampleValue_` has landed. It writes one sample into the result buffer and returns that buffer. With `sampleSize` `2`, index `0` writes `(10, 20)` and leaves a longer buffer's third value `3` in place. Index `2` writes `(50, 60)`. The sample values stay `(10, ..., 60)`.
 
+`Interpolant.interpolate_` has landed. The base method aborts. Calling it with interval index `1`, previous time `0`, time `0.5`, and next time `1` does not write a sample.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1523,6 +1525,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `FrustumArray.clone` | `math` |
 | planned | 7 | `Interpolant` | `math` |
 | planned | 7 | `Interpolant.copySampleValue_` | `math` |
+| planned | 7 | `Interpolant.interpolate_` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

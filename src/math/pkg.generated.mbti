@@ -248,6 +248,7 @@ pub(all) struct Interpolant {
   value_size : Int
 }
 pub fn Interpolant::copy_sample_value(Self, Int) -> Array[Double]
+pub fn Interpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn Interpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Line3 {
