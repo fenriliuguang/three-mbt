@@ -5569,6 +5569,19 @@ test "Quaternion.multiplyQuaternionsFlat multiplies flat quaternions" {
 }
 
 ///|
+test "Quaternion.setX writes x and notifies" {
+  let q = @math.Quaternion::new(y=0.5, z=0.25, w=1.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  ignore(q.set_x(0.25))
+  assert_eq(q.x, 0.25)
+  assert_eq(q.y, 0.5)
+  assert_eq(q.z, 0.25)
+  assert_eq(q.w, 1.0)
+  assert_eq(hits[0], 1)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
