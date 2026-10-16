@@ -4517,6 +4517,14 @@ test "Color.convertLinearToSRGB converts its own channels" {
 }
 
 ///|
+test "Color.getHexString writes six lowercase digits" {
+  let black = @math.Color::new(r=0.0, g=0.0, b=0.0)
+  assert_eq(black.get_hex_string(), "000000")
+  let green = @math.Color::new().set_hex(0x00FF00)
+  assert_eq(green.get_hex_string(), "00ff00")
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

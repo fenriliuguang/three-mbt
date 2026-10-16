@@ -159,6 +159,13 @@ pub fn Color::get_hex(self : Color) -> Int {
 }
 
 ///|
+/// 把颜色写成六位小写十六进制字符串。
+/// r186: `getHexString` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L553
+pub fn Color::get_hex_string(self : Color) -> String {
+  self.get_hex().to_string(radix=16).pad_start(6, '0')
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
