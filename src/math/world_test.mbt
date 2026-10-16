@@ -4005,6 +4005,21 @@ test "Ray.lookAt points the direction at a position" {
 }
 
 ///|
+test "Ray.recast shifts the origin along the direction" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(y=1.0),
+  )
+  ignore(ray.recast(0.5))
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.origin.y, 2.5)
+  assert_eq(ray.origin.z, 3.0)
+  assert_eq(ray.direction.x, 0.0)
+  assert_eq(ray.direction.y, 1.0)
+  assert_eq(ray.direction.z, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

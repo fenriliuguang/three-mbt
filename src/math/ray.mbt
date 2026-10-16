@@ -53,3 +53,11 @@ pub fn Ray::look_at(self : Ray, v : Vector3) -> Ray {
   ignore(self.direction.copy(v).sub(self.origin).normalize())
   self
 }
+
+///|
+/// 把原点沿方向挪一段距离。方向不改。
+/// r186: `recast` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L104
+pub fn Ray::recast(self : Ray, t : Double) -> Ray {
+  ignore(self.origin.copy(self.at(t, Vector3::new())))
+  self
+}
