@@ -2370,6 +2370,18 @@ test "applyNormalMatrix rotates and normalizes each interleaved vertex" {
 }
 
 ///|
+test "transformDirection ignores translation on an interleaved vertex" {
+  let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 1.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  let shift = @math.Matrix4::new().make_translation(10.0, 0.0, 0.0)
+  let written = attribute.transform_direction(shift)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.get_x(0), 0.0)
+  assert_eq(attribute.get_y(0), 0.0)
+  assert_eq(attribute.get_z(0), 1.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
