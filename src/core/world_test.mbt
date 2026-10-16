@@ -724,3 +724,63 @@ test "transformDirection ignores translation and normalizes scale" {
   assert_close(scaled.get_y(0), 0.447213595499958)
   assert_eq(scaled.get_z(0), 0.0)
 }
+
+///|
+test "applyMatrix4 transforms position, normal, and tangent" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)))
+  ignore(geometry.set_attribute("normal", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)))
+  ignore(geometry.set_attribute("tangent", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)))
+  ignore(geometry.set_attribute("uv", @core.BufferAttribute::new([0.25, 0.5], 2)))
+  geometry.compute_bounding_box()
+  geometry.compute_bounding_sphere()
+  let scale = @math.Matrix4::new().make_scale(2.0, 1.0, 1.0)
+  let written = geometry.apply_matrix4(scale)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.get_x(0), 2.0)
+      assert_eq(position.get_y(0), 2.0)
+      assert_eq(position.get_z(0), 3.0)
+    }
+  }
+  match geometry.get_attribute("normal") {
+    None => assert_eq(false, true)
+    Some(normal) => {
+      assert_close(normal.get_x(0), 0.447213595499958)
+      assert_close(normal.get_y(0), 0.894427190999916)
+      assert_eq(normal.get_z(0), 0.0)
+    }
+  }
+  match geometry.get_attribute("tangent") {
+    None => assert_eq(false, true)
+    Some(tangent) => {
+      assert_close(tangent.get_x(0), 0.894427190999916)
+      assert_close(tangent.get_y(0), 0.447213595499958)
+      assert_eq(tangent.get_z(0), 0.0)
+    }
+  }
+  match geometry.get_attribute("uv") {
+    None => assert_eq(false, true)
+    Some(uv) => {
+      assert_eq(uv.get_x(0), 0.25)
+      assert_eq(uv.get_y(0), 0.5)
+    }
+  }
+  match geometry.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => {
+      assert_eq(box.min.x, 2.0)
+      assert_eq(box.min.y, 2.0)
+      assert_eq(box.max.z, 3.0)
+    }
+  }
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 2.0)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+}
