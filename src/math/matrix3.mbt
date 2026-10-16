@@ -138,6 +138,23 @@ pub fn Matrix3::premultiply(self : Matrix3, m : Matrix3) -> Matrix3 {
 }
 
 ///|
+/// 每个元素乘以一个标量。
+/// r186: `multiplyScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L257
+pub fn Matrix3::multiply_scalar(self : Matrix3, s : Double) -> Matrix3 {
+  let te = self.elements
+  te[0] *= s
+  te[3] *= s
+  te[6] *= s
+  te[1] *= s
+  te[4] *= s
+  te[7] *= s
+  te[2] *= s
+  te[5] *= s
+  te[8] *= s
+  self
+}
+
+///|
 pub fn Matrix3::set_from_matrix4(self : Matrix3, m : Matrix4) -> Matrix3 {
   let me = m.elements
   self.set(me[0], me[4], me[8], me[1], me[5], me[9], me[2], me[6], me[10])

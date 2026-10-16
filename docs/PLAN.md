@@ -885,6 +885,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Matrix3.premultiply` has landed. It pre-multiplies this matrix by another. The matrix with rows `(1, 2, 3)`, `(4, 5, 6)`, `(7, 8, 9)` times scaling by `(2, 3, 4)` writes elements `[2, 8, 14, 6, 15, 24, 12, 24, 36]`. The other matrix stays unchanged.
 
+`Matrix3.multiplyScalar` has landed. It multiplies every element by a scalar. The matrix with rows `(1, 2, 3)`, `(4, 5, 6)`, `(7, 8, 9)` times `2` writes elements `[2, 8, 14, 4, 10, 16, 6, 12, 18]`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1268,6 +1270,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix3.multiplyMatrices` | `math` |
 | planned | 7 | `Matrix3.multiply` | `math` |
 | planned | 7 | `Matrix3.premultiply` | `math` |
+| planned | 7 | `Matrix3.multiplyScalar` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

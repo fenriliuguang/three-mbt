@@ -5102,6 +5102,21 @@ test "Matrix3.premultiply pre-multiplies in place" {
 }
 
 ///|
+test "Matrix3.multiplyScalar scales every element" {
+  let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  ignore(m.multiply_scalar(2.0))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[1], 8.0)
+  assert_eq(m.elements[2], 14.0)
+  assert_eq(m.elements[3], 4.0)
+  assert_eq(m.elements[4], 10.0)
+  assert_eq(m.elements[5], 16.0)
+  assert_eq(m.elements[6], 6.0)
+  assert_eq(m.elements[7], 12.0)
+  assert_eq(m.elements[8], 18.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

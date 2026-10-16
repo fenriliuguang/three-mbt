@@ -214,6 +214,7 @@ pub fn Matrix3::identity(Self) -> Self
 pub fn Matrix3::invert(Self) -> Self
 pub fn Matrix3::multiply(Self, Self) -> Self
 pub fn Matrix3::multiply_matrices(Self, Self, Self) -> Self
+pub fn Matrix3::multiply_scalar(Self, Double) -> Self
 pub fn Matrix3::new() -> Self
 pub fn Matrix3::premultiply(Self, Self) -> Self
 pub fn Matrix3::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
