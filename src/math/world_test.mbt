@@ -6383,6 +6383,55 @@ test "FrustumArray.intersectsSphere uses only the counted frustums" {
 }
 
 ///|
+test "FrustumArray.intersectsBox uses only the counted frustums" {
+  let frustums = @math.FrustumArray::new()
+  let inside = @math.Box3::new(
+    @math.Vector3::new(x=0.25, y=0.25, z=0.25),
+    @math.Vector3::new(x=0.75, y=0.75, z=0.75),
+  )
+  let outside = @math.Box3::new(
+    @math.Vector3::new(x=-2.0, y=-2.0, z=-2.0),
+    @math.Vector3::new(x=-1.0, y=-1.0, z=-1.0),
+  )
+  assert_eq(frustums.intersects_box(inside), false)
+  let cube = @math.Frustum::new()
+  ignore(
+    cube.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  frustums.frustums.push(cube)
+  assert_eq(frustums.intersects_box(inside), false)
+  frustums.count = 1
+  assert_eq(frustums.intersects_box(inside), true)
+  assert_eq(frustums.intersects_box(outside), false)
+  let wide = @math.Frustum::new()
+  ignore(
+    wide.set(
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+    ),
+  )
+  frustums.frustums.push(wide)
+  assert_eq(frustums.intersects_box(outside), false)
+  frustums.count = 2
+  assert_eq(frustums.intersects_box(outside), true)
+  assert_eq(outside.min.x, -2.0)
+  assert_eq(outside.max.x, -1.0)
+  assert_eq(inside.min.x, 0.25)
+  assert_eq(inside.max.x, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

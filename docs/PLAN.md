@@ -1043,6 +1043,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `FrustumArray.intersectsSphere` has landed. With `count` `0` it is false, including when a frustum is already stored. A unit-cube frustum and a sphere of radius `0.25` at `(0.5, 0.5, 0.5)` is true. The same radius at `(-2, 0, 0)` stays false while `count` is `1`, and becomes true once a second frustum with constant `10` is counted. `setFromArrayCamera` reads an `ArrayCamera`, `intersectsObject` reads an `Object3D`, and `intersectsSprite` reads a sprite, so those three stay out of `math`.
 
+`FrustumArray.intersectsBox` has landed. With `count` `0` it is false, including when a frustum is already stored. A unit-cube frustum accepts the box from `(0.25, 0.25, 0.25)` to `(0.75, 0.75, 0.75)`. The box from `(-2, -2, -2)` to `(-1, -1, -1)` stays false while `count` is `1`, and becomes true once a second frustum with constant `10` is counted.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1505,6 +1507,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SphericalHarmonics3.getBasisAt` | `math` |
 | planned | 7 | `FrustumArray` | `math` |
 | planned | 7 | `FrustumArray.intersectsSphere` | `math` |
+| planned | 7 | `FrustumArray.intersectsBox` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
