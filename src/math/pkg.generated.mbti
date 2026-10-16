@@ -30,6 +30,8 @@ pub fn linear_to_srgb(Double) -> Double
 
 pub fn map_linear(Double, Double, Double, Double, Double) -> Double
 
+pub fn normalize(Double, ArrayComponentType) -> Double
+
 pub fn pingpong(Double, length? : Double) -> Double
 
 pub fn rad_to_deg(Double) -> Double

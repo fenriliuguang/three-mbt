@@ -5944,6 +5944,21 @@ test "MathUtils.denormalize expands an integer range" {
 }
 
 ///|
+test "MathUtils.normalize packs a unit range into an integer" {
+  assert_eq(@math.normalize(0.25, @math.ArrayComponentType::Float32), 0.25)
+  assert_eq(@math.normalize(0.0, @math.ArrayComponentType::Uint8), 0.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint8), 255.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint8Clamped), 255.0)
+  assert_eq(@math.normalize(0.25, @math.ArrayComponentType::Uint8), 64.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint16), 65535.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint32), 4294967295.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Int8), 127.0)
+  assert_eq(@math.normalize(-1.0, @math.ArrayComponentType::Int8), -127.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Int16), 32767.0)
+  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Int32), 2147483647.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

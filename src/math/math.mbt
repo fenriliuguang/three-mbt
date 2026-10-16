@@ -256,3 +256,18 @@ pub fn denormalize(value : Double, component : ArrayComponentType) -> Double {
     Int8 => (value / 127.0).max(-1.0)
   }
 }
+
+///|
+/// 按分量类型把 `[0, 1]` 或 `[-1, 1]` 收成整数范围。
+/// r186: `normalize` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L436
+pub fn normalize(value : Double, component : ArrayComponentType) -> Double {
+  match component {
+    Float32 => value
+    Uint32 => (value * 4294967295.0).round()
+    Uint16 => (value * 65535.0).round()
+    Uint8 | Uint8Clamped => (value * 255.0).round()
+    Int32 => (value * 2147483647.0).round()
+    Int16 => (value * 32767.0).round()
+    Int8 => (value * 127.0).round()
+  }
+}
