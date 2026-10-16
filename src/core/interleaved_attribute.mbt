@@ -108,6 +108,23 @@ pub fn InterleavedBufferAttribute::set_xy(
 }
 
 ///|
+/// 写入指定顶点的 x、y 和 z。归一化换算还没有落地，写入的是原值。
+/// r186: `setXYZ` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L379
+pub fn InterleavedBufferAttribute::set_xyz(
+  self : InterleavedBufferAttribute,
+  index : Int,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> InterleavedBufferAttribute {
+  let start = index * self.data.stride + self.offset
+  self.data.array[start] = x
+  self.data.array[start + 1] = y
+  self.data.array[start + 2] = z
+  self
+}
+
+///|
 /// 写入指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，写入的是原值。
 /// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L219
 pub fn InterleavedBufferAttribute::set_x(
