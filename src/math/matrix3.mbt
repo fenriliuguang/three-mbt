@@ -303,3 +303,11 @@ pub fn Matrix3::make_rotation(self : Matrix3, theta : Double) -> Matrix3 {
   let s = @std.sin(theta)
   self.set(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0)
 }
+
+///|
+/// 左乘一个取反角度的二维旋转。
+/// r186: `rotate` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L434
+pub fn Matrix3::rotate(self : Matrix3, theta : Double) -> Matrix3 {
+  let m = Matrix3::new().make_rotation(-theta)
+  self.premultiply(m)
+}

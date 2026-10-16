@@ -5195,6 +5195,21 @@ test "Matrix3.makeRotation stores a zero angle as identity" {
 }
 
 ///|
+test "Matrix3.rotate by zero leaves the matrix" {
+  let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  ignore(m.rotate(0.0))
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[1], 4.0)
+  assert_eq(m.elements[2], 7.0)
+  assert_eq(m.elements[3], 2.0)
+  assert_eq(m.elements[4], 5.0)
+  assert_eq(m.elements[5], 8.0)
+  assert_eq(m.elements[6], 3.0)
+  assert_eq(m.elements[7], 6.0)
+  assert_eq(m.elements[8], 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
