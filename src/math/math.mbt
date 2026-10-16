@@ -56,3 +56,16 @@ pub fn euclidean_modulo(n : Double, m : Double) -> Double {
 pub fn lerp(x : Double, y : Double, t : Double) -> Double {
   (1.0 - t) * x + t * y
 }
+
+///|
+/// 把一个区间上的数线性映射到另一个区间。
+/// r186: `mapLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L76
+pub fn map_linear(
+  x : Double,
+  a1 : Double,
+  a2 : Double,
+  b1 : Double,
+  b2 : Double,
+) -> Double {
+  b1 + (x - a1) * (b2 - b1) / (a2 - a1)
+}
