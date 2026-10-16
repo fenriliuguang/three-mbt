@@ -1570,3 +1570,15 @@ test "dispose runs only geometry dispose listeners" {
   geometry.dispose()
   assert_eq(hits.val, 1)
 }
+
+///|
+test "id counts attributes and stays on the destination" {
+  let first = @core.BufferAttribute::new([1.0], 1)
+  let second = @core.BufferAttribute::new([2.0], 1)
+  assert_eq(second.id, first.id + 1)
+  let destination = @core.BufferAttribute::new([9.0], 1)
+  let kept = destination.id
+  ignore(destination.copy(first))
+  assert_eq(destination.id, kept)
+  assert_eq(destination.id == first.id, false)
+}

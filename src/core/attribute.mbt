@@ -1,6 +1,16 @@
 // r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 
 ///|
+let next_attribute_id : Ref[Int] = Ref::Ref(0)
+
+///|
+fn fresh_attribute_id() -> Int {
+  let id = next_attribute_id.val
+  next_attribute_id.val = id + 1
+  id
+}
+
+///|
 /// 一段待上传的缓冲区间。上游没有单独的类。
 /// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L181
 pub(all) struct UpdateRange {
@@ -10,8 +20,11 @@ pub(all) struct UpdateRange {
 
 ///|
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。
 /// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
+/// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L56
 pub(all) struct BufferAttribute {
+  id : Int
   mut array : Array[Double]
   mut item_size : Int
   mut normalized : Bool
@@ -30,6 +43,7 @@ pub fn BufferAttribute::new(
   normalized? : Bool = false,
 ) -> BufferAttribute {
   {
+    id: fresh_attribute_id(),
     array,
     item_size,
     normalized,

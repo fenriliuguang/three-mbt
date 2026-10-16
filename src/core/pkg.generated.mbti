@@ -20,6 +20,7 @@ pub(all) struct AttributeJson {
 }
 
 pub(all) struct BufferAttribute {
+  id : Int
   mut array : Array[Double]
   mut item_size : Int
   mut normalized : Bool
