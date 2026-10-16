@@ -174,6 +174,15 @@ pub fn Matrix4::make_rotation_y(self : Matrix4, theta : Double) -> Matrix4 {
 }
 
 ///|
+/// 绕 Z 轴旋转。
+/// r186: `makeRotationZ` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L918
+pub fn Matrix4::make_rotation_z(self : Matrix4, theta : Double) -> Matrix4 {
+  let c = @std.cos(theta)
+  let s = @std.sin(theta)
+  self.set(c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,
