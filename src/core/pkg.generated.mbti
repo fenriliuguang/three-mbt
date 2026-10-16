@@ -246,6 +246,7 @@ pub fn InterleavedBufferAttribute::get_x(Self, Int) -> Double
 pub fn InterleavedBufferAttribute::new(InterleavedBuffer, Int, Int, normalized? : Bool) -> Self
 pub fn InterleavedBufferAttribute::set_needs_update(Self, Bool) -> Unit
 pub fn InterleavedBufferAttribute::set_x(Self, Int, Double) -> Self
+pub fn InterleavedBufferAttribute::set_y(Self, Int, Double) -> Self
 
 pub(all) struct InterleavedJson {
   uuid : String

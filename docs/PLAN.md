@@ -1307,6 +1307,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `InterleavedBufferAttribute.setX` has landed. On `[0, 0, 0, 9, 9, 9]` with stride `3`, `setX(1, 4)` at offset `0` writes `4` at index `3`. The following value stays `9`.
 
+`InterleavedBufferAttribute.setY` has landed. On the same buffer, `setY(1, 4)` at offset `0` writes `4` at index `4`. The values on either side stay `9`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1901,6 +1903,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InterleavedBufferAttribute.needsUpdate` | `core` |
 | planned | 7 | `InterleavedBufferAttribute.getX` | `core` |
 | planned | 7 | `InterleavedBufferAttribute.setX` | `core` |
+| planned | 7 | `InterleavedBufferAttribute.setY` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
