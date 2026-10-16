@@ -1532,3 +1532,12 @@ test "addEventListener keeps one copy of a geometry listener" {
     Some(listeners) => assert_eq(listeners.length(), 1)
   }
 }
+
+///|
+test "hasEventListener reports a registered geometry listener" {
+  let geometry = @core.BufferGeometry::new()
+  let listener = fn() {}
+  assert_eq(geometry.has_event_listener("dispose", listener), false)
+  geometry.add_event_listener("dispose", listener)
+  assert_eq(geometry.has_event_listener("dispose", listener), true)
+}

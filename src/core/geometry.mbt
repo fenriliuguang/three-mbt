@@ -827,3 +827,25 @@ pub fn BufferGeometry::add_event_listener(
     listeners.push(listener)
   }
 }
+
+///|
+/// 同一种事件里是否已经有这个监听。
+/// r186: `hasEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L58
+pub fn BufferGeometry::has_event_listener(
+  self : BufferGeometry,
+  kind : String,
+  listener : () -> Unit,
+) -> Bool {
+  match self.listeners.get(kind) {
+    None => false
+    Some(listeners) => {
+      let mut found = false
+      for existing in listeners {
+        if physical_equal(existing, listener) {
+          found = true
+        }
+      }
+      found
+    }
+  }
+}
