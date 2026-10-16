@@ -2082,3 +2082,12 @@ test "toJSON writes instanceCount when it is finite" {
     Some(flag) => assert_eq(flag, true)
   }
 }
+
+///|
+test "InterleavedBuffer count is the array length divided by stride" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  assert_eq(buffer.stride, 3)
+  assert_eq(buffer.count, 2)
+  assert_eq(buffer.array[0], 1.0)
+  assert_eq(buffer.array[5], 6.0)
+}

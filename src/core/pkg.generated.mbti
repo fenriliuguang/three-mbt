@@ -211,6 +211,13 @@ pub(all) struct InstanceData {
   mut version : Int
 }
 
+pub(all) struct InterleavedBuffer {
+  array : Array[Double]
+  stride : Int
+  count : Int
+}
+pub fn InterleavedBuffer::new(Array[Double], Int) -> Self
+
 pub(all) struct Layers {
   mut mask : Int
 }
