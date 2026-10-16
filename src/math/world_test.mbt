@@ -4439,6 +4439,13 @@ test "Color.setScalar writes the same value into every channel" {
 }
 
 ///|
+test "MathUtils.clamp limits a number to a closed range" {
+  assert_eq(@math.clamp(1.5, 0.0, 1.0), 1.0)
+  assert_eq(@math.clamp(-0.5, 0.0, 1.0), 0.0)
+  assert_eq(@math.clamp(0.25, 0.0, 1.0), 0.25)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

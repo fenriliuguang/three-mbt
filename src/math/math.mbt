@@ -35,3 +35,10 @@ pub fn linear_to_srgb(c : Double) -> Double {
     1.055 * @std.pow(c, 0.41666) - 0.055
   }
 }
+
+///|
+/// 把数值限制在闭区间里。
+/// r186: `clamp` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L43
+pub fn clamp(value : Double, min : Double, max : Double) -> Double {
+  max.min(value).max(min)
+}

@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn clamp(Double, Double, Double) -> Double
+
 pub fn deg_to_rad(Double) -> Double
 
 pub fn linear_to_srgb(Double) -> Double
