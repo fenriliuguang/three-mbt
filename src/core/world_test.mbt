@@ -2024,3 +2024,25 @@ test "meshPerAttribute defaults to one and copy carries it" {
   ignore(destination.copy(source))
   assert_eq(destination.mesh_per_attribute, 2)
 }
+
+///|
+test "toJSON writes meshPerAttribute when the repeat count is not one" {
+  let plain = @core.BufferAttribute::new([1.0], 1).to_json()
+  match plain.mesh_per_attribute {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  match plain.is_instanced_buffer_attribute {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  let data = @core.BufferAttribute::new([1.0], 1, mesh_per_attribute=2).to_json()
+  match data.mesh_per_attribute {
+    None => assert_eq(false, true)
+    Some(count) => assert_eq(count, 2)
+  }
+  match data.is_instanced_buffer_attribute {
+    None => assert_eq(false, true)
+    Some(flag) => assert_eq(flag, true)
+  }
+}

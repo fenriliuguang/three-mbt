@@ -20,6 +20,8 @@ pub(all) struct AttributeJson {
   name : String
   usage : Int
   gpu_type : Int
+  mesh_per_attribute : Int?
+  is_instanced_buffer_attribute : Bool?
 }
 
 pub(all) struct BufferAttribute {

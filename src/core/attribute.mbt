@@ -646,7 +646,7 @@ pub fn BufferAttribute::transform_direction(
 }
 
 ///|
-/// `BufferAttribute.toJSON` 返回的数据。上游没有单独的类。
+/// `BufferAttribute.toJSON` 返回的数据。上游没有单独的类。重复次数不是 `1` 时带上实例字段。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
 pub(all) struct AttributeJson {
   item_size : Int
@@ -655,12 +655,16 @@ pub(all) struct AttributeJson {
   name : String
   usage : Int
   gpu_type : Int
+  mesh_per_attribute : Int?
+  is_instanced_buffer_attribute : Bool?
 }
 
 ///|
-/// 复制分量个数、数值、是否归一化、名字、使用方式和 GPU 类型。
+/// 复制分量个数、数值、是否归一化、名字、使用方式和 GPU 类型。没有单独的 `InstancedBufferAttribute` 类型，重复次数不是 `1` 时再写出 `meshPerAttribute` 和 `isInstancedBufferAttribute`。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedBufferAttribute.js#L54
 pub fn BufferAttribute::to_json(self : BufferAttribute) -> AttributeJson {
+  let instanced = self.mesh_per_attribute != 1
   {
     item_size: self.item_size,
     array: self.array.copy(),
@@ -668,5 +672,11 @@ pub fn BufferAttribute::to_json(self : BufferAttribute) -> AttributeJson {
     name: self.name,
     usage: self.usage,
     gpu_type: self.gpu_type,
+    mesh_per_attribute: if instanced {
+      Some(self.mesh_per_attribute)
+    } else {
+      None
+    },
+    is_instanced_buffer_attribute: if instanced { Some(true) } else { None },
   }
 }
