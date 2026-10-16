@@ -1968,3 +1968,13 @@ test "setIndirect stores several byte offsets" {
     Some(stored) => assert_eq(stored.get_x(0), 1.0)
   }
 }
+
+///|
+test "update advances the timer delta" {
+  let timer = @core.Timer::new()
+  let written = timer.update(1000.0)
+  assert_eq(physical_equal(written, timer), true)
+  assert_eq(timer.get_delta(), 1.0)
+  ignore(timer.update(2500.0))
+  assert_eq(timer.get_delta(), 1.5)
+}

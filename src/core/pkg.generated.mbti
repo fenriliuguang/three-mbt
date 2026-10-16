@@ -437,6 +437,18 @@ pub(all) struct SkinState {
 }
 pub fn SkinState::write(Self, Object3D, BufferGeometry) -> Unit
 
+pub(all) struct Timer {
+  mut previous_time : Double
+  mut current_time : Double
+  mut start_time : Double
+  mut delta : Double
+  mut elapsed : Double
+  mut timescale : Double
+}
+pub fn Timer::get_delta(Self) -> Double
+pub fn Timer::new(start_time? : Double) -> Self
+pub fn Timer::update(Self, Double) -> Self
+
 pub(all) struct UpdateRange {
   start : Int
   count : Int
