@@ -4747,6 +4747,34 @@ test "Color.fromArray reads three channels at an offset" {
 }
 
 ///|
+test "Color.toArray writes three channels at an offset" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let fresh = color.to_array()
+  assert_eq(fresh.length(), 3)
+  assert_eq(fresh[0], 0.25)
+  assert_eq(fresh[1], 0.5)
+  assert_eq(fresh[2], 0.75)
+  let values = [9.0, 8.0, 7.0, 6.0]
+  let written = color.to_array(array=values, offset=1)
+  assert_eq(physical_equal(written, values), true)
+  assert_eq(values[0], 9.0)
+  assert_eq(values[1], 0.25)
+  assert_eq(values[2], 0.5)
+  assert_eq(values[3], 0.75)
+  let short = [4.0]
+  ignore(color.to_array(array=short, offset=2))
+  assert_eq(short.length(), 5)
+  assert_eq(short[0], 4.0)
+  assert_eq(short[1], 0.0)
+  assert_eq(short[2], 0.25)
+  assert_eq(short[3], 0.5)
+  assert_eq(short[4], 0.75)
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

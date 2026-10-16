@@ -359,3 +359,25 @@ pub fn Color::from_array(
   self.b = array[offset + 2]
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 3` 的数组会补零再写入。颜色本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L906
+pub fn Color::to_array(
+  self : Color,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 3
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.r
+  target[offset + 1] = self.g
+  target[offset + 2] = self.b
+  target
+}
