@@ -6583,6 +6583,38 @@ test "FrustumArray.clone copies counted frustums into a new array" {
 }
 
 ///|
+test "Interpolant.new stores positions, samples, and a zero result buffer" {
+  let positions = [0.0, 1.0, 2.0]
+  let values = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]
+  let interpolant = @math.Interpolant::new(positions, values, 2)
+  assert_eq(interpolant.parameter_positions[0], 0.0)
+  assert_eq(interpolant.parameter_positions[2], 2.0)
+  assert_eq(interpolant.sample_values[0], 10.0)
+  assert_eq(interpolant.sample_values[5], 60.0)
+  assert_eq(interpolant.value_size, 2)
+  assert_eq(interpolant.cached_index, 0)
+  assert_eq(interpolant.result_buffer.length(), 2)
+  assert_eq(interpolant.result_buffer[0], 0.0)
+  assert_eq(interpolant.result_buffer[1], 0.0)
+  positions[0] = 9.0
+  values[5] = 7.0
+  assert_eq(interpolant.parameter_positions[0], 9.0)
+  assert_eq(interpolant.sample_values[5], 7.0)
+  let given = [1.0, 2.0, 3.0]
+  let with_buffer = @math.Interpolant::new(
+    positions,
+    values,
+    2,
+    result_buffer=given,
+  )
+  assert_eq(with_buffer.result_buffer[0], 1.0)
+  assert_eq(with_buffer.result_buffer[2], 3.0)
+  assert_eq(with_buffer.value_size, 2)
+  given[0] = 4.0
+  assert_eq(with_buffer.result_buffer[0], 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

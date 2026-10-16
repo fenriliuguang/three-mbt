@@ -240,6 +240,15 @@ pub fn FrustumArray::intersects_box(Self, Box3) -> Bool
 pub fn FrustumArray::intersects_sphere(Self, Sphere) -> Bool
 pub fn FrustumArray::new() -> Self
 
+pub(all) struct Interpolant {
+  parameter_positions : Array[Double]
+  mut cached_index : Int
+  result_buffer : Array[Double]
+  sample_values : Array[Double]
+  value_size : Int
+}
+pub fn Interpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Line3 {
   start : Vector3
   end : Vector3

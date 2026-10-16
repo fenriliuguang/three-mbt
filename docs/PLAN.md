@@ -1051,6 +1051,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `FrustumArray.clone` has landed. It returns a new array with the same coordinate system and counted frustums. A WebGPU source with plane constants `1` through `6` produces a clone whose first constant stays `1` after the source is edited, and whose last constant stays `6` after the clone is edited. An empty array clones to a count of `0` in WebGL coordinates. `setFromArrayCamera`, `intersectsObject`, and `intersectsSprite` still stay out of `math`.
 
+`Interpolant` has landed. `new` stores the parameter positions and sample values by reference. Positions `(0, 1, 2)` and six sample numbers with `sampleSize` `2` keep a cached index of `0` and a zero result buffer of length `2`. A supplied result buffer `(1, 2, 3)` is stored as given. Editing the position array changes the stored `0` to `9`. `evaluate`, `getSettings_`, and `copySampleValue_` stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1517,6 +1519,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `FrustumArray.containsPoint` | `math` |
 | planned | 7 | `FrustumArray.copy` | `math` |
 | planned | 7 | `FrustumArray.clone` | `math` |
+| planned | 7 | `Interpolant` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
