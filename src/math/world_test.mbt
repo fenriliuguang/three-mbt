@@ -4871,6 +4871,42 @@ test "Euler.fromArray reads three angles and an optional order" {
 }
 
 ///|
+test "Euler.toArray writes three angles and returns the order" {
+  let euler = @math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)
+  let (fresh, fresh_order) = euler.to_array()
+  assert_eq(fresh.length(), 3)
+  assert_eq(fresh[0], 1.0)
+  assert_eq(fresh[1], 2.0)
+  assert_eq(fresh[2], 3.0)
+  match fresh_order {
+    @math.EulerOrder::ZYX => assert_eq(fresh[0], 1.0)
+    _ => assert_eq(true, false)
+  }
+  let values = [9.0, 8.0, 7.0, 6.0]
+  let (written, written_order) = euler.to_array(array=values, offset=1)
+  assert_eq(physical_equal(written, values), true)
+  assert_eq(values[0], 9.0)
+  assert_eq(values[1], 1.0)
+  assert_eq(values[2], 2.0)
+  assert_eq(values[3], 3.0)
+  match written_order {
+    @math.EulerOrder::ZYX => assert_eq(values[1], 1.0)
+    _ => assert_eq(true, false)
+  }
+  let short = [4.0]
+  let (grown, _) = euler.to_array(array=short, offset=2)
+  assert_eq(grown.length(), 5)
+  assert_eq(short[0], 4.0)
+  assert_eq(short[1], 0.0)
+  assert_eq(short[2], 1.0)
+  assert_eq(short[3], 2.0)
+  assert_eq(short[4], 3.0)
+  assert_eq(euler.x, 1.0)
+  assert_eq(euler.y, 2.0)
+  assert_eq(euler.z, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

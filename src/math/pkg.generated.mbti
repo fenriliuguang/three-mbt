@@ -160,6 +160,7 @@ pub fn Euler::set_order(Self, EulerOrder) -> Self
 pub fn Euler::set_x(Self, Double) -> Self
 pub fn Euler::set_y(Self, Double) -> Self
 pub fn Euler::set_z(Self, Double) -> Self
+pub fn Euler::to_array(Self, array? : Array[Double], offset? : Int) -> (Array[Double], EulerOrder)
 
 pub(all) enum EulerOrder {
   XYZ

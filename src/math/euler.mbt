@@ -257,3 +257,25 @@ pub fn Euler::from_array(
     Some(order) => self.set(array[0], array[1], array[2], order=order)
   }
 }
+
+///|
+/// 写出三个角度。顺序跟数组一起返回，因为数组里只有数字。短于 `offset + 3` 的数组会补零再写入。欧拉角本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L408
+pub fn Euler::to_array(
+  self : Euler,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> (Array[Double], EulerOrder) {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 3
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.x
+  target[offset + 1] = self.y
+  target[offset + 2] = self.z
+  (target, self.order)
+}
