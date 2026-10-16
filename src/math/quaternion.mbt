@@ -537,3 +537,26 @@ pub fn Quaternion::from_array(
   self.emit()
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 4` 的数组会补零再写入。四元数本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L844
+pub fn Quaternion::to_array(
+  self : Quaternion,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 4
+  while target.length() < end {
+    target.push(0.0)
+  }
+  target[offset] = self.x
+  target[offset + 1] = self.y
+  target[offset + 2] = self.z
+  target[offset + 3] = self.w
+  target
+}

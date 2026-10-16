@@ -5726,6 +5726,35 @@ test "Quaternion.fromArray reads four components" {
 }
 
 ///|
+test "Quaternion.toArray writes four components" {
+  let q = @math.Quaternion::new(x=0.25, y=0.5, z=0.25, w=0.75)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  let fresh = q.to_array()
+  assert_eq(fresh.length(), 4)
+  assert_eq(fresh[0], 0.25)
+  assert_eq(fresh[1], 0.5)
+  assert_eq(fresh[2], 0.25)
+  assert_eq(fresh[3], 0.75)
+  let values = [9.0, 0.0, 0.0, 0.0, 0.0]
+  let written = q.to_array(array=values, offset=1)
+  assert_eq(physical_equal(written, values), true)
+  assert_eq(values[0], 9.0)
+  assert_eq(values[1], 0.25)
+  assert_eq(values[4], 0.75)
+  let short = [4.0]
+  ignore(q.to_array(array=short, offset=2))
+  assert_eq(short.length(), 6)
+  assert_eq(short[0], 4.0)
+  assert_eq(short[1], 0.0)
+  assert_eq(short[2], 0.25)
+  assert_eq(short[5], 0.75)
+  assert_eq(q.x, 0.25)
+  assert_eq(q.w, 0.75)
+  assert_eq(hits[0], 0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
