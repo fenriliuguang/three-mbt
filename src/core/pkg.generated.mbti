@@ -109,6 +109,7 @@ pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::dispatch_event(Self, String) -> Unit
 pub fn BufferGeometry::dispose(Self) -> Unit
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
+pub fn BufferGeometry::get_indirect(Self) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
 pub fn BufferGeometry::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn BufferGeometry::look_at(Self, @math.Vector3) -> Self

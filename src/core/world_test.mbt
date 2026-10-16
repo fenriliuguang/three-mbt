@@ -1668,3 +1668,21 @@ test "setIndirect stores an attribute at a byte offset" {
   }
   assert_eq(geometry.indirect_offset, 16)
 }
+
+///|
+test "getIndirect returns the stored attribute" {
+  let geometry = @core.BufferGeometry::new()
+  match geometry.get_indirect() {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0], 5)
+  ignore(geometry.set_indirect(attribute, offset=16))
+  match geometry.get_indirect() {
+    None => assert_eq(false, true)
+    Some(stored) => {
+      assert_eq(physical_equal(stored, attribute), true)
+      assert_eq(stored.get_x(0), 1.0)
+    }
+  }
+}

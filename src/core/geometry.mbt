@@ -140,6 +140,13 @@ pub fn BufferGeometry::set_indirect(
 }
 
 ///|
+/// 返回间接绘制属性。没有设置时是空。
+/// r186: `getIndirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L267
+pub fn BufferGeometry::get_indirect(self : BufferGeometry) -> BufferAttribute? {
+  self.indirect
+}
+
+///|
 pub fn BufferGeometry::add_group(
   self : BufferGeometry,
   start : Int,
