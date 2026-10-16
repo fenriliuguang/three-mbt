@@ -345,3 +345,17 @@ pub fn Color::apply_matrix3(self : Color, m : Matrix3) -> Color {
 pub fn Color::equals(self : Color, color : Color) -> Bool {
   color.r == self.r && color.g == self.g && color.b == self.b
 }
+
+///|
+/// `offset` 默认是 0。数组本身不改。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L888
+pub fn Color::from_array(
+  self : Color,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Color {
+  self.r = array[offset]
+  self.g = array[offset + 1]
+  self.b = array[offset + 2]
+  self
+}

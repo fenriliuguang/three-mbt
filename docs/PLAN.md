@@ -851,6 +851,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Color.equals` has landed. It is true when all three channels match. `(0.25, 0.5, 0.75)` equals another color with those values, and differs when any channel is `0`. Both colors are unchanged.
 
+`Color.fromArray` has landed. It reads three channels from an array. The default offset reads `(1, 2, 3)` from `[1, 2, 3, 0.25, 0.5, 0.75]`. Offset `3` reads `(0.25, 0.5, 0.75)`. The array is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1217,6 +1219,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Color.setFromVector3` | `math` |
 | planned | 7 | `Color.applyMatrix3` | `math` |
 | planned | 7 | `Color.equals` | `math` |
+| planned | 7 | `Color.fromArray` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -104,6 +104,7 @@ pub fn Color::copy(Self, Self) -> Self
 pub fn Color::copy_linear_to_srgb(Self, Self) -> Self
 pub fn Color::copy_srgb_to_linear(Self, Self) -> Self
 pub fn Color::equals(Self, Self) -> Bool
+pub fn Color::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Color::get_hex(Self) -> Int
 pub fn Color::get_hex_string(Self) -> String
 pub fn Color::get_hsl(Self) -> (Double, Double, Double)
