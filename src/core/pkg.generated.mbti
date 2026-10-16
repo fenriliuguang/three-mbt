@@ -51,6 +51,7 @@ pub fn BufferAttribute::set_triangle(Self, @math.Triangle, Int, Int, Int) -> @ma
 pub fn BufferAttribute::set_x(Self, Int, Double) -> Self
 pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
 pub fn BufferAttribute::set_xyzw(Self, Int, Double, Double, Double, Double) -> Self
+pub fn BufferAttribute::set_y(Self, Int, Double) -> Self
 pub fn BufferAttribute::to_json(Self) -> AttributeJson
 pub fn BufferAttribute::transform_direction(Self, @math.Matrix4) -> Self
 

@@ -154,6 +154,17 @@ pub fn BufferAttribute::get_y(self : BufferAttribute, index : Int) -> Double {
 }
 
 ///|
+/// 写入一个顶点的 y 分量。
+/// r186: `setY` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L469
+pub fn BufferAttribute::set_y(
+  self : BufferAttribute,
+  index : Int,
+  y : Double,
+) -> BufferAttribute {
+  self.set_component(index, 1, y)
+}
+
+///|
 pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int) -> Double {
   self.get_component(index, 2)
 }

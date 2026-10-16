@@ -1288,6 +1288,16 @@ test "setX writes the x channel" {
 }
 
 ///|
+test "setY writes the y channel" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)
+  let written = attribute.set_y(0, 9.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.get_x(0), 1.0)
+  assert_eq(attribute.get_y(0), 9.0)
+  assert_eq(attribute.get_z(0), 3.0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(
