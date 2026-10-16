@@ -82,7 +82,9 @@ pub(all) struct BufferGeometry {
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
   mut version : Int
+  listeners : Map[String, Array[() -> Unit]]
 }
+pub fn BufferGeometry::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn BufferGeometry::add_group(Self, Int, Int, material_index? : Int) -> Unit
 pub fn BufferGeometry::apply_matrix4(Self, @math.Matrix4) -> Self
 pub fn BufferGeometry::apply_quaternion(Self, @math.Quaternion) -> Self

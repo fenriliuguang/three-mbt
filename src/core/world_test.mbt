@@ -1520,3 +1520,15 @@ test "clone copies tangent, groups, and draw range" {
     Some(index) => assert_eq(index.get_x(0), 0.0)
   }
 }
+
+///|
+test "addEventListener keeps one copy of a geometry listener" {
+  let geometry = @core.BufferGeometry::new()
+  let listener = fn() {}
+  geometry.add_event_listener("dispose", listener)
+  geometry.add_event_listener("dispose", listener)
+  match geometry.listeners.get("dispose") {
+    None => assert_eq(false, true)
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+}

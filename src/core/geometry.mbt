@@ -28,6 +28,7 @@ pub(all) struct BufferGeometry {
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
   mut version : Int
+  listeners : Map[String, Array[() -> Unit]]
 }
 
 ///|
@@ -40,6 +41,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     bounding_box: None,
     bounding_sphere: None,
     version: 0,
+    listeners: Map([]),
   }
 }
 
@@ -804,4 +806,24 @@ pub fn BufferGeometry::copy(
   self.draw_range.start = source.draw_range.start
   self.draw_range.count = source.draw_range.count
   self
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn BufferGeometry::add_event_listener(
+  self : BufferGeometry,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
 }
