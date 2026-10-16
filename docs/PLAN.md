@@ -965,6 +965,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion.toArray` has landed. It writes four components and leaves the quaternion unchanged. `(0.25, 0.5, 0.25, 0.75)` fills a new array. The same components at offset `1` keep the leading value. A one-element array at offset `2` grows to length `6` and pads the gap with `0`. The change callback does not run. `Quaternion.fromBufferAttribute` reads a `BufferAttribute`, so it stays with attributes.
 
+`Quaternion.toJSON` has landed. It returns `[x, y, z, w]`. `(0.25, 0.5, 0.25, 0.75)` serializes to those four numbers. The quaternion is unchanged and the change callback does not run.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1388,6 +1390,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Quaternion.equals` | `math` |
 | planned | 7 | `Quaternion.fromArray` | `math` |
 | planned | 7 | `Quaternion.toArray` | `math` |
+| planned | 7 | `Quaternion.toJSON` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

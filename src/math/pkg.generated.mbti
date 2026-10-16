@@ -341,6 +341,7 @@ pub fn Quaternion::slerp(Self, Self, Double) -> Self
 pub fn Quaternion::slerp_flat(Array[Double], Int, Array[Double], Int, Array[Double], Int, Double) -> Unit
 pub fn Quaternion::slerp_quaternions(Self, Self, Self, Double) -> Self
 pub fn Quaternion::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
+pub fn Quaternion::to_json(Self) -> Array[Double]
 
 pub(all) struct Ray {
   origin : Vector3

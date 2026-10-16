@@ -560,3 +560,10 @@ pub fn Quaternion::to_array(
   target[offset + 3] = self.w
   target
 }
+
+///|
+/// 序列化成 `[x, y, z, w]`。四元数本身不改。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L881
+pub fn Quaternion::to_json(self : Quaternion) -> Array[Double] {
+  self.to_array()
+}

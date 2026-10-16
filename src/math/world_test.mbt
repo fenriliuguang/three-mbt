@@ -5755,6 +5755,22 @@ test "Quaternion.toArray writes four components" {
 }
 
 ///|
+test "Quaternion.toJSON writes four components" {
+  let q = @math.Quaternion::new(x=0.25, y=0.5, z=0.25, w=0.75)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  let json = q.to_json()
+  assert_eq(json.length(), 4)
+  assert_eq(json[0], 0.25)
+  assert_eq(json[1], 0.5)
+  assert_eq(json[2], 0.25)
+  assert_eq(json[3], 0.75)
+  assert_eq(q.x, 0.25)
+  assert_eq(q.w, 0.75)
+  assert_eq(hits[0], 0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
