@@ -79,6 +79,7 @@ pub(all) struct BezierInterpolant {
   mut in_tangents : Array[Double]?
   mut out_tangents : Array[Double]?
 }
+pub fn BezierInterpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn BezierInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Box2 {

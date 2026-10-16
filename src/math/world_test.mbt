@@ -6767,6 +6767,23 @@ test "solveBezierParameter finds the curve parameter" {
 }
 
 ///|
+test "BezierInterpolant.interpolate_ blends samples" {
+  let values = [10.0, 40.0]
+  let bezier = @math.BezierInterpolant::new([0.0, 1.0], values, 1)
+  let linear = bezier.interpolate(1, 0.0, 0.25, 1.0)
+  assert_eq(physical_equal(linear, bezier.interpolant.result_buffer), true)
+  assert_eq(linear[0], 17.5)
+  bezier.out_tangents = Some([10.0, 20.0, 0.0, 0.0])
+  let still_linear = bezier.interpolate(1, 0.0, 0.25, 1.0)
+  assert_eq(still_linear[0], 17.5)
+  bezier.in_tangents = Some([0.0, 0.0, 20.0, 30.0])
+  let curved = bezier.interpolate(1, 0.0, 15.0, 30.0)
+  assert_eq(curved[0], 25.0)
+  assert_eq(values[0], 10.0)
+  assert_eq(values[1], 40.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -86,3 +86,72 @@ pub fn solve_bezier_parameter(
   }
   s
 }
+
+///|
+fn write_linear_sample(
+  result : Array[Double],
+  values : Array[Double],
+  stride : Int,
+  i1 : Int,
+  t0 : Double,
+  t : Double,
+  t1 : Double,
+) -> Array[Double] {
+  let weight1 = (t - t0) / (t1 - t0)
+  let weight0 = 1.0 - weight1
+  let offset1 = i1 * stride
+  let offset0 = offset1 - stride
+  for i in 0..<stride {
+    result[i] = values[offset0 + i] * weight0 + values[offset1 + i] * weight1
+  }
+  result
+}
+
+///|
+/// 按切线做三次贝塞尔。缺一条切线时改为线性插值。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/BezierInterpolant.js#L22
+pub fn BezierInterpolant::interpolate(
+  self : BezierInterpolant,
+  i1 : Int,
+  t0 : Double,
+  t : Double,
+  t1 : Double,
+) -> Array[Double] {
+  let result = self.interpolant.result_buffer
+  let values = self.interpolant.sample_values
+  let stride = self.interpolant.value_size
+  match self.in_tangents {
+    None => write_linear_sample(result, values, stride, i1, t0, t, t1)
+    Some(in_tangents) =>
+      match self.out_tangents {
+        None => write_linear_sample(result, values, stride, i1, t0, t, t1)
+        Some(out_tangents) => {
+          let tangent_stride = stride * 2
+          let i0 = i1 - 1
+          let offset1 = i1 * stride
+          let offset0 = offset1 - stride
+          for i in 0..<stride {
+            let v0 = values[offset0 + i]
+            let v1 = values[offset1 + i]
+            let out_offset = i0 * tangent_stride + i * 2
+            let in_offset = i1 * tangent_stride + i * 2
+            let s = solve_bezier_parameter(
+              t,
+              t0,
+              out_tangents[out_offset],
+              in_tangents[in_offset],
+              t1,
+            )
+            result[i] = cubic_bezier(
+              s,
+              v0,
+              out_tangents[out_offset + 1],
+              in_tangents[in_offset + 1],
+              v1,
+            )
+          }
+          result
+        }
+      }
+  }
+}
