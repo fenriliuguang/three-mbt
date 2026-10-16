@@ -212,6 +212,7 @@ pub fn Matrix3::extract_basis(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Matrix3::get_normal_matrix(Self, Matrix4) -> Self
 pub fn Matrix3::identity(Self) -> Self
 pub fn Matrix3::invert(Self) -> Self
+pub fn Matrix3::multiply_matrices(Self, Self, Self) -> Self
 pub fn Matrix3::new() -> Self
 pub fn Matrix3::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
 pub fn Matrix3::set_from_matrix4(Self, Matrix4) -> Self

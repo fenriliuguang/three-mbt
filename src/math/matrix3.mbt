@@ -83,6 +83,47 @@ pub fn Matrix3::extract_basis(
 }
 
 ///|
+/// 把两个矩阵相乘，写入自身。
+/// r186: `multiplyMatrices` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L221
+pub fn Matrix3::multiply_matrices(
+  self : Matrix3,
+  a : Matrix3,
+  b : Matrix3,
+) -> Matrix3 {
+  let ae = a.elements
+  let be = b.elements
+  let a11 = ae[0]
+  let a12 = ae[3]
+  let a13 = ae[6]
+  let a21 = ae[1]
+  let a22 = ae[4]
+  let a23 = ae[7]
+  let a31 = ae[2]
+  let a32 = ae[5]
+  let a33 = ae[8]
+  let b11 = be[0]
+  let b12 = be[3]
+  let b13 = be[6]
+  let b21 = be[1]
+  let b22 = be[4]
+  let b23 = be[7]
+  let b31 = be[2]
+  let b32 = be[5]
+  let b33 = be[8]
+  let te = self.elements
+  te[0] = a11 * b11 + a12 * b21 + a13 * b31
+  te[3] = a11 * b12 + a12 * b22 + a13 * b32
+  te[6] = a11 * b13 + a12 * b23 + a13 * b33
+  te[1] = a21 * b11 + a22 * b21 + a23 * b31
+  te[4] = a21 * b12 + a22 * b22 + a23 * b32
+  te[7] = a21 * b13 + a22 * b23 + a23 * b33
+  te[2] = a31 * b11 + a32 * b21 + a33 * b31
+  te[5] = a31 * b12 + a32 * b22 + a33 * b32
+  te[8] = a31 * b13 + a32 * b23 + a33 * b33
+  self
+}
+
+///|
 pub fn Matrix3::set_from_matrix4(self : Matrix3, m : Matrix4) -> Matrix3 {
   let me = m.elements
   self.set(me[0], me[4], me[8], me[1], me[5], me[9], me[2], me[6], me[10])

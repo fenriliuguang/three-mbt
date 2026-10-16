@@ -5049,6 +5049,25 @@ test "Matrix3.extractBasis writes the three columns" {
 }
 
 ///|
+test "Matrix3.multiplyMatrices stores the product" {
+  let a = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
+  let b = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let m = @math.Matrix3::new()
+  ignore(m.multiply_matrices(a, b))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[1], 12.0)
+  assert_eq(m.elements[2], 28.0)
+  assert_eq(m.elements[3], 4.0)
+  assert_eq(m.elements[4], 15.0)
+  assert_eq(m.elements[5], 32.0)
+  assert_eq(m.elements[6], 6.0)
+  assert_eq(m.elements[7], 18.0)
+  assert_eq(m.elements[8], 36.0)
+  assert_eq(a.elements[0], 2.0)
+  assert_eq(b.elements[0], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
