@@ -647,15 +647,21 @@ pub(all) struct AttributeJson {
   item_size : Int
   array : Array[Double]
   normalized : Bool
+  name : String
+  usage : Int
+  gpu_type : Int
 }
 
 ///|
-/// 复制分量个数、数值和是否归一化。
+/// 复制分量个数、数值、是否归一化、名字、使用方式和 GPU 类型。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
 pub fn BufferAttribute::to_json(self : BufferAttribute) -> AttributeJson {
   {
     item_size: self.item_size,
     array: self.array.copy(),
     normalized: self.normalized,
+    name: self.name,
+    usage: self.usage,
+    gpu_type: self.gpu_type,
   }
 }

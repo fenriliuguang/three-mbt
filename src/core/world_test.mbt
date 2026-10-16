@@ -1777,3 +1777,15 @@ test "getIndex returns the stored index" {
     Some(index) => assert_eq(index.get_x(0), 0.0)
   }
 }
+
+///|
+test "toJSON writes name, usage, and gpuType" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)
+  attribute.name = "tangent"
+  ignore(attribute.set_usage(@constants.DYNAMIC_DRAW_USAGE))
+  attribute.gpu_type = @constants.INT_TYPE
+  let data = attribute.to_json()
+  assert_eq(data.name, "tangent")
+  assert_eq(data.usage, 35048)
+  assert_eq(data.gpu_type, 1013)
+}
