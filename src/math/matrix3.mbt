@@ -131,6 +131,13 @@ pub fn Matrix3::multiply(self : Matrix3, m : Matrix3) -> Matrix3 {
 }
 
 ///|
+/// 左乘另一个矩阵。
+/// r186: `premultiply` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L207
+pub fn Matrix3::premultiply(self : Matrix3, m : Matrix3) -> Matrix3 {
+  self.multiply_matrices(m, self)
+}
+
+///|
 pub fn Matrix3::set_from_matrix4(self : Matrix3, m : Matrix4) -> Matrix3 {
   let me = m.elements
   self.set(me[0], me[4], me[8], me[1], me[5], me[9], me[2], me[6], me[10])
