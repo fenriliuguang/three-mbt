@@ -189,6 +189,37 @@ pub fn BufferAttribute::set_xyz(
 }
 
 ///|
+/// 用 3×3 矩阵变换属性。`item_size` 为 2 或 3 时逐个顶点变换，其它大小不动。
+/// r186: `applyMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L263
+pub fn BufferAttribute::apply_matrix3(
+  self : BufferAttribute,
+  matrix : @math.Matrix3,
+) -> BufferAttribute {
+  if self.item_size == 2 {
+    let point = @math.Vector2::new()
+    let mut index = 0
+    while index < self.count {
+      ignore(self.copy_to_vector2(index, point))
+      ignore(point.apply_matrix3(matrix))
+      let offset = index * self.item_size
+      self.array[offset] = point.x
+      self.array[offset + 1] = point.y
+      index = index + 1
+    }
+  } else if self.item_size == 3 {
+    let point = @math.Vector3::new()
+    let mut index = 0
+    while index < self.count {
+      ignore(self.copy_to_vector3(index, point))
+      ignore(point.apply_matrix3(matrix))
+      self.set_xyz(index, point.x, point.y, point.z)
+      index = index + 1
+    }
+  }
+  self
+}
+
+///|
 /// 用矩阵变换每个三点顶点。只适用于 `item_size` 为 3 的属性。
 /// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L300
 pub fn BufferAttribute::apply_matrix4(

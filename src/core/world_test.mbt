@@ -673,3 +673,23 @@ test "applyMatrix4 translates each vertex" {
   assert_eq(positions.get_y(1), 5.0)
   assert_eq(positions.get_z(1), 6.0)
 }
+
+///|
+test "applyMatrix3 transforms item sizes 2 and 3" {
+  let uvs = @core.BufferAttribute::new([1.0, 2.0], 2)
+  let shift = @math.Matrix3::new().make_translation(0.25, 0.5)
+  let written = uvs.apply_matrix3(shift)
+  assert_eq(physical_equal(written, uvs), true)
+  assert_eq(uvs.get_x(0), 1.25)
+  assert_eq(uvs.get_y(0), 2.5)
+  let positions = @core.BufferAttribute::new([1.0, 1.0, 1.0], 3)
+  let scale = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
+  ignore(positions.apply_matrix3(scale))
+  assert_eq(positions.get_x(0), 2.0)
+  assert_eq(positions.get_y(0), 3.0)
+  assert_eq(positions.get_z(0), 4.0)
+  let wide = @core.BufferAttribute::new([9.0, 8.0, 7.0, 6.0], 4)
+  ignore(wide.apply_matrix3(scale))
+  assert_eq(wide.get_x(0), 9.0)
+  assert_eq(wide.get_component(0, 3), 6.0)
+}
