@@ -1308,6 +1308,12 @@ test "setZ writes the z channel" {
 }
 
 ///|
+test "getW reads the fourth channel" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0], 4)
+  assert_eq(attribute.get_w(0), 4.0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

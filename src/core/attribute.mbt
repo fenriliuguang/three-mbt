@@ -181,6 +181,13 @@ pub fn BufferAttribute::set_z(
 }
 
 ///|
+/// 读取一个顶点的 w 分量。
+/// r186: `getW` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L518
+pub fn BufferAttribute::get_w(self : BufferAttribute, index : Int) -> Double {
+  self.get_component(index, 3)
+}
+
+///|
 /// 写入 `target`。`math` 不依赖 `core`，所以这个函数放在属性上，而不是 `Vector3` 上。
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1203
 pub fn BufferAttribute::copy_to_vector3(
