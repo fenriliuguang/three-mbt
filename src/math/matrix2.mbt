@@ -38,3 +38,10 @@ pub fn Matrix2::set(
   te[3] = n22
   self
 }
+
+///|
+/// 写成 2×2 单位矩阵。
+/// r186: `identity` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix2.js#L77
+pub fn Matrix2::identity(self : Matrix2) -> Matrix2 {
+  self.set(1.0, 0.0, 0.0, 1.0)
+}

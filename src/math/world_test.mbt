@@ -5991,6 +5991,17 @@ test "Matrix2.set stores row-major arguments in column-major order" {
 }
 
 ///|
+test "Matrix2.identity replaces the elements with the identity" {
+  let m = @math.Matrix2::new()
+  ignore(m.set(11.0, 12.0, 21.0, 22.0))
+  ignore(m.identity())
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[1], 0.0)
+  assert_eq(m.elements[2], 0.0)
+  assert_eq(m.elements[3], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

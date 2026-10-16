@@ -250,6 +250,7 @@ pub fn Line3::set(Self, Vector3, Vector3) -> Self
 pub(all) struct Matrix2 {
   elements : FixedArray[Double]
 }
+pub fn Matrix2::identity(Self) -> Self
 pub fn Matrix2::new() -> Self
 pub fn Matrix2::set(Self, Double, Double, Double, Double) -> Self
 
