@@ -1249,6 +1249,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferGeometry.computeBoundingSphere` now includes morph positions. A point at `(1, 1, 0)` with absolute morphs `(0, 0, 0)` and `(2, 2, 0)` has radius `sqrt(2)`.
 
+`BufferGeometry.toNonIndexed` now expands morph attributes. Index `[0, 2, 1]` turns morph values `[4, 5, 6]` into `[4, 6, 5]`. `morphTargetsRelative` set to `true` is kept. The source stays at `5`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1814,6 +1816,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferGeometry.applyMatrix4` needsUpdate | `core` |
 | planned | 7 | `BufferGeometry.computeBoundingBox` morph positions | `core` |
 | planned | 7 | `BufferGeometry.computeBoundingSphere` morph positions | `core` |
+| planned | 7 | `BufferGeometry.toNonIndexed` morph attributes | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

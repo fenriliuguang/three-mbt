@@ -819,7 +819,7 @@ fn expand_indexed_attribute(
 }
 
 ///|
-/// 按索引展开属性，得到没有索引的几何体。本来就没有索引时返回自身。
+/// 按索引展开属性和形变属性，得到没有索引的几何体。本来就没有索引时返回自身。
 /// r186: `toNonIndexed` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1123
 pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
   match self.index {
@@ -832,6 +832,15 @@ pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
           geometry.set_attribute(name, expand_indexed_attribute(attribute, index)),
         )
       }
+      for pair in self.morph_attributes.iter() {
+        let (name, attributes) = pair
+        let expanded = []
+        for attribute in attributes {
+          expanded.push(expand_indexed_attribute(attribute, index))
+        }
+        geometry.morph_attributes.set(name, expanded)
+      }
+      geometry.morph_targets_relative = self.morph_targets_relative
       let mut group_index = 0
       while group_index < self.groups.length() {
         let group = self.groups[group_index]

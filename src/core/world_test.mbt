@@ -1889,3 +1889,29 @@ test "computeBoundingSphere includes morph positions" {
     Some(sphere) => assert_eq(sphere.radius, 2.0.sqrt())
   }
 }
+
+///|
+test "toNonIndexed expands morph attributes" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(geometry.set_index_array([0, 2, 1]))
+  geometry.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([4.0, 5.0, 6.0], 1)],
+  )
+  geometry.morph_targets_relative = true
+  let expanded = geometry.to_non_indexed()
+  assert_eq(expanded.morph_targets_relative, true)
+  match expanded.morph_attributes.get("position") {
+    None => assert_eq(false, true)
+    Some(morphs) => {
+      assert_eq(morphs.length(), 1)
+      assert_eq(morphs[0].get_x(0), 4.0)
+      assert_eq(morphs[0].get_x(1), 6.0)
+      assert_eq(morphs[0].get_x(2), 5.0)
+    }
+  }
+  match geometry.morph_attributes.get("position") {
+    None => assert_eq(false, true)
+    Some(morphs) => assert_eq(morphs[0].get_x(1), 5.0)
+  }
+}
