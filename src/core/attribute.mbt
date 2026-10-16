@@ -236,3 +236,21 @@ pub fn BufferAttribute::apply_matrix4(
   }
   self
 }
+
+///|
+/// 用法线矩阵变换每个三点顶点，并归一化。只适用于 `item_size` 为 3 的属性。
+/// r186: `applyNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L323
+pub fn BufferAttribute::apply_normal_matrix(
+  self : BufferAttribute,
+  matrix : @math.Matrix3,
+) -> BufferAttribute {
+  let point = @math.Vector3::new()
+  let mut index = 0
+  while index < self.count {
+    ignore(self.copy_to_vector3(index, point))
+    ignore(point.apply_normal_matrix(matrix))
+    self.set_xyz(index, point.x, point.y, point.z)
+    index = index + 1
+  }
+  self
+}

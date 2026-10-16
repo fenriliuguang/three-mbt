@@ -693,3 +693,17 @@ test "applyMatrix3 transforms item sizes 2 and 3" {
   assert_eq(wide.get_x(0), 9.0)
   assert_eq(wide.get_component(0, 3), 6.0)
 }
+
+///|
+test "applyNormalMatrix rotates and normalizes each vertex" {
+  let normals = @core.BufferAttribute::new([2.0, 0.0, 0.0, 0.0, 3.0, 0.0], 3)
+  let turn = @math.Matrix3::new().set(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  let written = normals.apply_normal_matrix(turn)
+  assert_eq(physical_equal(written, normals), true)
+  assert_eq(normals.get_x(0), 0.0)
+  assert_eq(normals.get_y(0), 1.0)
+  assert_eq(normals.get_z(0), 0.0)
+  assert_eq(normals.get_x(1), -1.0)
+  assert_eq(normals.get_y(1), 0.0)
+  assert_eq(normals.get_z(1), 0.0)
+}
