@@ -4693,6 +4693,19 @@ test "Color.lerpHSL blends lightness of two grays" {
 }
 
 ///|
+test "Color.setFromVector3 copies the vector components" {
+  let color = @math.Color::new()
+  let v = @math.Vector3::new(x=0.25, y=0.5, z=0.75)
+  ignore(color.set_from_vector3(v))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 0.75)
+  assert_eq(v.x, 0.25)
+  assert_eq(v.y, 0.5)
+  assert_eq(v.z, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

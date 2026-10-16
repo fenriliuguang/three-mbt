@@ -314,3 +314,13 @@ pub fn Color::lerp_hsl(self : Color, color : Color, alpha : Double) -> Color {
   let (h2, s2, l2) = color.get_hsl()
   self.set_hsl(lerp(h1, h2, alpha), lerp(s1, s2, alpha), lerp(l1, l2, alpha))
 }
+
+///|
+/// 用三维向量的三个分量写入通道。
+/// r186: `setFromVector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L840
+pub fn Color::set_from_vector3(self : Color, v : Vector3) -> Color {
+  self.r = v.x
+  self.g = v.y
+  self.b = v.z
+  self
+}
