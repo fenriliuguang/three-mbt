@@ -130,3 +130,11 @@ pub fn rand_int(low : Double, high : Double) -> Double {
   let rng = @random.Rand::Rand()
   low + @std.floor(rng.double() * (high - low + 1.0))
 }
+
+///|
+/// 在半开区间 `[low, high)` 里取一个随机数。两端相同就返回那个数。
+/// r186: `randFloat` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L218
+pub fn rand_float(low : Double, high : Double) -> Double {
+  let rng = @random.Rand::Rand()
+  low + rng.double() * (high - low)
+}

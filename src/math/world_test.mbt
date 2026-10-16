@@ -5832,6 +5832,15 @@ test "MathUtils.randInt returns an integer in a closed range" {
 }
 
 ///|
+test "MathUtils.randFloat returns a number in a half-open range" {
+  assert_eq(@math.rand_float(2.0, 2.0), 2.0)
+  let unit = @math.rand_float(0.0, 1.0)
+  assert_eq(unit >= 0.0 && unit < 1.0, true)
+  let wide = @math.rand_float(1.0, 4.0)
+  assert_eq(wide >= 1.0 && wide < 4.0, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
