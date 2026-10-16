@@ -310,6 +310,11 @@ pub fn Line3::get_center(Self, Vector3) -> Vector3
 pub fn Line3::new(start? : Vector3, end? : Vector3) -> Self
 pub fn Line3::set(Self, Vector3, Vector3) -> Self
 
+pub(all) struct LinearInterpolant {
+  interpolant : Interpolant
+}
+pub fn LinearInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Matrix2 {
   elements : FixedArray[Double]
 }
