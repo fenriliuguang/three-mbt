@@ -5376,6 +5376,23 @@ test "Matrix4.extractBasis writes the first three columns" {
 }
 
 ///|
+test "Matrix4.makeBasis stores three axes" {
+  let x_axis = @math.Vector3::new(x=2.0)
+  let y_axis = @math.Vector3::new(y=3.0)
+  let z_axis = @math.Vector3::new(z=4.0)
+  let m = @math.Matrix4::new()
+  ignore(m.make_basis(x_axis, y_axis, z_axis))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[5], 3.0)
+  assert_eq(m.elements[10], 4.0)
+  assert_eq(m.elements[15], 1.0)
+  assert_eq(m.elements[1], 0.0)
+  assert_eq(m.elements[12], 0.0)
+  x_axis.x = 0.0
+  assert_eq(m.elements[0], 2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

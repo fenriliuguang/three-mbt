@@ -129,6 +129,21 @@ pub fn Matrix4::extract_basis(
 }
 
 ///|
+/// 用三个轴向量组成矩阵，平移为 0。
+/// r186: `makeBasis` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L267
+pub fn Matrix4::make_basis(
+  self : Matrix4,
+  x_axis : Vector3,
+  y_axis : Vector3,
+  z_axis : Vector3,
+) -> Matrix4 {
+  self.set(
+    x_axis.x, y_axis.x, z_axis.x, 0.0, x_axis.y, y_axis.y, z_axis.y, 0.0,
+    x_axis.z, y_axis.z, z_axis.z, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
+}
+
+///|
 pub fn Matrix4::make_translation(
   self : Matrix4,
   x : Double,

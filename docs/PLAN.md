@@ -915,6 +915,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Matrix4.extractBasis` has landed. It writes the first three columns into three vectors. Scaling by `(2, 3, 4)` gives axes `(2, 0, 0)`, `(0, 3, 0)`, and `(0, 0, 4)`. A matrix whose affine determinant is `0` writes the identity axes instead. The matrix is unchanged.
 
+`Matrix4.makeBasis` has landed. It stores three axes and a zero translation. Axes `(2, 0, 0)`, `(0, 3, 0)`, and `(0, 0, 4)` write elements `0`, `5`, `10`, and `15` as `2`, `3`, `4`, and `1`. Later changes to an axis leave the matrix alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1313,6 +1315,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix4.copyPosition` | `math` |
 | planned | 7 | `Matrix4.setFromMatrix3` | `math` |
 | planned | 7 | `Matrix4.extractBasis` | `math` |
+| planned | 7 | `Matrix4.makeBasis` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

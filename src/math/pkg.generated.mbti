@@ -249,6 +249,7 @@ pub fn Matrix4::get_max_scale_on_axis(Self) -> Double
 pub fn Matrix4::identity(Self) -> Self
 pub fn Matrix4::invert(Self) -> Self
 pub fn Matrix4::look_at(Self, Vector3, Vector3, Vector3) -> Self
+pub fn Matrix4::make_basis(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Matrix4::make_orthographic(Self, Double, Double, Double, Double, Double, Double, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
 pub fn Matrix4::make_perspective(Self, Double, Double, Double, Double, Double, Double, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
 pub fn Matrix4::make_rotation_from_euler(Self, Euler) -> Self
