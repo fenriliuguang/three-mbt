@@ -1,0 +1,22 @@
+// r186: `Ray` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L14
+
+///|
+/// 从原点沿方向发出的射线。缺省原点是 (0, 0, 0)，方向是 (0, 0, -1)。
+/// r186: `Ray` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L14
+pub(all) struct Ray {
+  origin : Vector3
+  direction : Vector3
+}
+
+///|
+pub fn Ray::new(origin? : Vector3, direction? : Vector3) -> Ray {
+  let origin = match origin {
+    None => Vector3::new()
+    Some(origin) => origin.clone()
+  }
+  let direction = match direction {
+    None => Vector3::new(z=-1.0)
+    Some(direction) => direction.clone()
+  }
+  { origin, direction }
+}

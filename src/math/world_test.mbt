@@ -3911,6 +3911,30 @@ test "Sphere.fromJSON reads the center and the radius" {
 }
 
 ///|
+test "Ray stores copies of its origin and direction" {
+  let empty = @math.Ray::new()
+  assert_eq(empty.origin.x, 0.0)
+  assert_eq(empty.origin.y, 0.0)
+  assert_eq(empty.origin.z, 0.0)
+  assert_eq(empty.direction.x, 0.0)
+  assert_eq(empty.direction.y, 0.0)
+  assert_eq(empty.direction.z, -1.0)
+  let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let direction = @math.Vector3::new(y=1.0)
+  let ray = @math.Ray::new(origin=origin, direction=direction)
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.origin.y, 2.0)
+  assert_eq(ray.origin.z, 3.0)
+  assert_eq(ray.direction.x, 0.0)
+  assert_eq(ray.direction.y, 1.0)
+  assert_eq(ray.direction.z, 0.0)
+  origin.x = 9.0
+  direction.y = 0.0
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.direction.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

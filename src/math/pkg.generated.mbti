@@ -256,6 +256,12 @@ pub fn Quaternion::set_from_euler(Self, Euler, update? : Bool) -> Self
 pub fn Quaternion::set_from_rotation_matrix(Self, Matrix4) -> Self
 pub fn Quaternion::slerp(Self, Self, Double) -> Self
 
+pub(all) struct Ray {
+  origin : Vector3
+  direction : Vector3
+}
+pub fn Ray::new(origin? : Vector3, direction? : Vector3) -> Self
+
 pub(all) struct Sphere {
   center : Vector3
   mut radius : Double
