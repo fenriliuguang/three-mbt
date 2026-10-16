@@ -179,3 +179,10 @@ pub fn SphericalHarmonics3::copy(
 ) -> SphericalHarmonics3 {
   self.set(sh.coefficients)
 }
+
+///|
+/// 复制出一组新的球谐。原对象之后再改，不影响副本。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L261
+pub fn SphericalHarmonics3::clone(self : SphericalHarmonics3) -> SphericalHarmonics3 {
+  SphericalHarmonics3::new().copy(self)
+}
