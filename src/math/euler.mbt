@@ -224,3 +224,22 @@ pub fn Euler::reorder(self : Euler, new_order : EulerOrder) -> Euler {
   let quaternion = Quaternion::new().set_from_euler(self)
   self.set_from_quaternion(quaternion, order=new_order)
 }
+
+///|
+fn same_order(a : EulerOrder, b : EulerOrder) -> Bool {
+  match (a, b) {
+    (XYZ, XYZ) | (YXZ, YXZ) | (ZXY, ZXY) | (ZYX, ZYX) | (YZX, YZX) | (XZY, XZY) =>
+      true
+    _ => false
+  }
+}
+
+///|
+/// 角度和顺序都相同才相等。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L373
+pub fn Euler::equals(self : Euler, euler : Euler) -> Bool {
+  euler.x == self.x &&
+  euler.y == self.y &&
+  euler.z == self.z &&
+  same_order(euler.order, self.order)
+}

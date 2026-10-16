@@ -148,6 +148,7 @@ pub(all) struct Euler {
 }
 pub fn Euler::clone(Self) -> Self
 pub fn Euler::copy(Self, Self) -> Self
+pub fn Euler::equals(Self, Self) -> Bool
 pub fn Euler::new(x? : Double, y? : Double, z? : Double, order? : EulerOrder) -> Self
 pub fn Euler::reorder(Self, EulerOrder) -> Self
 pub fn Euler::set(Self, Double, Double, Double, order? : EulerOrder) -> Self

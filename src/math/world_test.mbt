@@ -4830,6 +4830,24 @@ test "Euler.setFromVector3 copies the vector components" {
 }
 
 ///|
+test "Euler.equals compares the angles and the order" {
+  let euler = @math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)
+  let same = @math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)
+  assert_eq(euler.equals(same), true)
+  assert_eq(euler.equals(euler), true)
+  assert_eq(
+    euler.equals(@math.Euler::new(x=0.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)),
+    false,
+  )
+  assert_eq(
+    euler.equals(@math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::XYZ)),
+    false,
+  )
+  assert_eq(euler.x, 1.0)
+  assert_eq(same.z, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
