@@ -5794,6 +5794,16 @@ test "MathUtils.damp eases toward a target" {
 }
 
 ///|
+test "MathUtils.pingpong folds a value between zero and a length" {
+  assert_eq(@math.pingpong(0.25), 0.25)
+  assert_eq(@math.pingpong(1.25), 0.75)
+  assert_eq(@math.pingpong(0.0), 0.0)
+  assert_eq(@math.pingpong(2.0), 0.0)
+  assert_eq(@math.pingpong(-0.25), 0.25)
+  assert_eq(@math.pingpong(3.0, length=2.0), 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

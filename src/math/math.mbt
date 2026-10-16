@@ -87,3 +87,10 @@ pub fn inverse_lerp(x : Double, y : Double, value : Double) -> Double {
 pub fn damp(x : Double, y : Double, lambda : Double, dt : Double) -> Double {
   lerp(x, y, 1.0 - @std.exp(-lambda * dt))
 }
+
+///|
+/// 在 `0` 和 `length` 之间来回折返。`length` 默认是 1。
+/// r186: `pingpong` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L147
+pub fn pingpong(x : Double, length? : Double = 1.0) -> Double {
+  length - (euclidean_modulo(x, length * 2.0) - length).abs()
+}
