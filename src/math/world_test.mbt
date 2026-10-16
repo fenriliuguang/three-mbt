@@ -4066,6 +4066,37 @@ test "Ray.distanceToPoint is the root of the squared distance" {
 }
 
 ///|
+test "Ray.distanceSqToSegment meets a crossing segment" {
+  let ray = @math.Ray::new(direction=@math.Vector3::new(x=1.0))
+  let v0 = @math.Vector3::new(x=2.0, y=-1.0)
+  let v1 = @math.Vector3::new(x=2.0, y=1.0)
+  let on_ray = @math.Vector3::new(x=9.0)
+  let on_segment = @math.Vector3::new(y=9.0)
+  assert_eq(
+    ray.distance_sq_to_segment(
+      v0,
+      v1,
+      point_on_ray=on_ray,
+      point_on_segment=on_segment,
+    ),
+    0.0,
+  )
+  assert_eq(on_ray.x, 2.0)
+  assert_eq(on_ray.y, 0.0)
+  assert_eq(on_ray.z, 0.0)
+  assert_eq(on_segment.x, 2.0)
+  assert_eq(on_segment.y, 0.0)
+  assert_eq(on_segment.z, 0.0)
+  let parallel0 = @math.Vector3::new(y=1.0)
+  let parallel1 = @math.Vector3::new(x=2.0, y=1.0)
+  assert_eq(ray.distance_sq_to_segment(parallel0, parallel1), 1.0)
+  assert_eq(v0.y, -1.0)
+  assert_eq(v1.x, 2.0)
+  assert_eq(ray.origin.x, 0.0)
+  assert_eq(ray.direction.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -102,3 +102,87 @@ pub fn Ray::distance_sq_to_point(self : Ray, point : Vector3) -> Double {
 pub fn Ray::distance_to_point(self : Ray, point : Vector3) -> Double {
   self.distance_sq_to_point(point).sqrt()
 }
+
+///|
+/// 返回射线到线段的距离平方。给出的话，写入两边的最近点。射线和端点都不改。
+/// r186: `distanceSqToSegment` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L180
+pub fn Ray::distance_sq_to_segment(
+  self : Ray,
+  v0 : Vector3,
+  v1 : Vector3,
+  point_on_ray? : Vector3,
+  point_on_segment? : Vector3,
+) -> Double {
+  let seg_center = Vector3::new().copy(v0).add(v1).multiply_scalar(0.5)
+  let seg_dir = Vector3::new().copy(v1).sub(v0).normalize()
+  let diff = Vector3::new().copy(self.origin).sub(seg_center)
+  let seg_extent = v0.distance_to(v1) * 0.5
+  let a01 = -self.direction.dot(seg_dir)
+  let b0 = diff.dot(self.direction)
+  let b1 = -diff.dot(seg_dir)
+  let c = diff.length_sq()
+  let det = (1.0 - a01 * a01).abs()
+  let mut s0 = 0.0
+  let mut s1 = 0.0
+  let mut sqr_dist = 0.0
+  if det > 0.0 {
+    s0 = a01 * b1 - b0
+    s1 = a01 * b0 - b1
+    let ext_det = seg_extent * det
+    if s0 >= 0.0 {
+      if s1 >= -ext_det {
+        if s1 <= ext_det {
+          let inv_det = 1.0 / det
+          s0 = s0 * inv_det
+          s1 = s1 * inv_det
+          sqr_dist = s0 * (s0 + a01 * s1 + 2.0 * b0) +
+            s1 * (a01 * s0 + s1 + 2.0 * b1) +
+            c
+        } else {
+          s1 = seg_extent
+          s0 = 0.0.max(-(a01 * s1 + b0))
+          sqr_dist = -s0 * s0 + s1 * (s1 + 2.0 * b1) + c
+        }
+      } else {
+        s1 = -seg_extent
+        s0 = 0.0.max(-(a01 * s1 + b0))
+        sqr_dist = -s0 * s0 + s1 * (s1 + 2.0 * b1) + c
+      }
+    } else if s1 <= -ext_det {
+      s0 = 0.0.max(-(-a01 * seg_extent + b0))
+      s1 = if s0 > 0.0 {
+        -seg_extent
+      } else {
+        (-seg_extent).max(-b1).min(seg_extent)
+      }
+      sqr_dist = -s0 * s0 + s1 * (s1 + 2.0 * b1) + c
+    } else if s1 <= ext_det {
+      s0 = 0.0
+      s1 = (-seg_extent).max(-b1).min(seg_extent)
+      sqr_dist = s1 * (s1 + 2.0 * b1) + c
+    } else {
+      s0 = 0.0.max(-(a01 * seg_extent + b0))
+      s1 = if s0 > 0.0 {
+        seg_extent
+      } else {
+        (-seg_extent).max(-b1).min(seg_extent)
+      }
+      sqr_dist = -s0 * s0 + s1 * (s1 + 2.0 * b1) + c
+    }
+  } else {
+    s1 = if a01 > 0.0 { -seg_extent } else { seg_extent }
+    s0 = 0.0.max(-(a01 * s1 + b0))
+    sqr_dist = -s0 * s0 + s1 * (s1 + 2.0 * b1) + c
+  }
+  match point_on_ray {
+    None => ()
+    Some(point) =>
+      ignore(point.copy(self.origin).add_scaled_vector(self.direction, s0))
+  }
+  match point_on_segment {
+    None => ()
+    Some(point) =>
+      ignore(point.copy(seg_center).add_scaled_vector(seg_dir, s1))
+  }
+  sqr_dist
+}
