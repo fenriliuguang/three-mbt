@@ -165,6 +165,15 @@ pub fn Matrix4::make_rotation_x(self : Matrix4, theta : Double) -> Matrix4 {
 }
 
 ///|
+/// 绕 Y 轴旋转。
+/// r186: `makeRotationY` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L894
+pub fn Matrix4::make_rotation_y(self : Matrix4, theta : Double) -> Matrix4 {
+  let c = @std.cos(theta)
+  let s = @std.sin(theta)
+  self.set(c, 0.0, s, 0.0, 0.0, 1.0, 0.0, 0.0, -s, 0.0, c, 0.0, 0.0, 0.0, 0.0, 1.0)
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,
