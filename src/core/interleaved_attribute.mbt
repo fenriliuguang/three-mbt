@@ -41,3 +41,13 @@ pub fn InterleavedBufferAttribute::array(
 ) -> Array[Double] {
   self.data.array
 }
+
+///|
+/// 为真时把交错缓冲的 `version` 加一。为假时不变。
+/// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L102
+pub fn InterleavedBufferAttribute::set_needs_update(
+  self : InterleavedBufferAttribute,
+  value : Bool,
+) -> Unit {
+  self.data.set_needs_update(value)
+}

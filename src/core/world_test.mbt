@@ -2247,3 +2247,15 @@ test "array returns the interleaved storage" {
   attribute.array()[1] = 8.0
   assert_eq(buffer.array[1], 8.0)
 }
+
+///|
+test "needsUpdate increments the interleaved attribute buffer version" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  assert_eq(attribute.data.version, 0)
+  attribute.set_needs_update(false)
+  assert_eq(attribute.data.version, 0)
+  attribute.set_needs_update(true)
+  attribute.set_needs_update(true)
+  assert_eq(attribute.data.version, 2)
+}

@@ -243,6 +243,7 @@ pub(all) struct InterleavedBufferAttribute {
 pub fn InterleavedBufferAttribute::array(Self) -> Array[Double]
 pub fn InterleavedBufferAttribute::count(Self) -> Int
 pub fn InterleavedBufferAttribute::new(InterleavedBuffer, Int, Int, normalized? : Bool) -> Self
+pub fn InterleavedBufferAttribute::set_needs_update(Self, Bool) -> Unit
 
 pub(all) struct InterleavedJson {
   uuid : String
