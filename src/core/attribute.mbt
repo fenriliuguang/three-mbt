@@ -170,6 +170,17 @@ pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int) -> Double {
 }
 
 ///|
+/// 写入一个顶点的 z 分量。
+/// r186: `setZ` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L502
+pub fn BufferAttribute::set_z(
+  self : BufferAttribute,
+  index : Int,
+  z : Double,
+) -> BufferAttribute {
+  self.set_component(index, 2, z)
+}
+
+///|
 /// 写入 `target`。`math` 不依赖 `core`，所以这个函数放在属性上，而不是 `Vector3` 上。
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1203
 pub fn BufferAttribute::copy_to_vector3(
