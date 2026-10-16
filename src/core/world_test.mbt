@@ -1071,3 +1071,36 @@ test "normalizeNormals makes each normal unit length" {
     }
   }
 }
+
+///|
+test "computeVertexNormals points an xy triangle along +Z" {
+  let positions = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new(positions, 3)),
+  )
+  ignore(geometry.set_index_array([0, 1, 2]))
+  geometry.compute_vertex_normals()
+  match geometry.get_attribute("normal") {
+    None => assert_eq(false, true)
+    Some(normal) => {
+      let mut vertex = 0
+      while vertex < 3 {
+        assert_eq(normal.get_x(vertex), 0.0)
+        assert_eq(normal.get_y(vertex), 0.0)
+        assert_eq(normal.get_z(vertex), 1.0)
+        vertex = vertex + 1
+      }
+    }
+  }
+  let soup = @core.BufferGeometry::new()
+  ignore(soup.set_attribute("position", @core.BufferAttribute::new(positions, 3)))
+  soup.compute_vertex_normals()
+  match soup.get_attribute("normal") {
+    None => assert_eq(false, true)
+    Some(normal) => {
+      assert_eq(normal.get_z(0), 1.0)
+      assert_eq(normal.get_z(2), 1.0)
+    }
+  }
+}

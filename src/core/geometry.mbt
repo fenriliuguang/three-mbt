@@ -533,6 +533,115 @@ pub fn BufferGeometry::compute_tangents(self : BufferGeometry) -> Unit {
 }
 
 ///|
+fn accumulate_indexed_normals(
+  position : BufferAttribute,
+  normal : BufferAttribute,
+  index : BufferAttribute,
+) -> Unit {
+  let p_a = @math.Vector3::new()
+  let p_b = @math.Vector3::new()
+  let p_c = @math.Vector3::new()
+  let n_a = @math.Vector3::new()
+  let n_b = @math.Vector3::new()
+  let n_c = @math.Vector3::new()
+  let cb = @math.Vector3::new()
+  let ab = @math.Vector3::new()
+  let mut cursor = 0
+  while cursor < index.count {
+    let v_a = index.get_x(cursor).to_int()
+    let v_b = index.get_x(cursor + 1).to_int()
+    let v_c = index.get_x(cursor + 2).to_int()
+    ignore(position.copy_to_vector3(v_a, p_a))
+    ignore(position.copy_to_vector3(v_b, p_b))
+    ignore(position.copy_to_vector3(v_c, p_c))
+    ignore(cb.sub_vectors(p_c, p_b))
+    ignore(ab.sub_vectors(p_a, p_b))
+    ignore(cb.cross(ab))
+    ignore(normal.copy_to_vector3(v_a, n_a))
+    ignore(normal.copy_to_vector3(v_b, n_b))
+    ignore(normal.copy_to_vector3(v_c, n_c))
+    ignore(n_a.add(cb))
+    ignore(n_b.add(cb))
+    ignore(n_c.add(cb))
+    normal.set_xyz(v_a, n_a.x, n_a.y, n_a.z)
+    normal.set_xyz(v_b, n_b.x, n_b.y, n_b.z)
+    normal.set_xyz(v_c, n_c.x, n_c.y, n_c.z)
+    cursor = cursor + 3
+  }
+}
+
+///|
+fn assign_triangle_soup_normals(
+  position : BufferAttribute,
+  normal : BufferAttribute,
+) -> Unit {
+  let p_a = @math.Vector3::new()
+  let p_b = @math.Vector3::new()
+  let p_c = @math.Vector3::new()
+  let cb = @math.Vector3::new()
+  let ab = @math.Vector3::new()
+  let mut cursor = 0
+  while cursor < position.count {
+    ignore(position.copy_to_vector3(cursor, p_a))
+    ignore(position.copy_to_vector3(cursor + 1, p_b))
+    ignore(position.copy_to_vector3(cursor + 2, p_c))
+    ignore(cb.sub_vectors(p_c, p_b))
+    ignore(ab.sub_vectors(p_a, p_b))
+    ignore(cb.cross(ab))
+    normal.set_xyz(cursor, cb.x, cb.y, cb.z)
+    normal.set_xyz(cursor + 1, cb.x, cb.y, cb.z)
+    normal.set_xyz(cursor + 2, cb.x, cb.y, cb.z)
+    cursor = cursor + 3
+  }
+}
+
+///|
+fn BufferGeometry::fresh_normal_attribute(
+  self : BufferGeometry,
+  vertex_count : Int,
+) -> BufferAttribute {
+  let values = []
+  let mut index = 0
+  while index < vertex_count * 3 {
+    values.push(0.0)
+    index = index + 1
+  }
+  let normal = BufferAttribute::new(values, 3)
+  ignore(self.set_attribute("normal", normal))
+  normal
+}
+
+///|
+/// 按三角形面法线累加顶点法线，再归一化。没有 `position` 时不改动。
+/// r186: `computeVertexNormals` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1005
+pub fn BufferGeometry::compute_vertex_normals(self : BufferGeometry) -> Unit {
+  match self.get_attribute("position") {
+    None => ()
+    Some(position) => {
+      let normal = match self.get_attribute("normal") {
+        Some(existing) =>
+          if existing.count == position.count {
+            let mut index = 0
+            while index < existing.count {
+              existing.set_xyz(index, 0.0, 0.0, 0.0)
+              index = index + 1
+            }
+            existing
+          } else {
+            self.fresh_normal_attribute(position.count)
+          }
+        None => self.fresh_normal_attribute(position.count)
+      }
+      match self.index {
+        Some(index) => accumulate_indexed_normals(position, normal, index)
+        None => assign_triangle_soup_normals(position, normal)
+      }
+      self.normalize_normals()
+    }
+  }
+}
+
+///|
 /// 把每个法线归一化。
 /// r186: `normalizeNormals` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1101
 pub fn BufferGeometry::normalize_normals(self : BufferGeometry) -> Unit {
