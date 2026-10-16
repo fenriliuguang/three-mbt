@@ -69,3 +69,18 @@ pub fn Interpolant::interpolate(
   ignore(t1)
   abort("THREE.Interpolant: Call to abstract method.")
 }
+
+///|
+/// 区间变化时基类什么都不做。
+/// r186: `intervalChanged_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L312
+pub fn Interpolant::interval_changed(
+  self : Interpolant,
+  i1 : Int,
+  t0 : Double,
+  t1 : Double,
+) -> Unit {
+  ignore(self)
+  ignore(i1)
+  ignore(t0)
+  ignore(t1)
+}

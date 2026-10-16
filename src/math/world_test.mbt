@@ -6643,6 +6643,24 @@ test "panic Interpolant.interpolate_ rejects the abstract base" {
 }
 
 ///|
+test "Interpolant.intervalChanged_ leaves the samples in place" {
+  let positions = [0.0, 1.0, 2.0]
+  let values = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]
+  let given = [1.0, 2.0, 3.0]
+  let interpolant = @math.Interpolant::new(
+    positions, values, 2, result_buffer=given,
+  )
+  interpolant.interval_changed(1, 0.0, 1.0)
+  assert_eq(interpolant.cached_index, 0)
+  assert_eq(given[0], 1.0)
+  assert_eq(given[1], 2.0)
+  assert_eq(given[2], 3.0)
+  assert_eq(values[0], 10.0)
+  assert_eq(values[5], 60.0)
+  assert_eq(positions[2], 2.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
