@@ -5150,6 +5150,21 @@ test "Matrix3.setUvTransform stores offset repeat and center" {
 }
 
 ///|
+test "Matrix3.makeScale stores a 2D scale" {
+  let m = @math.Matrix3::new()
+  ignore(m.make_scale(2.0, 3.0))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[1], 0.0)
+  assert_eq(m.elements[2], 0.0)
+  assert_eq(m.elements[3], 0.0)
+  assert_eq(m.elements[4], 3.0)
+  assert_eq(m.elements[5], 0.0)
+  assert_eq(m.elements[6], 0.0)
+  assert_eq(m.elements[7], 0.0)
+  assert_eq(m.elements[8], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

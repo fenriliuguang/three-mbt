@@ -279,3 +279,10 @@ pub fn Matrix3::set_uv_transform(
     1.0,
   )
 }
+
+///|
+/// 组成二维缩放矩阵。
+/// r186: `makeScale` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L531
+pub fn Matrix3::make_scale(self : Matrix3, x : Double, y : Double) -> Matrix3 {
+  self.set(x, 0.0, 0.0, 0.0, y, 0.0, 0.0, 0.0, 1.0)
+}
