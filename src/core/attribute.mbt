@@ -1,6 +1,14 @@
 // r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 
 ///|
+/// 一段待上传的缓冲区间。上游没有单独的类。
+/// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L181
+pub(all) struct UpdateRange {
+  start : Int
+  count : Int
+}
+
+///|
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
 /// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 pub(all) struct BufferAttribute {
@@ -10,6 +18,7 @@ pub(all) struct BufferAttribute {
   mut count : Int
   mut version : Int
   mut usage : Int
+  update_ranges : Array[UpdateRange]
 }
 
 ///|
@@ -18,7 +27,15 @@ pub fn BufferAttribute::new(
   item_size : Int,
   normalized? : Bool = false,
 ) -> BufferAttribute {
-  { array, item_size, normalized, count: array.length() / item_size, version: 0, usage: @constants.STATIC_DRAW_USAGE, }
+  {
+    array,
+    item_size,
+    normalized,
+    count: array.length() / item_size,
+    version: 0,
+    usage: @constants.STATIC_DRAW_USAGE,
+    update_ranges: [],
+  }
 }
 
 ///|
@@ -54,6 +71,17 @@ pub fn BufferAttribute::set_usage(
 ) -> BufferAttribute {
   self.usage = value
   self
+}
+
+///|
+/// 追加一段需要上传到 GPU 的区间。
+/// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L181
+pub fn BufferAttribute::add_update_range(
+  self : BufferAttribute,
+  start : Int,
+  count : Int,
+) -> Unit {
+  self.update_ranges.push({ start, count })
 }
 
 ///|

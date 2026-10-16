@@ -1183,6 +1183,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferAttribute.setUsage` has landed. A new attribute uses `StaticDrawUsage` `35044`. Setting `DynamicDrawUsage` stores `35048`, and copying the attribute carries that usage.
 
+`BufferAttribute.addUpdateRange` has landed. A new attribute has no ranges. Adding start `1` and count `2` stores that one span.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1715,6 +1717,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferAttribute.setXY` | `core` |
 | planned | 7 | `BufferAttribute.needsUpdate` | `core` |
 | planned | 7 | `BufferAttribute.setUsage` | `core` |
+| planned | 7 | `BufferAttribute.addUpdateRange` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

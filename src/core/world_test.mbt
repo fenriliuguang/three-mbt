@@ -1359,6 +1359,16 @@ test "setUsage switches static draw to dynamic draw" {
 }
 
 ///|
+test "addUpdateRange records a component span" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0], 1)
+  assert_eq(attribute.update_ranges.length(), 0)
+  attribute.add_update_range(1, 2)
+  assert_eq(attribute.update_ranges.length(), 1)
+  assert_eq(attribute.update_ranges[0].start, 1)
+  assert_eq(attribute.update_ranges[0].count, 2)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(
