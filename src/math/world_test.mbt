@@ -6943,6 +6943,32 @@ test "LinearInterpolant.new stores the samples" {
 }
 
 ///|
+test "LinearInterpolant.interpolate_ blends neighboring samples" {
+  let values = [10.0, 11.0, 20.0, 21.0]
+  let given = [1.0, 2.0, 3.0]
+  let linear = @math.LinearInterpolant::new(
+    [0.0, 1.0],
+    values,
+    2,
+    result_buffer=given,
+  )
+  let at_left = linear.interpolate(1, 0.0, 0.0, 1.0)
+  assert_eq(physical_equal(at_left, given), true)
+  assert_eq(at_left[0], 10.0)
+  assert_eq(at_left[1], 11.0)
+  assert_eq(at_left[2], 3.0)
+  let mid = linear.interpolate(1, 0.0, 0.25, 1.0)
+  assert_eq(mid[0], 12.5)
+  assert_eq(mid[1], 13.5)
+  assert_eq(mid[2], 3.0)
+  let at_right = linear.interpolate(1, 0.0, 1.0, 1.0)
+  assert_eq(at_right[0], 20.0)
+  assert_eq(at_right[1], 21.0)
+  assert_eq(values[0], 10.0)
+  assert_eq(values[3], 21.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

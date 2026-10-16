@@ -313,6 +313,7 @@ pub fn Line3::set(Self, Vector3, Vector3) -> Self
 pub(all) struct LinearInterpolant {
   interpolant : Interpolant
 }
+pub fn LinearInterpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn LinearInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Matrix2 {
