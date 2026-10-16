@@ -196,6 +196,16 @@ pub fn Color::get_hsl(self : Color) -> (Double, Double, Double) {
 }
 
 ///|
+/// 把线性通道写入目标颜色。
+/// r186: `getRGB` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L619
+pub fn Color::get_rgb(self : Color, target : Color) -> Color {
+  target.r = self.r
+  target.g = self.g
+  target.b = self.b
+  target
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha

@@ -4540,6 +4540,19 @@ test "Color.getHSL reads hue saturation and lightness" {
 }
 
 ///|
+test "Color.getRGB writes the linear channels into a target" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let target = @math.Color::new()
+  ignore(color.get_rgb(target))
+  assert_eq(target.r, 0.25)
+  assert_eq(target.g, 0.5)
+  assert_eq(target.b, 0.75)
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
