@@ -105,6 +105,22 @@ pub fn BufferAttribute::copy_to_color(
 }
 
 ///|
+/// 写入 `target` 的 x、y、z、w，并通知一次。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L862
+pub fn BufferAttribute::copy_to_quaternion(
+  self : BufferAttribute,
+  index : Int,
+  target : @math.Quaternion,
+) -> @math.Quaternion {
+  target.set(
+    self.get_x(index),
+    self.get_y(index),
+    self.get_z(index),
+    self.get_component(index, 3),
+  )
+}
+
+///|
 /// 先清空 `target`，再纳入每个顶点的 xyz。`math` 不依赖 `core`，所以这个函数放在属性上。
 /// r186: `setFromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L86
 pub fn BufferAttribute::set_box3(

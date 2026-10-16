@@ -20,6 +20,7 @@ pub(all) struct BufferAttribute {
   count : Int
 }
 pub fn BufferAttribute::copy_to_color(Self, Int, @math.Color) -> @math.Color
+pub fn BufferAttribute::copy_to_quaternion(Self, Int, @math.Quaternion) -> @math.Quaternion
 pub fn BufferAttribute::copy_to_vector2(Self, Int, @math.Vector2) -> @math.Vector2
 pub fn BufferAttribute::copy_to_vector3(Self, Int, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::copy_to_vector4(Self, Int, @math.Vector4) -> @math.Vector4

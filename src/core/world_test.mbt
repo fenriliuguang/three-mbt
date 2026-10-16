@@ -160,6 +160,33 @@ test "fromBufferAttribute reads rgb and skips a fourth component" {
 }
 
 ///|
+test "fromBufferAttribute reads a quaternion" {
+  let values = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+    4,
+  )
+  let q = @math.Quaternion::new(x=9.0, y=9.0, z=9.0, w=9.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  let written = values.copy_to_quaternion(1, q)
+  assert_eq(physical_equal(written, q), true)
+  assert_eq(q.x, 5.0)
+  assert_eq(q.y, 6.0)
+  assert_eq(q.z, 7.0)
+  assert_eq(q.w, 8.0)
+  assert_eq(hits[0], 1)
+  let packed = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  ignore(packed.copy_to_quaternion(0, q))
+  assert_eq(q.x, 1.0)
+  assert_eq(q.y, 2.0)
+  assert_eq(q.z, 3.0)
+  assert_eq(q.w, 4.0)
+  assert_eq(hits[0], 2)
+  assert_eq(values.get_x(0), 1.0)
+  assert_eq(packed.get_x(1), 4.0)
+}
+
+///|
 test "child world matrix matches r186" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))
