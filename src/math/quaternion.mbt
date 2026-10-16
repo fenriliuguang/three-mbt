@@ -481,3 +481,15 @@ pub fn Quaternion::slerp(
   }
   self
 }
+
+///|
+/// 在两个四元数之间插值，结果写入自身。
+/// r186: `slerpQuaternions` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L771
+pub fn Quaternion::slerp_quaternions(
+  self : Quaternion,
+  qa : Quaternion,
+  qb : Quaternion,
+  t : Double,
+) -> Quaternion {
+  self.copy(qa).slerp(qb, t)
+}

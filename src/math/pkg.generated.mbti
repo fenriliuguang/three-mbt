@@ -336,6 +336,7 @@ pub fn Quaternion::set_y(Self, Double) -> Self
 pub fn Quaternion::set_z(Self, Double) -> Self
 pub fn Quaternion::slerp(Self, Self, Double) -> Self
 pub fn Quaternion::slerp_flat(Array[Double], Int, Array[Double], Int, Array[Double], Int, Double) -> Unit
+pub fn Quaternion::slerp_quaternions(Self, Self, Self, Double) -> Self
 
 pub(all) struct Ray {
   origin : Vector3
