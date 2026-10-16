@@ -1869,3 +1869,23 @@ test "computeBoundingBox includes morph positions" {
     Some(box) => assert_eq(box.max.x, 5.0)
   }
 }
+
+///|
+test "computeBoundingSphere includes morph positions" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)),
+  )
+  geometry.morph_attributes.set(
+    "position",
+    [
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+      @core.BufferAttribute::new([2.0, 2.0, 0.0], 3),
+    ],
+  )
+  geometry.compute_bounding_sphere()
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => assert_eq(sphere.radius, 2.0.sqrt())
+  }
+}

@@ -427,6 +427,8 @@ fn BufferGeometry::expand_box_by_morph_positions(
 }
 
 ///|
+/// 用 `position` 和形变目标计算包围球。球心来自包围盒。
+/// r186: `computeBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L718
 pub fn BufferGeometry::compute_bounding_sphere(self : BufferGeometry) -> Unit {
   self.compute_bounding_box()
   match (self.attributes.get("position"), self.bounding_box) {
@@ -453,9 +455,40 @@ pub fn BufferGeometry::compute_bounding_sphere(self : BufferGeometry) -> Unit {
         )
         index = index + 1
       }
+      max_radius_sq = self.morph_radius_sq(position, sphere.center, max_radius_sq)
       sphere.radius = max_radius_sq.sqrt()
     }
     _ => self.bounding_sphere = None
+  }
+}
+
+///|
+fn BufferGeometry::morph_radius_sq(
+  self : BufferGeometry,
+  position : BufferAttribute,
+  center : @math.Vector3,
+  max_radius_sq : Double,
+) -> Double {
+  match self.morph_attributes.get("position") {
+    None => max_radius_sq
+    Some(morphs) => {
+      let mut max_radius_sq = max_radius_sq
+      let point = @math.Vector3::new()
+      let offset = @math.Vector3::new()
+      for morph in morphs {
+        let mut index = 0
+        while index < morph.count {
+          ignore(morph.copy_to_vector3(index, point))
+          if self.morph_targets_relative && index < position.count {
+            ignore(position.copy_to_vector3(index, offset))
+            ignore(point.add(offset))
+          }
+          max_radius_sq = max_radius_sq.max(center.distance_to_squared(point))
+          index = index + 1
+        }
+      }
+      max_radius_sq
+    }
   }
 }
 
