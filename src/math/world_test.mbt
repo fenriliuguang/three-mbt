@@ -5804,6 +5804,16 @@ test "MathUtils.pingpong folds a value between zero and a length" {
 }
 
 ///|
+test "MathUtils.smoothstep eases between two endpoints" {
+  assert_eq(@math.smoothstep(-1.0, 0.0, 1.0), 0.0)
+  assert_eq(@math.smoothstep(0.0, 0.0, 1.0), 0.0)
+  assert_eq(@math.smoothstep(1.0, 0.0, 1.0), 1.0)
+  assert_eq(@math.smoothstep(2.0, 0.0, 1.0), 1.0)
+  assert_eq(@math.smoothstep(0.5, 0.0, 1.0), 0.5)
+  assert_eq(@math.smoothstep(0.25, 0.0, 1.0), 0.15625)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

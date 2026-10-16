@@ -94,3 +94,17 @@ pub fn damp(x : Double, y : Double, lambda : Double, dt : Double) -> Double {
 pub fn pingpong(x : Double, length? : Double = 1.0) -> Double {
   length - (euclidean_modulo(x, length * 2.0) - length).abs()
 }
+
+///|
+/// 在两端放慢的平滑插值。低于 `min` 是 0，高于 `max` 是 1。
+/// r186: `smoothstep` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L167
+pub fn smoothstep(x : Double, min : Double, max : Double) -> Double {
+  if x <= min {
+    0.0
+  } else if x >= max {
+    1.0
+  } else {
+    let t = (x - min) / (max - min)
+    t * t * (3.0 - 2.0 * t)
+  }
+}
