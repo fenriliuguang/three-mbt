@@ -186,6 +186,16 @@ pub fn Color::sub(Self, Self) -> Self
 pub fn Color::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 pub fn Color::to_json(Self) -> Int
 
+pub(all) struct CubicInterpolant {
+  interpolant : Interpolant
+  mut weight_prev : Double
+  mut offset_prev : Int
+  mut weight_next : Double
+  mut offset_next : Int
+  default_settings : SplineEndings
+}
+pub fn CubicInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Cylindrical {
   mut radius : Double
   mut theta : Double
@@ -533,6 +543,11 @@ pub fn SphericalHarmonics3::scale(Self, Double) -> Self
 pub fn SphericalHarmonics3::set(Self, Array[Vector3]) -> Self
 pub fn SphericalHarmonics3::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 pub fn SphericalHarmonics3::zero(Self) -> Self
+
+pub(all) struct SplineEndings {
+  mut ending_start : @constants.SplineEnding
+  mut ending_end : @constants.SplineEnding
+}
 
 pub(all) struct Triangle {
   a : Vector3

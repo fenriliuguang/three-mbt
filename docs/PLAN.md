@@ -1073,6 +1073,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BezierInterpolant.interpolate_` has landed. Without both tangents, time `0.25` between `0` and `1` blends samples `10` and `40` to `17.5`. With out-tangent `(10, 20)` and in-tangent `(20, 30)`, time `15` between `0` and `30` is `25`. The samples stay `10` and `40`.
 
+`CubicInterpolant` has landed. `new` stores positions `(0, 1, 2)` and samples `(10, 20, 30)`. The weights start at `-0`, the offsets start at `0`, and both endings are zero curvature. Those endings are `2400`. Zero slope is `2401` and wrap-around is `2402`. `intervalChanged_` and `interpolate_` stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1550,6 +1552,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `cubicBezierSlope` | `math` |
 | planned | 7 | `solveBezierParameter` | `math` |
 | planned | 7 | `BezierInterpolant.interpolate_` | `math` |
+| planned | 7 | `CubicInterpolant` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

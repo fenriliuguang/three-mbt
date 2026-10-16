@@ -6784,6 +6784,39 @@ test "BezierInterpolant.interpolate_ blends samples" {
 }
 
 ///|
+test "CubicInterpolant.new starts at zero curvature" {
+  let positions = [0.0, 1.0, 2.0]
+  let values = [10.0, 20.0, 30.0]
+  let cubic = @math.CubicInterpolant::new(positions, values, 1)
+  assert_eq(cubic.interpolant.parameter_positions[0], 0.0)
+  assert_eq(cubic.interpolant.parameter_positions[2], 2.0)
+  assert_eq(cubic.interpolant.sample_values[0], 10.0)
+  assert_eq(cubic.interpolant.sample_values[2], 30.0)
+  assert_eq(cubic.interpolant.value_size, 1)
+  assert_eq(cubic.interpolant.cached_index, 0)
+  assert_eq(cubic.interpolant.result_buffer[0], 0.0)
+  assert_eq(cubic.weight_prev, 0.0)
+  assert_eq(cubic.weight_next, 0.0)
+  assert_eq(cubic.offset_prev, 0)
+  assert_eq(cubic.offset_next, 0)
+  match cubic.default_settings.ending_start {
+    @constants.ZeroCurvature => assert_eq(true, true)
+    @constants.ZeroSlope => assert_eq(true, false)
+    @constants.WrapAround => assert_eq(true, false)
+  }
+  match cubic.default_settings.ending_end {
+    @constants.ZeroCurvature => assert_eq(true, true)
+    @constants.ZeroSlope => assert_eq(true, false)
+    @constants.WrapAround => assert_eq(true, false)
+  }
+  assert_eq(@constants.SplineEnding::ZeroCurvature.to_int(), 2400)
+  assert_eq(@constants.SplineEnding::ZeroSlope.to_int(), 2401)
+  assert_eq(@constants.SplineEnding::WrapAround.to_int(), 2402)
+  positions[0] = 9.0
+  assert_eq(cubic.interpolant.parameter_positions[0], 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

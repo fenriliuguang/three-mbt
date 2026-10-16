@@ -299,6 +299,36 @@ pub fn Interpolation::to_int(self : Interpolation) -> Int {
 }
 
 ///|
+/// 样条起点零曲率。对齐 `ZeroCurvatureEnding`（2400）。
+pub const ZERO_CURVATURE_ENDING : Int = 2400
+
+///|
+/// 样条端点零斜率。对齐 `ZeroSlopeEnding`（2401）。
+pub const ZERO_SLOPE_ENDING : Int = 2401
+
+///|
+/// 样条两端环绕。对齐 `WrapAroundEnding`（2402）。
+pub const WRAP_AROUND_ENDING : Int = 2402
+
+///|
+/// 三次样条的端点条件。`CubicInterpolant` 默认两端都是零曲率。
+/// r186: `ZeroCurvatureEnding` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1186 ; `ZeroSlopeEnding` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1194 ; `WrapAroundEnding` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1202
+pub(all) enum SplineEnding {
+  ZeroCurvature
+  ZeroSlope
+  WrapAround
+}
+
+///|
+pub fn SplineEnding::to_int(self : SplineEnding) -> Int {
+  match self {
+    ZeroCurvature => ZERO_CURVATURE_ENDING
+    ZeroSlope => ZERO_SLOPE_ENDING
+    WrapAround => WRAP_AROUND_ENDING
+  }
+}
+
+///|
 /// 不做色调映射。对齐 `NoToneMapping`（0）。
 pub const NO_TONE_MAPPING : Int = 0
 

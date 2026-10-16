@@ -74,6 +74,12 @@ pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
 pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
 
+pub const WRAP_AROUND_ENDING : Int = 2402
+
+pub const ZERO_CURVATURE_ENDING : Int = 2400
+
+pub const ZERO_SLOPE_ENDING : Int = 2401
+
 // Errors
 
 // Types and methods
@@ -122,6 +128,13 @@ pub(all) enum Side {
   Double
 }
 pub fn Side::to_int(Self) -> Int
+
+pub(all) enum SplineEnding {
+  ZeroCurvature
+  ZeroSlope
+  WrapAround
+}
+pub fn SplineEnding::to_int(Self) -> Int
 
 pub(all) enum TextureFilter {
   Nearest
