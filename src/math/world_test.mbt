@@ -4718,6 +4718,19 @@ test "Color.applyMatrix3 transforms the channels" {
 }
 
 ///|
+test "Color.equals compares the three channels" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let same = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  assert_eq(color.equals(same), true)
+  assert_eq(color.equals(color), true)
+  assert_eq(color.equals(@math.Color::new(r=0.0, g=0.5, b=0.75)), false)
+  assert_eq(color.equals(@math.Color::new(r=0.25, g=0.0, b=0.75)), false)
+  assert_eq(color.equals(@math.Color::new(r=0.25, g=0.5, b=0.0)), false)
+  assert_eq(color.r, 0.25)
+  assert_eq(same.b, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

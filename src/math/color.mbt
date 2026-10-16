@@ -338,3 +338,10 @@ pub fn Color::apply_matrix3(self : Color, m : Matrix3) -> Color {
   self.b = e[2] * r + e[5] * g + e[8] * b
   self
 }
+
+///|
+/// 三个通道都相同才相等。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L875
+pub fn Color::equals(self : Color, color : Color) -> Bool {
+  color.r == self.r && color.g == self.g && color.b == self.b
+}
