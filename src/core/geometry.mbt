@@ -168,6 +168,17 @@ pub fn BufferGeometry::apply_quaternion(
 }
 
 ///|
+/// 绕世界 X 轴旋转几何体。
+/// r186: `rotateX` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L452
+pub fn BufferGeometry::rotate_x(
+  self : BufferGeometry,
+  angle : Double,
+) -> BufferGeometry {
+  let matrix = @math.Matrix4::new().make_rotation_x(angle)
+  self.apply_matrix4(matrix)
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None

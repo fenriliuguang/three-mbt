@@ -59,6 +59,7 @@ pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
 pub fn BufferGeometry::new() -> Self
+pub fn BufferGeometry::rotate_x(Self, Double) -> Self
 pub fn BufferGeometry::set_attribute(Self, String, BufferAttribute) -> Self
 pub fn BufferGeometry::set_draw_range(Self, Double, Double) -> Unit
 pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self

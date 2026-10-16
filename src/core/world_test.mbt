@@ -811,3 +811,21 @@ test "applyQuaternion yaws a position a right angle around Y" {
   assert_eq(q.z, 0.0)
   assert_close(q.w, half)
 }
+
+///|
+test "rotateX turns a position a right angle around X" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([0.0, 1.0, 0.0], 3)),
+  )
+  let written = geometry.rotate_x(@std.PI / 2.0)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.get_x(0), 0.0)
+      assert_close(position.get_y(0), 0.0)
+      assert_close(position.get_z(0), 1.0)
+    }
+  }
+}
