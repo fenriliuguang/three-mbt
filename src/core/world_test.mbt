@@ -1616,3 +1616,14 @@ test "id counts geometries and stays on the destination" {
   assert_eq(destination.id, kept)
   assert_eq(destination.id == first.id, false)
 }
+
+///|
+test "uuid is a version-4 id that copy keeps" {
+  let source = @core.BufferGeometry::new()
+  assert_eq(source.uuid.length(), 36)
+  assert_eq(source.uuid[14:15].to_owned(), "4")
+  let destination = @core.BufferGeometry::new()
+  let kept = destination.uuid
+  ignore(destination.copy(source))
+  assert_eq(destination.uuid, kept)
+}
