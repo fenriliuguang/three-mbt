@@ -6694,6 +6694,20 @@ test "panic Interpolant.evaluate defers an interior sample" {
 }
 
 ///|
+test "Interpolant.getSettings_ prefers an assigned settings object" {
+  let interpolant = @math.Interpolant::new([0.0, 1.0], [10.0, 20.0], 1)
+  let defaults = interpolant.get_settings()
+  assert_eq(physical_equal(defaults, interpolant.default_settings), true)
+  let custom = @math.InterpolantSettings::{}
+  interpolant.settings = Some(custom)
+  assert_eq(physical_equal(interpolant.get_settings(), custom), true)
+  interpolant.settings = None
+  assert_eq(physical_equal(interpolant.get_settings(), defaults), true)
+  assert_eq(interpolant.sample_values[0], 10.0)
+  assert_eq(interpolant.sample_values[1], 20.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

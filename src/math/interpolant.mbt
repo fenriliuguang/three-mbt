@@ -9,7 +9,14 @@ pub(all) struct Interpolant {
   result_buffer : Array[Double]
   sample_values : Array[Double]
   value_size : Int
+  mut settings : InterpolantSettings?
+  default_settings : InterpolantSettings
 }
+
+///|
+/// 插值设置。基类默认是空对象，显式设置优先。上游没有同名类型，对应 `settings` 和 `DefaultSettings_`。
+/// r186: `DefaultSettings_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L82
+pub(all) struct InterpolantSettings {}
 
 ///|
 /// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L30
@@ -35,6 +42,8 @@ pub fn Interpolant::new(
     result_buffer,
     sample_values,
     value_size: sample_size,
+    settings: None,
+    default_settings: InterpolantSettings::{},
   }
 }
 
@@ -261,5 +270,15 @@ pub fn Interpolant::evaluate(self : Interpolant, t : Double) -> Array[Double] {
       self.interval_changed(i1, t0, t1)
       self.interpolate(i1, t0, t, t1)
     }
+  }
+}
+
+///|
+/// 返回显式设置。没有显式设置时返回默认对象。
+/// r186: `getSettings_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L257
+pub fn Interpolant::get_settings(self : Interpolant) -> InterpolantSettings {
+  match self.settings {
+    Some(settings) => settings
+    None => self.default_settings
   }
 }
