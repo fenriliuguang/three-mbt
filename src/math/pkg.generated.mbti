@@ -20,6 +20,8 @@ pub fn euclidean_modulo(Double, Double) -> Double
 
 pub fn floor_power_of_two(Double) -> Double
 
+pub fn generate_uuid() -> String
+
 pub fn inverse_lerp(Double, Double, Double) -> Double
 
 pub fn is_power_of_two(Double) -> Bool

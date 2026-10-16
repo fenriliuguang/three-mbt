@@ -271,3 +271,47 @@ pub fn normalize(value : Double, component : ArrayComponentType) -> Double {
     Int8 => (value * 127.0).round()
   }
 }
+
+///|
+fn hex_byte(byte : UInt) -> String {
+  let digits = "0123456789abcdef"
+  let hi = ((byte >> 4) & 0xFU).reinterpret_as_int()
+  let lo = (byte & 0xFU).reinterpret_as_int()
+  digits[hi:hi + 1].to_owned() + digits[lo:lo + 1].to_owned()
+}
+
+///|
+fn random_bits() -> UInt {
+  let rng = @random.Rand::Rand()
+  (rng.double() * 4294967295.0).to_uint()
+}
+
+///|
+/// 生成小写 UUID。版本位是 4，变体位是 8、9、a 或 b。
+/// r186: `generateUUID` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L17
+pub fn generate_uuid() -> String {
+  let d0 = random_bits()
+  let d1 = random_bits()
+  let d2 = random_bits()
+  let d3 = random_bits()
+  hex_byte(d0 & 0xFFU) +
+  hex_byte((d0 >> 8) & 0xFFU) +
+  hex_byte((d0 >> 16) & 0xFFU) +
+  hex_byte((d0 >> 24) & 0xFFU) +
+  "-" +
+  hex_byte(d1 & 0xFFU) +
+  hex_byte((d1 >> 8) & 0xFFU) +
+  "-" +
+  hex_byte(((d1 >> 16) & 0x0FU) | 0x40U) +
+  hex_byte((d1 >> 24) & 0xFFU) +
+  "-" +
+  hex_byte((d2 & 0x3FU) | 0x80U) +
+  hex_byte((d2 >> 8) & 0xFFU) +
+  "-" +
+  hex_byte((d2 >> 16) & 0xFFU) +
+  hex_byte((d2 >> 24) & 0xFFU) +
+  hex_byte(d3 & 0xFFU) +
+  hex_byte((d3 >> 8) & 0xFFU) +
+  hex_byte((d3 >> 16) & 0xFFU) +
+  hex_byte((d3 >> 24) & 0xFFU)
+}

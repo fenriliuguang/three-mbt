@@ -5959,6 +5959,19 @@ test "MathUtils.normalize packs a unit range into an integer" {
 }
 
 ///|
+test "MathUtils.generateUUID writes a version-4 UUID" {
+  let uuid = @math.generate_uuid()
+  assert_eq(uuid.length(), 36)
+  assert_eq(uuid[8:9].to_owned(), "-")
+  assert_eq(uuid[13:14].to_owned(), "-")
+  assert_eq(uuid[18:19].to_owned(), "-")
+  assert_eq(uuid[23:24].to_owned(), "-")
+  assert_eq(uuid[14:15].to_owned(), "4")
+  let variant = uuid[19:20].to_owned()
+  assert_eq(variant == "8" || variant == "9" || variant == "a" || variant == "b", true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

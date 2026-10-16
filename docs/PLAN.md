@@ -999,6 +999,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.normalize` has landed. It packs a unit-range value back into the same component type. `Float32` leaves `0.25` as `0.25`. `Uint8` maps `0` to `0`, `0.25` to `64`, and `1` to `255`. `Uint8Clamped` also maps `1` to `255`. `Uint16` maps `1` to `65535`, and `Uint32` maps `1` to `4294967295`. `Int8` maps `1` to `127` and `-1` to `-127`. `Int16` maps `1` to `32767`, and `Int32` maps `1` to `2147483647`.
 
+`MathUtils.generateUUID` has landed. It returns a 36-character lowercase UUID. The hyphens sit at indexes `8`, `13`, `18`, and `23`. The version character is `4`. The variant character is `8`, `9`, `a`, or `b`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1439,6 +1441,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `MathUtils.setQuaternionFromProperEuler` | `math` |
 | planned | 7 | `MathUtils.denormalize` | `math` |
 | planned | 7 | `MathUtils.normalize` | `math` |
+| planned | 7 | `MathUtils.generateUUID` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
