@@ -5824,6 +5824,14 @@ test "MathUtils.smootherstep eases with flat endpoints" {
 }
 
 ///|
+test "MathUtils.randInt returns an integer in a closed range" {
+  assert_eq(@math.rand_int(0.0, 0.0), 0.0)
+  assert_eq(@math.rand_int(2.0, 2.0), 2.0)
+  let value = @math.rand_int(1.0, 3.0)
+  assert_eq(value == 1.0 || value == 2.0 || value == 3.0, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

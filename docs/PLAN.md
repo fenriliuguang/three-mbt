@@ -979,6 +979,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.smootherstep` has landed. It eases the same way, with flat first and second derivatives at the endpoints. Below `0` and at `0` the result is `0`. At `1` and above it the result is `1`. The midpoint `0.5` stays `0.5`. `0.25` between `0` and `1` is `0.103515625`.
 
+`MathUtils.randInt` has landed. It returns a number from a closed range. `0` through `0` is `0`, and `2` through `2` is `2`. A draw from `1` through `3` is `1`, `2`, or `3`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1409,6 +1411,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `MathUtils.pingpong` | `math` |
 | planned | 7 | `MathUtils.smoothstep` | `math` |
 | planned | 7 | `MathUtils.smootherstep` | `math` |
+| planned | 7 | `MathUtils.randInt` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

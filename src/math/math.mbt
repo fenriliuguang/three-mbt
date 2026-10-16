@@ -122,3 +122,11 @@ pub fn smootherstep(x : Double, min : Double, max : Double) -> Double {
     t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
   }
 }
+
+///|
+/// 在闭区间里取一个随机整数。两端相同就返回那个数。
+/// r186: `randInt` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L205
+pub fn rand_int(low : Double, high : Double) -> Double {
+  let rng = @random.Rand::Rand()
+  low + @std.floor(rng.double() * (high - low + 1.0))
+}
