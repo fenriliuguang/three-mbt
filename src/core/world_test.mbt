@@ -1335,6 +1335,17 @@ test "setXY writes x and y and leaves z" {
 }
 
 ///|
+test "needsUpdate increments version only when true" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)
+  assert_eq(attribute.version, 0)
+  attribute.set_needs_update(false)
+  assert_eq(attribute.version, 0)
+  attribute.set_needs_update(true)
+  attribute.set_needs_update(true)
+  assert_eq(attribute.version, 2)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

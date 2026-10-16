@@ -8,6 +8,7 @@ pub(all) struct BufferAttribute {
   mut item_size : Int
   mut normalized : Bool
   mut count : Int
+  mut version : Int
 }
 
 ///|
@@ -16,7 +17,7 @@ pub fn BufferAttribute::new(
   item_size : Int,
   normalized? : Bool = false,
 ) -> BufferAttribute {
-  { array, item_size, normalized, count: array.length() / item_size, }
+  { array, item_size, normalized, count: array.length() / item_size, version: 0, }
 }
 
 ///|
@@ -29,6 +30,18 @@ pub fn BufferAttribute::from_ints(
     array.push(value.to_double())
   }
   BufferAttribute::new(array, item_size)
+}
+
+///|
+/// 为真时把 `version` 加一。为假时保持不变。
+/// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L155
+pub fn BufferAttribute::set_needs_update(
+  self : BufferAttribute,
+  value : Bool,
+) -> Unit {
+  if value {
+    self.version = self.version + 1
+  }
 }
 
 ///|
