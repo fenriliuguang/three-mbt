@@ -4611,6 +4611,22 @@ test "Color.addScalar adds one value to every channel" {
 }
 
 ///|
+test "Color.sub subtracts another color and stays at zero" {
+  let color = @math.Color::new(r=0.5, g=1.0, b=0.75)
+  let other = @math.Color::new(r=0.25, g=0.25, b=0.25)
+  ignore(color.sub(other))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.75)
+  assert_eq(color.b, 0.5)
+  assert_eq(other.r, 0.25)
+  let clamped = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  ignore(clamped.sub(@math.Color::new(r=0.5, g=0.0, b=0.0)))
+  assert_eq(clamped.r, 0.0)
+  assert_eq(clamped.g, 0.5)
+  assert_eq(clamped.b, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

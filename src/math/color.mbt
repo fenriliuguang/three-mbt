@@ -254,6 +254,16 @@ pub fn Color::add_scalar(self : Color, scalar : Double) -> Color {
 }
 
 ///|
+/// 减去另一个颜色的通道，结果不低于 0。
+/// r186: `sub` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L727
+pub fn Color::sub(self : Color, color : Color) -> Color {
+  self.r = 0.0.max(self.r - color.r)
+  self.g = 0.0.max(self.g - color.g)
+  self.b = 0.0.max(self.b - color.b)
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
