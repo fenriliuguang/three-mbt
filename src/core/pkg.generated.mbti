@@ -231,6 +231,14 @@ pub fn InterleavedBuffer::on_upload(Self, () -> Unit) -> Self
 pub fn InterleavedBuffer::set(Self, Array[Double], offset? : Int) -> Self
 pub fn InterleavedBuffer::set_needs_update(Self, Bool) -> Unit
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
+pub fn InterleavedBuffer::to_json(Self) -> InterleavedJson
+
+pub(all) struct InterleavedJson {
+  uuid : String
+  stride : Int
+  usage : Int
+  array : Array[Double]
+}
 
 pub(all) struct Layers {
   mut mask : Int

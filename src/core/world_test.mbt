@@ -2212,3 +2212,17 @@ test "uuid is a version-4 id that interleaved copy keeps" {
   ignore(destination.copy(source))
   assert_eq(destination.uuid, kept)
 }
+
+///|
+test "toJSON writes an interleaved buffer" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  ignore(buffer.set_usage(@constants.DYNAMIC_DRAW_USAGE))
+  let data = buffer.to_json()
+  assert_eq(data.uuid, buffer.uuid)
+  assert_eq(data.stride, 3)
+  assert_eq(data.usage, 35048)
+  assert_eq(data.array[0], 1.0)
+  assert_eq(data.array[5], 6.0)
+  data.array[0] = 8.0
+  assert_eq(buffer.array[0], 1.0)
+}

@@ -150,3 +150,25 @@ pub fn InterleavedBuffer::on_upload(
   self.on_upload_callback = Some(callback)
   self
 }
+
+///|
+/// `InterleavedBuffer.toJSON` 返回的数据。上游没有单独的类。上游把底层 `ArrayBuffer` 放进 `data.arrayBuffers`。本地没有共享缓冲区，数值直接写进 `array`。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L256
+pub(all) struct InterleavedJson {
+  uuid : String
+  stride : Int
+  usage : Int
+  array : Array[Double]
+}
+
+///|
+/// 写出标识、步长、使用方式和一份数值副本。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L256
+pub fn InterleavedBuffer::to_json(self : InterleavedBuffer) -> InterleavedJson {
+  {
+    uuid: self.uuid,
+    stride: self.stride,
+    usage: self.usage,
+    array: self.array.copy(),
+  }
+}
