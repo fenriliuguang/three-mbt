@@ -6275,6 +6275,35 @@ test "SphericalHarmonics3.fromArray reads nine coefficients" {
 }
 
 ///|
+test "SphericalHarmonics3.toArray writes twenty-seven components" {
+  let sh = @math.SphericalHarmonics3::new()
+  ignore(sh.coefficients[0].set(1.0, 2.0, 3.0))
+  ignore(sh.coefficients[8].set(4.0, 5.0, 6.0))
+  let fresh = sh.to_array()
+  assert_eq(fresh.length(), 27)
+  assert_eq(fresh[0], 1.0)
+  assert_eq(fresh[1], 2.0)
+  assert_eq(fresh[2], 3.0)
+  assert_eq(fresh[12], 0.0)
+  assert_eq(fresh[24], 4.0)
+  assert_eq(fresh[25], 5.0)
+  assert_eq(fresh[26], 6.0)
+  let placed = sh.to_array(array=[9.0], offset=1)
+  assert_eq(placed.length(), 28)
+  assert_eq(placed[0], 9.0)
+  assert_eq(placed[1], 1.0)
+  assert_eq(placed[27], 6.0)
+  let grown = sh.to_array(array=[7.0], offset=2)
+  assert_eq(grown.length(), 29)
+  assert_eq(grown[0], 7.0)
+  assert_eq(grown[1], 0.0)
+  assert_eq(grown[2], 1.0)
+  assert_eq(grown[28], 6.0)
+  assert_eq(sh.coefficients[0].x, 1.0)
+  assert_eq(sh.coefficients[8].z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

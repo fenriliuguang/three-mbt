@@ -1035,6 +1035,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `SphericalHarmonics3.fromArray` has landed. It reads nine coefficients as flat triples. The first triple `(1, 2, 3)` and the last triple `(4, 5, 6)` land in those coefficients. The middle stays `(0, 0, 0)`. The same 27 numbers at offset `1` store the same probe, and the source array is unchanged.
 
+`SphericalHarmonics3.toArray` has landed. It writes 27 numbers and leaves the probe unchanged. `(1, 2, 3)` and `(4, 5, 6)` occupy the first and last triples. A one-element array at offset `1` keeps the leading value and grows to length `28`. The same array at offset `2` grows to length `29` and pads the gap with `0`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1493,6 +1495,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SphericalHarmonics3.copy` | `math` |
 | planned | 7 | `SphericalHarmonics3.clone` | `math` |
 | planned | 7 | `SphericalHarmonics3.fromArray` | `math` |
+| planned | 7 | `SphericalHarmonics3.toArray` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

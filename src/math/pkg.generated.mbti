@@ -485,6 +485,7 @@ pub fn SphericalHarmonics3::lerp(Self, Self, Double) -> Self
 pub fn SphericalHarmonics3::new() -> Self
 pub fn SphericalHarmonics3::scale(Self, Double) -> Self
 pub fn SphericalHarmonics3::set(Self, Array[Vector3]) -> Self
+pub fn SphericalHarmonics3::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 pub fn SphericalHarmonics3::zero(Self) -> Self
 
 pub(all) struct Triangle {

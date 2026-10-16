@@ -200,3 +200,21 @@ pub fn SphericalHarmonics3::from_array(
   }
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 27` 的数组会补零再写入。球谐本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L296
+pub fn SphericalHarmonics3::to_array(
+  self : SphericalHarmonics3,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let mut target = match array {
+    None => []
+    Some(array) => array
+  }
+  for i in 0..<9 {
+    target = self.coefficients[i].to_array(array=target, offset=offset + i * 3)
+  }
+  target
+}
