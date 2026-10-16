@@ -1079,7 +1079,9 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `CubicInterpolant.interpolate_` has landed. After that same interval is recorded for samples `(10, 20, 30, 40)`, time `1` is `20`, time `1.5` is `25`, and time `2` is `30`. The samples stay unchanged.
 
-`DiscreteInterpolant` has landed. `new` stores positions `(0, 1)` and samples `(10, 20)` with a sample size of `1`. The cached index is `0` and the result buffer is `(0)`. A supplied result buffer `(4, 5)` is stored as given. `interpolate_` stays later.
+`DiscreteInterpolant` has landed. `new` stores positions `(0, 1)` and samples `(10, 20)` with a sample size of `1`. The cached index is `0` and the result buffer is `(0)`. A supplied result buffer `(4, 5)` is stored as given.
+
+`DiscreteInterpolant.interpolate_` has landed. With sample size `2`, interval index `2` at time `1.5` copies `(20, 21)` and leaves a longer buffer's third value `3` in place. Interval index `1` copies `(10, 11)`. The samples stay unchanged.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -1562,6 +1564,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `CubicInterpolant.intervalChanged_` | `math` |
 | planned | 7 | `CubicInterpolant.interpolate_` | `math` |
 | planned | 7 | `DiscreteInterpolant` | `math` |
+| planned | 7 | `DiscreteInterpolant.interpolate_` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

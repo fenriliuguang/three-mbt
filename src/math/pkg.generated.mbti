@@ -213,6 +213,7 @@ pub fn Cylindrical::set_from_vector3(Self, Vector3) -> Self
 pub(all) struct DiscreteInterpolant {
   interpolant : Interpolant
 }
+pub fn DiscreteInterpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn DiscreteInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Euler {

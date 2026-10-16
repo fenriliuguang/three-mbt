@@ -27,3 +27,19 @@ pub fn DiscreteInterpolant::new(
   }
   { interpolant, }
 }
+
+///|
+/// 取参数左侧的样本。时间参数不参与计算。
+/// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/DiscreteInterpolant.js#L25
+pub fn DiscreteInterpolant::interpolate(
+  self : DiscreteInterpolant,
+  i1 : Int,
+  t0 : Double,
+  t : Double,
+  t1 : Double,
+) -> Array[Double] {
+  ignore(t0)
+  ignore(t)
+  ignore(t1)
+  self.interpolant.copy_sample_value(i1 - 1)
+}

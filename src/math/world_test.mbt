@@ -6895,6 +6895,29 @@ test "DiscreteInterpolant.new stores the samples" {
 }
 
 ///|
+test "DiscreteInterpolant.interpolate_ copies the sample before the interval" {
+  let values = [10.0, 11.0, 20.0, 21.0, 30.0, 31.0]
+  let given = [1.0, 2.0, 3.0]
+  let discrete = @math.DiscreteInterpolant::new(
+    [0.0, 1.0, 2.0],
+    values,
+    2,
+    result_buffer=given,
+  )
+  let written = discrete.interpolate(2, 1.0, 1.5, 2.0)
+  assert_eq(physical_equal(written, given), true)
+  assert_eq(written[0], 20.0)
+  assert_eq(written[1], 21.0)
+  assert_eq(written[2], 3.0)
+  ignore(discrete.interpolate(1, 0.0, 0.25, 1.0))
+  assert_eq(given[0], 10.0)
+  assert_eq(given[1], 11.0)
+  assert_eq(given[2], 3.0)
+  assert_eq(values[0], 10.0)
+  assert_eq(values[5], 31.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
