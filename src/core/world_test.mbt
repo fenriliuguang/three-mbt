@@ -2160,3 +2160,20 @@ test "set writes an interleaved buffer at an offset" {
   assert_eq(buffer.array[2], 2.0)
   assert_eq(buffer.array[3], 9.0)
 }
+
+///|
+test "clone copies an interleaved buffer into a new object" {
+  let source = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  ignore(source.set_usage(@constants.DYNAMIC_DRAW_USAGE))
+  source.add_update_range(1, 2)
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.stride, 3)
+  assert_eq(cloned.count, 2)
+  assert_eq(cloned.usage, 35048)
+  assert_eq(cloned.array[0], 1.0)
+  assert_eq(cloned.array[5], 6.0)
+  assert_eq(cloned.update_ranges.length(), 0)
+  cloned.array[0] = 8.0
+  assert_eq(source.array[0], 1.0)
+}

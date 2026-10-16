@@ -112,3 +112,10 @@ pub fn InterleavedBuffer::set(
   }
   self
 }
+
+///|
+/// 新建一份交错缓冲。没有共享的 `ArrayBuffer`，数值是一份独立副本，使用方式一并带上。待上传区间不复制。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L205
+pub fn InterleavedBuffer::clone(self : InterleavedBuffer) -> InterleavedBuffer {
+  InterleavedBuffer::new(self.array, self.stride).copy(self)
+}
