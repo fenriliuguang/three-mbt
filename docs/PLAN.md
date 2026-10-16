@@ -765,6 +765,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.at` has landed. It writes the origin plus the direction scaled by a distance. Origin `(1, 2, 3)` and direction `(0, 1, 0)` at distance `0.5` is `(1, 2.5, 3)`, and distance `0` is the origin. The ray is unchanged.
 
+`Ray.lookAt` has landed. It points the direction from the origin at a position and normalizes it. Origin `(1, 2, 3)` looking at `(1, 5, 3)` gets direction `(0, 1, 0)`. The position is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1088,6 +1090,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.set` | `math` |
 | planned | 7 | `Ray.copy` | `math` |
 | planned | 7 | `Ray.at` | `math` |
+| planned | 7 | `Ray.lookAt` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

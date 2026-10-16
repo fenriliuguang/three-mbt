@@ -45,3 +45,11 @@ pub fn Ray::copy(self : Ray, ray : Ray) -> Ray {
 pub fn Ray::at(self : Ray, t : Double, target : Vector3) -> Vector3 {
   target.copy(self.origin).add_scaled_vector(self.direction, t)
 }
+
+///|
+/// 把方向改成从原点指向这个点，并单位化。点不改。
+/// r186: `lookAt` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L90
+pub fn Ray::look_at(self : Ray, v : Vector3) -> Ray {
+  ignore(self.direction.copy(v).sub(self.origin).normalize())
+  self
+}
