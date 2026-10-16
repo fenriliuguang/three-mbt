@@ -68,6 +68,21 @@ pub fn Matrix3::clone(self : Matrix3) -> Matrix3 {
 }
 
 ///|
+/// 把三列写进三个轴向量。
+/// r186: `extractBasis` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L157
+pub fn Matrix3::extract_basis(
+  self : Matrix3,
+  x_axis : Vector3,
+  y_axis : Vector3,
+  z_axis : Vector3,
+) -> Matrix3 {
+  ignore(x_axis.set_from_matrix3_column(self, 0))
+  ignore(y_axis.set_from_matrix3_column(self, 1))
+  ignore(z_axis.set_from_matrix3_column(self, 2))
+  self
+}
+
+///|
 pub fn Matrix3::set_from_matrix4(self : Matrix3, m : Matrix4) -> Matrix3 {
   let me = m.elements
   self.set(me[0], me[4], me[8], me[1], me[5], me[9], me[2], me[6], me[10])

@@ -208,6 +208,7 @@ pub(all) struct Matrix3 {
 pub fn Matrix3::clone(Self) -> Self
 pub fn Matrix3::copy(Self, Self) -> Self
 pub fn Matrix3::determinant(Self) -> Double
+pub fn Matrix3::extract_basis(Self, Vector3, Vector3, Vector3) -> Self
 pub fn Matrix3::get_normal_matrix(Self, Matrix4) -> Self
 pub fn Matrix3::identity(Self) -> Self
 pub fn Matrix3::invert(Self) -> Self

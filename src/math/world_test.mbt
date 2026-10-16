@@ -5026,6 +5026,29 @@ test "Frustum.clone copies six planes into a new frustum" {
 }
 
 ///|
+test "Matrix3.extractBasis writes the three columns" {
+  let matrix = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
+  let x_axis = @math.Vector3::new(x=9.0)
+  let y_axis = @math.Vector3::new(y=8.0)
+  let z_axis = @math.Vector3::new(z=7.0)
+  ignore(matrix.extract_basis(x_axis, y_axis, z_axis))
+  assert_eq(x_axis.x, 1.0)
+  assert_eq(x_axis.y, 4.0)
+  assert_eq(x_axis.z, 7.0)
+  assert_eq(y_axis.x, 2.0)
+  assert_eq(y_axis.y, 5.0)
+  assert_eq(y_axis.z, 8.0)
+  assert_eq(z_axis.x, 3.0)
+  assert_eq(z_axis.y, 6.0)
+  assert_eq(z_axis.z, 9.0)
+  assert_eq(matrix.elements[0], 1.0)
+  x_axis.x = 0.0
+  assert_eq(matrix.elements[0], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
