@@ -1257,6 +1257,17 @@ test "copyArray writes a prefix and leaves the tail" {
 }
 
 ///|
+test "set writes values at an offset" {
+  let attribute = @core.BufferAttribute::new([0.0, 0.0, 0.0, 9.0], 1)
+  let values = [1.0, 2.0]
+  let written = attribute.set(values, offset=1)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.array, [0.0, 1.0, 2.0, 9.0])
+  values[0] = 8.0
+  assert_eq(attribute.get_x(1), 1.0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

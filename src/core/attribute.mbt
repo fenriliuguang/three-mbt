@@ -85,6 +85,25 @@ pub fn BufferAttribute::copy_array(
 }
 
 ///|
+/// 从偏移处写入一份数值。放不下时中止。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L369
+pub fn BufferAttribute::set(
+  self : BufferAttribute,
+  value : Array[Double],
+  offset? : Int = 0,
+) -> BufferAttribute {
+  if offset < 0 || offset + value.length() > self.array.length() {
+    abort("BufferAttribute.set source does not fit")
+  }
+  let mut index = 0
+  while index < value.length() {
+    self.array[offset + index] = value[index]
+    index = index + 1
+  }
+  self
+}
+
+///|
 /// 新建一份属性，数值与源独立。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L653
 pub fn BufferAttribute::clone(self : BufferAttribute) -> BufferAttribute {
