@@ -943,3 +943,40 @@ test "center moves the bounding box center to the origin" {
     }
   }
 }
+
+///|
+test "setFromPoints writes a position attribute" {
+  let geometry = @core.BufferGeometry::new()
+  let points = [
+    @math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    @math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  ]
+  let written = geometry.set_from_points(points)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.count, 2)
+      assert_eq(position.get_x(0), 1.0)
+      assert_eq(position.get_y(0), 2.0)
+      assert_eq(position.get_z(0), 3.0)
+      assert_eq(position.get_x(1), 4.0)
+      assert_eq(position.get_y(1), 5.0)
+      assert_eq(position.get_z(1), 6.0)
+    }
+  }
+  let existing = @core.BufferGeometry::new()
+  ignore(
+    existing.set_attribute("position", @core.BufferAttribute::new([9.0, 9.0, 9.0], 3)),
+  )
+  ignore(existing.set_from_points(points))
+  match existing.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.count, 1)
+      assert_eq(position.get_x(0), 1.0)
+      assert_eq(position.get_y(0), 2.0)
+      assert_eq(position.get_z(0), 3.0)
+    }
+  }
+}

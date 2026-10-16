@@ -255,6 +255,44 @@ pub fn BufferGeometry::center(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
+/// 用三维点写入 `position`。没有该属性时新建；已有时只覆盖缓冲区装得下的顶点。
+/// r186: `setFromPoints` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L596
+pub fn BufferGeometry::set_from_points(
+  self : BufferGeometry,
+  points : Array[@math.Vector3],
+) -> BufferGeometry {
+  match self.get_attribute("position") {
+    None => {
+      let position = []
+      let mut index = 0
+      while index < points.length() {
+        let point = points[index]
+        position.push(point.x)
+        position.push(point.y)
+        position.push(point.z)
+        index = index + 1
+      }
+      ignore(self.set_attribute("position", BufferAttribute::new(position, 3)))
+      self
+    }
+    Some(attribute) => {
+      let limit = if points.length() < attribute.count {
+        points.length()
+      } else {
+        attribute.count
+      }
+      let mut index = 0
+      while index < limit {
+        let point = points[index]
+        attribute.set_xyz(index, point.x, point.y, point.z)
+        index = index + 1
+      }
+      self
+    }
+  }
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None
