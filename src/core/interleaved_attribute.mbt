@@ -97,3 +97,15 @@ pub fn InterleavedBufferAttribute::set_z(
   self.data.array[index * self.data.stride + self.offset + 2] = z
   self
 }
+
+///|
+/// 写入指定顶点的 w。下标是 `index * stride + offset + 3`。归一化换算还没有落地，写入的是原值。
+/// r186: `setW` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L270
+pub fn InterleavedBufferAttribute::set_w(
+  self : InterleavedBufferAttribute,
+  index : Int,
+  w : Double,
+) -> InterleavedBufferAttribute {
+  self.data.array[index * self.data.stride + self.offset + 3] = w
+  self
+}

@@ -2301,3 +2301,16 @@ test "setZ writes an interleaved component" {
   assert_eq(buffer.array[5], 4.0)
   assert_eq(buffer.array[2], 0.0)
 }
+
+///|
+test "setW writes an interleaved component" {
+  let buffer = @core.InterleavedBuffer::new(
+    [0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 9.0, 9.0],
+    4,
+  )
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 4, 0)
+  let written = attribute.set_w(1, 4.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(buffer.array[6], 9.0)
+  assert_eq(buffer.array[7], 4.0)
+}
