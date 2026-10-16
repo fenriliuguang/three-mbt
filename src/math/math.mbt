@@ -138,3 +138,11 @@ pub fn rand_float(low : Double, high : Double) -> Double {
   let rng = @random.Rand::Rand()
   low + rng.double() * (high - low)
 }
+
+///|
+/// 在以 0 为中心、宽度为 `range` 的区间里取一个随机数。`range` 为 0 时返回 0。
+/// r186: `randFloatSpread` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L230
+pub fn rand_float_spread(range : Double) -> Double {
+  let rng = @random.Rand::Rand()
+  range * (0.5 - rng.double())
+}

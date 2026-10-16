@@ -28,6 +28,8 @@ pub fn rad_to_deg(Double) -> Double
 
 pub fn rand_float(Double, Double) -> Double
 
+pub fn rand_float_spread(Double) -> Double
+
 pub fn rand_int(Double, Double) -> Double
 
 pub fn smootherstep(Double, Double, Double) -> Double

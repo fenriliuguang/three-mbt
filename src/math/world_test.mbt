@@ -5841,6 +5841,13 @@ test "MathUtils.randFloat returns a number in a half-open range" {
 }
 
 ///|
+test "MathUtils.randFloatSpread stays inside a centered range" {
+  assert_eq(@math.rand_float_spread(0.0), 0.0)
+  let value = @math.rand_float_spread(4.0)
+  assert_eq(value > -2.0 && value <= 2.0, true)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
