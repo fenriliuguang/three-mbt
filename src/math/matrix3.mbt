@@ -355,3 +355,32 @@ pub fn Matrix3::from_array(
   }
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 9` 的数组会补零再写入。矩阵本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L593
+pub fn Matrix3::to_array(
+  self : Matrix3,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 9
+  while target.length() < end {
+    target.push(0.0)
+  }
+  let te = self.elements
+  target[offset] = te[0]
+  target[offset + 1] = te[1]
+  target[offset + 2] = te[2]
+  target[offset + 3] = te[3]
+  target[offset + 4] = te[4]
+  target[offset + 5] = te[5]
+  target[offset + 6] = te[6]
+  target[offset + 7] = te[7]
+  target[offset + 8] = te[8]
+  target
+}

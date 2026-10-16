@@ -5274,6 +5274,36 @@ test "Matrix3.fromArray reads nine column-major elements" {
 }
 
 ///|
+test "Matrix3.toArray writes nine column-major elements" {
+  let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let fresh = m.to_array()
+  assert_eq(fresh.length(), 9)
+  assert_eq(fresh[0], 1.0)
+  assert_eq(fresh[1], 4.0)
+  assert_eq(fresh[2], 7.0)
+  assert_eq(fresh[3], 2.0)
+  assert_eq(fresh[4], 5.0)
+  assert_eq(fresh[5], 8.0)
+  assert_eq(fresh[6], 3.0)
+  assert_eq(fresh[7], 6.0)
+  assert_eq(fresh[8], 9.0)
+  let placed = m.to_array(
+    array=[9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0],
+    offset=1,
+  )
+  assert_eq(placed[0], 9.0)
+  assert_eq(placed[1], 1.0)
+  assert_eq(placed[9], 9.0)
+  let grown = m.to_array(array=[4.0], offset=2)
+  assert_eq(grown.length(), 11)
+  assert_eq(grown[0], 4.0)
+  assert_eq(grown[1], 0.0)
+  assert_eq(grown[2], 1.0)
+  assert_eq(grown[10], 9.0)
+  assert_eq(m.elements[0], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
