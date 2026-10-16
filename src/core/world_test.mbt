@@ -2046,3 +2046,15 @@ test "toJSON writes meshPerAttribute when the repeat count is not one" {
     Some(flag) => assert_eq(flag, true)
   }
 }
+
+///|
+test "instanceCount defaults to infinity and copy carries it" {
+  let geometry = @core.BufferGeometry::new()
+  assert_eq(geometry.instance_count.is_inf(), true)
+  assert_eq(geometry.instance_count > 0.0, true)
+  geometry.instance_count = 4.0
+  let destination = @core.BufferGeometry::new()
+  ignore(destination.copy(geometry))
+  assert_eq(destination.instance_count, 4.0)
+  assert_eq(geometry.instance_count, 4.0)
+}

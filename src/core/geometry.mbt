@@ -29,12 +29,13 @@ pub(all) struct DrawRange {
 
 ///|
 /// 几何体。属性按名字存放，索引和包围体单独保存。
-/// `id` 从 0 起递增，`copy` 不改写目标的编号。`uuid` 在新建时生成，`copy` 也不改写它。`name` 默认是空字符串。`type_name` 默认是 `BufferGeometry`，`copy` 保留目标自己的类型。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。`uuid` 在新建时生成，`copy` 也不改写它。`name` 默认是空字符串。`type_name` 默认是 `BufferGeometry`，`copy` 保留目标自己的类型。`instance_count` 来自 `InstancedBufferGeometry`，默认是正无穷。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L73
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L81
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L88
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L89
+/// r186: `instanceCount` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedBufferGeometry.js#L32
 /// r186: `indirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L112
 /// r186: `morphAttributes` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L141
 /// r186: `morphTargetsRelative` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L151
@@ -45,6 +46,7 @@ pub(all) struct BufferGeometry {
   uuid : String
   mut name : String
   mut type_name : String
+  mut instance_count : Double
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
@@ -69,6 +71,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     uuid: @math.generate_uuid(),
     name: "",
     type_name: "BufferGeometry",
+    instance_count: 1.0 / 0.0,
     attributes: Map([]),
     index: None,
     indirect: None,
@@ -980,13 +983,14 @@ pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
-/// 把源几何体的名字、属性、形变属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。`user_data` 与源共用同一张表。
+/// 把源几何体的名字、实例数量、属性、形变属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。`user_data` 与源共用同一张表。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1357
 pub fn BufferGeometry::copy(
   self : BufferGeometry,
   source : BufferGeometry,
 ) -> BufferGeometry {
   self.name = source.name
+  self.instance_count = source.instance_count
   self.index = None
   self.attributes.clear()
   self.morph_attributes.clear()
