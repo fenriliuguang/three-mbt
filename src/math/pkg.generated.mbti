@@ -146,6 +146,7 @@ pub(all) struct Euler {
   mut order : EulerOrder
   mut on_change : (() -> Unit)?
 }
+pub fn Euler::clone(Self) -> Self
 pub fn Euler::copy(Self, Self) -> Self
 pub fn Euler::new(x? : Double, y? : Double, z? : Double, order? : EulerOrder) -> Self
 pub fn Euler::reorder(Self, EulerOrder) -> Self

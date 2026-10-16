@@ -35,6 +35,13 @@ pub fn Euler::new(
 }
 
 ///|
+/// 复制出一份新的欧拉角。回调不跟着走。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L156
+pub fn Euler::clone(self : Euler) -> Euler {
+  Euler::new(x=self.x, y=self.y, z=self.z, order=self.order)
+}
+
+///|
 fn Euler::emit(self : Euler) -> Unit {
   match self.on_change {
     None => ()

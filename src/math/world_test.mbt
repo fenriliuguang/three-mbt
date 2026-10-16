@@ -4786,6 +4786,26 @@ test "Color.toJSON returns the sRGB hexadecimal integer" {
 }
 
 ///|
+test "Euler.clone copies the angles and the order" {
+  let euler = @math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)
+  let cloned = euler.clone()
+  assert_eq(cloned.x, 1.0)
+  assert_eq(cloned.y, 2.0)
+  assert_eq(cloned.z, 3.0)
+  match cloned.order {
+    @math.EulerOrder::ZYX => assert_eq(cloned.x, 1.0)
+    _ => assert_eq(true, false)
+  }
+  euler.x = 0.0
+  cloned.order = @math.EulerOrder::XYZ
+  assert_eq(cloned.x, 1.0)
+  match euler.order {
+    @math.EulerOrder::ZYX => assert_eq(euler.x, 0.0)
+    _ => assert_eq(true, false)
+  }
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
