@@ -217,3 +217,13 @@ pub fn Ray::intersect_sphere(
     Some(self.at(t0, target))
   }
 }
+
+///|
+/// 射线与球相交，或从球内出发，则为真。空球为假。球和射线都不改。
+/// r186: `intersectsSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L345
+pub fn Ray::intersects_sphere(self : Ray, sphere : Sphere) -> Bool {
+  if sphere.radius < 0.0 {
+    return false
+  }
+  self.distance_sq_to_point(sphere.center) <= sphere.radius * sphere.radius
+}

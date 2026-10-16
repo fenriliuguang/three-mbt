@@ -4139,6 +4139,31 @@ test "Ray.intersectSphere returns the first hit in front of the ray" {
 }
 
 ///|
+test "Ray.intersectsSphere counts a sphere in front of the ray" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let sphere = @math.Sphere::new(radius=1.0)
+  let miss = @math.Ray::new(
+    origin=@math.Vector3::new(y=3.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let behind = @math.Ray::new(
+    origin=@math.Vector3::new(x=2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  assert_eq(ray.intersects_sphere(sphere), true)
+  assert_eq(miss.intersects_sphere(sphere), false)
+  assert_eq(behind.intersects_sphere(sphere), false)
+  assert_eq(@math.Ray::new().intersects_sphere(sphere), true)
+  assert_eq(ray.intersects_sphere(@math.Sphere::new()), false)
+  assert_eq(sphere.radius, 1.0)
+  assert_eq(ray.origin.x, -2.0)
+  assert_eq(ray.direction.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
