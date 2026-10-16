@@ -1650,3 +1650,21 @@ test "type stays BufferGeometry and copy keeps the destination type" {
   assert_eq(destination.type_name, "SphereGeometry")
   assert_eq(source.type_name, "BoxGeometry")
 }
+
+///|
+test "setIndirect stores an attribute at a byte offset" {
+  let geometry = @core.BufferGeometry::new()
+  match geometry.indirect {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  assert_eq(geometry.indirect_offset, 0)
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0], 5)
+  let written = geometry.set_indirect(attribute, offset=16)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.indirect {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(stored.get_x(0), 1.0)
+  }
+  assert_eq(geometry.indirect_offset, 16)
+}

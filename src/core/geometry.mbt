@@ -35,6 +35,7 @@ pub(all) struct DrawRange {
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L81
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L88
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L89
+/// r186: `indirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L112
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
@@ -42,6 +43,8 @@ pub(all) struct BufferGeometry {
   mut type_name : String
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
+  mut indirect : BufferAttribute?
+  mut indirect_offset : Int
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
@@ -59,6 +62,8 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     type_name: "BufferGeometry",
     attributes: Map([]),
     index: None,
+    indirect: None,
+    indirect_offset: 0,
     groups: [],
     draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
@@ -119,6 +124,19 @@ pub fn BufferGeometry::set_index_array(
   indices : Array[Int],
 ) -> BufferGeometry {
   self.set_index(BufferAttribute::from_ints(indices, 1))
+}
+
+///|
+/// 设置间接绘制用的属性，以及缓冲里的字节偏移。偏移默认是 0。
+/// r186: `setIndirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L253
+pub fn BufferGeometry::set_indirect(
+  self : BufferGeometry,
+  indirect : BufferAttribute,
+  offset? : Int = 0,
+) -> BufferGeometry {
+  self.indirect = Some(indirect)
+  self.indirect_offset = offset
+  self
 }
 
 ///|
