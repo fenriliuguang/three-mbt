@@ -64,6 +64,19 @@ pub fn InterleavedBufferAttribute::get_component(
 }
 
 ///|
+/// 写入指定顶点的一个分量。下标是 `index * stride + offset + component`。归一化换算还没有落地，写入的是原值。
+/// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L202
+pub fn InterleavedBufferAttribute::set_component(
+  self : InterleavedBufferAttribute,
+  index : Int,
+  component : Int,
+  value : Double,
+) -> InterleavedBufferAttribute {
+  self.data.array[index * self.data.stride + self.offset + component] = value
+  self
+}
+
+///|
 /// 读取指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，读到的是缓冲里的原值。
 /// r186: `getX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L286
 pub fn InterleavedBufferAttribute::get_x(

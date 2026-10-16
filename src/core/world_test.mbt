@@ -2391,6 +2391,16 @@ test "getComponent reads an interleaved component by index" {
 }
 
 ///|
+test "setComponent writes an interleaved component by index" {
+  let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  let written = attribute.set_component(1, 2, 4.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(buffer.array[4], 9.0)
+  assert_eq(buffer.array[5], 4.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
