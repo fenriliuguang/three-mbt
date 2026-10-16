@@ -20,10 +20,11 @@ pub(all) struct UpdateRange {
 
 ///|
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
-/// `id` 从 0 起递增，`copy` 不改写目标的编号。`name` 默认是空字符串。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。`name` 默认是空字符串。`gpu_type` 默认是 `FloatType`。
 /// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L56
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L63
+/// r186: `gpuType` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L130
 pub(all) struct BufferAttribute {
   id : Int
   mut name : String
@@ -33,6 +34,7 @@ pub(all) struct BufferAttribute {
   mut count : Int
   mut version : Int
   mut usage : Int
+  mut gpu_type : Int
   update_ranges : Array[UpdateRange]
   mut on_upload_callback : (() -> Unit)?
   listeners : Map[String, Array[() -> Unit]]
@@ -53,6 +55,7 @@ pub fn BufferAttribute::new(
     count: array.length() / item_size,
     version: 0,
     usage: @constants.STATIC_DRAW_USAGE,
+    gpu_type: @constants.FLOAT_TYPE,
     update_ranges: [],
     on_upload_callback: None,
     listeners: Map([]),
@@ -216,7 +219,7 @@ pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
 }
 
 ///|
-/// 用源属性的名字、数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
+/// 用源属性的名字、数值、分量个数、归一化标记、使用方式和 GPU 类型替换当前属性。数值是一份副本。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
 pub fn BufferAttribute::copy(
   self : BufferAttribute,
@@ -228,6 +231,7 @@ pub fn BufferAttribute::copy(
   self.count = source.count
   self.normalized = source.normalized
   self.usage = source.usage
+  self.gpu_type = source.gpu_type
   self
 }
 

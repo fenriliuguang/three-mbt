@@ -430,3 +430,13 @@ pub const DYNAMIC_COPY_USAGE : Int = 35050
 /// 缓冲区流式复制。对齐 `StreamCopyUsage`（35042）。
 /// r186: `StreamCopyUsage` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1632
 pub const STREAM_COPY_USAGE : Int = 35042
+
+///|
+/// 整数纹理类型。对齐 `IntType`（1013）。
+/// r186: `IntType` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L675
+pub const INT_TYPE : Int = 1013
+
+///|
+/// 浮点纹理类型。对齐 `FloatType`（1015）。
+/// r186: `FloatType` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L691
+pub const FLOAT_TYPE : Int = 1015

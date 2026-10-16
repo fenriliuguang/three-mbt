@@ -28,6 +28,7 @@ pub(all) struct BufferAttribute {
   mut count : Int
   mut version : Int
   mut usage : Int
+  mut gpu_type : Int
   update_ranges : Array[UpdateRange]
   mut on_upload_callback : (() -> Unit)?
   listeners : Map[String, Array[() -> Unit]]

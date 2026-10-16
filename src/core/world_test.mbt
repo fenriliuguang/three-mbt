@@ -1593,3 +1593,14 @@ test "name starts empty and copy carries it" {
   ignore(destination.copy(source))
   assert_eq(destination.name, "tangent")
 }
+
+///|
+test "gpuType defaults to float and copy carries int" {
+  let source = @core.BufferAttribute::new([1.0], 1)
+  assert_eq(source.gpu_type, @constants.FLOAT_TYPE)
+  assert_eq(source.gpu_type, 1015)
+  source.gpu_type = @constants.INT_TYPE
+  let destination = @core.BufferAttribute::new([9.0], 1)
+  ignore(destination.copy(source))
+  assert_eq(destination.gpu_type, 1013)
+}

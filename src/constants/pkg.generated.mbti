@@ -26,6 +26,8 @@ pub const DYNAMIC_READ_USAGE : Int = 35049
 
 pub const EQUAL_DEPTH : Int = 4
 
+pub const FLOAT_TYPE : Int = 1015
+
 pub const FRONT_SIDE : Int = 0
 
 pub const GREATER_DEPTH : Int = 6
@@ -37,6 +39,8 @@ pub const INTERPOLATE_DISCRETE : Int = 2300
 pub const INTERPOLATE_LINEAR : Int = 2301
 
 pub const INTERPOLATE_SMOOTH : Int = 2302
+
+pub const INT_TYPE : Int = 1013
 
 pub const LESS_DEPTH : Int = 2
 
