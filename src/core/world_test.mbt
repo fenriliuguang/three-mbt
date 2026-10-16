@@ -2118,3 +2118,21 @@ test "clearUpdateRanges drops the span on an interleaved buffer" {
   buffer.clear_update_ranges()
   assert_eq(buffer.update_ranges.length(), 0)
 }
+
+///|
+test "copy replaces an interleaved buffer" {
+  let source = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  ignore(source.set_usage(@constants.DYNAMIC_DRAW_USAGE))
+  let destination = @core.InterleavedBuffer::new([9.0], 1)
+  destination.add_update_range(1, 2)
+  let written = destination.copy(source)
+  assert_eq(physical_equal(written, destination), true)
+  assert_eq(destination.stride, 3)
+  assert_eq(destination.count, 2)
+  assert_eq(destination.usage, 35048)
+  assert_eq(destination.array[0], 1.0)
+  assert_eq(destination.array[5], 6.0)
+  assert_eq(destination.update_ranges.length(), 1)
+  destination.array[0] = 8.0
+  assert_eq(source.array[0], 1.0)
+}

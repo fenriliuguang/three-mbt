@@ -1281,6 +1281,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `InterleavedBuffer.clearUpdateRanges` has landed. After adding start `1` and count `2`, clearing leaves no ranges.
 
+`InterleavedBuffer.copy` has landed. Copying stride `3` and values `[1, 2, 3, 4, 5, 6]` onto `[9]` replaces the array, the stride, the count, and `DynamicDrawUsage` (`35048`). The destination keeps its own update range. Changing the copy leaves the source at `1`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1862,6 +1864,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InterleavedBuffer.setUsage` | `core` |
 | planned | 7 | `InterleavedBuffer.addUpdateRange` | `core` |
 | planned | 7 | `InterleavedBuffer.clearUpdateRanges` | `core` |
+| planned | 7 | `InterleavedBuffer.copy` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

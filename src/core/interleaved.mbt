@@ -9,9 +9,9 @@
 /// r186: `usage` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L60
 /// r186: `updateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L68
 pub(all) struct InterleavedBuffer {
-  array : Array[Double]
-  stride : Int
-  count : Int
+  mut array : Array[Double]
+  mut stride : Int
+  mut count : Int
   mut usage : Int
   update_ranges : Array[UpdateRange]
 }
@@ -57,4 +57,18 @@ pub fn InterleavedBuffer::add_update_range(
 /// r186: `clearUpdateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L136
 pub fn InterleavedBuffer::clear_update_ranges(self : InterleavedBuffer) -> Unit {
   self.update_ranges.clear()
+}
+
+///|
+/// 用源缓冲的数值、步长、顶点数和使用方式替换当前缓冲。数值是一份副本。待上传区间保留目标自己的。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L148
+pub fn InterleavedBuffer::copy(
+  self : InterleavedBuffer,
+  source : InterleavedBuffer,
+) -> InterleavedBuffer {
+  self.array = source.array.copy()
+  self.count = source.count
+  self.stride = source.stride
+  self.usage = source.usage
+  self
 }
