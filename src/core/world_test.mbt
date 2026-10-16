@@ -2226,3 +2226,15 @@ test "toJSON writes an interleaved buffer" {
   data.array[0] = 8.0
   assert_eq(buffer.array[0], 1.0)
 }
+
+///|
+test "InterleavedBufferAttribute count comes from its buffer" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1)
+  assert_eq(attribute.name, "")
+  assert_eq(attribute.item_size, 2)
+  assert_eq(attribute.offset, 1)
+  assert_eq(attribute.normalized, false)
+  assert_eq(attribute.count(), 2)
+  assert_eq(attribute.data.array[1], 2.0)
+}

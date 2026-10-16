@@ -233,6 +233,16 @@ pub fn InterleavedBuffer::set_needs_update(Self, Bool) -> Unit
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
 pub fn InterleavedBuffer::to_json(Self) -> InterleavedJson
 
+pub(all) struct InterleavedBufferAttribute {
+  mut name : String
+  data : InterleavedBuffer
+  item_size : Int
+  offset : Int
+  mut normalized : Bool
+}
+pub fn InterleavedBufferAttribute::count(Self) -> Int
+pub fn InterleavedBufferAttribute::new(InterleavedBuffer, Int, Int, normalized? : Bool) -> Self
+
 pub(all) struct InterleavedJson {
   uuid : String
   stride : Int
