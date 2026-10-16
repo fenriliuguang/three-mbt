@@ -659,3 +659,17 @@ test "setDrawRange stores the first vertex and the count" {
   assert_eq(geometry.draw_range.start, 1.0)
   assert_eq(geometry.draw_range.count, 4.0)
 }
+
+///|
+test "applyMatrix4 translates each vertex" {
+  let positions = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let matrix = @math.Matrix4::new().make_translation(10.0, 0.0, 0.0)
+  let written = positions.apply_matrix4(matrix)
+  assert_eq(physical_equal(written, positions), true)
+  assert_eq(positions.get_x(0), 11.0)
+  assert_eq(positions.get_y(0), 2.0)
+  assert_eq(positions.get_z(0), 3.0)
+  assert_eq(positions.get_x(1), 14.0)
+  assert_eq(positions.get_y(1), 5.0)
+  assert_eq(positions.get_z(1), 6.0)
+}
