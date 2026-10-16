@@ -157,6 +157,15 @@ pub fn Quaternion::set_z(self : Quaternion, value : Double) -> Quaternion {
 }
 
 ///|
+/// 写入 w 并通知。
+/// r186: `w` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L234
+pub fn Quaternion::set_w(self : Quaternion, value : Double) -> Quaternion {
+  self.w = value
+  self.emit()
+  self
+}
+
+///|
 pub fn Quaternion::copy(self : Quaternion, q : Quaternion) -> Quaternion {
   self.x = q.x
   self.y = q.y

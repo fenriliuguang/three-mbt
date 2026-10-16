@@ -945,6 +945,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion` `z` setter has landed as `setZ`. It writes `z` and runs the change callback. Setting `z` to `0.25` on `(0.25, 0.5, 0, 1)` stores that `z` and leaves the other components. The callback runs once.
 
+`Quaternion` `w` setter has landed as `setW`. It writes `w` and runs the change callback. Setting `w` to `0.75` on `(0.25, 0.5, 0.25, 1)` stores that `w` and leaves the other components. The callback runs once.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1358,6 +1360,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Quaternion` `x` setter | `math` |
 | planned | 7 | `Quaternion` `y` setter | `math` |
 | planned | 7 | `Quaternion` `z` setter | `math` |
+| planned | 7 | `Quaternion` `w` setter | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

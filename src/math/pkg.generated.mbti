@@ -326,6 +326,7 @@ pub fn Quaternion::set(Self, Double, Double, Double, Double) -> Self
 pub fn Quaternion::set_from_axis_angle(Self, Vector3, Double) -> Self
 pub fn Quaternion::set_from_euler(Self, Euler, update? : Bool) -> Self
 pub fn Quaternion::set_from_rotation_matrix(Self, Matrix4) -> Self
+pub fn Quaternion::set_w(Self, Double) -> Self
 pub fn Quaternion::set_x(Self, Double) -> Self
 pub fn Quaternion::set_y(Self, Double) -> Self
 pub fn Quaternion::set_z(Self, Double) -> Self
