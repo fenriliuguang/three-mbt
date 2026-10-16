@@ -127,3 +127,16 @@ pub fn SphericalHarmonics3::add_scaled_sh(
   }
   self
 }
+
+///|
+/// 把九个系数都乘上同一个标量。
+/// r186: `scale` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L190
+pub fn SphericalHarmonics3::scale(
+  self : SphericalHarmonics3,
+  s : Double,
+) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].multiply_scalar(s))
+  }
+  self
+}

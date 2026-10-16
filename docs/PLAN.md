@@ -1023,6 +1023,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `SphericalHarmonics3.addScaledSH` has landed. It adds a scaled copy and leaves the source unchanged. `(1, 2, 3)` plus twice `(4, 5, 6)` is `(9, 12, 15)`. The last coefficient `(1, 0, 0)` plus twice `(0, 1, 0)` is `(1, 2, 0)`. The middle stays `(0, 0, 0)`.
 
+`SphericalHarmonics3.scale` has landed. It multiplies every coefficient by the same factor. `(1, 2, 3)` scaled by `2` is `(2, 4, 6)`. The last coefficient `(4, 5, 6)` becomes `(8, 10, 12)`. The middle stays `(0, 0, 0)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1475,6 +1477,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SphericalHarmonics3.getIrradianceAt` | `math` |
 | planned | 7 | `SphericalHarmonics3.add` | `math` |
 | planned | 7 | `SphericalHarmonics3.addScaledSH` | `math` |
+| planned | 7 | `SphericalHarmonics3.scale` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
