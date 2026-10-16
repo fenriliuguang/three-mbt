@@ -49,3 +49,10 @@ pub fn clamp(value : Double, min : Double, max : Double) -> Double {
 pub fn euclidean_modulo(n : Double, m : Double) -> Double {
   ((n % m) + m) % m
 }
+
+///|
+/// 在两个数之间线性插值。
+/// r186: `lerp` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L116
+pub fn lerp(x : Double, y : Double, t : Double) -> Double {
+  (1.0 - t) * x + t * y
+}
