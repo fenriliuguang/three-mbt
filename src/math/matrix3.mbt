@@ -318,3 +318,11 @@ pub fn Matrix3::rotate(self : Matrix3, theta : Double) -> Matrix3 {
 pub fn Matrix3::make_translation(self : Matrix3, x : Double, y : Double) -> Matrix3 {
   self.set(1.0, 0.0, x, 0.0, 1.0, y, 0.0, 0.0, 1.0)
 }
+
+///|
+/// 左乘一个二维平移。
+/// r186: `translate` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L452
+pub fn Matrix3::translate(self : Matrix3, tx : Double, ty : Double) -> Matrix3 {
+  let m = Matrix3::new().make_translation(tx, ty)
+  self.premultiply(m)
+}

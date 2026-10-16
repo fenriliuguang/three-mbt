@@ -225,6 +225,7 @@ pub fn Matrix3::scale(Self, Double, Double) -> Self
 pub fn Matrix3::set(Self, Double, Double, Double, Double, Double, Double, Double, Double, Double) -> Self
 pub fn Matrix3::set_from_matrix4(Self, Matrix4) -> Self
 pub fn Matrix3::set_uv_transform(Self, Double, Double, Double, Double, Double, Double, Double) -> Self
+pub fn Matrix3::translate(Self, Double, Double) -> Self
 pub fn Matrix3::transpose(Self) -> Self
 pub fn Matrix3::transpose_into_array(Self, Array[Double]) -> Self
 

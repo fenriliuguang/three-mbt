@@ -5225,6 +5225,21 @@ test "Matrix3.makeTranslation stores a 2D translation" {
 }
 
 ///|
+test "Matrix3.translate premultiplies a 2D translation" {
+  let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  ignore(m.translate(0.25, 0.5))
+  assert_eq(m.elements[0], 2.75)
+  assert_eq(m.elements[1], 7.5)
+  assert_eq(m.elements[2], 7.0)
+  assert_eq(m.elements[3], 4.0)
+  assert_eq(m.elements[4], 9.0)
+  assert_eq(m.elements[5], 8.0)
+  assert_eq(m.elements[6], 5.25)
+  assert_eq(m.elements[7], 10.5)
+  assert_eq(m.elements[8], 9.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
