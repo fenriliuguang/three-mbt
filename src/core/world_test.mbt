@@ -1721,3 +1721,13 @@ test "morphAttributes copy a position target" {
     Some(attributes) => assert_eq(attributes[0].get_x(0), 1.0)
   }
 }
+
+///|
+test "morphTargetsRelative defaults to false and copy carries it" {
+  let source = @core.BufferGeometry::new()
+  assert_eq(source.morph_targets_relative, false)
+  source.morph_targets_relative = true
+  let destination = @core.BufferGeometry::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.morph_targets_relative, true)
+}

@@ -37,6 +37,7 @@ pub(all) struct DrawRange {
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L89
 /// r186: `indirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L112
 /// r186: `morphAttributes` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L141
+/// r186: `morphTargetsRelative` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L151
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
@@ -47,6 +48,7 @@ pub(all) struct BufferGeometry {
   mut indirect : BufferAttribute?
   mut indirect_offset : Int
   morph_attributes : Map[String, Array[BufferAttribute]]
+  mut morph_targets_relative : Bool
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
@@ -67,6 +69,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     indirect: None,
     indirect_offset: 0,
     morph_attributes: Map([]),
+    morph_targets_relative: false,
     groups: [],
     draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
@@ -850,6 +853,7 @@ pub fn BufferGeometry::copy(
     }
     self.morph_attributes.set(name, cloned)
   }
+  self.morph_targets_relative = source.morph_targets_relative
   let mut group_index = 0
   while group_index < source.groups.length() {
     let group = source.groups[group_index]
