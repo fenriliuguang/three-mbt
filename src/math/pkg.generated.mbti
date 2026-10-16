@@ -194,6 +194,7 @@ pub(all) struct CubicInterpolant {
   mut offset_next : Int
   default_settings : SplineEndings
 }
+pub fn CubicInterpolant::interval_changed(Self, Int, Double, Double) -> Unit
 pub fn CubicInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Cylindrical {

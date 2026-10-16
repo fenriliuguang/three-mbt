@@ -6817,6 +6817,45 @@ test "CubicInterpolant.new starts at zero curvature" {
 }
 
 ///|
+test "CubicInterpolant.intervalChanged_ stores neighbor weights" {
+  let cubic = @math.CubicInterpolant::new(
+    [0.0, 1.0, 2.0, 3.0],
+    [10.0, 11.0, 20.0, 21.0, 30.0, 31.0, 40.0, 41.0],
+    2,
+  )
+  cubic.interval_changed(2, 1.0, 2.0)
+  assert_eq(cubic.weight_prev, 0.5)
+  assert_eq(cubic.weight_next, 0.5)
+  assert_eq(cubic.offset_prev, 0)
+  assert_eq(cubic.offset_next, 6)
+  cubic.interval_changed(1, 0.0, 1.0)
+  assert_eq(cubic.weight_prev, -0.5)
+  assert_eq(cubic.offset_prev, 2)
+  assert_eq(cubic.weight_next, 0.5)
+  assert_eq(cubic.offset_next, 4)
+  cubic.default_settings.ending_start = @constants.ZeroSlope
+  cubic.interval_changed(1, 0.0, 1.0)
+  assert_eq(cubic.weight_prev, 0.5)
+  assert_eq(cubic.offset_prev, 2)
+  cubic.default_settings.ending_start = @constants.WrapAround
+  cubic.interval_changed(1, 0.0, 1.0)
+  assert_eq(cubic.weight_prev, 0.5)
+  assert_eq(cubic.offset_prev, 4)
+  cubic.default_settings.ending_start = @constants.ZeroCurvature
+  cubic.interval_changed(3, 2.0, 3.0)
+  assert_eq(cubic.weight_next, -0.5)
+  assert_eq(cubic.offset_next, 4)
+  cubic.default_settings.ending_end = @constants.ZeroSlope
+  cubic.interval_changed(3, 2.0, 3.0)
+  assert_eq(cubic.weight_next, 0.5)
+  assert_eq(cubic.offset_next, 6)
+  cubic.default_settings.ending_end = @constants.WrapAround
+  cubic.interval_changed(3, 2.0, 3.0)
+  assert_eq(cubic.weight_next, 0.5)
+  assert_eq(cubic.offset_next, 2)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
