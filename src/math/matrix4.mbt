@@ -937,3 +937,18 @@ pub fn Matrix4::equals(self : Matrix4, matrix : Matrix4) -> Bool {
   }
   same
 }
+
+///|
+/// 从列主序数组读入十六个元素。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L1274
+pub fn Matrix4::from_array(
+  self : Matrix4,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Matrix4 {
+  let te = self.elements
+  for i in 0..<16 {
+    te[i] = array[i + offset]
+  }
+  self
+}

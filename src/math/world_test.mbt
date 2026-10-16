@@ -5489,6 +5489,32 @@ test "Matrix4.makeShear stores six shear terms" {
 }
 
 ///|
+test "Matrix4.fromArray reads sixteen column-major elements" {
+  let values = [
+    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0,
+    1.0,
+  ]
+  let m = @math.Matrix4::new()
+  ignore(m.from_array(values))
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[5], 3.0)
+  assert_eq(m.elements[10], 4.0)
+  assert_eq(m.elements[15], 1.0)
+  assert_eq(m.elements[1], 0.0)
+  ignore(
+    m.from_array(
+      [
+        9.0, 2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0,
+        0.0, 0.0, 1.0,
+      ],
+      offset=1,
+    ),
+  )
+  assert_eq(m.elements[0], 2.0)
+  assert_eq(m.elements[15], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
