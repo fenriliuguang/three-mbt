@@ -42,3 +42,10 @@ pub fn linear_to_srgb(c : Double) -> Double {
 pub fn clamp(value : Double, min : Double, max : Double) -> Double {
   max.min(value).max(min)
 }
+
+///|
+/// 欧几里得取模，结果与除数同号。
+/// r186: `euclideanModulo` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L57
+pub fn euclidean_modulo(n : Double, m : Double) -> Double {
+  ((n % m) + m) % m
+}
