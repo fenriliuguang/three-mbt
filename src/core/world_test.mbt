@@ -1541,3 +1541,12 @@ test "hasEventListener reports a registered geometry listener" {
   geometry.add_event_listener("dispose", listener)
   assert_eq(geometry.has_event_listener("dispose", listener), true)
 }
+
+///|
+test "removeEventListener drops a registered geometry listener" {
+  let geometry = @core.BufferGeometry::new()
+  let listener = fn() {}
+  geometry.add_event_listener("dispose", listener)
+  geometry.remove_event_listener("dispose", listener)
+  assert_eq(geometry.has_event_listener("dispose", listener), false)
+}
