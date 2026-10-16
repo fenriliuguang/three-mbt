@@ -6192,6 +6192,20 @@ test "SphericalHarmonics3.lerp blends toward another probe" {
 }
 
 ///|
+test "SphericalHarmonics3.equals compares every coefficient" {
+  let sh = @math.SphericalHarmonics3::new()
+  let other = @math.SphericalHarmonics3::new()
+  assert_eq(sh.equals(other), true)
+  ignore(sh.coefficients[0].set(1.0, 2.0, 3.0))
+  assert_eq(sh.equals(other), false)
+  ignore(other.coefficients[0].set(1.0, 2.0, 3.0))
+  assert_eq(sh.equals(other), true)
+  ignore(other.coefficients[8].set(4.0, 5.0, 6.0))
+  assert_eq(sh.equals(other), false)
+  assert_eq(sh.coefficients[8].x, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

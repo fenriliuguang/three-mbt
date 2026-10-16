@@ -154,3 +154,18 @@ pub fn SphericalHarmonics3::lerp(
   }
   self
 }
+
+///|
+/// 九个系数都相同才相等。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L228
+pub fn SphericalHarmonics3::equals(
+  self : SphericalHarmonics3,
+  sh : SphericalHarmonics3,
+) -> Bool {
+  for i in 0..<9 {
+    if !self.coefficients[i].equals(sh.coefficients[i]) {
+      return false
+    }
+  }
+  true
+}
