@@ -51,6 +51,7 @@ pub fn BufferAttribute::set_component(Self, Int, Int, Double) -> Self
 pub fn BufferAttribute::set_triangle(Self, @math.Triangle, Int, Int, Int) -> @math.Triangle
 pub fn BufferAttribute::set_w(Self, Int, Double) -> Self
 pub fn BufferAttribute::set_x(Self, Int, Double) -> Self
+pub fn BufferAttribute::set_xy(Self, Int, Double, Double) -> Self
 pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
 pub fn BufferAttribute::set_xyzw(Self, Int, Double, Double, Double, Double) -> Self
 pub fn BufferAttribute::set_y(Self, Int, Double) -> Self

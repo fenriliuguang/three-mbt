@@ -318,6 +318,21 @@ pub fn BufferAttribute::set_triangle(
 }
 
 ///|
+/// 写入一个顶点的 x 和 y。z 及之后的分量不动。
+/// r186: `setXY` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L553
+pub fn BufferAttribute::set_xy(
+  self : BufferAttribute,
+  index : Int,
+  x : Double,
+  y : Double,
+) -> BufferAttribute {
+  let offset = index * self.item_size
+  self.array[offset] = x
+  self.array[offset + 1] = y
+  self
+}
+
+///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
   index : Int,
