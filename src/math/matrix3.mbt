@@ -286,3 +286,11 @@ pub fn Matrix3::set_uv_transform(
 pub fn Matrix3::make_scale(self : Matrix3, x : Double, y : Double) -> Matrix3 {
   self.set(x, 0.0, 0.0, 0.0, y, 0.0, 0.0, 0.0, 1.0)
 }
+
+///|
+/// 左乘一个二维缩放。
+/// r186: `scale` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L417
+pub fn Matrix3::scale(self : Matrix3, sx : Double, sy : Double) -> Matrix3 {
+  let m = Matrix3::new().make_scale(sx, sy)
+  self.premultiply(m)
+}
