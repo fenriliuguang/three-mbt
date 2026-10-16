@@ -34,6 +34,13 @@ pub fn Color::set_rgb(
 }
 
 ///|
+/// 写入三个线性通道。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L149
+pub fn Color::set(self : Color, r : Double, g : Double, b : Double) -> Color {
+  self.set_rgb(r, g, b)
+}
+
+///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()
