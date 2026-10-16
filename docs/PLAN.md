@@ -971,6 +971,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.inverseLerp` has landed. It returns where a number sits between two endpoints. `1` between `0` and `4` is `0.25`. The endpoints themselves are `0` and `1`. Equal endpoints return `0`.
 
+`MathUtils.damp` has landed. It eases from the current value toward a target. With `lambda` `0` or `dt` `0`, `4` toward `8` stays `4`. Equal values stay put. From `0` toward `4` with `lambda` `1` and `dt` `1` is about `2.5284822353142307`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1397,6 +1399,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Quaternion.toJSON` | `math` |
 | planned | 7 | `MathUtils.mapLinear` | `math` |
 | planned | 7 | `MathUtils.inverseLerp` | `math` |
+| planned | 7 | `MathUtils.damp` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

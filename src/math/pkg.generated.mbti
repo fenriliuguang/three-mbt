@@ -8,6 +8,8 @@ import {
 // Values
 pub fn clamp(Double, Double, Double) -> Double
 
+pub fn damp(Double, Double, Double, Double) -> Double
+
 pub fn deg_to_rad(Double) -> Double
 
 pub fn euclidean_modulo(Double, Double) -> Double

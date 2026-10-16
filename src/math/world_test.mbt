@@ -5786,6 +5786,14 @@ test "MathUtils.inverseLerp returns the factor between two numbers" {
 }
 
 ///|
+test "MathUtils.damp eases toward a target" {
+  assert_eq(@math.damp(4.0, 8.0, 0.0, 2.0), 4.0)
+  assert_eq(@math.damp(4.0, 8.0, 3.0, 0.0), 4.0)
+  assert_eq(@math.damp(5.0, 5.0, 2.0, 0.25), 5.0)
+  assert_close(@math.damp(0.0, 4.0, 1.0, 1.0), 2.5284822353142307)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

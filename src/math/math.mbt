@@ -80,3 +80,10 @@ pub fn inverse_lerp(x : Double, y : Double, value : Double) -> Double {
     0.0
   }
 }
+
+///|
+/// 按指数衰减靠近目标。`lambda` 或 `dt` 为 0 时停在当前值。
+/// r186: `damp` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L134
+pub fn damp(x : Double, y : Double, lambda : Double, dt : Double) -> Double {
+  lerp(x, y, 1.0 - @std.exp(-lambda * dt))
+}
