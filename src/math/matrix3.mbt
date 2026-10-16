@@ -311,3 +311,10 @@ pub fn Matrix3::rotate(self : Matrix3, theta : Double) -> Matrix3 {
   let m = Matrix3::new().make_rotation(-theta)
   self.premultiply(m)
 }
+
+///|
+/// 用两个数组成二维平移矩阵。
+/// r186: `makeTranslation` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L471
+pub fn Matrix3::make_translation(self : Matrix3, x : Double, y : Double) -> Matrix3 {
+  self.set(1.0, 0.0, x, 0.0, 1.0, y, 0.0, 0.0, 1.0)
+}

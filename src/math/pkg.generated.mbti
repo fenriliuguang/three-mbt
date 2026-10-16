@@ -214,6 +214,7 @@ pub fn Matrix3::identity(Self) -> Self
 pub fn Matrix3::invert(Self) -> Self
 pub fn Matrix3::make_rotation(Self, Double) -> Self
 pub fn Matrix3::make_scale(Self, Double, Double) -> Self
+pub fn Matrix3::make_translation(Self, Double, Double) -> Self
 pub fn Matrix3::multiply(Self, Self) -> Self
 pub fn Matrix3::multiply_matrices(Self, Self, Self) -> Self
 pub fn Matrix3::multiply_scalar(Self, Double) -> Self

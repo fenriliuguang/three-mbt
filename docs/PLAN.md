@@ -899,6 +899,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Matrix3.rotate` has landed. It pre-multiplies a rotation of the negated angle. Rotating the matrix with rows `(1, 2, 3)`, `(4, 5, 6)`, `(7, 8, 9)` by angle `0` leaves elements `[1, 4, 7, 2, 5, 8, 3, 6, 9]`.
 
+`Matrix3.translate` calls `makeTranslation`, so that constructor lands first. `Matrix3.makeTranslation` has landed. It stores a 2D translation from two numbers. Translating by `(0.25, 0.5)` writes elements `[1, 0, 0, 0, 1, 0, 0.25, 0.5, 1]`. The `Vector2` argument stays out.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1289,6 +1291,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix3.scale` | `math` |
 | planned | 7 | `Matrix3.makeRotation` | `math` |
 | planned | 7 | `Matrix3.rotate` | `math` |
+| planned | 7 | `Matrix3.makeTranslation` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
