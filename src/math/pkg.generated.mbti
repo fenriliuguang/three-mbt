@@ -93,6 +93,7 @@ pub(all) struct Color {
 }
 pub fn Color::clone(Self) -> Self
 pub fn Color::copy(Self, Self) -> Self
+pub fn Color::copy_srgb_to_linear(Self, Self) -> Self
 pub fn Color::get_hex(Self) -> Int
 pub fn Color::lerp(Self, Self, Double) -> Self
 pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self

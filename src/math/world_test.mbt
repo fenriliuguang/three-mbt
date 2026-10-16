@@ -4473,6 +4473,19 @@ test "Color.setHSL writes linear channels from hue saturation and lightness" {
 }
 
 ///|
+test "Color.copySRGBToLinear converts copied channels" {
+  let source = @math.Color::new(r=0.0, g=0.5, b=1.0)
+  let color = @math.Color::new()
+  ignore(color.copy_srgb_to_linear(source))
+  assert_eq(color.r, 0.0)
+  assert_close(color.g, 0.2140411404715882)
+  assert_eq(color.b, 1.0)
+  assert_eq(source.r, 0.0)
+  assert_eq(source.g, 0.5)
+  assert_eq(source.b, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

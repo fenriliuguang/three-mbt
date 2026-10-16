@@ -94,6 +94,16 @@ pub fn Color::set_hsl(self : Color, h : Double, s : Double, l : Double) -> Color
 }
 
 ///|
+/// 复制颜色，并把每个 sRGB 通道转成线性。
+/// r186: `copySRGBToLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L480
+pub fn Color::copy_srgb_to_linear(self : Color, color : Color) -> Color {
+  self.r = srgb_to_linear(color.r)
+  self.g = srgb_to_linear(color.g)
+  self.b = srgb_to_linear(color.b)
+  self
+}
+
+///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()
