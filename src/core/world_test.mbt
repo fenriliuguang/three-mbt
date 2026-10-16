@@ -2091,3 +2091,12 @@ test "InterleavedBuffer count is the array length divided by stride" {
   assert_eq(buffer.array[0], 1.0)
   assert_eq(buffer.array[5], 6.0)
 }
+
+///|
+test "setUsage stores DynamicDrawUsage on an interleaved buffer" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3)
+  assert_eq(buffer.usage, 35044)
+  let written = buffer.set_usage(@constants.DYNAMIC_DRAW_USAGE)
+  assert_eq(physical_equal(written, buffer), true)
+  assert_eq(buffer.usage, 35048)
+}
