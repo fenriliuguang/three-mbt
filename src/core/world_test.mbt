@@ -1993,3 +1993,13 @@ test "getTimescale starts at one" {
   let timer = @core.Timer::new()
   assert_eq(timer.get_timescale(), 1.0)
 }
+
+///|
+test "setTimescale scales the next delta" {
+  let timer = @core.Timer::new()
+  let written = timer.set_timescale(2.0)
+  assert_eq(physical_equal(written, timer), true)
+  assert_eq(timer.get_timescale(), 2.0)
+  ignore(timer.update(1000.0))
+  assert_eq(timer.get_delta(), 2.0)
+}
