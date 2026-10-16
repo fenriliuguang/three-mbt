@@ -4907,6 +4907,26 @@ test "Euler.toArray writes three angles and returns the order" {
 }
 
 ///|
+test "Frustum.set copies six planes" {
+  let frustum = @math.Frustum::new()
+  let p0 = @math.Plane::new(constant=1.0)
+  let p1 = @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=2.0)
+  let p2 = @math.Plane::new(constant=3.0)
+  let p3 = @math.Plane::new(constant=4.0)
+  let p4 = @math.Plane::new(constant=5.0)
+  let p5 = @math.Plane::new(constant=6.0)
+  ignore(frustum.set(p0, p1, p2, p3, p4, p5))
+  assert_eq(frustum.planes[0].constant, 1.0)
+  assert_eq(frustum.planes[1].constant, 2.0)
+  assert_eq(frustum.planes[1].normal.y, 1.0)
+  assert_eq(frustum.planes[5].constant, 6.0)
+  p0.constant = 0.0
+  p1.normal.y = 0.0
+  assert_eq(frustum.planes[0].constant, 1.0)
+  assert_eq(frustum.planes[1].normal.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

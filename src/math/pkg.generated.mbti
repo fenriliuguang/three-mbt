@@ -176,6 +176,7 @@ pub(all) struct Frustum {
 }
 pub fn Frustum::intersects_sphere(Self, Sphere) -> Bool
 pub fn Frustum::new() -> Self
+pub fn Frustum::set(Self, Plane, Plane, Plane, Plane, Plane, Plane) -> Self
 pub fn Frustum::set_from_projection_matrix(Self, Matrix4, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
 
 pub(all) struct Line3 {

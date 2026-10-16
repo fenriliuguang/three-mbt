@@ -22,6 +22,27 @@ pub fn Frustum::new() -> Frustum {
 }
 
 ///|
+/// 复制六个裁剪面。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L52
+pub fn Frustum::set(
+  self : Frustum,
+  p0 : Plane,
+  p1 : Plane,
+  p2 : Plane,
+  p3 : Plane,
+  p4 : Plane,
+  p5 : Plane,
+) -> Frustum {
+  ignore(self.planes[0].copy(p0))
+  ignore(self.planes[1].copy(p1))
+  ignore(self.planes[2].copy(p2))
+  ignore(self.planes[3].copy(p3))
+  ignore(self.planes[4].copy(p4))
+  ignore(self.planes[5].copy(p5))
+  self
+}
+
+///|
 pub fn Frustum::set_from_projection_matrix(
   self : Frustum,
   m : Matrix4,
