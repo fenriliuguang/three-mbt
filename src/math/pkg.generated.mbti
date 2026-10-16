@@ -248,6 +248,7 @@ pub(all) struct Interpolant {
   value_size : Int
 }
 pub fn Interpolant::copy_sample_value(Self, Int) -> Array[Double]
+pub fn Interpolant::evaluate(Self, Double) -> Array[Double]
 pub fn Interpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn Interpolant::interval_changed(Self, Int, Double, Double) -> Unit
 pub fn Interpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self

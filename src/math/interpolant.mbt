@@ -84,3 +84,182 @@ pub fn Interpolant::interval_changed(
   ignore(t0)
   ignore(t1)
 }
+
+///|
+/// 越界下标对应 JavaScript 里的 `undefined`。
+fn position_at(positions : Array[Double], index : Int) -> Double? {
+  if index < 0 || index >= positions.length() {
+    None
+  } else {
+    Some(positions[index])
+  }
+}
+
+///|
+/// `!(t < bound)`。上界越界时为 true。
+fn not_before(t : Double, bound : Double?) -> Bool {
+  match bound {
+    None => true
+    Some(bound) => !(t < bound)
+  }
+}
+
+///|
+/// `!(t >= bound)`。下界越界时为 true。
+fn not_from(t : Double, bound : Double?) -> Bool {
+  match bound {
+    None => true
+    Some(bound) => !(t >= bound)
+  }
+}
+
+///|
+/// `t < bound`。上界越界时为 false。
+fn is_before(t : Double, bound : Double?) -> Bool {
+  match bound {
+    None => false
+    Some(bound) => t < bound
+  }
+}
+
+///|
+/// `t >= bound`。下界越界时为 false。
+fn is_from(t : Double, bound : Double?) -> Bool {
+  match bound {
+    None => false
+    Some(bound) => t >= bound
+  }
+}
+
+///|
+fn present(bound : Double?) -> Double {
+  match bound {
+    Some(bound) => bound
+    None => abort("interpolant interval is missing a bound")
+  }
+}
+
+///|
+priv enum EvalStep {
+  CopySample(Int)
+  UseInterval(Int, Double, Double)
+}
+
+///|
+fn Interpolant::binary_search_interval(
+  self : Interpolant,
+  t : Double,
+  i1 : Int,
+  right : Int,
+) -> EvalStep {
+  let positions = self.parameter_positions
+  let mut i1 = i1
+  let mut right = right
+  while i1 < right {
+    let mid = (i1 + right) / 2
+    if is_before(t, position_at(positions, mid)) {
+      right = mid
+    } else {
+      i1 = mid + 1
+    }
+  }
+  let t0 = position_at(positions, i1 - 1)
+  let t1 = position_at(positions, i1)
+  match t0 {
+    None => {
+      self.cached_index = 0
+      CopySample(0)
+    }
+    Some(t0) =>
+      match t1 {
+        None => {
+          let end = positions.length()
+          self.cached_index = end
+          CopySample(end - 1)
+        }
+        Some(t1) => UseInterval(i1, t0, t1)
+      }
+  }
+}
+
+///|
+fn Interpolant::seek_interval(self : Interpolant, t : Double) -> EvalStep {
+  let positions = self.parameter_positions
+  let mut i1 = self.cached_index
+  let mut t1 = position_at(positions, i1)
+  let mut t0 = position_at(positions, i1 - 1)
+  if not_before(t, t1) {
+    let give_up_at = i1 + 2
+    let mut scan_reverse = false
+    while true {
+      match t1 {
+        None =>
+          if is_before(t, t0) {
+            scan_reverse = true
+            break
+          } else {
+            let end = positions.length()
+            self.cached_index = end
+            return CopySample(end - 1)
+          }
+        Some(_) =>
+          if i1 == give_up_at {
+            break
+          } else {
+            t0 = t1
+            i1 = i1 + 1
+            t1 = position_at(positions, i1)
+            if is_before(t, t1) {
+              return UseInterval(i1, present(t0), present(t1))
+            }
+          }
+      }
+    }
+    if !scan_reverse {
+      return self.binary_search_interval(t, i1, positions.length())
+    }
+  }
+  if not_from(t, t0) {
+    let next = position_at(positions, 1)
+    if is_before(t, next) {
+      i1 = 2
+      t0 = next
+    }
+    let give_up_at = i1 - 2
+    while true {
+      match t0 {
+        None => {
+          self.cached_index = 0
+          return CopySample(0)
+        }
+        Some(_) => {
+          if i1 == give_up_at {
+            break
+          }
+          t1 = t0
+          i1 = i1 - 1
+          t0 = position_at(positions, i1 - 1)
+          if is_from(t, t0) {
+            return UseInterval(i1, present(t0), present(t1))
+          }
+        }
+      }
+    }
+    return self.binary_search_interval(t, 0, i1)
+  }
+  UseInterval(i1, present(t0), present(t1))
+}
+
+///|
+/// 在参数 `t` 处求值。区间外复制端点样本，区间内交给 `interpolate_`。
+/// r186: `evaluate` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L92
+pub fn Interpolant::evaluate(self : Interpolant, t : Double) -> Array[Double] {
+  match self.seek_interval(t) {
+    CopySample(index) => self.copy_sample_value(index)
+    UseInterval(i1, t0, t1) => {
+      self.cached_index = i1
+      self.interval_changed(i1, t0, t1)
+      self.interpolate(i1, t0, t, t1)
+    }
+  }
+}

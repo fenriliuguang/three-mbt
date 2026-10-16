@@ -6661,6 +6661,39 @@ test "Interpolant.intervalChanged_ leaves the samples in place" {
 }
 
 ///|
+test "Interpolant.evaluate copies the end samples" {
+  let positions = [0.0, 1.0, 2.0, 3.0, 4.0]
+  let values = [10.0, 20.0, 30.0, 40.0, 50.0]
+  let interpolant = @math.Interpolant::new(positions, values, 1)
+  let before = interpolant.evaluate(-1.0)
+  assert_eq(before[0], 10.0)
+  assert_eq(interpolant.cached_index, 0)
+  let after = interpolant.evaluate(10.0)
+  assert_eq(after[0], 50.0)
+  assert_eq(interpolant.cached_index, 5)
+  assert_eq(physical_equal(after, interpolant.result_buffer), true)
+  let at_end = interpolant.evaluate(4.0)
+  assert_eq(at_end[0], 50.0)
+  assert_eq(interpolant.cached_index, 5)
+  let again = interpolant.evaluate(-1.0)
+  assert_eq(again[0], 10.0)
+  assert_eq(interpolant.cached_index, 0)
+  assert_eq(values[0], 10.0)
+  assert_eq(values[4], 50.0)
+  assert_eq(positions[4], 4.0)
+}
+
+///|
+test "panic Interpolant.evaluate defers an interior sample" {
+  let interpolant = @math.Interpolant::new(
+    [0.0, 1.0, 2.0, 3.0, 4.0],
+    [10.0, 20.0, 30.0, 40.0, 50.0],
+    1,
+  )
+  ignore(interpolant.evaluate(1.5))
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

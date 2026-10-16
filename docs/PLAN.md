@@ -1051,13 +1051,15 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `FrustumArray.clone` has landed. It returns a new array with the same coordinate system and counted frustums. A WebGPU source with plane constants `1` through `6` produces a clone whose first constant stays `1` after the source is edited, and whose last constant stays `6` after the clone is edited. An empty array clones to a count of `0` in WebGL coordinates. `setFromArrayCamera`, `intersectsObject`, and `intersectsSprite` still stay out of `math`.
 
-`Interpolant` has landed. `new` stores the parameter positions and sample values by reference. Positions `(0, 1, 2)` and six sample numbers with `sampleSize` `2` keep a cached index of `0` and a zero result buffer of length `2`. A supplied result buffer `(1, 2, 3)` is stored as given. Editing the position array changes the stored `0` to `9`. `evaluate` and `getSettings_` stay later.
+`Interpolant` has landed. `new` stores the parameter positions and sample values by reference. Positions `(0, 1, 2)` and six sample numbers with `sampleSize` `2` keep a cached index of `0` and a zero result buffer of length `2`. A supplied result buffer `(1, 2, 3)` is stored as given. Editing the position array changes the stored `0` to `9`. `getSettings_` stays later.
 
 `Interpolant.copySampleValue_` has landed. It writes one sample into the result buffer and returns that buffer. With `sampleSize` `2`, index `0` writes `(10, 20)` and leaves a longer buffer's third value `3` in place. Index `2` writes `(50, 60)`. The sample values stay `(10, ..., 60)`.
 
 `Interpolant.interpolate_` has landed. The base method aborts. Calling it with interval index `1`, previous time `0`, time `0.5`, and next time `1` does not write a sample.
 
 `Interpolant.intervalChanged_` has landed. The base method does nothing. Interval index `1` between times `0` and `1` leaves the cached index at `0`, the result buffer at `(1, 2, 3)`, and the sample values at `(10, ..., 60)`.
+
+`Interpolant.evaluate` has landed. Time `-1` on positions `(0, 1, 2, 3, 4)` and samples `(10, 20, 30, 40, 50)` copies `10` and keeps the cached index at `0`. Time `10` and the last position `4` copy `50` and set the cached index to `5`. Time `1.5` reaches the base `interpolate_` and aborts. `getSettings_` stays later.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -1529,6 +1531,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Interpolant.copySampleValue_` | `math` |
 | planned | 7 | `Interpolant.interpolate_` | `math` |
 | planned | 7 | `Interpolant.intervalChanged_` | `math` |
+| planned | 7 | `Interpolant.evaluate` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
