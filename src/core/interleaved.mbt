@@ -72,3 +72,24 @@ pub fn InterleavedBuffer::copy(
   self.usage = source.usage
   self
 }
+
+///|
+/// 把源缓冲的一个顶点复制到当前缓冲的指定位置。复制长度是当前缓冲的步长。
+/// r186: `copyAt` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L169
+pub fn InterleavedBuffer::copy_at(
+  self : InterleavedBuffer,
+  index1 : Int,
+  buffer : InterleavedBuffer,
+  index2 : Int,
+) -> InterleavedBuffer {
+  let mut destination = index1 * self.stride
+  let mut source = index2 * buffer.stride
+  let mut component = 0
+  while component < self.stride {
+    self.array[destination] = buffer.array[source]
+    destination = destination + 1
+    source = source + 1
+    component = component + 1
+  }
+  self
+}

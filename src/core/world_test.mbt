@@ -2136,3 +2136,16 @@ test "copy replaces an interleaved buffer" {
   destination.array[0] = 8.0
   assert_eq(source.array[0], 1.0)
 }
+
+///|
+test "copyAt writes one interleaved vertex" {
+  let source = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let destination = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let written = destination.copy_at(1, source, 0)
+  assert_eq(physical_equal(written, destination), true)
+  assert_eq(destination.array[0], 0.0)
+  assert_eq(destination.array[3], 1.0)
+  assert_eq(destination.array[4], 2.0)
+  assert_eq(destination.array[5], 3.0)
+  assert_eq(source.array[0], 1.0)
+}
