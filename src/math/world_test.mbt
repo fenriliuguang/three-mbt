@@ -6748,6 +6748,14 @@ test "cubicBezier weights the four control values" {
 }
 
 ///|
+test "cubicBezierSlope is the derivative of the control polygon" {
+  assert_eq(@math.cubic_bezier_slope(0.0, 0.0, 0.0, 0.0, 1.0), 0.0)
+  assert_eq(@math.cubic_bezier_slope(0.5, 0.0, 0.0, 0.0, 1.0), 0.75)
+  assert_eq(@math.cubic_bezier_slope(1.0, 0.0, 0.0, 0.0, 1.0), 3.0)
+  assert_eq(@math.cubic_bezier_slope(0.5, 10.0, 20.0, 30.0, 40.0), 30.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

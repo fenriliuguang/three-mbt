@@ -47,3 +47,17 @@ pub fn cubic_bezier(
   3.0 * k * s * s * p2 +
   s * s * s * p3
 }
+
+///|
+/// 三次贝塞尔对参数 `s` 的导数。
+/// r186: `cubicBezierSlope` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/BezierInterpolant.js#L89
+pub fn cubic_bezier_slope(
+  s : Double,
+  p0 : Double,
+  p1 : Double,
+  p2 : Double,
+  p3 : Double,
+) -> Double {
+  let k = 1.0 - s
+  3.0 * k * k * (p1 - p0) + 6.0 * k * s * (p2 - p1) + 3.0 * s * s * (p3 - p2)
+}
