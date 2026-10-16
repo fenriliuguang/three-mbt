@@ -242,6 +242,7 @@ pub(all) struct InterleavedBufferAttribute {
 }
 pub fn InterleavedBufferAttribute::array(Self) -> Array[Double]
 pub fn InterleavedBufferAttribute::count(Self) -> Int
+pub fn InterleavedBufferAttribute::get_w(Self, Int) -> Double
 pub fn InterleavedBufferAttribute::get_x(Self, Int) -> Double
 pub fn InterleavedBufferAttribute::get_y(Self, Int) -> Double
 pub fn InterleavedBufferAttribute::get_z(Self, Int) -> Double

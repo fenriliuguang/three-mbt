@@ -2288,6 +2288,18 @@ test "getZ reads an interleaved component" {
 }
 
 ///|
+test "getW reads an interleaved component" {
+  let buffer = @core.InterleavedBuffer::new(
+    [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+    4,
+  )
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 4, 0)
+  assert_eq(attribute.get_w(1), 8.0)
+  let shifted = @core.InterleavedBufferAttribute::new(buffer, 1, 1)
+  assert_eq(shifted.get_w(0), 5.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
