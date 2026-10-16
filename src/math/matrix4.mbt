@@ -156,6 +156,15 @@ pub fn Matrix4::make_translation(
 }
 
 ///|
+/// 绕 X 轴旋转。
+/// r186: `makeRotationX` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L870
+pub fn Matrix4::make_rotation_x(self : Matrix4, theta : Double) -> Matrix4 {
+  let c = @std.cos(theta)
+  let s = @std.sin(theta)
+  self.set(1.0, 0.0, 0.0, 0.0, 0.0, c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0)
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,
