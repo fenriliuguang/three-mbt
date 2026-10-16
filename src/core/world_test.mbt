@@ -2013,3 +2013,14 @@ test "reset skips the gap before the next update" {
   ignore(timer.update(5000.0))
   assert_eq(timer.get_delta(), 1.0)
 }
+
+///|
+test "meshPerAttribute defaults to one and copy carries it" {
+  let plain = @core.BufferAttribute::new([1.0], 1)
+  assert_eq(plain.mesh_per_attribute, 1)
+  let source = @core.BufferAttribute::new([1.0], 1, mesh_per_attribute=2)
+  assert_eq(source.mesh_per_attribute, 2)
+  let destination = @core.BufferAttribute::new([9.0], 1)
+  ignore(destination.copy(source))
+  assert_eq(destination.mesh_per_attribute, 2)
+}
