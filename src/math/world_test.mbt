@@ -4255,6 +4255,40 @@ test "Ray.intersectsPlane is true when the ray heads toward the plane" {
 }
 
 ///|
+test "Ray.intersectBox writes the first hit on the box" {
+  let box = @math.Box3::new(
+    @math.Vector3::new(),
+    @math.Vector3::new(x=1.0, y=1.0, z=1.0),
+  )
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-1.0, y=0.5, z=0.5),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let target = @math.Vector3::new(x=9.0)
+  match ray.intersect_box(box, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(physical_equal(hit, target), true)
+      assert_eq(hit.x, 0.0)
+      assert_eq(hit.y, 0.5)
+      assert_eq(hit.z, 0.5)
+    }
+  }
+  let miss = @math.Ray::new(
+    origin=@math.Vector3::new(x=-1.0, y=2.0, z=0.5),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  match miss.intersect_box(box, target) {
+    None => assert_eq(target.x, 0.0)
+    Some(_) => assert_eq(true, false)
+  }
+  assert_eq(ray.origin.x, -1.0)
+  assert_eq(ray.direction.x, 1.0)
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.max.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

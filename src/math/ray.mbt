@@ -274,3 +274,65 @@ pub fn Ray::intersects_plane(self : Ray, plane : Plane) -> Bool {
   let denominator = plane.normal.dot(self.direction)
   denominator * dist_to_point < 0.0
 }
+
+///|
+/// 射线与盒子的第一个前方交点写入 target。没有交点时返回 None。盒子和射线都不改。
+/// r186: `intersectBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L449
+pub fn Ray::intersect_box(self : Ray, box : Box3, target : Vector3) -> Vector3? {
+  let invdirx = 1.0 / self.direction.x
+  let invdiry = 1.0 / self.direction.y
+  let invdirz = 1.0 / self.direction.z
+  let origin = self.origin
+  let mut tmin = 0.0
+  let mut tmax = 0.0
+  if invdirx >= 0.0 {
+    tmin = (box.min.x - origin.x) * invdirx
+    tmax = (box.max.x - origin.x) * invdirx
+  } else {
+    tmin = (box.max.x - origin.x) * invdirx
+    tmax = (box.min.x - origin.x) * invdirx
+  }
+  let tymin = if invdiry >= 0.0 {
+    (box.min.y - origin.y) * invdiry
+  } else {
+    (box.max.y - origin.y) * invdiry
+  }
+  let tymax = if invdiry >= 0.0 {
+    (box.max.y - origin.y) * invdiry
+  } else {
+    (box.min.y - origin.y) * invdiry
+  }
+  if tmin > tymax || tymin > tmax {
+    return None
+  }
+  if tymin > tmin || tmin.is_nan() {
+    tmin = tymin
+  }
+  if tymax < tmax || tmax.is_nan() {
+    tmax = tymax
+  }
+  let tzmin = if invdirz >= 0.0 {
+    (box.min.z - origin.z) * invdirz
+  } else {
+    (box.max.z - origin.z) * invdirz
+  }
+  let tzmax = if invdirz >= 0.0 {
+    (box.max.z - origin.z) * invdirz
+  } else {
+    (box.min.z - origin.z) * invdirz
+  }
+  if tmin > tzmax || tzmin > tmax {
+    return None
+  }
+  if tzmin > tmin || tmin.is_nan() {
+    tmin = tzmin
+  }
+  if tzmax < tmax || tmax.is_nan() {
+    tmax = tzmax
+  }
+  if tmax < 0.0 {
+    return None
+  }
+  let t = if tmin >= 0.0 { tmin } else { tmax }
+  Some(self.at(t, target))
+}
