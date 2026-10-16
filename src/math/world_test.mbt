@@ -5700,6 +5700,16 @@ test "Quaternion.random stores a unit quaternion" {
 }
 
 ///|
+test "Quaternion.equals compares every component" {
+  let q = @math.Quaternion::new(x=0.25, y=0.5, z=0.25, w=0.75)
+  let same = @math.Quaternion::new(x=0.25, y=0.5, z=0.25, w=0.75)
+  assert_eq(q.equals(same), true)
+  same.w = 0.0
+  assert_eq(q.equals(same), false)
+  assert_eq(q.w, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

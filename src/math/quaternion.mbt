@@ -511,3 +511,13 @@ pub fn Quaternion::random(self : Quaternion) -> Quaternion {
     r2 * @std.cos(theta2),
   )
 }
+
+///|
+/// 逐个分量比较是否相等。
+/// r186: `equals` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L810
+pub fn Quaternion::equals(self : Quaternion, quaternion : Quaternion) -> Bool {
+  quaternion.x == self.x &&
+  quaternion.y == self.y &&
+  quaternion.z == self.z &&
+  quaternion.w == self.w
+}
