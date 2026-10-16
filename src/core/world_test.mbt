@@ -1627,3 +1627,14 @@ test "uuid is a version-4 id that copy keeps" {
   ignore(destination.copy(source))
   assert_eq(destination.uuid, kept)
 }
+
+///|
+test "name starts empty and copy carries the geometry name" {
+  let source = @core.BufferGeometry::new()
+  assert_eq(source.name, "")
+  source.name = "square"
+  let destination = @core.BufferGeometry::new()
+  destination.name = "old"
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "square")
+}

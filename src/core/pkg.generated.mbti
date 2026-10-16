@@ -80,6 +80,7 @@ pub fn BufferAttribute::transform_direction(Self, @math.Matrix4) -> Self
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
+  mut name : String
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]
