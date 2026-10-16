@@ -1048,3 +1048,26 @@ test "computeTangents writes a +X tangent for an xy triangle" {
   bare.compute_tangents()
   assert_eq(bare.has_attribute("tangent"), false)
 }
+
+///|
+test "normalizeNormals makes each normal unit length" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "normal",
+      @core.BufferAttribute::new([2.0, 0.0, 0.0, 0.0, 3.0, 0.0], 3),
+    ),
+  )
+  geometry.normalize_normals()
+  match geometry.get_attribute("normal") {
+    None => assert_eq(false, true)
+    Some(normal) => {
+      assert_eq(normal.get_x(0), 1.0)
+      assert_eq(normal.get_y(0), 0.0)
+      assert_eq(normal.get_z(0), 0.0)
+      assert_eq(normal.get_x(1), 0.0)
+      assert_eq(normal.get_y(1), 1.0)
+      assert_eq(normal.get_z(1), 0.0)
+    }
+  }
+}

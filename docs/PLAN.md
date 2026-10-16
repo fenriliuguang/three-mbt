@@ -1143,6 +1143,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferGeometry.computeTangents` has landed. An indexed triangle on the XY plane, with UVs `(0, 0)`, `(1, 0)`, `(0, 1)` and normals `(0, 0, 1)`, gets tangent `(1, 0, 0, 1)` at each vertex. A geometry that only has `position` is left unchanged.
 
+`BufferGeometry.normalizeNormals` has landed. Normals `(2, 0, 0)` and `(0, 3, 0)` become `(1, 0, 0)` and `(0, 1, 0)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1655,6 +1657,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferGeometry.setFromPoints` | `core` |
 | planned | 7 | `BufferAttribute.setXYZW` | `core` |
 | planned | 7 | `BufferGeometry.computeTangents` | `core` |
+| planned | 7 | `BufferGeometry.normalizeNormals` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

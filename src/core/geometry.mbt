@@ -533,6 +533,25 @@ pub fn BufferGeometry::compute_tangents(self : BufferGeometry) -> Unit {
 }
 
 ///|
+/// 把每个法线归一化。
+/// r186: `normalizeNormals` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1101
+pub fn BufferGeometry::normalize_normals(self : BufferGeometry) -> Unit {
+  match self.get_attribute("normal") {
+    None => abort("BufferGeometry.normalize_normals requires a normal attribute")
+    Some(normals) => {
+      let vector = @math.Vector3::new()
+      let mut index = 0
+      while index < normals.count {
+        ignore(normals.copy_to_vector3(index, vector))
+        ignore(vector.normalize())
+        normals.set_xyz(index, vector.x, vector.y, vector.z)
+        index = index + 1
+      }
+    }
+  }
+}
+
+///|
 /// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
 pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
   let geometry = BufferGeometry::new()
