@@ -43,6 +43,16 @@ pub fn Frustum::set(
 }
 
 ///|
+/// 复制另一个视锥的六个裁剪面。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L73
+pub fn Frustum::copy(self : Frustum, frustum : Frustum) -> Frustum {
+  for i in 0..<6 {
+    ignore(self.planes[i].copy(frustum.planes[i]))
+  }
+  self
+}
+
+///|
 pub fn Frustum::set_from_projection_matrix(
   self : Frustum,
   m : Matrix4,

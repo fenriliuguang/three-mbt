@@ -4927,6 +4927,30 @@ test "Frustum.set copies six planes" {
 }
 
 ///|
+test "Frustum.copy copies six planes" {
+  let source = @math.Frustum::new()
+  ignore(
+    source.set(
+      @math.Plane::new(constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=2.0),
+      @math.Plane::new(constant=3.0),
+      @math.Plane::new(constant=4.0),
+      @math.Plane::new(constant=5.0),
+      @math.Plane::new(constant=6.0),
+    ),
+  )
+  let frustum = @math.Frustum::new()
+  ignore(frustum.copy(source))
+  assert_eq(frustum.planes[0].constant, 1.0)
+  assert_eq(frustum.planes[1].normal.y, 1.0)
+  assert_eq(frustum.planes[5].constant, 6.0)
+  source.planes[0].constant = 0.0
+  source.planes[1].normal.y = 0.0
+  assert_eq(frustum.planes[0].constant, 1.0)
+  assert_eq(frustum.planes[1].normal.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

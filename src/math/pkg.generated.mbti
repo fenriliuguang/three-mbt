@@ -174,6 +174,7 @@ pub(all) enum EulerOrder {
 pub(all) struct Frustum {
   planes : Array[Plane]
 }
+pub fn Frustum::copy(Self, Self) -> Self
 pub fn Frustum::intersects_sphere(Self, Sphere) -> Bool
 pub fn Frustum::new() -> Self
 pub fn Frustum::set(Self, Plane, Plane, Plane, Plane, Plane, Plane) -> Self

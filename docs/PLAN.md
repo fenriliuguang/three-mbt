@@ -869,6 +869,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Frustum.set` has landed. It copies six planes. Constants `1` through `6`, with the second normal `(0, 1, 0)`, are stored on the frustum. Later changes to those planes leave the frustum alone.
 
+`Frustum.copy` has landed. It copies another frustum's six planes. Those same constants and the second normal `(0, 1, 0)` are stored on the copy. Later changes to the source frustum leave the copy alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1244,6 +1246,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Euler.fromArray` | `math` |
 | planned | 7 | `Euler.toArray` | `math` |
 | planned | 7 | `Frustum.set` | `math` |
+| planned | 7 | `Frustum.copy` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
