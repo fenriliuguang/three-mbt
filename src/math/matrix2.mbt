@@ -45,3 +45,18 @@ pub fn Matrix2::set(
 pub fn Matrix2::identity(self : Matrix2) -> Matrix2 {
   self.set(1.0, 0.0, 0.0, 1.0)
 }
+
+///|
+/// 从列主序数组读入四个元素。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix2.js#L95
+pub fn Matrix2::from_array(
+  self : Matrix2,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Matrix2 {
+  let te = self.elements
+  for i in 0..<4 {
+    te[i] = array[i + offset]
+  }
+  self
+}

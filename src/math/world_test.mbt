@@ -6002,6 +6002,22 @@ test "Matrix2.identity replaces the elements with the identity" {
 }
 
 ///|
+test "Matrix2.fromArray reads four column-major elements" {
+  let m = @math.Matrix2::new()
+  ignore(m.from_array([11.0, 21.0, 12.0, 22.0]))
+  assert_eq(m.elements[0], 11.0)
+  assert_eq(m.elements[1], 21.0)
+  assert_eq(m.elements[2], 12.0)
+  assert_eq(m.elements[3], 22.0)
+  ignore(m.identity())
+  ignore(m.from_array([9.0, 11.0, 21.0, 12.0, 22.0], offset=1))
+  assert_eq(m.elements[0], 11.0)
+  assert_eq(m.elements[1], 21.0)
+  assert_eq(m.elements[2], 12.0)
+  assert_eq(m.elements[3], 22.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
