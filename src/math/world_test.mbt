@@ -4640,6 +4640,15 @@ test "Color.multiply multiplies channels" {
 }
 
 ///|
+test "Color.multiplyScalar scales every channel" {
+  let color = @math.Color::new(r=0.5, g=0.25, b=1.0)
+  ignore(color.multiply_scalar(0.5))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.125)
+  assert_eq(color.b, 0.5)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

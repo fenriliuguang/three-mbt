@@ -274,6 +274,16 @@ pub fn Color::multiply(self : Color, color : Color) -> Color {
 }
 
 ///|
+/// 每个通道都乘上同一个数。
+/// r186: `multiplyScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L759
+pub fn Color::multiply_scalar(self : Color, scalar : Double) -> Color {
+  self.r *= scalar
+  self.g *= scalar
+  self.b *= scalar
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
