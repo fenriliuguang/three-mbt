@@ -99,6 +99,7 @@ pub fn Color::copy_linear_to_srgb(Self, Self) -> Self
 pub fn Color::copy_srgb_to_linear(Self, Self) -> Self
 pub fn Color::get_hex(Self) -> Int
 pub fn Color::get_hex_string(Self) -> String
+pub fn Color::get_hsl(Self) -> (Double, Double, Double)
 pub fn Color::lerp(Self, Self, Double) -> Self
 pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self
 pub fn Color::set(Self, Double, Double, Double) -> Self

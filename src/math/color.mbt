@@ -166,6 +166,36 @@ pub fn Color::get_hex_string(self : Color) -> String {
 }
 
 ///|
+/// 读出色相、饱和度、亮度。通道已在线性工作空间。
+/// r186: `getHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L567
+pub fn Color::get_hsl(self : Color) -> (Double, Double, Double) {
+  let r = self.r
+  let g = self.g
+  let b = self.b
+  let max = r.max(g).max(b)
+  let min = r.min(g).min(b)
+  let lightness = (min + max) / 2.0
+  if min == max {
+    (0.0, 0.0, lightness)
+  } else {
+    let delta = max - min
+    let saturation = if lightness <= 0.5 {
+      delta / (max + min)
+    } else {
+      delta / (2.0 - max - min)
+    }
+    let hue = if max == r {
+      (g - b) / delta + (if g < b { 6.0 } else { 0.0 })
+    } else if max == g {
+      (b - r) / delta + 2.0
+    } else {
+      (r - g) / delta + 4.0
+    }
+    (hue / 6.0, saturation, lightness)
+  }
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
