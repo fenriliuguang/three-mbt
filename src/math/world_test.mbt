@@ -3881,6 +3881,23 @@ test "Sphere.clone copies the center and the radius" {
 }
 
 ///|
+test "Sphere.toJSON writes the center and the radius" {
+  let sphere = @math.Sphere::new(
+    center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    radius=4.0,
+  )
+  let (center, radius) = sphere.to_json()
+  assert_eq(center.length(), 3)
+  assert_eq(center[0], 1.0)
+  assert_eq(center[1], 2.0)
+  assert_eq(center[2], 3.0)
+  assert_eq(radius, 4.0)
+  center[0] = 9.0
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.radius, 4.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

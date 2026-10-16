@@ -206,3 +206,10 @@ pub fn Sphere::equals(self : Sphere, sphere : Sphere) -> Bool {
 pub fn Sphere::clone(self : Sphere) -> Sphere {
   Sphere::new().copy(self)
 }
+
+///|
+/// 把球心写成数组，并带上半径。改数组不影响球。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L395
+pub fn Sphere::to_json(self : Sphere) -> (Array[Double], Double) {
+  (self.center.to_array(), self.radius)
+}
