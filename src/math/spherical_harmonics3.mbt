@@ -169,3 +169,13 @@ pub fn SphericalHarmonics3::equals(
   }
   true
 }
+
+///|
+/// 复制另一组球谐。来源之后再改，不影响这里。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L250
+pub fn SphericalHarmonics3::copy(
+  self : SphericalHarmonics3,
+  sh : SphericalHarmonics3,
+) -> SphericalHarmonics3 {
+  self.set(sh.coefficients)
+}
