@@ -268,6 +268,7 @@ pub fn Ray::distance_sq_to_point(Self, Vector3) -> Double
 pub fn Ray::distance_sq_to_segment(Self, Vector3, Vector3, point_on_ray? : Vector3, point_on_segment? : Vector3) -> Double
 pub fn Ray::distance_to_plane(Self, Plane) -> Double?
 pub fn Ray::distance_to_point(Self, Vector3) -> Double
+pub fn Ray::equals(Self, Self) -> Bool
 pub fn Ray::intersect_box(Self, Box3, Vector3) -> Vector3?
 pub fn Ray::intersect_plane(Self, Plane, Vector3) -> Vector3?
 pub fn Ray::intersect_sphere(Self, Sphere, Vector3) -> Vector3?

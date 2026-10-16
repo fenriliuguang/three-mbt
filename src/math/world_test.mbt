@@ -4375,6 +4375,33 @@ test "Ray.applyMatrix4 moves the origin and keeps a translated direction" {
 }
 
 ///|
+test "Ray.equals matches the origin and the direction" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let same = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let other_origin = @math.Ray::new(
+    origin=@math.Vector3::new(x=0.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let other_direction = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(x=4.0, y=5.0),
+  )
+  assert_eq(ray.equals(same), true)
+  assert_eq(ray.equals(ray), true)
+  assert_eq(ray.equals(other_origin), false)
+  assert_eq(ray.equals(other_direction), false)
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.direction.z, 6.0)
+  assert_eq(same.direction.y, 5.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
