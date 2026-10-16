@@ -92,6 +92,7 @@ pub(all) struct Color {
   mut b : Double
 }
 pub fn Color::add(Self, Self) -> Self
+pub fn Color::add_colors(Self, Self, Self) -> Self
 pub fn Color::clone(Self) -> Self
 pub fn Color::convert_linear_to_srgb(Self) -> Self
 pub fn Color::convert_srgb_to_linear(Self) -> Self

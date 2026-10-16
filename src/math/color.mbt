@@ -234,6 +234,16 @@ pub fn Color::add(self : Color, color : Color) -> Color {
 }
 
 ///|
+/// 把两个颜色的通道相加，写入自身。
+/// r186: `addColors` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L695
+pub fn Color::add_colors(self : Color, color1 : Color, color2 : Color) -> Color {
+  self.r = color1.r + color2.r
+  self.g = color1.g + color2.g
+  self.b = color1.b + color2.b
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
