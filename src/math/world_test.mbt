@@ -4848,6 +4848,29 @@ test "Euler.equals compares the angles and the order" {
 }
 
 ///|
+test "Euler.fromArray reads three angles and an optional order" {
+  let array = [1.0, 2.0, 3.0]
+  let euler = @math.Euler::new(x=9.0, y=8.0, z=7.0, order=@math.EulerOrder::YXZ)
+  ignore(euler.from_array(array))
+  assert_eq(euler.x, 1.0)
+  assert_eq(euler.y, 2.0)
+  assert_eq(euler.z, 3.0)
+  match euler.order {
+    @math.EulerOrder::YXZ => assert_eq(euler.x, 1.0)
+    _ => assert_eq(true, false)
+  }
+  ignore(euler.from_array(array, order=@math.EulerOrder::ZYX))
+  assert_eq(euler.x, 1.0)
+  assert_eq(euler.y, 2.0)
+  assert_eq(euler.z, 3.0)
+  match euler.order {
+    @math.EulerOrder::ZYX => assert_eq(array[0], 1.0)
+    _ => assert_eq(true, false)
+  }
+  assert_eq(array[2], 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

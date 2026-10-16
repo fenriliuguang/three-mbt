@@ -243,3 +243,17 @@ pub fn Euler::equals(self : Euler, euler : Euler) -> Bool {
   euler.z == self.z &&
   same_order(euler.order, self.order)
 }
+
+///|
+/// 从数组读三个角度。顺序是单独的参数，省略时保留当前顺序。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L387
+pub fn Euler::from_array(
+  self : Euler,
+  array : Array[Double],
+  order? : EulerOrder,
+) -> Euler {
+  match order {
+    None => self.set(array[0], array[1], array[2])
+    Some(order) => self.set(array[0], array[1], array[2], order=order)
+  }
+}
