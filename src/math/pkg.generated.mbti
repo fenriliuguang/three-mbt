@@ -233,6 +233,7 @@ pub(all) struct FrustumArray {
   frustums : Array[Frustum]
   mut count : Int
 }
+pub fn FrustumArray::contains_point(Self, Vector3) -> Bool
 pub fn FrustumArray::intersects_box(Self, Box3) -> Bool
 pub fn FrustumArray::intersects_sphere(Self, Sphere) -> Bool
 pub fn FrustumArray::new() -> Self

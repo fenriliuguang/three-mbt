@@ -42,3 +42,18 @@ pub fn FrustumArray::intersects_box(self : FrustumArray, box : Box3) -> Bool {
   }
   false
 }
+
+///|
+/// 点是否落在任一已用视锥内。`count` 为 0 时为 false。
+/// r186: `containsPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L174
+pub fn FrustumArray::contains_point(
+  self : FrustumArray,
+  point : Vector3,
+) -> Bool {
+  for i in 0..<self.count {
+    if self.frustums[i].contains_point(point) {
+      return true
+    }
+  }
+  false
+}
