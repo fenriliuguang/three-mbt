@@ -5869,6 +5869,16 @@ test "MathUtils.isPowerOfTwo recognizes powers of two" {
 }
 
 ///|
+test "MathUtils.ceilPowerOfTwo rounds up to a power of two" {
+  assert_eq(@math.ceil_power_of_two(0.5), 0.5)
+  assert_eq(@math.ceil_power_of_two(1.0), 1.0)
+  assert_eq(@math.ceil_power_of_two(3.0), 4.0)
+  assert_eq(@math.ceil_power_of_two(4.0), 4.0)
+  assert_eq(@math.ceil_power_of_two(5.0), 8.0)
+  assert_eq(@math.ceil_power_of_two(9.0), 16.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

@@ -175,3 +175,10 @@ pub fn is_power_of_two(value : Double) -> Bool {
     @std.pow(2.0, @std.log2(value).round()) == value
   }
 }
+
+///|
+/// 不小于给定数的最小 2 的幂。
+/// r186: `ceilPowerOfTwo` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L300
+pub fn ceil_power_of_two(value : Double) -> Double {
+  @std.pow(2.0, @std.log2(value).ceil())
+}

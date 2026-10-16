@@ -989,6 +989,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.isPowerOfTwo` has landed. It accepts a positive integer that is a power of two. `1`, `2`, and `8` are powers of two. `3`, `6`, `0`, `-2`, and `1.5` are not.
 
+`MathUtils.ceilPowerOfTwo` has landed. It returns the smallest power of two that is not below the value. `0.5` stays `0.5`. `1` stays `1`. `3` and `4` become `4`. `5` becomes `8`. `9` becomes `16`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1424,6 +1426,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `MathUtils.randFloatSpread` | `math` |
 | planned | 7 | `MathUtils.seededRandom` | `math` |
 | planned | 7 | `MathUtils.isPowerOfTwo` | `math` |
+| planned | 7 | `MathUtils.ceilPowerOfTwo` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

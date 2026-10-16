@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn ceil_power_of_two(Double) -> Double
+
 pub fn clamp(Double, Double, Double) -> Double
 
 pub fn damp(Double, Double, Double, Double) -> Double
