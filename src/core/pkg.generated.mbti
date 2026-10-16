@@ -78,6 +78,7 @@ pub fn BufferAttribute::to_json(Self) -> AttributeJson
 pub fn BufferAttribute::transform_direction(Self, @math.Matrix4) -> Self
 
 pub(all) struct BufferGeometry {
+  id : Int
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]

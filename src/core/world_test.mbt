@@ -1604,3 +1604,15 @@ test "gpuType defaults to float and copy carries int" {
   ignore(destination.copy(source))
   assert_eq(destination.gpu_type, 1013)
 }
+
+///|
+test "id counts geometries and stays on the destination" {
+  let first = @core.BufferGeometry::new()
+  let second = @core.BufferGeometry::new()
+  assert_eq(second.id, first.id + 1)
+  let destination = @core.BufferGeometry::new()
+  let kept = destination.id
+  ignore(destination.copy(first))
+  assert_eq(destination.id, kept)
+  assert_eq(destination.id == first.id, false)
+}

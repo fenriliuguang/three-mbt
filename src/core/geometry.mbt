@@ -1,6 +1,16 @@
 // r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 
 ///|
+let next_geometry_id : Ref[Int] = Ref::Ref(0)
+
+///|
+fn fresh_geometry_id() -> Int {
+  let id = next_geometry_id.val
+  next_geometry_id.val = id + 1
+  id
+}
+
+///|
 /// `BufferGeometry` 的一组索引。`material_index` 对应 r186 的 group materialIndex。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 pub(all) struct GeometryGroup {
@@ -19,8 +29,11 @@ pub(all) struct DrawRange {
 
 ///|
 /// 几何体。属性按名字存放，索引和包围体单独保存。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
+/// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L73
 pub(all) struct BufferGeometry {
+  id : Int
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]
@@ -34,6 +47,7 @@ pub(all) struct BufferGeometry {
 ///|
 pub fn BufferGeometry::new() -> BufferGeometry {
   {
+    id: fresh_geometry_id(),
     attributes: Map([]),
     index: None,
     groups: [],
