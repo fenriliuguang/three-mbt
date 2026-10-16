@@ -294,3 +294,12 @@ pub fn Matrix3::scale(self : Matrix3, sx : Double, sy : Double) -> Matrix3 {
   let m = Matrix3::new().make_scale(sx, sy)
   self.premultiply(m)
 }
+
+///|
+/// 组成逆时针的二维旋转矩阵。
+/// r186: `makeRotation` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L505
+pub fn Matrix3::make_rotation(self : Matrix3, theta : Double) -> Matrix3 {
+  let c = @std.cos(theta)
+  let s = @std.sin(theta)
+  self.set(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0)
+}
