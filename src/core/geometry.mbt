@@ -874,3 +874,21 @@ pub fn BufferGeometry::remove_event_listener(
     }
   }
 }
+
+///|
+/// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
+pub fn BufferGeometry::dispatch_event(
+  self : BufferGeometry,
+  kind : String,
+) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let snapshot = listeners.copy()
+      for listener in snapshot {
+        listener()
+      }
+    }
+  }
+}

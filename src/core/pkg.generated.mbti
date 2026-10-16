@@ -97,6 +97,7 @@ pub fn BufferGeometry::compute_tangents(Self) -> Unit
 pub fn BufferGeometry::compute_vertex_normals(Self) -> Unit
 pub fn BufferGeometry::copy(Self, Self) -> Self
 pub fn BufferGeometry::delete_attribute(Self, String) -> Self
+pub fn BufferGeometry::dispatch_event(Self, String) -> Unit
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
 pub fn BufferGeometry::has_event_listener(Self, String, () -> Unit) -> Bool

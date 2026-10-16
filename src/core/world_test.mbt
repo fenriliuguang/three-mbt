@@ -1550,3 +1550,13 @@ test "removeEventListener drops a registered geometry listener" {
   geometry.remove_event_listener("dispose", listener)
   assert_eq(geometry.has_event_listener("dispose", listener), false)
 }
+
+///|
+test "dispatchEvent runs geometry listeners of one kind" {
+  let geometry = @core.BufferGeometry::new()
+  let hits = Ref::Ref(0)
+  geometry.add_event_listener("change", fn() { hits.val = hits.val + 1 })
+  geometry.add_event_listener("dispose", fn() { hits.val = hits.val + 10 })
+  geometry.dispatch_event("change")
+  assert_eq(hits.val, 1)
+}
