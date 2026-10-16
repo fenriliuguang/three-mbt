@@ -51,3 +51,13 @@ pub fn InterleavedBufferAttribute::set_needs_update(
 ) -> Unit {
   self.data.set_needs_update(value)
 }
+
+///|
+/// 读取指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，读到的是缓冲里的原值。
+/// r186: `getX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L286
+pub fn InterleavedBufferAttribute::get_x(
+  self : InterleavedBufferAttribute,
+  index : Int,
+) -> Double {
+  self.data.array[index * self.data.stride + self.offset]
+}

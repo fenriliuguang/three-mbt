@@ -2259,3 +2259,12 @@ test "needsUpdate increments the interleaved attribute buffer version" {
   attribute.set_needs_update(true)
   assert_eq(attribute.data.version, 2)
 }
+
+///|
+test "getX reads an interleaved component" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  assert_eq(attribute.get_x(1), 4.0)
+  let shifted = @core.InterleavedBufferAttribute::new(buffer, 1, 1)
+  assert_eq(shifted.get_x(0), 2.0)
+}
