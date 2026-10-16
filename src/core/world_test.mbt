@@ -1402,6 +1402,16 @@ test "addEventListener keeps one copy of a listener" {
 }
 
 ///|
+test "dispose runs only dispose listeners" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let hits = Ref::Ref(0)
+  attribute.add_event_listener("dispose", fn() { hits.val = hits.val + 1 })
+  attribute.add_event_listener("other", fn() { hits.val = hits.val + 10 })
+  attribute.dispose()
+  assert_eq(hits.val, 1)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

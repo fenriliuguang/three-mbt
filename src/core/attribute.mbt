@@ -127,6 +127,21 @@ pub fn BufferAttribute::add_event_listener(
 }
 
 ///|
+/// 通知 `dispose` 监听。其它事件不动。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L684
+pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
+  match self.listeners.get("dispose") {
+    None => ()
+    Some(listeners) => {
+      let snapshot = listeners.copy()
+      for listener in snapshot {
+        listener()
+      }
+    }
+  }
+}
+
+///|
 /// 用源属性的数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
 pub fn BufferAttribute::copy(

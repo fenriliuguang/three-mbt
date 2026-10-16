@@ -1191,6 +1191,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferAttribute.addEventListener` has landed. Registering the same `dispose` listener twice leaves a single entry.
 
+`BufferAttribute.dispose` has landed. A `dispose` listener adds `1` and another event's listener adds `10`, so the counter ends at `1`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1727,6 +1729,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferAttribute.clearUpdateRanges` | `core` |
 | planned | 7 | `BufferAttribute.onUpload` | `core` |
 | planned | 7 | `BufferAttribute.addEventListener` | `core` |
+| planned | 7 | `BufferAttribute.dispose` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
