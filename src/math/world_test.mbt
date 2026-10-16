@@ -6065,6 +6065,32 @@ test "SphericalHarmonics3.zero clears nine coefficients" {
 }
 
 ///|
+test "SphericalHarmonics3.getAt evaluates a coefficient along a normal" {
+  let sh = @math.SphericalHarmonics3::new()
+  let normal = @math.Vector3::new(y=1.0)
+  let target = @math.Vector3::new(x=9.0)
+  let radiance = sh.get_at(normal, target)
+  assert_eq(physical_equal(radiance, target), true)
+  assert_eq(target.x, 0.0)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  ignore(sh.coefficients[0].set(1.0, 0.0, 0.0))
+  ignore(sh.get_at(normal, target))
+  assert_eq(target.x, 0.282095)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(normal.y, 1.0)
+  ignore(sh.zero())
+  ignore(sh.coefficients[3].set(1.0, 0.0, 0.0))
+  let axis = @math.Vector3::new(x=1.0)
+  ignore(sh.get_at(axis, target))
+  assert_eq(target.x, 0.488603)
+  assert_eq(target.y, 0.0)
+  assert_eq(target.z, 0.0)
+  assert_eq(axis.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

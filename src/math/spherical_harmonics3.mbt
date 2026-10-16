@@ -44,3 +44,31 @@ pub fn SphericalHarmonics3::zero(self : SphericalHarmonics3) -> SphericalHarmoni
   }
   self
 }
+
+///|
+/// 求单位法线方向上的辐射亮度。法线本身不改。
+/// r186: `getAt` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L84
+pub fn SphericalHarmonics3::get_at(
+  self : SphericalHarmonics3,
+  normal : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let x = normal.x
+  let y = normal.y
+  let z = normal.z
+  let coeff = self.coefficients
+  ignore(
+    target
+      .copy(coeff[0])
+      .multiply_scalar(0.282095)
+      .add_scaled_vector(coeff[1], 0.488603 * y)
+      .add_scaled_vector(coeff[2], 0.488603 * z)
+      .add_scaled_vector(coeff[3], 0.488603 * x)
+      .add_scaled_vector(coeff[4], 1.092548 * (x * y))
+      .add_scaled_vector(coeff[5], 1.092548 * (y * z))
+      .add_scaled_vector(coeff[6], 0.315392 * (3.0 * z * z - 1.0))
+      .add_scaled_vector(coeff[7], 1.092548 * (x * z))
+      .add_scaled_vector(coeff[8], 0.546274 * (x * x - y * y)),
+  )
+  target
+}
