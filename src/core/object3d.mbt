@@ -244,6 +244,22 @@ pub fn Object3D::project_point(
 }
 
 ///|
+/// 把 NDC 还原到世界坐标。先乘投影逆矩阵，再乘世界矩阵。调用前要先更新世界矩阵。
+/// r186: `unproject` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L512
+pub fn Object3D::unproject_point(
+  self : Object3D,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  match self.camera {
+    None => abort("Object3D.unproject_point requires a camera")
+    Some(camera) =>
+      target
+      .apply_matrix4(camera.projection_inverse)
+      .apply_matrix4(self.matrix_world)
+  }
+}
+
+///|
 /// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1176
 pub fn Object3D::update_matrix_world(
   self : Object3D,

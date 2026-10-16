@@ -1101,6 +1101,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Vector3.project` has landed as `Object3D.project_point`, because `math` does not import cameras. It multiplies by the view inverse, then by the projection. On the wide orthographic camera, world `(2, 1, -0.1)` becomes NDC `(1, 1, 0)`. The same NDC comes from `(12, 1, -0.1)` when the camera sits at x `10`. A node without a camera aborts.
 
+`Vector3.unproject` has landed as `Object3D.unproject_point`. It multiplies by the inverse projection, then by the world matrix. On that same camera, NDC `(1, 1, 0)` returns world `(2, 1, -0.1)`. With the camera at x `10`, the same NDC returns `(12, 1, -0.1)`. A node without a camera aborts.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1592,6 +1594,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Color.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | `Quaternion.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | `Vector3.project` on `Object3D` | `core` |
+| planned | 7 | `Vector3.unproject` on `Object3D` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

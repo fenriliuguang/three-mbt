@@ -436,3 +436,35 @@ test "panic Vector3.project requires a camera" {
   let node = @core.Object3D::new()
   ignore(node.project_point(@math.Vector3::new()))
 }
+
+///|
+test "Vector3.unproject maps NDC back to world space" {
+  let camera = @cameras.OrthographicCamera::new(
+    left=-2.0,
+    right=2.0,
+    top=1.0,
+    bottom=-1.0,
+    near=0.1,
+    far=10.0,
+  )
+  camera.node.update_matrix_world()
+  let point = @math.Vector3::new(x=1.0, y=1.0, z=0.0)
+  let written = camera.node.unproject_point(point)
+  assert_eq(physical_equal(written, point), true)
+  assert_eq(point.x, 2.0)
+  assert_eq(point.y, 1.0)
+  assert_eq(point.z, -0.1)
+  ignore(camera.node.position.set(10.0, 0.0, 0.0))
+  camera.node.update_matrix_world()
+  ignore(point.set(1.0, 1.0, 0.0))
+  ignore(camera.node.unproject_point(point))
+  assert_eq(point.x, 12.0)
+  assert_eq(point.y, 1.0)
+  assert_eq(point.z, -0.1)
+}
+
+///|
+test "panic Vector3.unproject requires a camera" {
+  let node = @core.Object3D::new()
+  ignore(node.unproject_point(@math.Vector3::new()))
+}
