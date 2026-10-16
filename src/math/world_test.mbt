@@ -4627,6 +4627,19 @@ test "Color.sub subtracts another color and stays at zero" {
 }
 
 ///|
+test "Color.multiply multiplies channels" {
+  let color = @math.Color::new(r=0.5, g=0.25, b=1.0)
+  let other = @math.Color::new(r=0.5, g=0.5, b=0.25)
+  ignore(color.multiply(other))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.125)
+  assert_eq(color.b, 0.25)
+  assert_eq(other.r, 0.5)
+  assert_eq(other.g, 0.5)
+  assert_eq(other.b, 0.25)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

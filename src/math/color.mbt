@@ -264,6 +264,16 @@ pub fn Color::sub(self : Color, color : Color) -> Color {
 }
 
 ///|
+/// 与另一个颜色按通道相乘。
+/// r186: `multiply` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L743
+pub fn Color::multiply(self : Color, color : Color) -> Color {
+  self.r *= color.r
+  self.g *= color.g
+  self.b *= color.b
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
