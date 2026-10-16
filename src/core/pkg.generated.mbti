@@ -58,6 +58,7 @@ pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
 pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
+pub fn BufferGeometry::look_at(Self, @math.Vector3) -> Self
 pub fn BufferGeometry::new() -> Self
 pub fn BufferGeometry::rotate_x(Self, Double) -> Self
 pub fn BufferGeometry::rotate_y(Self, Double) -> Self

@@ -901,3 +901,21 @@ test "scale multiplies a position" {
     }
   }
 }
+
+///|
+test "lookAt turns local +Z toward the target" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 1.0], 3)),
+  )
+  let written = geometry.look_at(@math.Vector3::new(x=1.0))
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_close(position.get_x(0), 1.0)
+      assert_close(position.get_y(0), 0.0)
+      assert_close(position.get_z(0), 0.0)
+    }
+  }
+}

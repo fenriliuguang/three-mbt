@@ -227,6 +227,19 @@ pub fn BufferGeometry::scale(
 }
 
 ///|
+/// 让几何体朝向一个点。临时物体在原点，朝向后再把旋转作用到顶点上。
+/// r186: `lookAt` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L556
+pub fn BufferGeometry::look_at(
+  self : BufferGeometry,
+  vector : @math.Vector3,
+) -> BufferGeometry {
+  let obj = Object3D::new()
+  obj.look_at_vector(vector)
+  obj.update_matrix()
+  self.apply_matrix4(obj.matrix)
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None
