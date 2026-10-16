@@ -210,6 +210,7 @@ pub fn Matrix3::copy(Self, Self) -> Self
 pub fn Matrix3::determinant(Self) -> Double
 pub fn Matrix3::equals(Self, Self) -> Bool
 pub fn Matrix3::extract_basis(Self, Vector3, Vector3, Vector3) -> Self
+pub fn Matrix3::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Matrix3::get_normal_matrix(Self, Matrix4) -> Self
 pub fn Matrix3::identity(Self) -> Self
 pub fn Matrix3::invert(Self) -> Self

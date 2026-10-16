@@ -340,3 +340,18 @@ pub fn Matrix3::equals(self : Matrix3, matrix : Matrix3) -> Bool {
   }
   true
 }
+
+///|
+/// 从列主序数组读入九个元素。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L573
+pub fn Matrix3::from_array(
+  self : Matrix3,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Matrix3 {
+  let te = self.elements
+  for i in 0..<9 {
+    te[i] = array[i + offset]
+  }
+  self
+}
