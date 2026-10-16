@@ -4951,6 +4951,33 @@ test "Frustum.copy copies six planes" {
 }
 
 ///|
+test "Frustum.intersectsBox accepts a box inside the unit cube" {
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  let inside = @math.Box3::new(
+    @math.Vector3::new(x=0.25, y=0.25, z=0.25),
+    @math.Vector3::new(x=0.75, y=0.75, z=0.75),
+  )
+  assert_eq(frustum.intersects_box(inside), true)
+  let outside = @math.Box3::new(
+    @math.Vector3::new(x=-2.0, y=-2.0, z=-2.0),
+    @math.Vector3::new(x=-1.0, y=-1.0, z=-1.0),
+  )
+  assert_eq(frustum.intersects_box(outside), false)
+  assert_eq(outside.min.x, -2.0)
+  assert_eq(frustum.planes[0].constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
