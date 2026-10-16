@@ -49,6 +49,7 @@ pub(all) struct BufferGeometry {
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
   mut indirect_offset : Int
+  mut indirect_offsets : Array[Int]?
   morph_attributes : Map[String, Array[BufferAttribute]]
   mut morph_targets_relative : Bool
   mut user_data : Map[String, String]
@@ -72,6 +73,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     index: None,
     indirect: None,
     indirect_offset: 0,
+    indirect_offsets: None,
     morph_attributes: Map([]),
     morph_targets_relative: false,
     user_data: Map([]),
@@ -155,6 +157,20 @@ pub fn BufferGeometry::set_indirect(
 ) -> BufferGeometry {
   self.indirect = Some(indirect)
   self.indirect_offset = offset
+  self.indirect_offsets = None
+  self
+}
+
+///|
+/// 设置间接绘制属性，以及每一段绘制的字节偏移。偏移数组是一份副本。
+/// r186: `setIndirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L253
+pub fn BufferGeometry::set_indirect_offsets(
+  self : BufferGeometry,
+  indirect : BufferAttribute,
+  offsets : Array[Int],
+) -> BufferGeometry {
+  self.indirect = Some(indirect)
+  self.indirect_offsets = Some(offsets.copy())
   self
 }
 

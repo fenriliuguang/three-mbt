@@ -1946,3 +1946,25 @@ test "toJSON writes morph attributes" {
       }
   }
 }
+
+///|
+test "setIndirect stores several byte offsets" {
+  let geometry = @core.BufferGeometry::new()
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0], 5)
+  let offsets = [8, 24]
+  let written = geometry.set_indirect_offsets(attribute, offsets)
+  assert_eq(physical_equal(written, geometry), true)
+  offsets[0] = 1
+  match geometry.indirect_offsets {
+    None => assert_eq(false, true)
+    Some(stored) => {
+      assert_eq(stored.length(), 2)
+      assert_eq(stored[0], 8)
+      assert_eq(stored[1], 24)
+    }
+  }
+  match geometry.get_indirect() {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(stored.get_x(0), 1.0)
+  }
+}

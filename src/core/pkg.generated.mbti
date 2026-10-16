@@ -89,6 +89,7 @@ pub(all) struct BufferGeometry {
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
   mut indirect_offset : Int
+  mut indirect_offsets : Array[Int]?
   morph_attributes : Map[String, Array[BufferAttribute]]
   mut morph_targets_relative : Bool
   mut user_data : Map[String, String]
@@ -134,6 +135,7 @@ pub fn BufferGeometry::set_from_points(Self, Array[@math.Vector3]) -> Self
 pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self
 pub fn BufferGeometry::set_index_array(Self, Array[Int]) -> Self
 pub fn BufferGeometry::set_indirect(Self, BufferAttribute, offset? : Int) -> Self
+pub fn BufferGeometry::set_indirect_offsets(Self, BufferAttribute, Array[Int]) -> Self
 pub fn BufferGeometry::to_json(Self) -> GeometryJson
 pub fn BufferGeometry::to_non_indexed(Self) -> Self
 pub fn BufferGeometry::translate(Self, Double, Double, Double) -> Self
