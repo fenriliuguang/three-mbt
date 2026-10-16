@@ -213,3 +213,16 @@ pub fn Sphere::clone(self : Sphere) -> Sphere {
 pub fn Sphere::to_json(self : Sphere) -> (Array[Double], Double) {
   (self.center.to_array(), self.radius)
 }
+
+///|
+/// 从数组和半径读入球。数组不改。
+/// r186: `fromJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Sphere.js#L410
+pub fn Sphere::from_json(
+  self : Sphere,
+  center : Array[Double],
+  radius : Double,
+) -> Sphere {
+  ignore(self.center.from_array(center))
+  self.radius = radius
+  self
+}
