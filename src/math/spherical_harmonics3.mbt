@@ -72,3 +72,31 @@ pub fn SphericalHarmonics3::get_at(
   )
   target
 }
+
+///|
+/// 求单位法线方向上的辐照度。法线本身不改。
+/// r186: `getIrradianceAt` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L119
+pub fn SphericalHarmonics3::get_irradiance_at(
+  self : SphericalHarmonics3,
+  normal : Vector3,
+  target : Vector3,
+) -> Vector3 {
+  let x = normal.x
+  let y = normal.y
+  let z = normal.z
+  let coeff = self.coefficients
+  ignore(
+    target
+      .copy(coeff[0])
+      .multiply_scalar(0.886227)
+      .add_scaled_vector(coeff[1], 2.0 * 0.511664 * y)
+      .add_scaled_vector(coeff[2], 2.0 * 0.511664 * z)
+      .add_scaled_vector(coeff[3], 2.0 * 0.511664 * x)
+      .add_scaled_vector(coeff[4], 2.0 * 0.429043 * x * y)
+      .add_scaled_vector(coeff[5], 2.0 * 0.429043 * y * z)
+      .add_scaled_vector(coeff[6], 0.743125 * z * z - 0.247708)
+      .add_scaled_vector(coeff[7], 2.0 * 0.429043 * x * z)
+      .add_scaled_vector(coeff[8], 0.429043 * (x * x - y * y)),
+  )
+  target
+}
