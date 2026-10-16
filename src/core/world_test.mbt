@@ -1638,3 +1638,15 @@ test "name starts empty and copy carries the geometry name" {
   ignore(destination.copy(source))
   assert_eq(destination.name, "square")
 }
+
+///|
+test "type stays BufferGeometry and copy keeps the destination type" {
+  let source = @core.BufferGeometry::new()
+  assert_eq(source.type_name, "BufferGeometry")
+  source.type_name = "BoxGeometry"
+  let destination = @core.BufferGeometry::new()
+  destination.type_name = "SphereGeometry"
+  ignore(destination.copy(source))
+  assert_eq(destination.type_name, "SphereGeometry")
+  assert_eq(source.type_name, "BoxGeometry")
+}

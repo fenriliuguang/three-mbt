@@ -29,15 +29,17 @@ pub(all) struct DrawRange {
 
 ///|
 /// 几何体。属性按名字存放，索引和包围体单独保存。
-/// `id` 从 0 起递增，`copy` 不改写目标的编号。`uuid` 在新建时生成，`copy` 也不改写它。`name` 默认是空字符串。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。`uuid` 在新建时生成，`copy` 也不改写它。`name` 默认是空字符串。`type_name` 默认是 `BufferGeometry`，`copy` 保留目标自己的类型。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L73
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L81
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L88
+/// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L89
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
   mut name : String
+  mut type_name : String
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]
@@ -54,6 +56,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     id: fresh_geometry_id(),
     uuid: @math.generate_uuid(),
     name: "",
+    type_name: "BufferGeometry",
     attributes: Map([]),
     index: None,
     groups: [],
