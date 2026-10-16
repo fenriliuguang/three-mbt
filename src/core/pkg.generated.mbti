@@ -212,6 +212,7 @@ pub(all) struct InstanceData {
 }
 
 pub(all) struct InterleavedBuffer {
+  uuid : String
   mut array : Array[Double]
   mut stride : Int
   mut count : Int

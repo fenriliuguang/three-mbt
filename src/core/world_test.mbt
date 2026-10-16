@@ -2201,3 +2201,14 @@ test "needsUpdate increments an interleaved buffer version only when true" {
   buffer.set_needs_update(true)
   assert_eq(buffer.version, 2)
 }
+
+///|
+test "uuid is a version-4 id that interleaved copy keeps" {
+  let source = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3)
+  assert_eq(source.uuid.length(), 36)
+  assert_eq(source.uuid[14:15].to_owned(), "4")
+  let destination = @core.InterleavedBuffer::new([9.0], 1)
+  let kept = destination.uuid
+  ignore(destination.copy(source))
+  assert_eq(destination.uuid, kept)
+}

@@ -1293,6 +1293,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `InterleavedBuffer.needsUpdate` has landed. A new buffer's version is `0`. Setting it false leaves `0`. Setting it true twice makes the version `2`.
 
+`InterleavedBuffer.uuid` has landed. A new buffer's id has length `36` and version nibble `4`. `copy` keeps the destination id.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1880,6 +1882,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InterleavedBuffer.clone` | `core` |
 | planned | 7 | `InterleavedBuffer.onUpload` | `core` |
 | planned | 7 | `InterleavedBuffer.needsUpdate` | `core` |
+| planned | 7 | `InterleavedBuffer.uuid` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

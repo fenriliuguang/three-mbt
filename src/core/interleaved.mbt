@@ -1,7 +1,7 @@
 // r186: `InterleavedBuffer` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L10
 
 ///|
-/// 多个属性共用的交错缓冲。数值用 `Double` 保存。`count` 是数组长度除以步长。`usage` 默认是 `StaticDrawUsage`。待上传区间一开始是空的。`version` 从 0 起，只有 `needsUpdate` 为真时加一。
+/// 多个属性共用的交错缓冲。数值用 `Double` 保存。`count` 是数组长度除以步长。`usage` 默认是 `StaticDrawUsage`。待上传区间一开始是空的。`version` 从 0 起，只有 `needsUpdate` 为真时加一。`uuid` 在新建时生成，`copy` 不改写它。
 /// r186: `InterleavedBuffer` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L10
 /// r186: `array` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L34
 /// r186: `stride` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L41
@@ -9,7 +9,9 @@
 /// r186: `usage` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L60
 /// r186: `updateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L68
 /// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L75
+/// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L83
 pub(all) struct InterleavedBuffer {
+  uuid : String
   mut array : Array[Double]
   mut stride : Int
   mut count : Int
@@ -25,6 +27,7 @@ pub fn InterleavedBuffer::new(
   stride : Int,
 ) -> InterleavedBuffer {
   {
+    uuid: @math.generate_uuid(),
     array,
     stride,
     count: array.length() / stride,
