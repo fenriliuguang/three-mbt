@@ -179,6 +179,17 @@ pub fn BufferGeometry::rotate_x(
 }
 
 ///|
+/// 绕世界 Y 轴旋转几何体。
+/// r186: `rotateY` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L472
+pub fn BufferGeometry::rotate_y(
+  self : BufferGeometry,
+  angle : Double,
+) -> BufferGeometry {
+  let matrix = @math.Matrix4::new().make_rotation_y(angle)
+  self.apply_matrix4(matrix)
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None
