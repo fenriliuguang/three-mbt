@@ -865,3 +865,21 @@ test "rotateZ turns a position a right angle around Z" {
     }
   }
 }
+
+///|
+test "translate moves a position by an offset" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+  )
+  let written = geometry.translate(10.0, 0.0, 0.0)
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.get_x(0), 11.0)
+      assert_eq(position.get_y(0), 2.0)
+      assert_eq(position.get_z(0), 3.0)
+    }
+  }
+}
