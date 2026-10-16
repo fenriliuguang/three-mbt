@@ -97,6 +97,13 @@ pub fn BufferGeometry::add_group(
 }
 
 ///|
+/// 清空全部分组。属性和索引不动。
+/// r186: `clearGroups` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L350
+pub fn BufferGeometry::clear_groups(self : BufferGeometry) -> Unit {
+  self.groups.clear()
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None

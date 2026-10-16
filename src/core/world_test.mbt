@@ -631,3 +631,20 @@ test "hasAttribute reports a named attribute" {
   ignore(geometry.delete_attribute("position"))
   assert_eq(geometry.has_attribute("position"), false)
 }
+
+///|
+test "clearGroups drops every draw group" {
+  let geometry = @core.BufferGeometry::new()
+  geometry.add_group(0, 3, material_index=1)
+  geometry.add_group(3, 6)
+  assert_eq(geometry.groups.length(), 2)
+  assert_eq(geometry.groups[0].material_index, 1)
+  assert_eq(geometry.groups[1].start, 3)
+  assert_eq(geometry.groups[1].count, 6)
+  ignore(
+    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+  )
+  geometry.clear_groups()
+  assert_eq(geometry.groups.length(), 0)
+  assert_eq(geometry.has_attribute("position"), true)
+}
