@@ -68,6 +68,13 @@ pub(all) enum ArrayComponentType {
   Int8
 }
 
+pub(all) struct BezierInterpolant {
+  interpolant : Interpolant
+  mut in_tangents : Array[Double]?
+  mut out_tangents : Array[Double]?
+}
+pub fn BezierInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Box2 {
   min : Vector2
   max : Vector2
