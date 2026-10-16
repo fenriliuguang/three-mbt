@@ -182,3 +182,10 @@ pub fn is_power_of_two(value : Double) -> Bool {
 pub fn ceil_power_of_two(value : Double) -> Double {
   @std.pow(2.0, @std.log2(value).ceil())
 }
+
+///|
+/// 不大于给定数的最大 2 的幂。
+/// r186: `floorPowerOfTwo` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L312
+pub fn floor_power_of_two(value : Double) -> Double {
+  @std.pow(2.0, @std.log2(value).floor())
+}

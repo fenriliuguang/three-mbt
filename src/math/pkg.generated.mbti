@@ -16,6 +16,8 @@ pub fn deg_to_rad(Double) -> Double
 
 pub fn euclidean_modulo(Double, Double) -> Double
 
+pub fn floor_power_of_two(Double) -> Double
+
 pub fn inverse_lerp(Double, Double, Double) -> Double
 
 pub fn is_power_of_two(Double) -> Bool
