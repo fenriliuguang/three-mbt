@@ -859,6 +859,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Euler.clone` has landed. It returns a new euler with the same angles and order. Cloning `(1, 2, 3)` in order `ZYX` stores those values. Later changes to either euler leave the other alone. The change callback is not copied.
 
+`Euler.setFromVector3` has landed. It writes the vector components as angles. `(1, 2, 3)` is stored as those angles. Omitting the order keeps `XYZ`. Passing `ZYX` stores that order. The vector is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1229,6 +1231,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Color.toArray` | `math` |
 | planned | 7 | `Color.toJSON` | `math` |
 | planned | 7 | `Euler.clone` | `math` |
+| planned | 7 | `Euler.setFromVector3` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

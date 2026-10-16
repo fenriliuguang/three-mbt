@@ -153,6 +153,7 @@ pub fn Euler::reorder(Self, EulerOrder) -> Self
 pub fn Euler::set(Self, Double, Double, Double, order? : EulerOrder) -> Self
 pub fn Euler::set_from_quaternion(Self, Quaternion, order? : EulerOrder, update? : Bool) -> Self
 pub fn Euler::set_from_rotation_matrix(Self, Matrix4, order? : EulerOrder, update? : Bool) -> Self
+pub fn Euler::set_from_vector3(Self, Vector3, order? : EulerOrder) -> Self
 pub fn Euler::set_order(Self, EulerOrder) -> Self
 pub fn Euler::set_x(Self, Double) -> Self
 pub fn Euler::set_y(Self, Double) -> Self

@@ -206,6 +206,20 @@ pub fn Euler::set_from_quaternion(
 }
 
 ///|
+/// 用向量的三个分量写入角度。省略顺序时保留当前顺序。
+/// r186: `setFromVector3` https://github.com/mrdoob/three.js/blob/r186/src/math/Euler.js#L343
+pub fn Euler::set_from_vector3(
+  self : Euler,
+  v : Vector3,
+  order? : EulerOrder,
+) -> Euler {
+  match order {
+    None => self.set(v.x, v.y, v.z)
+    Some(order) => self.set(v.x, v.y, v.z, order=order)
+  }
+}
+
+///|
 pub fn Euler::reorder(self : Euler, new_order : EulerOrder) -> Euler {
   let quaternion = Quaternion::new().set_from_euler(self)
   self.set_from_quaternion(quaternion, order=new_order)

@@ -4806,6 +4806,30 @@ test "Euler.clone copies the angles and the order" {
 }
 
 ///|
+test "Euler.setFromVector3 copies the vector components" {
+  let euler = @math.Euler::new()
+  let v = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  ignore(euler.set_from_vector3(v))
+  assert_eq(euler.x, 1.0)
+  assert_eq(euler.y, 2.0)
+  assert_eq(euler.z, 3.0)
+  match euler.order {
+    @math.EulerOrder::XYZ => assert_eq(euler.x, 1.0)
+    _ => assert_eq(true, false)
+  }
+  ignore(euler.set_from_vector3(v, order=@math.EulerOrder::ZYX))
+  assert_eq(euler.x, 1.0)
+  assert_eq(euler.y, 2.0)
+  assert_eq(euler.z, 3.0)
+  match euler.order {
+    @math.EulerOrder::ZYX => assert_eq(v.x, 1.0)
+    _ => assert_eq(true, false)
+  }
+  assert_eq(v.y, 2.0)
+  assert_eq(v.z, 3.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
