@@ -100,3 +100,16 @@ pub fn SphericalHarmonics3::get_irradiance_at(
   )
   target
 }
+
+///|
+/// 把另一组球谐的九个系数加进来。来源不改。
+/// r186: `add` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L152
+pub fn SphericalHarmonics3::add(
+  self : SphericalHarmonics3,
+  sh : SphericalHarmonics3,
+) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].add(sh.coefficients[i]))
+  }
+  self
+}
