@@ -183,6 +183,42 @@ pub fn Matrix4::make_rotation_z(self : Matrix4, theta : Double) -> Matrix4 {
 }
 
 ///|
+/// 绕给定单位轴旋转。
+/// r186: `makeRotationAxis` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L943
+pub fn Matrix4::make_rotation_axis(
+  self : Matrix4,
+  axis : Vector3,
+  angle : Double,
+) -> Matrix4 {
+  let c = @std.cos(angle)
+  let s = @std.sin(angle)
+  let t = 1.0 - c
+  let x = axis.x
+  let y = axis.y
+  let z = axis.z
+  let tx = t * x
+  let ty = t * y
+  self.set(
+    tx * x + c,
+    tx * y - s * z,
+    tx * z + s * y,
+    0.0,
+    tx * y + s * z,
+    ty * y + c,
+    ty * z - s * x,
+    0.0,
+    tx * z - s * y,
+    ty * z + s * x,
+    t * z * z + c,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+  )
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,
