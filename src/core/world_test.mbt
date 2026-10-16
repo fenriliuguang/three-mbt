@@ -1686,3 +1686,38 @@ test "getIndirect returns the stored attribute" {
     }
   }
 }
+
+///|
+test "morphAttributes copy a position target" {
+  let source = @core.BufferGeometry::new()
+  match source.morph_attributes.get("position") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  source.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([1.0, 2.0, 3.0], 3)],
+  )
+  let destination = @core.BufferGeometry::new()
+  destination.morph_attributes.set(
+    "normal",
+    [@core.BufferAttribute::new([9.0, 9.0, 9.0], 3)],
+  )
+  ignore(destination.copy(source))
+  match destination.morph_attributes.get("normal") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  match destination.morph_attributes.get("position") {
+    None => assert_eq(false, true)
+    Some(attributes) => {
+      assert_eq(attributes.length(), 1)
+      assert_eq(attributes[0].get_x(0), 1.0)
+      attributes[0].array[0] = 8.0
+    }
+  }
+  match source.morph_attributes.get("position") {
+    None => assert_eq(false, true)
+    Some(attributes) => assert_eq(attributes[0].get_x(0), 1.0)
+  }
+}

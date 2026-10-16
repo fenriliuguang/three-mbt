@@ -36,6 +36,7 @@ pub(all) struct DrawRange {
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L88
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L89
 /// r186: `indirect` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L112
+/// r186: `morphAttributes` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L141
 pub(all) struct BufferGeometry {
   id : Int
   uuid : String
@@ -45,6 +46,7 @@ pub(all) struct BufferGeometry {
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
   mut indirect_offset : Int
+  morph_attributes : Map[String, Array[BufferAttribute]]
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
@@ -64,6 +66,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     index: None,
     indirect: None,
     indirect_offset: 0,
+    morph_attributes: Map([]),
     groups: [],
     draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
@@ -818,7 +821,7 @@ pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
-/// 把源几何体的名字、属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。
+/// 把源几何体的名字、属性、形变属性、索引、分组、包围体和绘制范围复制过来。数值各自独立。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1357
 pub fn BufferGeometry::copy(
   self : BufferGeometry,
@@ -827,6 +830,7 @@ pub fn BufferGeometry::copy(
   self.name = source.name
   self.index = None
   self.attributes.clear()
+  self.morph_attributes.clear()
   self.groups.clear()
   self.bounding_box = None
   self.bounding_sphere = None
@@ -837,6 +841,14 @@ pub fn BufferGeometry::copy(
   for pair in source.attributes.iter() {
     let (name, attribute) = pair
     ignore(self.set_attribute(name, attribute.clone()))
+  }
+  for pair in source.morph_attributes.iter() {
+    let (name, attributes) = pair
+    let cloned = []
+    for attribute in attributes {
+      cloned.push(attribute.clone())
+    }
+    self.morph_attributes.set(name, cloned)
   }
   let mut group_index = 0
   while group_index < source.groups.length() {

@@ -86,6 +86,7 @@ pub(all) struct BufferGeometry {
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
   mut indirect_offset : Int
+  morph_attributes : Map[String, Array[BufferAttribute]]
   groups : Array[GeometryGroup]
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
