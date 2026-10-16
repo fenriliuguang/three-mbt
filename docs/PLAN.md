@@ -807,6 +807,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `MathUtils.euclideanModulo` has landed. It wraps the remainder so the result has the same sign as the divisor. `1.25` modulo `1` is `0.25`, and `-0.25` modulo `1` is `0.75`.
 
+`Color.setHSL` has landed. It writes linear channels from hue, saturation, and lightness, already in the linear working space. Hue `0`, saturation `1`, lightness `0.5` is `(1, 0, 0)`. Saturation `0` and lightness `0.25` is `(0.25, 0.25, 0.25)`. Hue `1` wraps to the same red.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1151,6 +1153,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Color.setScalar` | `math` |
 | planned | 7 | `MathUtils.clamp` | `math` |
 | planned | 7 | `MathUtils.euclideanModulo` | `math` |
+| planned | 7 | `Color.setHSL` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

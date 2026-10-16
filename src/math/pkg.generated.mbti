@@ -98,6 +98,7 @@ pub fn Color::lerp(Self, Self, Double) -> Self
 pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self
 pub fn Color::set(Self, Double, Double, Double) -> Self
 pub fn Color::set_hex(Self, Int) -> Self
+pub fn Color::set_hsl(Self, Double, Double, Double) -> Self
 pub fn Color::set_rgb(Self, Double, Double, Double) -> Self
 pub fn Color::set_scalar(Self, Double) -> Self
 

@@ -51,6 +51,49 @@ pub fn Color::set_scalar(self : Color, scalar : Double) -> Color {
 }
 
 ///|
+/// 色相转成一个线性通道。
+/// r186: `hue2rgb` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L34
+fn hue2rgb(p : Double, q : Double, t : Double) -> Double {
+  let t = if t < 0.0 {
+    t + 1.0
+  } else if t > 1.0 {
+    t - 1.0
+  } else {
+    t
+  }
+  if t < 1.0 / 6.0 {
+    p + (q - p) * 6.0 * t
+  } else if t < 0.5 {
+    q
+  } else if t < 2.0 / 3.0 {
+    p + (q - p) * 6.0 * (2.0 / 3.0 - t)
+  } else {
+    p
+  }
+}
+
+///|
+/// 用色相、饱和度、亮度写入线性通道。默认工作空间已是线性，不再做色彩空间转换。
+/// r186: `setHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L248
+pub fn Color::set_hsl(self : Color, h : Double, s : Double, l : Double) -> Color {
+  let h = euclidean_modulo(h, 1.0)
+  let s = clamp(s, 0.0, 1.0)
+  let l = clamp(l, 0.0, 1.0)
+  if s == 0.0 {
+    self.r = l
+    self.g = l
+    self.b = l
+  } else {
+    let p = if l <= 0.5 { l * (1.0 + s) } else { l + s - l * s }
+    let q = 2.0 * l - p
+    self.r = hue2rgb(q, p, h + 1.0 / 3.0)
+    self.g = hue2rgb(q, p, h)
+    self.b = hue2rgb(q, p, h - 1.0 / 3.0)
+  }
+  self
+}
+
+///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()

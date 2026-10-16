@@ -4454,6 +4454,25 @@ test "MathUtils.euclideanModulo wraps a negative remainder" {
 }
 
 ///|
+test "Color.setHSL writes linear channels from hue saturation and lightness" {
+  let red = @math.Color::new()
+  ignore(red.set_hsl(0.0, 1.0, 0.5))
+  assert_eq(red.r, 1.0)
+  assert_eq(red.g, 0.0)
+  assert_eq(red.b, 0.0)
+  let gray = @math.Color::new()
+  ignore(gray.set_hsl(0.2, 0.0, 0.25))
+  assert_eq(gray.r, 0.25)
+  assert_eq(gray.g, 0.25)
+  assert_eq(gray.b, 0.25)
+  let wrapped = @math.Color::new()
+  ignore(wrapped.set_hsl(1.0, 1.0, 0.5))
+  assert_eq(wrapped.r, 1.0)
+  assert_eq(wrapped.g, 0.0)
+  assert_eq(wrapped.b, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
