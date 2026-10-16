@@ -589,3 +589,32 @@ test "added child notifies the parent" {
     Some(_) => assert_eq(false, true)
   }
 }
+
+///|
+test "deleteAttribute removes one named attribute" {
+  let geometry = @core.BufferGeometry::new()
+  let position = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)
+  let normal = @core.BufferAttribute::new([0.0, 1.0, 0.0], 3)
+  ignore(geometry.set_attribute("position", position))
+  ignore(geometry.set_attribute("normal", normal))
+  ignore(geometry.set_index_array([0, 1, 2]))
+  let written = geometry.delete_attribute("normal")
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("normal") {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(found) => assert_eq(found.get_y(0), 2.0)
+  }
+  match geometry.index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index.get_x(1), 1.0)
+  }
+  ignore(geometry.delete_attribute("missing"))
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(found) => assert_eq(found.get_x(0), 1.0)
+  }
+}

@@ -47,6 +47,7 @@ pub fn BufferGeometry::add_group(Self, Int, Int, material_index? : Int) -> Unit
 pub fn BufferGeometry::clone(Self) -> Self
 pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
 pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
+pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::new() -> Self
 pub fn BufferGeometry::set_attribute(Self, String, BufferAttribute) -> Self

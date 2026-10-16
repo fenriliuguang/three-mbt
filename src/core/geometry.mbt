@@ -52,6 +52,17 @@ pub fn BufferGeometry::get_attribute(
 }
 
 ///|
+/// 按名字删掉一个属性。没有这个名字时几何体不变。索引不受影响。
+/// r186: `deleteAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L307
+pub fn BufferGeometry::delete_attribute(
+  self : BufferGeometry,
+  name : String,
+) -> BufferGeometry {
+  self.attributes.remove(name)
+  self
+}
+
+///|
 pub fn BufferGeometry::set_index(
   self : BufferGeometry,
   index : BufferAttribute,
