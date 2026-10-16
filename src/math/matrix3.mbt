@@ -251,3 +251,31 @@ pub fn Matrix3::transpose_into_array(
   array[8] = m[8]
   self
 }
+
+///|
+/// 用偏移、重复、旋转和中心组成 UV 变换。
+/// r186: `setUvTransform` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L394
+pub fn Matrix3::set_uv_transform(
+  self : Matrix3,
+  tx : Double,
+  ty : Double,
+  sx : Double,
+  sy : Double,
+  rotation : Double,
+  cx : Double,
+  cy : Double,
+) -> Matrix3 {
+  let c = @std.cos(rotation)
+  let s = @std.sin(rotation)
+  self.set(
+    sx * c,
+    sx * s,
+    -sx * (c * cx + s * cy) + cx + tx,
+    -sy * s,
+    sy * c,
+    -sy * (-s * cx + c * cy) + cy + ty,
+    0.0,
+    0.0,
+    1.0,
+  )
+}
