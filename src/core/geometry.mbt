@@ -214,6 +214,19 @@ pub fn BufferGeometry::translate(
 }
 
 ///|
+/// 缩放几何体。
+/// r186: `scale` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L536
+pub fn BufferGeometry::scale(
+  self : BufferGeometry,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> BufferGeometry {
+  let matrix = @math.Matrix4::new().make_scale(x, y, z)
+  self.apply_matrix4(matrix)
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None
