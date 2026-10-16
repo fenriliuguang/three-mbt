@@ -37,3 +37,17 @@ pub fn Interpolant::new(
     value_size: sample_size,
   }
 }
+
+///|
+/// 把第 `index` 个样本抄进结果缓冲。样本本身不改。
+/// r186: `copySampleValue_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L269
+pub fn Interpolant::copy_sample_value(
+  self : Interpolant,
+  index : Int,
+) -> Array[Double] {
+  let offset = index * self.value_size
+  for i in 0..<self.value_size {
+    self.result_buffer[i] = self.sample_values[offset + i]
+  }
+  self.result_buffer
+}
