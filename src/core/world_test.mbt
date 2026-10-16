@@ -1411,6 +1411,15 @@ test "hasEventListener reports a registered listener" {
 }
 
 ///|
+test "removeEventListener drops a registered listener" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let listener = fn() {}
+  attribute.add_event_listener("dispose", listener)
+  attribute.remove_event_listener("dispose", listener)
+  assert_eq(attribute.has_event_listener("dispose", listener), false)
+}
+
+///|
 test "dispose runs only dispose listeners" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
   let hits = Ref::Ref(0)

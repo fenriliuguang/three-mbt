@@ -149,6 +149,31 @@ pub fn BufferAttribute::has_event_listener(
 }
 
 ///|
+/// 从一种事件里移除这个监听。没有登记时不动。
+/// r186: `removeEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L74
+pub fn BufferAttribute::remove_event_listener(
+  self : BufferAttribute,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let mut index = None
+      for i in 0..<listeners.length() {
+        if physical_equal(listeners[i], listener) {
+          index = Some(i)
+        }
+      }
+      match index {
+        None => ()
+        Some(index) => ignore(listeners.remove(index))
+      }
+    }
+  }
+}
+
+///|
 /// 通知 `dispose` 监听。其它事件不动。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L684
 pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {

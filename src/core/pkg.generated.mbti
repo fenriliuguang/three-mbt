@@ -56,6 +56,7 @@ pub fn BufferAttribute::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn BufferAttribute::interpolate_vector3(Self, Int, Int, Int, @math.Vector3, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::new(Array[Double], Int, normalized? : Bool) -> Self
 pub fn BufferAttribute::on_upload(Self, () -> Unit) -> Self
+pub fn BufferAttribute::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn BufferAttribute::set(Self, Array[Double], offset? : Int) -> Self
 pub fn BufferAttribute::set_box3(Self, @math.Box3) -> @math.Box3
 pub fn BufferAttribute::set_component(Self, Int, Int, Double) -> Self
