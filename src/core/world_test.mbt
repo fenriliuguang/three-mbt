@@ -2177,3 +2177,16 @@ test "clone copies an interleaved buffer into a new object" {
   cloned.array[0] = 8.0
   assert_eq(source.array[0], 1.0)
 }
+
+///|
+test "onUpload stores a callback on an interleaved buffer" {
+  let buffer = @core.InterleavedBuffer::new([1.0], 1)
+  let hits = Ref::Ref(0)
+  let written = buffer.on_upload(fn() { hits.val = hits.val + 1 })
+  assert_eq(physical_equal(written, buffer), true)
+  match buffer.on_upload_callback {
+    None => assert_eq(false, true)
+    Some(callback) => callback()
+  }
+  assert_eq(hits.val, 1)
+}

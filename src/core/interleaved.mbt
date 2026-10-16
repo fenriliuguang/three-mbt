@@ -14,6 +14,7 @@ pub(all) struct InterleavedBuffer {
   mut count : Int
   mut usage : Int
   update_ranges : Array[UpdateRange]
+  mut on_upload_callback : (() -> Unit)?
 }
 
 ///|
@@ -27,6 +28,7 @@ pub fn InterleavedBuffer::new(
     count: array.length() / stride,
     usage: @constants.STATIC_DRAW_USAGE,
     update_ranges: [],
+    on_upload_callback: None,
   }
 }
 
@@ -118,4 +120,15 @@ pub fn InterleavedBuffer::set(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L205
 pub fn InterleavedBuffer::clone(self : InterleavedBuffer) -> InterleavedBuffer {
   InterleavedBuffer::new(self.array, self.stride).copy(self)
+}
+
+///|
+/// 设置上传到 GPU 之后要执行的回调。
+/// r186: `onUpload` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L242
+pub fn InterleavedBuffer::on_upload(
+  self : InterleavedBuffer,
+  callback : () -> Unit,
+) -> InterleavedBuffer {
+  self.on_upload_callback = Some(callback)
+  self
 }
