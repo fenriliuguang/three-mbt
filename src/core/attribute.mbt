@@ -67,6 +67,24 @@ pub fn BufferAttribute::copy_at(
 }
 
 ///|
+/// 从缓冲区开头写入一份数值。源比缓冲区长时中止。
+/// r186: `copyArray` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L248
+pub fn BufferAttribute::copy_array(
+  self : BufferAttribute,
+  array : Array[Double],
+) -> BufferAttribute {
+  if array.length() > self.array.length() {
+    abort("BufferAttribute.copy_array source is longer than the attribute")
+  }
+  let mut index = 0
+  while index < array.length() {
+    self.array[index] = array[index]
+    index = index + 1
+  }
+  self
+}
+
+///|
 /// 新建一份属性，数值与源独立。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L653
 pub fn BufferAttribute::clone(self : BufferAttribute) -> BufferAttribute {
