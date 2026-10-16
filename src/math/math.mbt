@@ -146,3 +146,21 @@ pub fn rand_float_spread(range : Double) -> Double {
   let rng = @random.Rand::Rand()
   range * (0.5 - rng.double())
 }
+
+///|
+let mulberry_seed : Ref[UInt] = Ref::Ref(1234567U)
+
+///|
+/// 用 Mulberry32 生成 `[0, 1)` 里的确定性随机数。传入种子会重置序列。
+/// r186: `seededRandom` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L242
+pub fn seeded_random(s? : Int) -> Double {
+  match s {
+    Some(value) => mulberry_seed.val = value.reinterpret_as_uint()
+    None => ()
+  }
+  mulberry_seed.val = mulberry_seed.val + 0x6D2B79F5U
+  let mut t = mulberry_seed.val
+  t = (t ^ (t >> 15)) * (t | 1U)
+  t = t ^ (t + ((t ^ (t >> 7)) * (t | 61U)))
+  (t ^ (t >> 14)).to_double() / 4294967296.0
+}

@@ -32,6 +32,8 @@ pub fn rand_float_spread(Double) -> Double
 
 pub fn rand_int(Double, Double) -> Double
 
+pub fn seeded_random(s? : Int) -> Double
+
 pub fn smootherstep(Double, Double, Double) -> Double
 
 pub fn smoothstep(Double, Double, Double) -> Double

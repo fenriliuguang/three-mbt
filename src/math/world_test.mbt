@@ -5848,6 +5848,15 @@ test "MathUtils.randFloatSpread stays inside a centered range" {
 }
 
 ///|
+test "MathUtils.seededRandom repeats a seed" {
+  assert_eq(@math.seeded_random(), 0.6074679309967905)
+  assert_eq(@math.seeded_random(s=1), 0.6270739405881613)
+  assert_eq(@math.seeded_random(), 0.002735721180215478)
+  assert_eq(@math.seeded_random(), 0.5274470399599522)
+  assert_eq(@math.seeded_random(s=1), 0.6270739405881613)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
