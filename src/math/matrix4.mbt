@@ -952,3 +952,26 @@ pub fn Matrix4::from_array(
   }
   self
 }
+
+///|
+/// 省略数组时新建一个。短于 `offset + 16` 的数组会补零再写入。矩阵本身不改。
+/// r186: `toArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L1294
+pub fn Matrix4::to_array(
+  self : Matrix4,
+  array? : Array[Double],
+  offset? : Int = 0,
+) -> Array[Double] {
+  let target = match array {
+    None => []
+    Some(array) => array
+  }
+  let end = offset + 16
+  while target.length() < end {
+    target.push(0.0)
+  }
+  let te = self.elements
+  for i in 0..<16 {
+    target[offset + i] = te[i]
+  }
+  target
+}
