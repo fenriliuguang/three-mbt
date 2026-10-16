@@ -2340,6 +2340,21 @@ test "setXYZW writes four interleaved components" {
 }
 
 ///|
+test "applyMatrix4 translates each interleaved vertex" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  let matrix = @math.Matrix4::new().make_translation(10.0, 0.0, 0.0)
+  let written = attribute.apply_matrix4(matrix)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.get_x(0), 11.0)
+  assert_eq(attribute.get_y(0), 2.0)
+  assert_eq(attribute.get_z(0), 3.0)
+  assert_eq(attribute.get_x(1), 14.0)
+  assert_eq(attribute.get_y(1), 5.0)
+  assert_eq(attribute.get_z(1), 6.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
