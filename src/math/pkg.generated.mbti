@@ -10,6 +10,8 @@ pub fn ceil_power_of_two(Double) -> Double
 
 pub fn clamp(Double, Double, Double) -> Double
 
+pub fn cubic_bezier(Double, Double, Double, Double, Double) -> Double
+
 pub fn damp(Double, Double, Double, Double) -> Double
 
 pub fn deg_to_rad(Double) -> Double

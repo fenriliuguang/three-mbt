@@ -1063,7 +1063,9 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Interpolant.getSettings_` has landed. A new interpolant with positions `(0, 1)` and samples `(10, 20)` returns its default settings object. Assigning another settings object makes the method return that object. Clearing the assignment returns the default object again.
 
-`BezierInterpolant` has landed. `new` stores positions `(0, 1)`, samples `(10, 20)`, and a sample size of `1`. The cached index is `0`, the result buffer is `(0)`, and both tangent arrays are absent. A supplied result buffer `(4, 5)` is stored as given. `interpolate_`, `cubicBezier`, and `solveBezierParameter` stay later.
+`BezierInterpolant` has landed. `new` stores positions `(0, 1)`, samples `(10, 20)`, and a sample size of `1`. The cached index is `0`, the result buffer is `(0)`, and both tangent arrays are absent. A supplied result buffer `(4, 5)` is stored as given. `interpolate_` and `solveBezierParameter` stay later.
+
+`cubicBezier` has landed. Parameter `0` on controls `(10, 20, 30, 40)` is `10`. Parameter `1` is `40`. Parameter `0.5` is `25`.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -1538,6 +1540,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Interpolant.evaluate` | `math` |
 | planned | 7 | `Interpolant.getSettings_` | `math` |
 | planned | 7 | `BezierInterpolant` | `math` |
+| planned | 7 | `cubicBezier` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

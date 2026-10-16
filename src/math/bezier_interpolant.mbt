@@ -30,3 +30,20 @@ pub fn BezierInterpolant::new(
   }
   { interpolant, in_tangents: None, out_tangents: None }
 }
+
+///|
+/// 三次贝塞尔在参数 `s` 处的值。
+/// r186: `cubicBezier` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/BezierInterpolant.js#L81
+pub fn cubic_bezier(
+  s : Double,
+  p0 : Double,
+  p1 : Double,
+  p2 : Double,
+  p3 : Double,
+) -> Double {
+  let k = 1.0 - s
+  k * k * k * p0 +
+  3.0 * k * k * s * p1 +
+  3.0 * k * s * s * p2 +
+  s * s * s * p3
+}
