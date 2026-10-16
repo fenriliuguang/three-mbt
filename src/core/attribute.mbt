@@ -291,3 +291,23 @@ pub fn BufferAttribute::transform_direction(
   }
   self
 }
+
+///|
+/// `BufferAttribute.toJSON` 返回的数据。上游没有单独的类。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
+pub(all) struct AttributeJson {
+  item_size : Int
+  array : Array[Double]
+  normalized : Bool
+}
+
+///|
+/// 复制分量个数、数值和是否归一化。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
+pub fn BufferAttribute::to_json(self : BufferAttribute) -> AttributeJson {
+  {
+    item_size: self.item_size,
+    array: self.array.copy(),
+    normalized: self.normalized,
+  }
+}

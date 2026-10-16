@@ -13,6 +13,12 @@ pub fn apply_skins(Object3D) -> Unit
 // Errors
 
 // Types and methods
+pub(all) struct AttributeJson {
+  item_size : Int
+  array : Array[Double]
+  normalized : Bool
+}
+
 pub(all) struct BufferAttribute {
   array : Array[Double]
   item_size : Int
@@ -38,6 +44,7 @@ pub fn BufferAttribute::set_box3(Self, @math.Box3) -> @math.Box3
 pub fn BufferAttribute::set_triangle(Self, @math.Triangle, Int, Int, Int) -> @math.Triangle
 pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
 pub fn BufferAttribute::set_xyzw(Self, Int, Double, Double, Double, Double) -> Self
+pub fn BufferAttribute::to_json(Self) -> AttributeJson
 pub fn BufferAttribute::transform_direction(Self, @math.Matrix4) -> Self
 
 pub(all) struct BufferGeometry {

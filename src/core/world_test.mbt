@@ -1147,3 +1147,14 @@ test "toNonIndexed expands vertices in index order" {
   let plain = @core.BufferGeometry::new()
   assert_eq(physical_equal(plain.to_non_indexed(), plain), true)
 }
+
+///|
+test "toJSON copies item size, values, and normalized" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3, normalized=true)
+  let data = attribute.to_json()
+  assert_eq(data.item_size, 3)
+  assert_eq(data.normalized, true)
+  assert_eq(data.array, [1.0, 2.0, 3.0])
+  data.array[0] = 9.0
+  assert_eq(attribute.get_x(0), 1.0)
+}
