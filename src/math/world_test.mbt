@@ -5668,6 +5668,13 @@ test "Quaternion.rotateTowards stops when the angle is zero" {
 }
 
 ///|
+test "Quaternion.lengthSq sums the squared components" {
+  let q = @math.Quaternion::new(x=0.25, y=0.5, z=0.25, w=0.75)
+  assert_eq(q.length_sq(), 0.9375)
+  assert_eq(q.w, 0.75)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

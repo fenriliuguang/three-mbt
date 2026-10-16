@@ -317,6 +317,7 @@ pub fn Quaternion::dot(Self, Self) -> Double
 pub fn Quaternion::identity(Self) -> Self
 pub fn Quaternion::invert(Self) -> Self
 pub fn Quaternion::length(Self) -> Double
+pub fn Quaternion::length_sq(Self) -> Double
 pub fn Quaternion::multiply(Self, Self) -> Self
 pub fn Quaternion::multiply_quaternions(Self, Self, Self) -> Self
 pub fn Quaternion::multiply_quaternions_flat(Array[Double], Int, Array[Double], Int, Array[Double], Int) -> Array[Double]

@@ -380,6 +380,13 @@ pub fn Quaternion::dot(self : Quaternion, v : Quaternion) -> Double {
 }
 
 ///|
+/// 四个分量的平方和。
+/// r186: `lengthSq` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L603
+pub fn Quaternion::length_sq(self : Quaternion) -> Double {
+  self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
+}
+
+///|
 pub fn Quaternion::length(self : Quaternion) -> Double {
   (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
 }
