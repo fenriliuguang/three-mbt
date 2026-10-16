@@ -29,3 +29,12 @@ pub fn Ray::set(self : Ray, origin : Vector3, direction : Vector3) -> Ray {
   ignore(self.direction.copy(direction))
   self
 }
+
+///|
+/// 把另一条射线的原点和方向拷过来。之后改来源不影响这里。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L62
+pub fn Ray::copy(self : Ray, ray : Ray) -> Ray {
+  ignore(self.origin.copy(ray.origin))
+  ignore(self.direction.copy(ray.direction))
+  self
+}

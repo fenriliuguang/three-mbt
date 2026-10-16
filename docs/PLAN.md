@@ -761,6 +761,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.set` has landed. It copies the origin and the direction. Origin `(1, 2, 3)` and direction `(4, 5, 6)` are stored. Later changes to those vectors leave the ray alone.
 
+`Ray.copy` has landed. It copies another ray's origin and direction. Copying origin `(1, 2, 3)` and direction `(4, 5, 6)` stores those values. Later changes to the source leave the copy alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1082,6 +1084,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Sphere.fromJSON` | `math` |
 | planned | 7 | `Ray` | `math` |
 | planned | 7 | `Ray.set` | `math` |
+| planned | 7 | `Ray.copy` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
