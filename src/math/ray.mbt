@@ -186,3 +186,34 @@ pub fn Ray::distance_sq_to_segment(
   }
   sqr_dist
 }
+
+///|
+/// 射线与球的第一个前方交点写入 target。没有交点时返回 None。球和射线都不改。
+/// r186: `intersectSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L307
+pub fn Ray::intersect_sphere(
+  self : Ray,
+  sphere : Sphere,
+  target : Vector3,
+) -> Vector3? {
+  if sphere.radius < 0.0 {
+    return None
+  }
+  let offset = Vector3::new().sub_vectors(sphere.center, self.origin)
+  let tca = offset.dot(self.direction)
+  let d2 = offset.dot(offset) - tca * tca
+  let radius2 = sphere.radius * sphere.radius
+  if d2 > radius2 {
+    return None
+  }
+  let thc = (radius2 - d2).sqrt()
+  let t0 = tca - thc
+  let t1 = tca + thc
+  if t1 < 0.0 {
+    return None
+  }
+  if t0 < 0.0 {
+    Some(self.at(t1, target))
+  } else {
+    Some(self.at(t0, target))
+  }
+}

@@ -4097,6 +4097,48 @@ test "Ray.distanceSqToSegment meets a crossing segment" {
 }
 
 ///|
+test "Ray.intersectSphere returns the first hit in front of the ray" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let sphere = @math.Sphere::new(radius=1.0)
+  let target = @math.Vector3::new(x=9.0)
+  match ray.intersect_sphere(sphere, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(physical_equal(hit, target), true)
+      assert_eq(hit.x, -1.0)
+      assert_eq(hit.y, 0.0)
+      assert_eq(hit.z, 0.0)
+    }
+  }
+  let miss = @math.Ray::new(
+    origin=@math.Vector3::new(y=3.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  match miss.intersect_sphere(sphere, target) {
+    None => assert_eq(target.x, -1.0)
+    Some(_) => assert_eq(true, false)
+  }
+  let inside = @math.Ray::new()
+  match inside.intersect_sphere(sphere, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(hit.x, 0.0)
+      assert_eq(hit.y, 0.0)
+      assert_eq(hit.z, -1.0)
+    }
+  }
+  match ray.intersect_sphere(@math.Sphere::new(), target) {
+    None => assert_eq(sphere.radius, 1.0)
+    Some(_) => assert_eq(true, false)
+  }
+  assert_eq(ray.origin.x, -2.0)
+  assert_eq(ray.direction.x, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
