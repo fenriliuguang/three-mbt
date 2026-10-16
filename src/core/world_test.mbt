@@ -1789,3 +1789,30 @@ test "toJSON writes name, usage, and gpuType" {
   assert_eq(data.usage, 35048)
   assert_eq(data.gpu_type, 1013)
 }
+
+///|
+test "toJSON writes uuid, name, type, and userData" {
+  let geometry = @core.BufferGeometry::new()
+  geometry.name = "square"
+  geometry.type_name = "BoxGeometry"
+  let bare = geometry.to_json()
+  assert_eq(bare.uuid, geometry.uuid)
+  assert_eq(bare.uuid.length(), 36)
+  assert_eq(bare.name, "square")
+  assert_eq(bare.geometry_type, "BoxGeometry")
+  assert_eq(bare.type_name, "BufferGeometry")
+  match bare.user_data {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  geometry.user_data.set("label", "square")
+  let data = geometry.to_json()
+  match data.user_data {
+    None => assert_eq(false, true)
+    Some(user_data) =>
+      match user_data.get("label") {
+        None => assert_eq(false, true)
+        Some(label) => assert_eq(label, "square")
+      }
+  }
+}

@@ -779,12 +779,16 @@ pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
 }
 
 ///|
-/// `BufferGeometry.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。
+/// `BufferGeometry.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。`geometry_type` 对应数据上的 `type`。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
 pub(all) struct GeometryJson {
   version : Double
   type_name : String
   generator : String
+  uuid : String
+  geometry_type : String
+  name : String
+  user_data : Map[String, String]?
   index : Array[Double]?
   attributes : Map[String, AttributeJson]
   groups : Array[GeometryGroup]
@@ -792,7 +796,15 @@ pub(all) struct GeometryJson {
 }
 
 ///|
-/// 序列化元数据、属性、索引、分组和包围球。
+fn user_data_is_empty(user_data : Map[String, String]) -> Bool {
+  for _pair in user_data.iter() {
+    return false
+  }
+  true
+}
+
+///|
+/// 序列化标识、类型、名字、用户数据、属性、索引、分组和包围球。用户数据为空时省略。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
 pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
   let attributes : Map[String, AttributeJson] = Map([])
@@ -819,10 +831,19 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
     None => None
     Some(sphere) => Some(sphere.to_json())
   }
+  let user_data = if user_data_is_empty(self.user_data) {
+    None
+  } else {
+    Some(self.user_data)
+  }
   {
     version: 4.7,
     type_name: "BufferGeometry",
     generator: "BufferGeometry.toJSON",
+    uuid: self.uuid,
+    geometry_type: self.type_name,
+    name: self.name,
+    user_data,
     index,
     attributes,
     groups,

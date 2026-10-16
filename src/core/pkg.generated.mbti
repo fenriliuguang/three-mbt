@@ -184,6 +184,10 @@ pub(all) struct GeometryJson {
   version : Double
   type_name : String
   generator : String
+  uuid : String
+  geometry_type : String
+  name : String
+  user_data : Map[String, String]?
   index : Array[Double]?
   attributes : Map[String, AttributeJson]
   groups : Array[GeometryGroup]
