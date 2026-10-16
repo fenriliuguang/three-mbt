@@ -240,6 +240,21 @@ pub fn BufferGeometry::look_at(
 }
 
 ///|
+/// 把包围盒中心移到原点。
+/// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L573
+pub fn BufferGeometry::center(self : BufferGeometry) -> BufferGeometry {
+  self.compute_bounding_box()
+  match self.bounding_box {
+    None => abort("BufferGeometry.center requires a position attribute")
+    Some(box) => {
+      let offset = @math.Vector3::new()
+      ignore(box.get_center(offset).negate())
+      self.translate(offset.x, offset.y, offset.z)
+    }
+  }
+}
+
+///|
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None

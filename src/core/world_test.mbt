@@ -919,3 +919,27 @@ test "lookAt turns local +Z toward the target" {
     }
   }
 }
+
+///|
+test "center moves the bounding box center to the origin" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 2.0, 4.0, 6.0], 3),
+    ),
+  )
+  let written = geometry.center()
+  assert_eq(physical_equal(written, geometry), true)
+  match geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.get_x(0), -1.0)
+      assert_eq(position.get_y(0), -2.0)
+      assert_eq(position.get_z(0), -3.0)
+      assert_eq(position.get_x(1), 1.0)
+      assert_eq(position.get_y(1), 2.0)
+      assert_eq(position.get_z(1), 3.0)
+    }
+  }
+}
