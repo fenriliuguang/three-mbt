@@ -63,6 +63,13 @@ pub fn BufferGeometry::delete_attribute(
 }
 
 ///|
+/// 这个名字上有没有属性。索引不算属性。
+/// r186: `hasAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L321
+pub fn BufferGeometry::has_attribute(self : BufferGeometry, name : String) -> Bool {
+  self.attributes.contains(name)
+}
+
+///|
 pub fn BufferGeometry::set_index(
   self : BufferGeometry,
   index : BufferAttribute,

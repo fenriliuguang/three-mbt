@@ -618,3 +618,16 @@ test "deleteAttribute removes one named attribute" {
     Some(found) => assert_eq(found.get_x(0), 1.0)
   }
 }
+
+///|
+test "hasAttribute reports a named attribute" {
+  let geometry = @core.BufferGeometry::new()
+  assert_eq(geometry.has_attribute("position"), false)
+  ignore(geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)))
+  ignore(geometry.set_index_array([0]))
+  assert_eq(geometry.has_attribute("position"), true)
+  assert_eq(geometry.has_attribute("normal"), false)
+  assert_eq(geometry.has_attribute("index"), false)
+  ignore(geometry.delete_attribute("position"))
+  assert_eq(geometry.has_attribute("position"), false)
+}

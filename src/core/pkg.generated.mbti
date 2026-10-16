@@ -49,6 +49,7 @@ pub fn BufferGeometry::compute_bounding_box(Self) -> Unit
 pub fn BufferGeometry::compute_bounding_sphere(Self) -> Unit
 pub fn BufferGeometry::delete_attribute(Self, String) -> Self
 pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
+pub fn BufferGeometry::has_attribute(Self, String) -> Bool
 pub fn BufferGeometry::new() -> Self
 pub fn BufferGeometry::set_attribute(Self, String, BufferAttribute) -> Self
 pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self
