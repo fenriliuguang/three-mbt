@@ -4775,6 +4775,17 @@ test "Color.toArray writes three channels at an offset" {
 }
 
 ///|
+test "Color.toJSON returns the sRGB hexadecimal integer" {
+  let black = @math.Color::new(r=0.0, g=0.0, b=0.0)
+  assert_eq(black.to_json(), 0)
+  let green = @math.Color::new().set_hex(0x00FF00)
+  assert_eq(green.to_json(), 65280)
+  let red = @math.Color::new(r=1.0, g=0.0, b=0.0)
+  assert_eq(red.to_json(), 16711680)
+  assert_eq(red.r, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

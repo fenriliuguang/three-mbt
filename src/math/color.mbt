@@ -381,3 +381,10 @@ pub fn Color::to_array(
   target[offset + 2] = self.b
   target
 }
+
+///|
+/// 序列化成 sRGB 十六进制整数。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L939
+pub fn Color::to_json(self : Color) -> Int {
+  self.get_hex()
+}

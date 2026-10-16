@@ -125,6 +125,7 @@ pub fn Color::set_rgb(Self, Double, Double, Double) -> Self
 pub fn Color::set_scalar(Self, Double) -> Self
 pub fn Color::sub(Self, Self) -> Self
 pub fn Color::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
+pub fn Color::to_json(Self) -> Int
 
 pub(all) struct Cylindrical {
   mut radius : Double
