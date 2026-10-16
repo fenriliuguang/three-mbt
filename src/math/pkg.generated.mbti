@@ -262,6 +262,7 @@ pub(all) struct Ray {
 }
 pub fn Ray::apply_matrix4(Self, Matrix4) -> Self
 pub fn Ray::at(Self, Double, Vector3) -> Vector3
+pub fn Ray::clone(Self) -> Self
 pub fn Ray::closest_point_to_point(Self, Vector3, Vector3) -> Vector3
 pub fn Ray::copy(Self, Self) -> Self
 pub fn Ray::distance_sq_to_point(Self, Vector3) -> Double

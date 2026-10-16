@@ -4402,6 +4402,25 @@ test "Ray.equals matches the origin and the direction" {
 }
 
 ///|
+test "Ray.clone copies the origin and the direction" {
+  let source = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(x=4.0, y=5.0, z=6.0),
+  )
+  let ray = source.clone()
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.origin.y, 2.0)
+  assert_eq(ray.origin.z, 3.0)
+  assert_eq(ray.direction.x, 4.0)
+  assert_eq(ray.direction.y, 5.0)
+  assert_eq(ray.direction.z, 6.0)
+  source.origin.x = 0.0
+  ray.direction.z = 0.0
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(source.direction.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

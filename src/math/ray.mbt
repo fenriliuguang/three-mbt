@@ -510,3 +510,10 @@ pub fn Ray::apply_matrix4(self : Ray, matrix : Matrix4) -> Ray {
 pub fn Ray::equals(self : Ray, ray : Ray) -> Bool {
   ray.origin.equals(self.origin) && ray.direction.equals(self.direction)
 }
+
+///|
+/// 返回一条新射线。来源不改。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L697
+pub fn Ray::clone(self : Ray) -> Ray {
+  Ray::new().copy(self)
+}

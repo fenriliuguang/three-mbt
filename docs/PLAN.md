@@ -797,6 +797,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.equals` has landed. It is true when the origin and the direction both match. Origin `(1, 2, 3)` and direction `(4, 5, 6)` equal another ray with those values, and differ when the origin becomes `(0, 2, 3)` or the direction's z becomes `0`. Both rays are unchanged.
 
+`Ray.clone` has landed. It returns a new ray with the same origin and direction. Cloning origin `(1, 2, 3)` and direction `(4, 5, 6)` stores those values. Later changes to either ray leave the other alone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1136,6 +1138,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.intersectTriangle` | `math` |
 | planned | 7 | `Ray.applyMatrix4` | `math` |
 | planned | 7 | `Ray.equals` | `math` |
+| planned | 7 | `Ray.clone` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
