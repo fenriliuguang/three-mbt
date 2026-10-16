@@ -1987,3 +1987,9 @@ test "getElapsed accumulates timer updates" {
   ignore(timer.update(2500.0))
   assert_eq(timer.get_elapsed(), 2.5)
 }
+
+///|
+test "getTimescale starts at one" {
+  let timer = @core.Timer::new()
+  assert_eq(timer.get_timescale(), 1.0)
+}

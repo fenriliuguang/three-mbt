@@ -39,6 +39,13 @@ pub fn Timer::get_elapsed(self : Timer) -> Double {
 }
 
 ///|
+/// 返回时间缩放。默认是 `1`。
+/// r186: `getTimescale` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L102
+pub fn Timer::get_timescale(self : Timer) -> Double {
+  self.timescale
+}
+
+///|
 /// 用毫秒时间戳更新内部时间。时间戳减去时间原点。
 /// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/core/Timer.js#L156
 pub fn Timer::update(self : Timer, timestamp : Double) -> Timer {
