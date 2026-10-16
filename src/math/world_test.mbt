@@ -6870,6 +6870,31 @@ test "CubicInterpolant.interpolate_ blends four neighboring samples" {
 }
 
 ///|
+test "DiscreteInterpolant.new stores the samples" {
+  let positions = [0.0, 1.0]
+  let values = [10.0, 20.0]
+  let discrete = @math.DiscreteInterpolant::new(positions, values, 1)
+  assert_eq(discrete.interpolant.parameter_positions[0], 0.0)
+  assert_eq(discrete.interpolant.parameter_positions[1], 1.0)
+  assert_eq(discrete.interpolant.sample_values[0], 10.0)
+  assert_eq(discrete.interpolant.sample_values[1], 20.0)
+  assert_eq(discrete.interpolant.value_size, 1)
+  assert_eq(discrete.interpolant.cached_index, 0)
+  assert_eq(discrete.interpolant.result_buffer.length(), 1)
+  assert_eq(discrete.interpolant.result_buffer[0], 0.0)
+  positions[0] = 9.0
+  values[1] = 7.0
+  assert_eq(discrete.interpolant.parameter_positions[0], 9.0)
+  assert_eq(discrete.interpolant.sample_values[1], 7.0)
+  let given = [4.0, 5.0]
+  let with_buffer = @math.DiscreteInterpolant::new(
+    positions, values, 1, result_buffer=given,
+  )
+  assert_eq(with_buffer.interpolant.result_buffer[0], 4.0)
+  assert_eq(with_buffer.interpolant.result_buffer[1], 5.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

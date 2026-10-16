@@ -210,6 +210,11 @@ pub fn Cylindrical::set(Self, Double, Double, Double) -> Self
 pub fn Cylindrical::set_from_cartesian_coords(Self, Double, Double, Double) -> Self
 pub fn Cylindrical::set_from_vector3(Self, Vector3) -> Self
 
+pub(all) struct DiscreteInterpolant {
+  interpolant : Interpolant
+}
+pub fn DiscreteInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Euler {
   mut x : Double
   mut y : Double
