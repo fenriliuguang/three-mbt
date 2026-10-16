@@ -707,3 +707,20 @@ test "applyNormalMatrix rotates and normalizes each vertex" {
   assert_eq(normals.get_y(1), 0.0)
   assert_eq(normals.get_z(1), 0.0)
 }
+
+///|
+test "transformDirection ignores translation and normalizes scale" {
+  let directions = @core.BufferAttribute::new([0.0, 0.0, 1.0], 3)
+  let shift = @math.Matrix4::new().make_translation(10.0, 0.0, 0.0)
+  let written = directions.transform_direction(shift)
+  assert_eq(physical_equal(written, directions), true)
+  assert_eq(directions.get_x(0), 0.0)
+  assert_eq(directions.get_y(0), 0.0)
+  assert_eq(directions.get_z(0), 1.0)
+  let scaled = @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)
+  let scale = @math.Matrix4::new().make_scale(2.0, 1.0, 1.0)
+  ignore(scaled.transform_direction(scale))
+  assert_close(scaled.get_x(0), 0.894427190999916)
+  assert_close(scaled.get_y(0), 0.447213595499958)
+  assert_eq(scaled.get_z(0), 0.0)
+}

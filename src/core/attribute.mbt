@@ -254,3 +254,21 @@ pub fn BufferAttribute::apply_normal_matrix(
   }
   self
 }
+
+///|
+/// 用矩阵左上 3×3 变换方向并归一化。平移不参与。只适用于 `item_size` 为 3 的属性。
+/// r186: `transformDirection` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L346
+pub fn BufferAttribute::transform_direction(
+  self : BufferAttribute,
+  matrix : @math.Matrix4,
+) -> BufferAttribute {
+  let point = @math.Vector3::new()
+  let mut index = 0
+  while index < self.count {
+    ignore(self.copy_to_vector3(index, point))
+    ignore(point.transform_direction(matrix))
+    self.set_xyz(index, point.x, point.y, point.z)
+    index = index + 1
+  }
+  self
+}
