@@ -138,6 +138,17 @@ pub fn BufferAttribute::get_x(self : BufferAttribute, index : Int) -> Double {
 }
 
 ///|
+/// 写入一个顶点的 x 分量。
+/// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L436
+pub fn BufferAttribute::set_x(
+  self : BufferAttribute,
+  index : Int,
+  x : Double,
+) -> BufferAttribute {
+  self.set_component(index, 0, x)
+}
+
+///|
 pub fn BufferAttribute::get_y(self : BufferAttribute, index : Int) -> Double {
   self.get_component(index, 1)
 }
