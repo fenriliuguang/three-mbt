@@ -661,6 +661,54 @@ pub fn BufferGeometry::normalize_normals(self : BufferGeometry) -> Unit {
 }
 
 ///|
+fn expand_indexed_attribute(
+  attribute : BufferAttribute,
+  index : BufferAttribute,
+) -> BufferAttribute {
+  let values = []
+  let mut cursor = 0
+  while cursor < index.count {
+    let source = index.get_x(cursor).to_int() * attribute.item_size
+    let mut component = 0
+    while component < attribute.item_size {
+      values.push(attribute.array[source + component])
+      component = component + 1
+    }
+    cursor = cursor + 1
+  }
+  BufferAttribute::new(values, attribute.item_size, normalized=attribute.normalized)
+}
+
+///|
+/// 按索引展开属性，得到没有索引的几何体。本来就没有索引时返回自身。
+/// r186: `toNonIndexed` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1123
+pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
+  match self.index {
+    None => self
+    Some(index) => {
+      let geometry = BufferGeometry::new()
+      for pair in self.attributes.iter() {
+        let (name, attribute) = pair
+        ignore(
+          geometry.set_attribute(name, expand_indexed_attribute(attribute, index)),
+        )
+      }
+      let mut group_index = 0
+      while group_index < self.groups.length() {
+        let group = self.groups[group_index]
+        geometry.add_group(
+          group.start,
+          group.count,
+          material_index=group.material_index,
+        )
+        group_index = group_index + 1
+      }
+      geometry
+    }
+  }
+}
+
+///|
 /// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
 pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
   let geometry = BufferGeometry::new()

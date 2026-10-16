@@ -1147,6 +1147,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferGeometry.computeVertexNormals` has landed. An indexed triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` gets normal `(0, 0, 1)` at each vertex. The same triangle without an index does too.
 
+`BufferGeometry.toNonIndexed` has landed. Index `[0, 2, 1]` expands positions `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` into `(0, 0, 0)`, `(0, 1, 0)`, `(1, 0, 0)`. The group is copied. A geometry that already has no index is returned as itself.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1661,6 +1663,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferGeometry.computeTangents` | `core` |
 | planned | 7 | `BufferGeometry.normalizeNormals` | `core` |
 | planned | 7 | `BufferGeometry.computeVertexNormals` | `core` |
+| planned | 7 | `BufferGeometry.toNonIndexed` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

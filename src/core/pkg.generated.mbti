@@ -74,6 +74,7 @@ pub fn BufferGeometry::set_draw_range(Self, Double, Double) -> Unit
 pub fn BufferGeometry::set_from_points(Self, Array[@math.Vector3]) -> Self
 pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self
 pub fn BufferGeometry::set_index_array(Self, Array[Int]) -> Self
+pub fn BufferGeometry::to_non_indexed(Self) -> Self
 pub fn BufferGeometry::translate(Self, Double, Double, Double) -> Self
 
 pub(all) struct CameraState {

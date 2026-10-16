@@ -1104,3 +1104,46 @@ test "computeVertexNormals points an xy triangle along +Z" {
     }
   }
 }
+
+///|
+test "toNonIndexed expands vertices in index order" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(geometry.set_index_array([0, 2, 1]))
+  geometry.add_group(0, 3, material_index=1)
+  let expanded = geometry.to_non_indexed()
+  assert_eq(physical_equal(expanded, geometry), false)
+  match expanded.index {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  match expanded.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.count, 3)
+      assert_eq(position.get_x(0), 0.0)
+      assert_eq(position.get_y(0), 0.0)
+      assert_eq(position.get_z(0), 0.0)
+      assert_eq(position.get_x(1), 0.0)
+      assert_eq(position.get_y(1), 1.0)
+      assert_eq(position.get_z(1), 0.0)
+      assert_eq(position.get_x(2), 1.0)
+      assert_eq(position.get_y(2), 0.0)
+      assert_eq(position.get_z(2), 0.0)
+    }
+  }
+  assert_eq(expanded.groups.length(), 1)
+  assert_eq(expanded.groups[0].start, 0)
+  assert_eq(expanded.groups[0].count, 3)
+  assert_eq(expanded.groups[0].material_index, 1)
+  let plain = @core.BufferGeometry::new()
+  assert_eq(physical_equal(plain.to_non_indexed(), plain), true)
+}
