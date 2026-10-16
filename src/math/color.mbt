@@ -224,6 +224,16 @@ pub fn Color::offset_hsl(self : Color, h : Double, s : Double, l : Double) -> Co
 }
 
 ///|
+/// 把另一个颜色的通道加到自身。
+/// r186: `add` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L678
+pub fn Color::add(self : Color, color : Color) -> Color {
+  self.r += color.r
+  self.g += color.g
+  self.b += color.b
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha

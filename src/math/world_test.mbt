@@ -4576,6 +4576,19 @@ test "Color.offsetHSL adds to hue saturation and lightness" {
 }
 
 ///|
+test "Color.add adds another color's channels" {
+  let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
+  let other = @math.Color::new(r=0.25, g=0.5, b=0.25)
+  ignore(color.add(other))
+  assert_eq(color.r, 0.5)
+  assert_eq(color.g, 1.0)
+  assert_eq(color.b, 1.0)
+  assert_eq(other.r, 0.25)
+  assert_eq(other.g, 0.5)
+  assert_eq(other.b, 0.25)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
