@@ -75,3 +75,10 @@ pub fn FrustumArray::copy(
   self.count = source.count
   self
 }
+
+///|
+/// 复制出一份新的视锥数组。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L220
+pub fn FrustumArray::clone(self : FrustumArray) -> FrustumArray {
+  FrustumArray::new().copy(self)
+}

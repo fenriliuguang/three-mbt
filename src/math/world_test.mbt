@@ -6541,6 +6541,48 @@ test "FrustumArray.copy copies the counted frustums" {
 }
 
 ///|
+test "FrustumArray.clone copies counted frustums into a new array" {
+  let source = @math.FrustumArray::new()
+  source.coordinate_system = @constants.WebGPU
+  let first = @math.Frustum::new()
+  ignore(
+    first.set(
+      @math.Plane::new(constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=2.0),
+      @math.Plane::new(constant=3.0),
+      @math.Plane::new(constant=4.0),
+      @math.Plane::new(constant=5.0),
+      @math.Plane::new(constant=6.0),
+    ),
+  )
+  source.frustums.push(first)
+  source.count = 1
+  let cloned = source.clone()
+  assert_eq(cloned.count, 1)
+  assert_eq(cloned.frustums.length(), 1)
+  assert_eq(cloned.frustums[0].planes[0].constant, 1.0)
+  assert_eq(cloned.frustums[0].planes[1].normal.y, 1.0)
+  assert_eq(cloned.frustums[0].planes[5].constant, 6.0)
+  match cloned.coordinate_system {
+    @constants.WebGPU => assert_eq(true, true)
+    @constants.WebGL => assert_eq(true, false)
+  }
+  source.frustums[0].planes[0].constant = 0.0
+  source.frustums[0].planes[1].normal.y = 0.0
+  cloned.frustums[0].planes[5].constant = 9.0
+  assert_eq(cloned.frustums[0].planes[0].constant, 1.0)
+  assert_eq(cloned.frustums[0].planes[1].normal.y, 1.0)
+  assert_eq(source.frustums[0].planes[5].constant, 6.0)
+  let empty = @math.FrustumArray::new().clone()
+  assert_eq(empty.count, 0)
+  assert_eq(empty.frustums.length(), 0)
+  match empty.coordinate_system {
+    @constants.WebGL => assert_eq(true, true)
+    @constants.WebGPU => assert_eq(true, false)
+  }
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

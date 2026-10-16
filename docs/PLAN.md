@@ -1049,6 +1049,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `FrustumArray.copy` has landed. It copies the coordinate system and the counted frustums. A WebGPU source with plane constants `1` through `6` lands those values, and a later edit of the source leaves the copy at constant `1`. A second frustum with constant `10` grows the destination to length `2`. Copying a count of `0` sets the count to `0` and leaves both stored frustums in place.
 
+`FrustumArray.clone` has landed. It returns a new array with the same coordinate system and counted frustums. A WebGPU source with plane constants `1` through `6` produces a clone whose first constant stays `1` after the source is edited, and whose last constant stays `6` after the clone is edited. An empty array clones to a count of `0` in WebGL coordinates. `setFromArrayCamera`, `intersectsObject`, and `intersectsSprite` still stay out of `math`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1514,6 +1516,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `FrustumArray.intersectsBox` | `math` |
 | planned | 7 | `FrustumArray.containsPoint` | `math` |
 | planned | 7 | `FrustumArray.copy` | `math` |
+| planned | 7 | `FrustumArray.clone` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -233,6 +233,7 @@ pub(all) struct FrustumArray {
   frustums : Array[Frustum]
   mut count : Int
 }
+pub fn FrustumArray::clone(Self) -> Self
 pub fn FrustumArray::contains_point(Self, Vector3) -> Bool
 pub fn FrustumArray::copy(Self, Self) -> Self
 pub fn FrustumArray::intersects_box(Self, Box3) -> Bool
