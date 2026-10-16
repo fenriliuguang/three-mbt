@@ -189,6 +189,25 @@ pub fn BufferAttribute::set_xyz(
 }
 
 ///|
+/// 写入一个顶点的四个分量。
+/// r186: `setXYZW` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L610
+pub fn BufferAttribute::set_xyzw(
+  self : BufferAttribute,
+  index : Int,
+  x : Double,
+  y : Double,
+  z : Double,
+  w : Double,
+) -> BufferAttribute {
+  let offset = index * self.item_size
+  self.array[offset] = x
+  self.array[offset + 1] = y
+  self.array[offset + 2] = z
+  self.array[offset + 3] = w
+  self
+}
+
+///|
 /// 用 3×3 矩阵变换属性。`item_size` 为 2 或 3 时逐个顶点变换，其它大小不动。
 /// r186: `applyMatrix3` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L263
 pub fn BufferAttribute::apply_matrix3(

@@ -1139,6 +1139,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferGeometry.setFromPoints` has landed for `Vector3`. Points `(1, 2, 3)` and `(4, 5, 6)` become a new `position` attribute. An existing one-vertex buffer keeps only the first point.
 
+`BufferAttribute.setXYZW` has landed. Index `1` of a four-wide attribute becomes `(2, 3, 4, 5)`. The first vertex stays `(0, 0, 0, 0)`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1649,6 +1651,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferGeometry.lookAt` | `core` |
 | planned | 7 | `BufferGeometry.center` | `core` |
 | planned | 7 | `BufferGeometry.setFromPoints` | `core` |
+| planned | 7 | `BufferAttribute.setXYZW` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

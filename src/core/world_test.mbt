@@ -980,3 +980,20 @@ test "setFromPoints writes a position attribute" {
     }
   }
 }
+
+///|
+test "setXYZW writes four components" {
+  let attribute = @core.BufferAttribute::new(
+    [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+    4,
+  )
+  let written = attribute.set_xyzw(1, 2.0, 3.0, 4.0, 5.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.get_x(0), 0.0)
+  assert_eq(attribute.get_y(0), 0.0)
+  assert_eq(attribute.get_z(0), 0.0)
+  assert_eq(attribute.get_x(1), 2.0)
+  assert_eq(attribute.get_y(1), 3.0)
+  assert_eq(attribute.get_z(1), 4.0)
+  assert_eq(attribute.get_component(1, 3), 5.0)
+}
