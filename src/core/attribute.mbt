@@ -19,6 +19,7 @@ pub(all) struct BufferAttribute {
   mut version : Int
   mut usage : Int
   update_ranges : Array[UpdateRange]
+  mut on_upload_callback : (() -> Unit)?
 }
 
 ///|
@@ -35,6 +36,7 @@ pub fn BufferAttribute::new(
     version: 0,
     usage: @constants.STATIC_DRAW_USAGE,
     update_ranges: [],
+    on_upload_callback: None,
   }
 }
 
@@ -89,6 +91,17 @@ pub fn BufferAttribute::add_update_range(
 /// r186: `clearUpdateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L190
 pub fn BufferAttribute::clear_update_ranges(self : BufferAttribute) -> Unit {
   self.update_ranges.clear()
+}
+
+///|
+/// 设置上传到 GPU 之后要执行的回调。
+/// r186: `onUpload` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L640
+pub fn BufferAttribute::on_upload(
+  self : BufferAttribute,
+  callback : () -> Unit,
+) -> BufferAttribute {
+  self.on_upload_callback = Some(callback)
+  self
 }
 
 ///|

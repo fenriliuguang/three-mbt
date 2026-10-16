@@ -1377,6 +1377,19 @@ test "clearUpdateRanges drops every recorded span" {
 }
 
 ///|
+test "onUpload stores a callback that runs once" {
+  let attribute = @core.BufferAttribute::new([1.0], 1)
+  let hits = Ref::Ref(0)
+  let written = attribute.on_upload(fn() { hits.val = hits.val + 1 })
+  assert_eq(physical_equal(written, attribute), true)
+  match attribute.on_upload_callback {
+    None => assert_eq(false, true)
+    Some(callback) => callback()
+  }
+  assert_eq(hits.val, 1)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

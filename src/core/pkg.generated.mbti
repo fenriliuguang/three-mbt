@@ -27,6 +27,7 @@ pub(all) struct BufferAttribute {
   mut version : Int
   mut usage : Int
   update_ranges : Array[UpdateRange]
+  mut on_upload_callback : (() -> Unit)?
 }
 pub fn BufferAttribute::add_update_range(Self, Int, Int) -> Unit
 pub fn BufferAttribute::apply_matrix3(Self, @math.Matrix3) -> Self
@@ -50,6 +51,7 @@ pub fn BufferAttribute::get_y(Self, Int) -> Double
 pub fn BufferAttribute::get_z(Self, Int) -> Double
 pub fn BufferAttribute::interpolate_vector3(Self, Int, Int, Int, @math.Vector3, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::new(Array[Double], Int, normalized? : Bool) -> Self
+pub fn BufferAttribute::on_upload(Self, () -> Unit) -> Self
 pub fn BufferAttribute::set(Self, Array[Double], offset? : Int) -> Self
 pub fn BufferAttribute::set_box3(Self, @math.Box3) -> @math.Box3
 pub fn BufferAttribute::set_component(Self, Int, Int, Double) -> Self
