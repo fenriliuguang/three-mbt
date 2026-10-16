@@ -1915,3 +1915,34 @@ test "toNonIndexed expands morph attributes" {
     Some(morphs) => assert_eq(morphs[0].get_x(1), 5.0)
   }
 }
+
+///|
+test "toJSON writes morph attributes" {
+  let bare = @core.BufferGeometry::new()
+  match bare.to_json().morph_attributes {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  let geometry = @core.BufferGeometry::new()
+  geometry.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([1.0, 2.0, 3.0], 3)],
+  )
+  geometry.morph_targets_relative = true
+  let data = geometry.to_json()
+  match data.morph_targets_relative {
+    None => assert_eq(false, true)
+    Some(relative) => assert_eq(relative, true)
+  }
+  match data.morph_attributes {
+    None => assert_eq(false, true)
+    Some(morphs) =>
+      match morphs.get("position") {
+        None => assert_eq(false, true)
+        Some(attributes) => {
+          assert_eq(attributes.length(), 1)
+          assert_eq(attributes[0].array, [1.0, 2.0, 3.0])
+        }
+      }
+  }
+}

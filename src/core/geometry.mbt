@@ -869,6 +869,8 @@ pub(all) struct GeometryJson {
   user_data : Map[String, String]?
   index : Array[Double]?
   attributes : Map[String, AttributeJson]
+  morph_attributes : Map[String, Array[AttributeJson]]?
+  morph_targets_relative : Bool?
   groups : Array[GeometryGroup]
   bounding_sphere : (Array[Double], Double)?
 }
@@ -882,7 +884,7 @@ fn user_data_is_empty(user_data : Map[String, String]) -> Bool {
 }
 
 ///|
-/// 序列化标识、类型、名字、用户数据、属性、索引、分组和包围球。用户数据为空时省略。
+/// 序列化标识、类型、名字、用户数据、属性、形变属性、索引、分组和包围球。用户数据和空的形变属性省略。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1230
 pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
   let attributes : Map[String, AttributeJson] = Map([])
@@ -914,6 +916,29 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
   } else {
     Some(self.user_data)
   }
+  let morph_attributes : Map[String, Array[AttributeJson]] = Map([])
+  let mut has_morph = false
+  for pair in self.morph_attributes.iter() {
+    let (name, attributes) = pair
+    if attributes.length() > 0 {
+      let jsons = []
+      for attribute in attributes {
+        jsons.push(attribute.to_json())
+      }
+      morph_attributes.set(name, jsons)
+      has_morph = true
+    }
+  }
+  let morph_json = if has_morph {
+    Some(morph_attributes)
+  } else {
+    None
+  }
+  let morph_relative = if has_morph {
+    Some(self.morph_targets_relative)
+  } else {
+    None
+  }
   {
     version: 4.7,
     type_name: "BufferGeometry",
@@ -924,6 +949,8 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
     user_data,
     index,
     attributes,
+    morph_attributes: morph_json,
+    morph_targets_relative: morph_relative,
     groups,
     bounding_sphere,
   }
