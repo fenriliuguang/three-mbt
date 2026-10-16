@@ -346,3 +346,151 @@ pub fn Ray::intersects_box(self : Ray, box : Box3) -> Bool {
     Some(_) => true
   }
 }
+
+///|
+/// 射线与三角形的交点写入 target。背面剔除或没有交点时返回 None。顶点和射线都不改。
+/// r186: `intersectTriangle` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L538
+pub fn Ray::intersect_triangle(
+  self : Ray,
+  a : Vector3,
+  b : Vector3,
+  c : Vector3,
+  backface_culling : Bool,
+  target : Vector3,
+) -> Vector3? {
+  let origin = self.origin
+  let direction = self.direction
+  let dx = direction.x
+  let dy = direction.y
+  let dz = direction.z
+  let aox = a.x - origin.x
+  let aoy = a.y - origin.y
+  let aoz = a.z - origin.z
+  let box_ = b.x - origin.x
+  let boy = b.y - origin.y
+  let boz = b.z - origin.z
+  let cox = c.x - origin.x
+  let coy = c.y - origin.y
+  let coz = c.z - origin.z
+  let adx = dx.abs()
+  let ady = dy.abs()
+  let adz = dz.abs()
+  let mut dkx = 0.0
+  let mut dky = 0.0
+  let mut dkz = 0.0
+  let mut akx = 0.0
+  let mut aky = 0.0
+  let mut akz = 0.0
+  let mut bkx = 0.0
+  let mut bky = 0.0
+  let mut bkz = 0.0
+  let mut ckx = 0.0
+  let mut cky = 0.0
+  let mut ckz = 0.0
+  if adx >= ady && adx >= adz {
+    dkz = dx
+    akz = aox
+    bkz = box_
+    ckz = cox
+    if dx >= 0.0 {
+      dkx = dy
+      dky = dz
+      akx = aoy
+      aky = aoz
+      bkx = boy
+      bky = boz
+      ckx = coy
+      cky = coz
+    } else {
+      dkx = dz
+      dky = dy
+      akx = aoz
+      aky = aoy
+      bkx = boz
+      bky = boy
+      ckx = coz
+      cky = coy
+    }
+  } else if ady >= adz {
+    dkz = dy
+    akz = aoy
+    bkz = boy
+    ckz = coy
+    if dy >= 0.0 {
+      dkx = dz
+      dky = dx
+      akx = aoz
+      aky = aox
+      bkx = boz
+      bky = box_
+      ckx = coz
+      cky = cox
+    } else {
+      dkx = dx
+      dky = dz
+      akx = aox
+      aky = aoz
+      bkx = box_
+      bky = boz
+      ckx = cox
+      cky = coz
+    }
+  } else {
+    dkz = dz
+    akz = aoz
+    bkz = boz
+    ckz = coz
+    if dz >= 0.0 {
+      dkx = dx
+      dky = dy
+      akx = aox
+      aky = aoy
+      bkx = box_
+      bky = boy
+      ckx = cox
+      cky = coy
+    } else {
+      dkx = dy
+      dky = dx
+      akx = aoy
+      aky = aox
+      bkx = boy
+      bky = box_
+      ckx = coy
+      cky = cox
+    }
+  }
+  if dkz == 0.0 {
+    return None
+  }
+  let sx = dkx / dkz
+  let sy = dky / dkz
+  let sz = 1.0 / dkz
+  let ax = akx - sx * akz
+  let ay = aky - sy * akz
+  let bx = bkx - sx * bkz
+  let by = bky - sy * bkz
+  let cx = ckx - sx * ckz
+  let cy = cky - sy * ckz
+  let u = cx * by - cy * bx
+  let v = ax * cy - ay * cx
+  let w = bx * ay - by * ax
+  if backface_culling {
+    if u < 0.0 || v < 0.0 || w < 0.0 {
+      return None
+    }
+  } else if (u < 0.0 || v < 0.0 || w < 0.0) &&
+    (u > 0.0 || v > 0.0 || w > 0.0) {
+    return None
+  }
+  let det = u + v + w
+  if det == 0.0 {
+    return None
+  }
+  let t_scaled = sz * (u * akz + v * bkz + w * ckz)
+  let behind = if det > 0.0 { t_scaled < 0.0 } else { t_scaled > 0.0 }
+  if behind {
+    return None
+  }
+  Some(self.at(t_scaled / det, target))
+}

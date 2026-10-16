@@ -4311,6 +4311,56 @@ test "Ray.intersectsBox counts a box in front of the ray" {
 }
 
 ///|
+test "Ray.intersectTriangle hits the front of a triangle" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let a = @math.Vector3::new()
+  let b = @math.Vector3::new(x=1.0)
+  let c = @math.Vector3::new(y=1.0)
+  let target = @math.Vector3::new(x=9.0)
+  match ray.intersect_triangle(a, b, c, true, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(physical_equal(hit, target), true)
+      assert_eq(hit.x, 0.25)
+      assert_eq(hit.y, 0.25)
+      assert_eq(hit.z, 0.0)
+    }
+  }
+  let miss = @math.Ray::new(
+    origin=@math.Vector3::new(x=2.0, y=2.0, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  match miss.intersect_triangle(a, b, c, false, target) {
+    None => assert_eq(target.x, 0.25)
+    Some(_) => assert_eq(true, false)
+  }
+  let back = @math.Ray::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=-1.0),
+    direction=@math.Vector3::new(z=1.0),
+  )
+  match back.intersect_triangle(a, b, c, true, target) {
+    None => assert_eq(target.y, 0.25)
+    Some(_) => assert_eq(true, false)
+  }
+  match back.intersect_triangle(a, b, c, false, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(hit.x, 0.25)
+      assert_eq(hit.y, 0.25)
+      assert_eq(hit.z, 0.0)
+    }
+  }
+  assert_eq(a.x, 0.0)
+  assert_eq(b.x, 1.0)
+  assert_eq(c.y, 1.0)
+  assert_eq(ray.origin.z, 1.0)
+  assert_eq(ray.direction.z, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
