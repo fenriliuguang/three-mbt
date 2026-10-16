@@ -2324,6 +2324,22 @@ test "setXYZ writes three interleaved components" {
 }
 
 ///|
+test "setXYZW writes four interleaved components" {
+  let buffer = @core.InterleavedBuffer::new(
+    [0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 9.0, 9.0],
+    4,
+  )
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 4, 0)
+  let written = attribute.set_xyzw(1, 1.0, 2.0, 3.0, 4.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(buffer.array[3], 0.0)
+  assert_eq(buffer.array[4], 1.0)
+  assert_eq(buffer.array[5], 2.0)
+  assert_eq(buffer.array[6], 3.0)
+  assert_eq(buffer.array[7], 4.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
