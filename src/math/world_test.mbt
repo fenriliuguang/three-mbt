@@ -6304,6 +6304,25 @@ test "SphericalHarmonics3.toArray writes twenty-seven components" {
 }
 
 ///|
+test "SphericalHarmonics3.getBasisAt writes nine basis weights" {
+  let normal = @math.Vector3::new(y=1.0)
+  let basis = []
+  @math.SphericalHarmonics3::get_basis_at(normal, basis)
+  assert_eq(basis.length(), 9)
+  assert_eq(basis[0], 0.282095)
+  assert_eq(basis[1], 0.488603)
+  assert_eq(basis[2], 0.0)
+  assert_eq(basis[3], 0.0)
+  assert_eq(basis[4], 0.0)
+  assert_eq(basis[5], 0.0)
+  assert_eq(basis[6], 0.315392 * -1.0)
+  assert_eq(basis[7], 0.0)
+  assert_eq(basis[8], 0.546274 * -1.0)
+  assert_eq(normal.y, 1.0)
+  assert_eq(normal.x, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

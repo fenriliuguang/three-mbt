@@ -218,3 +218,27 @@ pub fn SphericalHarmonics3::to_array(
   }
   target
 }
+
+///|
+/// 把单位法线展开成九个球谐基。短于 9 的数组会补零再写入。法线本身不改。
+/// r186: `getBasisAt` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L316
+pub fn SphericalHarmonics3::get_basis_at(
+  normal : Vector3,
+  sh_basis : Array[Double],
+) -> Unit {
+  while sh_basis.length() < 9 {
+    sh_basis.push(0.0)
+  }
+  let x = normal.x
+  let y = normal.y
+  let z = normal.z
+  sh_basis[0] = 0.282095
+  sh_basis[1] = 0.488603 * y
+  sh_basis[2] = 0.488603 * z
+  sh_basis[3] = 0.488603 * x
+  sh_basis[4] = 1.092548 * x * y
+  sh_basis[5] = 1.092548 * y * z
+  sh_basis[6] = 0.315392 * (3.0 * z * z - 1.0)
+  sh_basis[7] = 1.092548 * x * z
+  sh_basis[8] = 0.546274 * (x * x - y * y)
+}

@@ -480,6 +480,7 @@ pub fn SphericalHarmonics3::copy(Self, Self) -> Self
 pub fn SphericalHarmonics3::equals(Self, Self) -> Bool
 pub fn SphericalHarmonics3::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn SphericalHarmonics3::get_at(Self, Vector3, Vector3) -> Vector3
+pub fn SphericalHarmonics3::get_basis_at(Vector3, Array[Double]) -> Unit
 pub fn SphericalHarmonics3::get_irradiance_at(Self, Vector3, Vector3) -> Vector3
 pub fn SphericalHarmonics3::lerp(Self, Self, Double) -> Self
 pub fn SphericalHarmonics3::new() -> Self
