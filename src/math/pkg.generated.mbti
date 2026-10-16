@@ -270,6 +270,7 @@ pub fn Ray::distance_to_point(Self, Vector3) -> Double
 pub fn Ray::intersect_box(Self, Box3, Vector3) -> Vector3?
 pub fn Ray::intersect_plane(Self, Plane, Vector3) -> Vector3?
 pub fn Ray::intersect_sphere(Self, Sphere, Vector3) -> Vector3?
+pub fn Ray::intersects_box(Self, Box3) -> Bool
 pub fn Ray::intersects_plane(Self, Plane) -> Bool
 pub fn Ray::intersects_sphere(Self, Sphere) -> Bool
 pub fn Ray::look_at(Self, Vector3) -> Self

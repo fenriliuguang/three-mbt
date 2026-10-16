@@ -336,3 +336,13 @@ pub fn Ray::intersect_box(self : Ray, box : Box3, target : Vector3) -> Vector3? 
   let t = if tmin >= 0.0 { tmin } else { tmax }
   Some(self.at(t, target))
 }
+
+///|
+/// 射线与盒子相交则为真。盒子和射线都不改。
+/// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L521
+pub fn Ray::intersects_box(self : Ray, box : Box3) -> Bool {
+  match self.intersect_box(box, Vector3::new()) {
+    None => false
+    Some(_) => true
+  }
+}
