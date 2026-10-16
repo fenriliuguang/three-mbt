@@ -120,6 +120,19 @@ pub fn BufferAttribute::get_component(
 }
 
 ///|
+/// 写入一个顶点的指定分量。
+/// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L403
+pub fn BufferAttribute::set_component(
+  self : BufferAttribute,
+  index : Int,
+  component : Int,
+  value : Double,
+) -> BufferAttribute {
+  self.array[index * self.item_size + component] = value
+  self
+}
+
+///|
 pub fn BufferAttribute::get_x(self : BufferAttribute, index : Int) -> Double {
   self.get_component(index, 0)
 }
