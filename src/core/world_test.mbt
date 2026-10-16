@@ -1369,6 +1369,14 @@ test "addUpdateRange records a component span" {
 }
 
 ///|
+test "clearUpdateRanges drops every recorded span" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0], 1)
+  attribute.add_update_range(1, 2)
+  attribute.clear_update_ranges()
+  assert_eq(attribute.update_ranges.length(), 0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

@@ -85,6 +85,13 @@ pub fn BufferAttribute::add_update_range(
 }
 
 ///|
+/// 清空待上传区间。
+/// r186: `clearUpdateRanges` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L190
+pub fn BufferAttribute::clear_update_ranges(self : BufferAttribute) -> Unit {
+  self.update_ranges.clear()
+}
+
+///|
 /// 用源属性的数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
 pub fn BufferAttribute::copy(

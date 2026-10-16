@@ -32,6 +32,7 @@ pub fn BufferAttribute::add_update_range(Self, Int, Int) -> Unit
 pub fn BufferAttribute::apply_matrix3(Self, @math.Matrix3) -> Self
 pub fn BufferAttribute::apply_matrix4(Self, @math.Matrix4) -> Self
 pub fn BufferAttribute::apply_normal_matrix(Self, @math.Matrix3) -> Self
+pub fn BufferAttribute::clear_update_ranges(Self) -> Unit
 pub fn BufferAttribute::clone(Self) -> Self
 pub fn BufferAttribute::copy(Self, Self) -> Self
 pub fn BufferAttribute::copy_array(Self, Array[Double]) -> Self
