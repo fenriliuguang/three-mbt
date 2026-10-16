@@ -244,6 +244,16 @@ pub fn Color::add_colors(self : Color, color1 : Color, color2 : Color) -> Color 
 }
 
 ///|
+/// 每个通道都加上同一个数。
+/// r186: `addScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L711
+pub fn Color::add_scalar(self : Color, scalar : Double) -> Color {
+  self.r += scalar
+  self.g += scalar
+  self.b += scalar
+  self
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha
