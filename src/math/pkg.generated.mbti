@@ -315,6 +315,7 @@ pub fn Quaternion::conjugate(Self) -> Self
 pub fn Quaternion::copy(Self, Self) -> Self
 pub fn Quaternion::dot(Self, Self) -> Double
 pub fn Quaternion::equals(Self, Self) -> Bool
+pub fn Quaternion::from_array(Self, Array[Double], offset? : Int) -> Self
 pub fn Quaternion::identity(Self) -> Self
 pub fn Quaternion::invert(Self) -> Self
 pub fn Quaternion::length(Self) -> Double

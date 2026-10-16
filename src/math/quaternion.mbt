@@ -521,3 +521,19 @@ pub fn Quaternion::equals(self : Quaternion, quaternion : Quaternion) -> Bool {
   quaternion.z == self.z &&
   quaternion.w == self.w
 }
+
+///|
+/// 从数组读入四个分量，并通知。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L823
+pub fn Quaternion::from_array(
+  self : Quaternion,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> Quaternion {
+  self.x = array[offset]
+  self.y = array[offset + 1]
+  self.z = array[offset + 2]
+  self.w = array[offset + 3]
+  self.emit()
+  self
+}
