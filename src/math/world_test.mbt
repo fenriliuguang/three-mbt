@@ -4040,6 +4040,19 @@ test "Ray.closestPointToPoint stays on the ray" {
 }
 
 ///|
+test "Ray.distanceSqToPoint is zero on the ray" {
+  let ray = @math.Ray::new()
+  let ahead = @math.Vector3::new(x=4.0, y=5.0, z=-2.0)
+  let behind = @math.Vector3::new(x=4.0, y=5.0, z=3.0)
+  let on_ray = @math.Vector3::new(z=-2.0)
+  assert_eq(ray.distance_sq_to_point(ahead), 41.0)
+  assert_eq(ray.distance_sq_to_point(behind), 50.0)
+  assert_eq(ray.distance_sq_to_point(on_ray), 0.0)
+  assert_eq(ahead.x, 4.0)
+  assert_eq(ray.direction.z, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

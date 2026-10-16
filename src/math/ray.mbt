@@ -79,3 +79,19 @@ pub fn Ray::closest_point_to_point(
     target.copy(self.origin).add_scaled_vector(self.direction, direction_distance)
   }
 }
+
+///|
+/// 返回点到射线的距离平方。点在反方向时是到原点的距离平方。点和射线都不改。
+/// r186: `distanceSqToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L153
+pub fn Ray::distance_sq_to_point(self : Ray, point : Vector3) -> Double {
+  let direction = Vector3::new().sub_vectors(point, self.origin)
+  let direction_distance = direction.dot(self.direction)
+  if direction_distance < 0.0 {
+    self.origin.distance_to_squared(point)
+  } else {
+    let closest = Vector3::new()
+      .copy(self.origin)
+      .add_scaled_vector(self.direction, direction_distance)
+    closest.distance_to_squared(point)
+  }
+}
