@@ -216,6 +216,14 @@ pub fn Color::get_style(self : Color) -> String {
 }
 
 ///|
+/// 在色相、饱和度、亮度上各加一个偏移，再写回线性通道。
+/// r186: `offsetHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L664
+pub fn Color::offset_hsl(self : Color, h : Double, s : Double, l : Double) -> Color {
+  let (hue, saturation, lightness) = self.get_hsl()
+  self.set_hsl(hue + h, saturation + s, lightness + l)
+}
+
+///|
 pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.r += (color.r - self.r) * alpha
   self.g += (color.g - self.g) * alpha

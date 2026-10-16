@@ -4562,6 +4562,20 @@ test "Color.getStyle writes an sRGB rgb string" {
 }
 
 ///|
+test "Color.offsetHSL adds to hue saturation and lightness" {
+  let red = @math.Color::new(r=1.0, g=0.0, b=0.0)
+  ignore(red.offset_hsl(0.0, 0.0, 0.0))
+  assert_eq(red.r, 1.0)
+  assert_eq(red.g, 0.0)
+  assert_eq(red.b, 0.0)
+  let gray = @math.Color::new(r=0.25, g=0.25, b=0.25)
+  ignore(gray.offset_hsl(0.0, 0.0, 0.25))
+  assert_eq(gray.r, 0.5)
+  assert_eq(gray.g, 0.5)
+  assert_eq(gray.b, 0.5)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
