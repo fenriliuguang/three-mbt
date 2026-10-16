@@ -648,3 +648,14 @@ test "clearGroups drops every draw group" {
   assert_eq(geometry.groups.length(), 0)
   assert_eq(geometry.has_attribute("position"), true)
 }
+
+///|
+test "setDrawRange stores the first vertex and the count" {
+  let geometry = @core.BufferGeometry::new()
+  assert_eq(geometry.draw_range.start, 0.0)
+  assert_eq(geometry.draw_range.count.is_inf(), true)
+  assert_eq(geometry.draw_range.count > 0.0, true)
+  geometry.set_draw_range(1.0, 4.0)
+  assert_eq(geometry.draw_range.start, 1.0)
+  assert_eq(geometry.draw_range.count, 4.0)
+}

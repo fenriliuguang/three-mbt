@@ -10,12 +10,21 @@ pub(all) struct GeometryGroup {
 }
 
 ///|
+/// 绘制范围。上游没有单独的类，默认值写在 `BufferGeometry` 构造函数里。
+/// r186: `drawRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L188
+pub(all) struct DrawRange {
+  mut start : Double
+  mut count : Double
+}
+
+///|
 /// 几何体。属性按名字存放，索引和包围体单独保存。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 pub(all) struct BufferGeometry {
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]
+  draw_range : DrawRange
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
   mut version : Int
@@ -27,6 +36,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     attributes: Map([]),
     index: None,
     groups: [],
+    draw_range: { start: 0.0, count: 1.0 / 0.0 },
     bounding_box: None,
     bounding_sphere: None,
     version: 0,
@@ -101,6 +111,18 @@ pub fn BufferGeometry::add_group(
 /// r186: `clearGroups` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L350
 pub fn BufferGeometry::clear_groups(self : BufferGeometry) -> Unit {
   self.groups.clear()
+}
+
+///|
+/// 设置从哪个顶点或索引开始画，以及画多少个。默认从 `0` 画到正无穷。
+/// r186: `setDrawRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L363
+pub fn BufferGeometry::set_draw_range(
+  self : BufferGeometry,
+  start : Double,
+  count : Double,
+) -> Unit {
+  self.draw_range.start = start
+  self.draw_range.count = count
 }
 
 ///|

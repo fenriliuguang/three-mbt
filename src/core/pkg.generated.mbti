@@ -39,6 +39,7 @@ pub(all) struct BufferGeometry {
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   groups : Array[GeometryGroup]
+  draw_range : DrawRange
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
   mut version : Int
@@ -53,6 +54,7 @@ pub fn BufferGeometry::get_attribute(Self, String) -> BufferAttribute?
 pub fn BufferGeometry::has_attribute(Self, String) -> Bool
 pub fn BufferGeometry::new() -> Self
 pub fn BufferGeometry::set_attribute(Self, String, BufferAttribute) -> Self
+pub fn BufferGeometry::set_draw_range(Self, Double, Double) -> Unit
 pub fn BufferGeometry::set_index(Self, BufferAttribute) -> Self
 pub fn BufferGeometry::set_index_array(Self, Array[Int]) -> Self
 
@@ -86,6 +88,11 @@ pub fn CameraState::perspective(Double, Double, Double, Double) -> Self
 pub fn CameraState::set_focal_length(Self, Double) -> Unit
 pub fn CameraState::update_projection(Self) -> Unit
 pub fn CameraState::write_view(Self, Double, Double, Double, Double, Double, Double) -> Unit
+
+pub(all) struct DrawRange {
+  mut start : Double
+  mut count : Double
+}
 
 pub(all) struct GeometryGroup {
   start : Int
