@@ -494,3 +494,12 @@ pub fn Ray::intersect_triangle(
   }
   Some(self.at(t_scaled / det, target))
 }
+
+///|
+/// 用矩阵变换原点，并把方向按矩阵的 3×3 部分变换后单位化。矩阵不改。
+/// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L671
+pub fn Ray::apply_matrix4(self : Ray, matrix : Matrix4) -> Ray {
+  ignore(self.origin.apply_matrix4(matrix))
+  ignore(self.direction.transform_direction(matrix))
+  self
+}

@@ -4361,6 +4361,20 @@ test "Ray.intersectTriangle hits the front of a triangle" {
 }
 
 ///|
+test "Ray.applyMatrix4 moves the origin and keeps a translated direction" {
+  let ray = @math.Ray::new()
+  let matrix = @math.Matrix4::new().make_translation(1.0, 2.0, 3.0)
+  ignore(ray.apply_matrix4(matrix))
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.origin.y, 2.0)
+  assert_eq(ray.origin.z, 3.0)
+  assert_eq(ray.direction.x, 0.0)
+  assert_eq(ray.direction.y, 0.0)
+  assert_eq(ray.direction.z, -1.0)
+  assert_eq(matrix.elements[12], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

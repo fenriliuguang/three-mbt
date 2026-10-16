@@ -793,6 +793,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.intersectTriangle` has landed. It writes the watertight intersection with a triangle. A ray from `(0.25, 0.25, 1)` along `(0, 0, -1)` meets the triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` at `(0.25, 0.25, 0)`. A ray from `(2, 2, 1)` misses. Coming from below, backface culling misses and turning it off hits the same point. The vertices and the ray are unchanged.
 
+`Ray.applyMatrix4` has landed. It transforms the origin and the direction. The default ray, translated by `(1, 2, 3)`, has origin `(1, 2, 3)` and keeps direction `(0, 0, -1)`. The matrix is unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1130,6 +1132,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.intersectBox` | `math` |
 | planned | 7 | `Ray.intersectsBox` | `math` |
 | planned | 7 | `Ray.intersectTriangle` | `math` |
+| planned | 7 | `Ray.applyMatrix4` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
