@@ -46,6 +46,27 @@ pub fn BufferAttribute::copy(
 }
 
 ///|
+/// 把源属性的一个顶点复制到当前属性的指定位置。
+/// r186: `copyAt` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L227
+pub fn BufferAttribute::copy_at(
+  self : BufferAttribute,
+  index1 : Int,
+  attribute : BufferAttribute,
+  index2 : Int,
+) -> BufferAttribute {
+  let mut destination = index1 * self.item_size
+  let mut source = index2 * attribute.item_size
+  let mut component = 0
+  while component < self.item_size {
+    self.array[destination] = attribute.array[source]
+    destination = destination + 1
+    source = source + 1
+    component = component + 1
+  }
+  self
+}
+
+///|
 /// 新建一份属性，数值与源独立。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L653
 pub fn BufferAttribute::clone(self : BufferAttribute) -> BufferAttribute {

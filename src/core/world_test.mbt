@@ -1231,6 +1231,21 @@ test "clone makes an independent attribute" {
 }
 
 ///|
+test "copyAt copies one vertex" {
+  let source = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let destination = @core.BufferAttribute::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let written = destination.copy_at(1, source, 0)
+  assert_eq(physical_equal(written, destination), true)
+  assert_eq(destination.get_x(0), 0.0)
+  assert_eq(destination.get_y(0), 0.0)
+  assert_eq(destination.get_z(0), 0.0)
+  assert_eq(destination.get_x(1), 1.0)
+  assert_eq(destination.get_y(1), 2.0)
+  assert_eq(destination.get_z(1), 3.0)
+  assert_eq(source.get_x(0), 1.0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(
