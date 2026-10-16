@@ -6334,6 +6334,55 @@ test "FrustumArray.new starts empty in WebGL coordinates" {
 }
 
 ///|
+test "FrustumArray.intersectsSphere uses only the counted frustums" {
+  let frustums = @math.FrustumArray::new()
+  let inside = @math.Sphere::new(
+    center=@math.Vector3::new(x=0.5, y=0.5, z=0.5),
+    radius=0.25,
+  )
+  let outside = @math.Sphere::new(
+    center=@math.Vector3::new(x=-2.0, y=0.0, z=0.0),
+    radius=0.25,
+  )
+  assert_eq(frustums.intersects_sphere(inside), false)
+  let cube = @math.Frustum::new()
+  ignore(
+    cube.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  frustums.frustums.push(cube)
+  assert_eq(frustums.intersects_sphere(inside), false)
+  frustums.count = 1
+  assert_eq(frustums.intersects_sphere(inside), true)
+  assert_eq(frustums.intersects_sphere(outside), false)
+  let wide = @math.Frustum::new()
+  ignore(
+    wide.set(
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+    ),
+  )
+  frustums.frustums.push(wide)
+  assert_eq(frustums.intersects_sphere(outside), false)
+  frustums.count = 2
+  assert_eq(frustums.intersects_sphere(outside), true)
+  assert_eq(outside.center.x, -2.0)
+  assert_eq(outside.radius, 0.25)
+  assert_eq(inside.center.x, 0.5)
+  assert_eq(inside.radius, 0.25)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
