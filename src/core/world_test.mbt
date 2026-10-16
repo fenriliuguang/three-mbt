@@ -1560,3 +1560,13 @@ test "dispatchEvent runs geometry listeners of one kind" {
   geometry.dispatch_event("change")
   assert_eq(hits.val, 1)
 }
+
+///|
+test "dispose runs only geometry dispose listeners" {
+  let geometry = @core.BufferGeometry::new()
+  let hits = Ref::Ref(0)
+  geometry.add_event_listener("dispose", fn() { hits.val = hits.val + 1 })
+  geometry.add_event_listener("other", fn() { hits.val = hits.val + 10 })
+  geometry.dispose()
+  assert_eq(hits.val, 1)
+}

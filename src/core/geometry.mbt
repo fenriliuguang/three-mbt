@@ -892,3 +892,10 @@ pub fn BufferGeometry::dispatch_event(
     }
   }
 }
+
+///|
+/// 通知 `dispose` 监听。其它事件不动。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1472
+pub fn BufferGeometry::dispose(self : BufferGeometry) -> Unit {
+  self.dispatch_event("dispose")
+}
