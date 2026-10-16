@@ -63,6 +63,16 @@ pub fn InterleavedBufferAttribute::get_x(
 }
 
 ///|
+/// 读取指定顶点的 y。下标是 `index * stride + offset + 1`。归一化换算还没有落地，读到的是缓冲里的原值。
+/// r186: `getY` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L302
+pub fn InterleavedBufferAttribute::get_y(
+  self : InterleavedBufferAttribute,
+  index : Int,
+) -> Double {
+  self.data.array[index * self.data.stride + self.offset + 1]
+}
+
+///|
 /// 写入指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，写入的是原值。
 /// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L219
 pub fn InterleavedBufferAttribute::set_x(
