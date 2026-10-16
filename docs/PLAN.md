@@ -1245,6 +1245,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `BufferGeometry.applyMatrix4` now marks `position`, `normal`, and `tangent` as needing an update. Their `version` goes from `0` to `1`. A `uv` attribute stays at `0`.
 
+`BufferGeometry.computeBoundingBox` now includes morph positions. A point at `(0, 0, 0)` with an absolute morph target at `(2, 0, 0)` has max x `2`. A point at `(1, 0, 0)` with a relative morph `(2, 0, 0)` has max x `5`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1808,6 +1810,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BufferAttribute.toJSON` name, usage, and gpuType | `core` |
 | planned | 7 | `BufferGeometry.toJSON` uuid, name, type, and userData | `core` |
 | planned | 7 | `BufferGeometry.applyMatrix4` needsUpdate | `core` |
+| planned | 7 | `BufferGeometry.computeBoundingBox` morph positions | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

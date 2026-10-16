@@ -1835,3 +1835,37 @@ test "applyMatrix4 marks position, normal, and tangent for update" {
   assert_eq(tangent.version, 1)
   assert_eq(uv.version, 0)
 }
+
+///|
+test "computeBoundingBox includes morph positions" {
+  let absolute = @core.BufferGeometry::new()
+  ignore(
+    absolute.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 0.0], 3)),
+  )
+  absolute.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
+  )
+  absolute.compute_bounding_box()
+  match absolute.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => {
+      assert_eq(box.min.x, 0.0)
+      assert_eq(box.max.x, 2.0)
+    }
+  }
+  let relative = @core.BufferGeometry::new()
+  ignore(
+    relative.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+  )
+  relative.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
+  )
+  relative.morph_targets_relative = true
+  relative.compute_bounding_box()
+  match relative.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => assert_eq(box.max.x, 5.0)
+  }
+}

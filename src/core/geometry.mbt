@@ -370,6 +370,8 @@ pub fn BufferGeometry::set_from_points(
 }
 
 ///|
+/// 用 `position` 计算包围盒，并纳入 `position` 形变目标。
+/// r186: `computeBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L643
 pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
   match self.attributes.get("position") {
     None => self.bounding_box = None
@@ -392,6 +394,33 @@ pub fn BufferGeometry::compute_bounding_box(self : BufferGeometry) -> Unit {
         )
         ignore(box.expand_by_point(point))
         index = index + 1
+      }
+      self.expand_box_by_morph_positions(box)
+    }
+  }
+}
+
+///|
+fn BufferGeometry::expand_box_by_morph_positions(
+  self : BufferGeometry,
+  box : @math.Box3,
+) -> Unit {
+  match self.morph_attributes.get("position") {
+    None => ()
+    Some(morphs) => {
+      let morph_box = @math.Box3::empty()
+      let vector = @math.Vector3::new()
+      for morph in morphs {
+        ignore(morph.set_box3(morph_box))
+        if self.morph_targets_relative {
+          ignore(vector.add_vectors(box.min, morph_box.min))
+          ignore(box.expand_by_point(vector))
+          ignore(vector.add_vectors(box.max, morph_box.max))
+          ignore(box.expand_by_point(vector))
+        } else {
+          ignore(box.expand_by_point(morph_box.min))
+          ignore(box.expand_by_point(morph_box.max))
+        }
       }
     }
   }
