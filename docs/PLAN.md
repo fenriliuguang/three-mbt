@@ -783,6 +783,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.distanceToPlane` has landed. It returns the distance from the origin to the plane, or nothing when the ray misses. A ray from `(-2, 0, 0)` along `(1, 0, 0)` meets the plane `x = 0` at distance `2`. A ray pointing the other way from `(1, 0, 0)` misses. A ray parallel to the plane misses unless it already lies on it, in which case the distance is `0`. The ray and the plane are unchanged.
 
+`Ray.intersectPlane` has landed. It writes the point at that distance. The same ray meets the plane `x = 0` at `(0, 0, 0)`. A ray from `(1, 0, 0)` along `(1, 0, 0)` misses and leaves the target alone. The ray and the plane are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1115,6 +1117,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.intersectSphere` | `math` |
 | planned | 7 | `Ray.intersectsSphere` | `math` |
 | planned | 7 | `Ray.distanceToPlane` | `math` |
+| planned | 7 | `Ray.intersectPlane` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -248,3 +248,17 @@ pub fn Ray::distance_to_plane(self : Ray, plane : Plane) -> Double? {
     }
   }
 }
+
+///|
+/// 射线与平面的交点写入 target。没有交点时返回 None。平面和射线都不改。
+/// r186: `intersectPlane` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L395
+pub fn Ray::intersect_plane(
+  self : Ray,
+  plane : Plane,
+  target : Vector3,
+) -> Vector3? {
+  match self.distance_to_plane(plane) {
+    None => None
+    Some(t) => Some(self.at(t, target))
+  }
+}

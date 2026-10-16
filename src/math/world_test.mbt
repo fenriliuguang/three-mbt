@@ -4201,6 +4201,36 @@ test "Ray.distanceToPlane is the distance to the first hit" {
 }
 
 ///|
+test "Ray.intersectPlane writes the hit on the plane" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=-2.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  let plane = @math.Plane::new()
+  let target = @math.Vector3::new(x=9.0)
+  match ray.intersect_plane(plane, target) {
+    None => assert_eq(true, false)
+    Some(hit) => {
+      assert_eq(physical_equal(hit, target), true)
+      assert_eq(hit.x, 0.0)
+      assert_eq(hit.y, 0.0)
+      assert_eq(hit.z, 0.0)
+    }
+  }
+  let away = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0),
+    direction=@math.Vector3::new(x=1.0),
+  )
+  match away.intersect_plane(plane, target) {
+    None => assert_eq(target.x, 0.0)
+    Some(_) => assert_eq(true, false)
+  }
+  assert_eq(ray.origin.x, -2.0)
+  assert_eq(ray.direction.x, 1.0)
+  assert_eq(plane.constant, 0.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
