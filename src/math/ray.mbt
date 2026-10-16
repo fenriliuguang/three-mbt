@@ -20,3 +20,12 @@ pub fn Ray::new(origin? : Vector3, direction? : Vector3) -> Ray {
   }
   { origin, direction }
 }
+
+///|
+/// 拷贝原点和方向。之后改来源向量不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L47
+pub fn Ray::set(self : Ray, origin : Vector3, direction : Vector3) -> Ray {
+  ignore(self.origin.copy(origin))
+  ignore(self.direction.copy(direction))
+  self
+}

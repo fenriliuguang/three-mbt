@@ -3935,6 +3935,24 @@ test "Ray stores copies of its origin and direction" {
 }
 
 ///|
+test "Ray.set copies the origin and the direction" {
+  let ray = @math.Ray::new()
+  let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let direction = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
+  ignore(ray.set(origin, direction))
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.origin.y, 2.0)
+  assert_eq(ray.origin.z, 3.0)
+  assert_eq(ray.direction.x, 4.0)
+  assert_eq(ray.direction.y, 5.0)
+  assert_eq(ray.direction.z, 6.0)
+  origin.x = 0.0
+  direction.z = 0.0
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.direction.z, 6.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
