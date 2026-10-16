@@ -162,6 +162,24 @@ pub fn InterleavedBufferAttribute::apply_matrix4(
 }
 
 ///|
+/// 用法线矩阵变换每个顶点的 x、y、z，并归一化。
+/// r186: `applyNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L138
+pub fn InterleavedBufferAttribute::apply_normal_matrix(
+  self : InterleavedBufferAttribute,
+  matrix : @math.Matrix3,
+) -> InterleavedBufferAttribute {
+  let point = @math.Vector3::new()
+  let mut index = 0
+  while index < self.count() {
+    ignore(point.set(self.get_x(index), self.get_y(index), self.get_z(index)))
+    ignore(point.apply_normal_matrix(matrix))
+    ignore(self.set_xyz(index, point.x, point.y, point.z))
+    index = index + 1
+  }
+  self
+}
+
+///|
 /// 写入指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，写入的是原值。
 /// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L219
 pub fn InterleavedBufferAttribute::set_x(

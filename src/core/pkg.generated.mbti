@@ -241,6 +241,7 @@ pub(all) struct InterleavedBufferAttribute {
   mut normalized : Bool
 }
 pub fn InterleavedBufferAttribute::apply_matrix4(Self, @math.Matrix4) -> Self
+pub fn InterleavedBufferAttribute::apply_normal_matrix(Self, @math.Matrix3) -> Self
 pub fn InterleavedBufferAttribute::array(Self) -> Array[Double]
 pub fn InterleavedBufferAttribute::count(Self) -> Int
 pub fn InterleavedBufferAttribute::get_w(Self, Int) -> Double
