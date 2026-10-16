@@ -38,3 +38,10 @@ pub fn Ray::copy(self : Ray, ray : Ray) -> Ray {
   ignore(self.direction.copy(ray.direction))
   self
 }
+
+///|
+/// 沿射线走距离 t，写入 target。射线不改。
+/// r186: `at` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L78
+pub fn Ray::at(self : Ray, t : Double, target : Vector3) -> Vector3 {
+  target.copy(self.origin).add_scaled_vector(self.direction, t)
+}

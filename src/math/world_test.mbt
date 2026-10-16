@@ -3973,6 +3973,26 @@ test "Ray.copy copies the origin and the direction" {
 }
 
 ///|
+test "Ray.at walks a distance along the direction" {
+  let ray = @math.Ray::new(
+    origin=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+    direction=@math.Vector3::new(y=1.0),
+  )
+  let target = @math.Vector3::new(x=9.0)
+  let point = ray.at(0.5, target)
+  assert_eq(physical_equal(point, target), true)
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 2.5)
+  assert_eq(target.z, 3.0)
+  ignore(ray.at(0.0, target))
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 2.0)
+  assert_eq(target.z, 3.0)
+  assert_eq(ray.origin.x, 1.0)
+  assert_eq(ray.direction.y, 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
