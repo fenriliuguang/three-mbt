@@ -6995,6 +6995,38 @@ test "QuaternionLinearInterpolant.new stores the samples" {
 }
 
 ///|
+test "QuaternionLinearInterpolant.interpolate_ slerps one quaternion" {
+  let values = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0]
+  let given = [9.0, 9.0, 9.0, 9.0, 4.0]
+  let slerp = @math.QuaternionLinearInterpolant::new(
+    [0.0, 1.0],
+    values,
+    4,
+    result_buffer=given,
+  )
+  let at_left = slerp.interpolate(1, 0.0, 0.0, 1.0)
+  assert_eq(physical_equal(at_left, given), true)
+  assert_eq(at_left[0], 0.0)
+  assert_eq(at_left[1], 0.0)
+  assert_eq(at_left[2], 0.0)
+  assert_eq(at_left[3], 1.0)
+  assert_eq(at_left[4], 4.0)
+  let at_right = slerp.interpolate(1, 0.0, 1.0, 1.0)
+  assert_eq(at_right[0], 0.0)
+  assert_eq(at_right[1], 0.0)
+  assert_eq(at_right[2], 1.0)
+  assert_eq(at_right[3], 0.0)
+  assert_eq(at_right[4], 4.0)
+  let mid = slerp.interpolate(1, 0.0, 0.5, 1.0)
+  assert_eq(mid[0], 0.0)
+  assert_eq(mid[1], 0.0)
+  assert_close(mid[2], 0.7071067811865476)
+  assert_close(mid[3], 0.7071067811865476)
+  assert_eq(values[3], 1.0)
+  assert_eq(values[6], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

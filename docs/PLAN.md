@@ -1087,7 +1087,9 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `LinearInterpolant.interpolate_` has landed. With sample size `2`, time `0` copies `(10, 11)`, time `0.25` blends to `(12.5, 13.5)`, and time `1` copies `(20, 21)`. A longer buffer's third value stays `3`. The samples stay unchanged.
 
-`QuaternionLinearInterpolant` has landed. `new` stores positions `(0, 1)` and two quaternions `(0, 0, 0, 1)` and `(0, 0, 1, 0)`. The sample size is `4`, the cached index is `0`, and the result buffer is four zeros. A supplied result buffer `(4, 5, 6, 8)` is stored as given. `interpolate_` stays later.
+`QuaternionLinearInterpolant` has landed. `new` stores positions `(0, 1)` and two quaternions `(0, 0, 0, 1)` and `(0, 0, 1, 0)`. The sample size is `4`, the cached index is `0`, and the result buffer is four zeros. A supplied result buffer `(4, 5, 6, 8)` is stored as given.
+
+`QuaternionLinearInterpolant.interpolate_` has landed. From `(0, 0, 0, 1)` to `(0, 0, 1, 0)`, time `0` is the first quaternion, time `1` is the second, and time `0.5` is about `(0, 0, 0.707106781, 0.707106781)`. A longer buffer's fifth value stays `4`.
 
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
@@ -1574,6 +1576,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LinearInterpolant` | `math` |
 | planned | 7 | `LinearInterpolant.interpolate_` | `math` |
 | planned | 7 | `QuaternionLinearInterpolant` | `math` |
+| planned | 7 | `QuaternionLinearInterpolant.interpolate_` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

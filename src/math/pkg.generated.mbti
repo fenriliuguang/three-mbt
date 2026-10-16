@@ -477,6 +477,7 @@ pub fn Quaternion::to_json(Self) -> Array[Double]
 pub(all) struct QuaternionLinearInterpolant {
   interpolant : Interpolant
 }
+pub fn QuaternionLinearInterpolant::interpolate(Self, Int, Double, Double, Double) -> Array[Double]
 pub fn QuaternionLinearInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
 
 pub(all) struct Ray {
