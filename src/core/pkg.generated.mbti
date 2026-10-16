@@ -223,6 +223,7 @@ pub fn InterleavedBuffer::clear_update_ranges(Self) -> Unit
 pub fn InterleavedBuffer::copy(Self, Self) -> Self
 pub fn InterleavedBuffer::copy_at(Self, Int, Self, Int) -> Self
 pub fn InterleavedBuffer::new(Array[Double], Int) -> Self
+pub fn InterleavedBuffer::set(Self, Array[Double], offset? : Int) -> Self
 pub fn InterleavedBuffer::set_usage(Self, Int) -> Self
 
 pub(all) struct Layers {

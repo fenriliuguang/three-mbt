@@ -93,3 +93,22 @@ pub fn InterleavedBuffer::copy_at(
   }
   self
 }
+
+///|
+/// 从偏移处写入一份数值。放不下时中止。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L191
+pub fn InterleavedBuffer::set(
+  self : InterleavedBuffer,
+  value : Array[Double],
+  offset? : Int = 0,
+) -> InterleavedBuffer {
+  if offset < 0 || offset + value.length() > self.array.length() {
+    abort("InterleavedBuffer.set source does not fit")
+  }
+  let mut index = 0
+  while index < value.length() {
+    self.array[offset + index] = value[index]
+    index = index + 1
+  }
+  self
+}

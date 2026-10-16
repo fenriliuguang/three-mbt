@@ -2149,3 +2149,14 @@ test "copyAt writes one interleaved vertex" {
   assert_eq(destination.array[5], 3.0)
   assert_eq(source.array[0], 1.0)
 }
+
+///|
+test "set writes an interleaved buffer at an offset" {
+  let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0], 1)
+  let written = buffer.set([1.0, 2.0], offset=1)
+  assert_eq(physical_equal(written, buffer), true)
+  assert_eq(buffer.array[0], 0.0)
+  assert_eq(buffer.array[1], 1.0)
+  assert_eq(buffer.array[2], 2.0)
+  assert_eq(buffer.array[3], 9.0)
+}
