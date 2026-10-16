@@ -21,3 +21,16 @@ fn sh3_coefficients() -> Array[Vector3] {
 pub fn SphericalHarmonics3::new() -> SphericalHarmonics3 {
   { coefficients: sh3_coefficients(), }
 }
+
+///|
+/// 把九个系数复制进来。来源之后再改，不影响这里。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L48
+pub fn SphericalHarmonics3::set(
+  self : SphericalHarmonics3,
+  coefficients : Array[Vector3],
+) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].copy(coefficients[i]))
+  }
+  self
+}
