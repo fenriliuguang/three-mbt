@@ -773,6 +773,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Ray.distanceSqToPoint` has landed. It is the squared distance to the closest point on the ray. The default ray is `41` from `(4, 5, -2)`, `50` from `(4, 5, 3)` behind the origin, and `0` from `(0, 0, -2)` on the ray. The point and the ray are unchanged.
 
+`Ray.distanceToPoint` has landed. It is the square root of that squared distance. The default ray is `5` from `(3, 4, -2)`, `3` from `(0, 0, 3)` behind the origin, and `0` from `(0, 0, -2)` on the ray. The point and the ray are unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1100,6 +1102,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Ray.recast` | `math` |
 | planned | 7 | `Ray.closestPointToPoint` | `math` |
 | planned | 7 | `Ray.distanceSqToPoint` | `math` |
+| planned | 7 | `Ray.distanceToPoint` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -95,3 +95,10 @@ pub fn Ray::distance_sq_to_point(self : Ray, point : Vector3) -> Double {
     closest.distance_to_squared(point)
   }
 }
+
+///|
+/// 返回点到射线的距离。点在反方向时是到原点的距离。点和射线都不改。
+/// r186: `distanceToPoint` https://github.com/mrdoob/three.js/blob/r186/src/math/Ray.js#L141
+pub fn Ray::distance_to_point(self : Ray, point : Vector3) -> Double {
+  self.distance_sq_to_point(point).sqrt()
+}

@@ -4053,6 +4053,19 @@ test "Ray.distanceSqToPoint is zero on the ray" {
 }
 
 ///|
+test "Ray.distanceToPoint is the root of the squared distance" {
+  let ray = @math.Ray::new()
+  let ahead = @math.Vector3::new(x=3.0, y=4.0, z=-2.0)
+  let behind = @math.Vector3::new(z=3.0)
+  let on_ray = @math.Vector3::new(z=-2.0)
+  assert_eq(ray.distance_to_point(ahead), 5.0)
+  assert_eq(ray.distance_to_point(behind), 3.0)
+  assert_eq(ray.distance_to_point(on_ray), 0.0)
+  assert_eq(ahead.x, 3.0)
+  assert_eq(ray.direction.z, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
