@@ -20,11 +20,13 @@ pub(all) struct UpdateRange {
 
 ///|
 /// 顶点缓冲。数值用 `Double` 保存，对应 r186 里进入着色器之前的 JS number。
-/// `id` 从 0 起递增，`copy` 不改写目标的编号。
+/// `id` 从 0 起递增，`copy` 不改写目标的编号。`name` 默认是空字符串。
 /// r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L56
+/// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L63
 pub(all) struct BufferAttribute {
   id : Int
+  mut name : String
   mut array : Array[Double]
   mut item_size : Int
   mut normalized : Bool
@@ -44,6 +46,7 @@ pub fn BufferAttribute::new(
 ) -> BufferAttribute {
   {
     id: fresh_attribute_id(),
+    name: "",
     array,
     item_size,
     normalized,
@@ -213,12 +216,13 @@ pub fn BufferAttribute::dispose(self : BufferAttribute) -> Unit {
 }
 
 ///|
-/// 用源属性的数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
+/// 用源属性的名字、数值、分量个数、归一化标记和使用方式替换当前属性。数值是一份副本。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L202
 pub fn BufferAttribute::copy(
   self : BufferAttribute,
   source : BufferAttribute,
 ) -> BufferAttribute {
+  self.name = source.name
   self.array = source.array.copy()
   self.item_size = source.item_size
   self.count = source.count

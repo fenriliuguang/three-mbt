@@ -1582,3 +1582,14 @@ test "id counts attributes and stays on the destination" {
   assert_eq(destination.id, kept)
   assert_eq(destination.id == first.id, false)
 }
+
+///|
+test "name starts empty and copy carries it" {
+  let source = @core.BufferAttribute::new([1.0], 1)
+  assert_eq(source.name, "")
+  source.name = "tangent"
+  let destination = @core.BufferAttribute::new([9.0], 1)
+  destination.name = "old"
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "tangent")
+}
