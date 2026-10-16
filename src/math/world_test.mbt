@@ -4649,6 +4649,27 @@ test "Color.multiplyScalar scales every channel" {
 }
 
 ///|
+test "Color.lerpColors stores the blend of two colors" {
+  let color = @math.Color::new()
+  let first = @math.Color::new(r=0.0, g=0.0, b=0.0)
+  let second = @math.Color::new(r=1.0, g=0.5, b=0.0)
+  ignore(color.lerp_colors(first, second, 0.25))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.125)
+  assert_eq(color.b, 0.0)
+  ignore(color.lerp_colors(first, second, 0.0))
+  assert_eq(color.r, 0.0)
+  assert_eq(color.g, 0.0)
+  assert_eq(color.b, 0.0)
+  ignore(color.lerp_colors(first, second, 1.0))
+  assert_eq(color.r, 1.0)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 0.0)
+  assert_eq(first.r, 0.0)
+  assert_eq(second.g, 0.5)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

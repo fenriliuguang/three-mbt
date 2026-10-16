@@ -290,3 +290,18 @@ pub fn Color::lerp(self : Color, color : Color, alpha : Double) -> Color {
   self.b += (color.b - self.b) * alpha
   self
 }
+
+///|
+/// 在两个颜色之间插值，写入自身。
+/// r186: `lerpColors` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L798
+pub fn Color::lerp_colors(
+  self : Color,
+  color1 : Color,
+  color2 : Color,
+  alpha : Double,
+) -> Color {
+  self.r = color1.r + (color2.r - color1.r) * alpha
+  self.g = color1.g + (color2.g - color1.g) * alpha
+  self.b = color1.b + (color2.b - color1.b) * alpha
+  self
+}

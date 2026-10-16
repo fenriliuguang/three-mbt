@@ -106,6 +106,7 @@ pub fn Color::get_hsl(Self) -> (Double, Double, Double)
 pub fn Color::get_rgb(Self, Self) -> Self
 pub fn Color::get_style(Self) -> String
 pub fn Color::lerp(Self, Self, Double) -> Self
+pub fn Color::lerp_colors(Self, Self, Self, Double) -> Self
 pub fn Color::multiply(Self, Self) -> Self
 pub fn Color::multiply_scalar(Self, Double) -> Self
 pub fn Color::new(r? : Double, g? : Double, b? : Double) -> Self
