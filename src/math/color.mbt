@@ -41,6 +41,16 @@ pub fn Color::set(self : Color, r : Double, g : Double, b : Double) -> Color {
 }
 
 ///|
+/// 三个通道都写成同一个值。
+/// r186: `setScalar` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L187
+pub fn Color::set_scalar(self : Color, scalar : Double) -> Color {
+  self.r = scalar
+  self.g = scalar
+  self.b = scalar
+  self
+}
+
+///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
 pub fn Color::set_hex(self : Color, hex : Int) -> Color {
   let hex = hex.to_double().floor().to_int()
