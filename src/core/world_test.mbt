@@ -139,6 +139,27 @@ test "fromBufferAttribute reads xyzw" {
 }
 
 ///|
+test "fromBufferAttribute reads rgb and skips a fourth component" {
+  let colors = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let color = @math.Color::new(r=9.0, g=8.0, b=7.0)
+  let written = colors.copy_to_color(1, color)
+  assert_eq(physical_equal(written, color), true)
+  assert_eq(color.r, 4.0)
+  assert_eq(color.g, 5.0)
+  assert_eq(color.b, 6.0)
+  let wide = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0, 9.0, 4.0, 5.0, 6.0, 8.0],
+    4,
+  )
+  ignore(wide.copy_to_color(1, color))
+  assert_eq(color.r, 4.0)
+  assert_eq(color.g, 5.0)
+  assert_eq(color.b, 6.0)
+  assert_eq(colors.get_x(0), 1.0)
+  assert_eq(wide.get_component(1, 3), 8.0)
+}
+
+///|
 test "child world matrix matches r186" {
   let parent = @core.Object3D::new()
   ignore(parent.position.set(10.0, 0.0, 0.0))

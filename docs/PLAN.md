@@ -1095,6 +1095,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Color.setStyle` has landed. `rgb(255, 0, 0)`, `rgb(100%, 0%, 0%)`, `#ff0000`, `#f00`, and `red` are `(1, 0, 0)`. `hsl(0, 0%, 50%)` is linear `srgb_to_linear(0.5)` on each channel. `AliceBlue` is hex `0xF0F8FF`. An empty string, `#ff`, and an unknown name leave `(0.25, 0.5, 0.75)` unchanged. Alpha is ignored.
 
+`Color.fromBufferAttribute` has landed as `BufferAttribute.copy_to_color`, because `math` does not import `core`. It writes `getX`, `getY`, and `getZ` into the color and leaves those numbers as stored. Index 1 of `[1, 2, 3, 4, 5, 6]` with item size 3 is `(4, 5, 6)`. Item size 4 skips the fourth component, so index 1 of `[1, 2, 3, 9, 4, 5, 6, 8]` is also `(4, 5, 6)`. The attribute is not modified.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1583,6 +1585,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `QuaternionLinearInterpolant.interpolate_` | `math` |
 | planned | 7 | `Color.setColorName` | `math` |
 | planned | 7 | `Color.setStyle` | `math` |
+| planned | 7 | `Color.fromBufferAttribute` on `BufferAttribute` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

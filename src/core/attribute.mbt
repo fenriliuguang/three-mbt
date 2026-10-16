@@ -94,6 +94,17 @@ pub fn BufferAttribute::copy_to_vector4(
 }
 
 ///|
+/// 写入 `target` 的 r、g、b。通道按属性里的数原样拷贝。`math` 不依赖 `core`，所以这个函数放在属性上。
+/// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L923
+pub fn BufferAttribute::copy_to_color(
+  self : BufferAttribute,
+  index : Int,
+  target : @math.Color,
+) -> @math.Color {
+  target.set(self.get_x(index), self.get_y(index), self.get_z(index))
+}
+
+///|
 /// 先清空 `target`，再纳入每个顶点的 xyz。`math` 不依赖 `core`，所以这个函数放在属性上。
 /// r186: `setFromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Box3.js#L86
 pub fn BufferAttribute::set_box3(
