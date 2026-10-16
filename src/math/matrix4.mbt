@@ -219,6 +219,18 @@ pub fn Matrix4::make_rotation_axis(
 }
 
 ///|
+/// 组成缩放矩阵。
+/// r186: `makeScale` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L972
+pub fn Matrix4::make_scale(
+  self : Matrix4,
+  x : Double,
+  y : Double,
+  z : Double,
+) -> Matrix4 {
+  self.set(x, 0.0, 0.0, 0.0, 0.0, y, 0.0, 0.0, 0.0, 0.0, z, 0.0, 0.0, 0.0, 0.0, 1.0)
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,
