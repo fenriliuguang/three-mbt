@@ -5472,6 +5472,23 @@ test "Matrix4.makeScale stores a scale" {
 }
 
 ///|
+test "Matrix4.makeShear stores six shear terms" {
+  let m = @math.Matrix4::new().make_translation(0.25, 0.5, 0.75)
+  ignore(m.make_shear(2.0, 3.0, 4.0, 5.0, 6.0, 7.0))
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[1], 2.0)
+  assert_eq(m.elements[2], 3.0)
+  assert_eq(m.elements[4], 4.0)
+  assert_eq(m.elements[5], 1.0)
+  assert_eq(m.elements[6], 5.0)
+  assert_eq(m.elements[8], 6.0)
+  assert_eq(m.elements[9], 7.0)
+  assert_eq(m.elements[10], 1.0)
+  assert_eq(m.elements[12], 0.0)
+  assert_eq(m.elements[15], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

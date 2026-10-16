@@ -231,6 +231,21 @@ pub fn Matrix4::make_scale(
 }
 
 ///|
+/// 组成剪切矩阵。
+/// r186: `makeShear` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L998
+pub fn Matrix4::make_shear(
+  self : Matrix4,
+  xy : Double,
+  xz : Double,
+  yx : Double,
+  yz : Double,
+  zx : Double,
+  zy : Double,
+) -> Matrix4 {
+  self.set(1.0, yx, zx, 0.0, xy, 1.0, zy, 0.0, xz, yz, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+}
+
+///|
 pub fn Matrix4::set_position(
   self : Matrix4,
   x : Double,

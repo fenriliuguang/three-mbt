@@ -929,6 +929,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Matrix4.makeScale` has landed. It stores a scale. Scaling by `(2, 3, 4)` replaces a translation of `(0.25, 0.5, 0.75)`: elements `0`, `5`, `10`, and `15` are `2`, `3`, `4`, and `1`, and element `12` is `0`.
 
+`Matrix4.makeShear` has landed. It stores six shear terms. Shearing by `xy = 2`, `xz = 3`, `yx = 4`, `yz = 5`, `zx = 6`, and `zy = 7` replaces a translation of `(0.25, 0.5, 0.75)` and writes `[1, 2, 3, 0, 4, 1, 5, 0, 6, 7, 1, 0, 0, 0, 0, 1]`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1334,6 +1336,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Matrix4.makeRotationZ` | `math` |
 | planned | 7 | `Matrix4.makeRotationAxis` | `math` |
 | planned | 7 | `Matrix4.makeScale` | `math` |
+| planned | 7 | `Matrix4.makeShear` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

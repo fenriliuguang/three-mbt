@@ -259,6 +259,7 @@ pub fn Matrix4::make_rotation_x(Self, Double) -> Self
 pub fn Matrix4::make_rotation_y(Self, Double) -> Self
 pub fn Matrix4::make_rotation_z(Self, Double) -> Self
 pub fn Matrix4::make_scale(Self, Double, Double, Double) -> Self
+pub fn Matrix4::make_shear(Self, Double, Double, Double, Double, Double, Double) -> Self
 pub fn Matrix4::make_translation(Self, Double, Double, Double) -> Self
 pub fn Matrix4::multiply(Self, Self) -> Self
 pub fn Matrix4::multiply_matrices(Self, Self, Self) -> Self
