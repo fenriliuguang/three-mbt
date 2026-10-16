@@ -951,6 +951,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion.angleTo` has landed. It returns the angle in radians between two quaternions. The identity against itself is `0`, and against `(0, 0, 0, -1)` is also `0`. Both quaternions stay unchanged.
 
+`Quaternion.rotateTowards` has landed. It rotates toward another quaternion by an angular step and does not pass the target. The identity rotated toward `(0, 0, 0, -1)` by `1` stays `(0, 0, 0, 1)`. The change callback does not run. The target stays unchanged.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1367,6 +1369,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Quaternion` `w` setter | `math` |
 | planned | 7 | `Quaternion.setFromUnitVectors` | `math` |
 | planned | 7 | `Quaternion.angleTo` | `math` |
+| planned | 7 | `Quaternion.rotateTowards` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

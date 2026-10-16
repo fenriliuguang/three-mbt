@@ -345,6 +345,22 @@ pub fn Quaternion::angle_to(self : Quaternion, q : Quaternion) -> Double {
 }
 
 ///|
+/// 按给定角步长转向另一个四元数，不超过目标。
+/// r186: `rotateTowards` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L526
+pub fn Quaternion::rotate_towards(
+  self : Quaternion,
+  q : Quaternion,
+  step : Double,
+) -> Quaternion {
+  let angle = self.angle_to(q)
+  if angle == 0.0 {
+    return self
+  }
+  let t = 1.0.min(step / angle)
+  self.slerp(q, t)
+}
+
+///|
 pub fn Quaternion::conjugate(self : Quaternion) -> Quaternion {
   self.x = -self.x
   self.y = -self.y

@@ -5653,6 +5653,21 @@ test "Quaternion.angleTo is zero for a quaternion and its negative" {
 }
 
 ///|
+test "Quaternion.rotateTowards stops when the angle is zero" {
+  let q = @math.Quaternion::new()
+  let flipped = @math.Quaternion::new(w=-1.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  ignore(q.rotate_towards(flipped, 1.0))
+  assert_eq(q.x, 0.0)
+  assert_eq(q.y, 0.0)
+  assert_eq(q.z, 0.0)
+  assert_eq(q.w, 1.0)
+  assert_eq(hits[0], 0)
+  assert_eq(flipped.w, -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

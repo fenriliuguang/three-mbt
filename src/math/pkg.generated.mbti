@@ -323,6 +323,7 @@ pub fn Quaternion::multiply_quaternions_flat(Array[Double], Int, Array[Double], 
 pub fn Quaternion::new(x? : Double, y? : Double, z? : Double, w? : Double) -> Self
 pub fn Quaternion::normalize(Self) -> Self
 pub fn Quaternion::premultiply(Self, Self) -> Self
+pub fn Quaternion::rotate_towards(Self, Self, Double) -> Self
 pub fn Quaternion::set(Self, Double, Double, Double, Double) -> Self
 pub fn Quaternion::set_from_axis_angle(Self, Vector3, Double) -> Self
 pub fn Quaternion::set_from_euler(Self, Euler, update? : Bool) -> Self
