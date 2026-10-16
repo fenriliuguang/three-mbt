@@ -6243,6 +6243,38 @@ test "SphericalHarmonics3.clone copies nine coefficients" {
 }
 
 ///|
+test "SphericalHarmonics3.fromArray reads nine coefficients" {
+  let sh = @math.SphericalHarmonics3::new()
+  let values = []
+  for _ in 0..<27 {
+    values.push(0.0)
+  }
+  values[0] = 1.0
+  values[1] = 2.0
+  values[2] = 3.0
+  values[24] = 4.0
+  values[25] = 5.0
+  values[26] = 6.0
+  ignore(sh.from_array(values))
+  assert_eq(sh.coefficients[0].x, 1.0)
+  assert_eq(sh.coefficients[0].y, 2.0)
+  assert_eq(sh.coefficients[0].z, 3.0)
+  assert_eq(sh.coefficients[4].x, 0.0)
+  assert_eq(sh.coefficients[8].x, 4.0)
+  assert_eq(sh.coefficients[8].y, 5.0)
+  assert_eq(sh.coefficients[8].z, 6.0)
+  let shifted = [9.0]
+  for i in 0..<27 {
+    shifted.push(values[i])
+  }
+  ignore(sh.zero())
+  ignore(sh.from_array(shifted, offset=1))
+  assert_eq(sh.coefficients[0].x, 1.0)
+  assert_eq(sh.coefficients[8].z, 6.0)
+  assert_eq(values[0], 1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

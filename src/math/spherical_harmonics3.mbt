@@ -186,3 +186,17 @@ pub fn SphericalHarmonics3::copy(
 pub fn SphericalHarmonics3::clone(self : SphericalHarmonics3) -> SphericalHarmonics3 {
   SphericalHarmonics3::new().copy(self)
 }
+
+///|
+/// 从扁平数组读入九个系数，每个系数三个数。
+/// r186: `fromArray` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L274
+pub fn SphericalHarmonics3::from_array(
+  self : SphericalHarmonics3,
+  array : Array[Double],
+  offset? : Int = 0,
+) -> SphericalHarmonics3 {
+  for i in 0..<9 {
+    ignore(self.coefficients[i].from_array(array, offset=offset + i * 3))
+  }
+  self
+}
