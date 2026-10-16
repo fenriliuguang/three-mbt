@@ -2417,6 +2417,21 @@ test "clone de-interleaves an attribute" {
 }
 
 ///|
+test "toJSON de-interleaves an attribute" {
+  let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1, normalized=true)
+  let data = attribute.to_json()
+  assert_eq(data.item_size, 2)
+  assert_eq(data.normalized, true)
+  assert_eq(data.array[0], 2.0)
+  assert_eq(data.array[1], 3.0)
+  assert_eq(data.array[2], 5.0)
+  assert_eq(data.array[3], 6.0)
+  data.array[0] = 8.0
+  assert_eq(buffer.array[1], 2.0)
+}
+
+///|
 test "setX writes an interleaved component" {
   let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)

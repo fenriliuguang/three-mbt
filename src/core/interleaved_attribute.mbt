@@ -288,3 +288,12 @@ pub fn InterleavedBufferAttribute::clone(
   }
   BufferAttribute::new(array, self.item_size, normalized=self.normalized)
 }
+
+///|
+/// 把交错属性拆开后按普通属性序列化。数值是一份副本。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L489
+pub fn InterleavedBufferAttribute::to_json(
+  self : InterleavedBufferAttribute,
+) -> AttributeJson {
+  self.clone().to_json()
+}
