@@ -474,6 +474,11 @@ pub fn Quaternion::slerp_quaternions(Self, Self, Self, Double) -> Self
 pub fn Quaternion::to_array(Self, array? : Array[Double], offset? : Int) -> Array[Double]
 pub fn Quaternion::to_json(Self) -> Array[Double]
 
+pub(all) struct QuaternionLinearInterpolant {
+  interpolant : Interpolant
+}
+pub fn QuaternionLinearInterpolant::new(Array[Double], Array[Double], Int, result_buffer? : Array[Double]) -> Self
+
 pub(all) struct Ray {
   origin : Vector3
   direction : Vector3
