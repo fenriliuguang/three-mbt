@@ -61,3 +61,15 @@ pub fn InterleavedBufferAttribute::get_x(
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset]
 }
+
+///|
+/// 写入指定顶点的 x。下标是 `index * stride + offset`。归一化换算还没有落地，写入的是原值。
+/// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L219
+pub fn InterleavedBufferAttribute::set_x(
+  self : InterleavedBufferAttribute,
+  index : Int,
+  x : Double,
+) -> InterleavedBufferAttribute {
+  self.data.array[index * self.data.stride + self.offset] = x
+  self
+}

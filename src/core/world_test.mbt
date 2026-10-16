@@ -2268,3 +2268,14 @@ test "getX reads an interleaved component" {
   let shifted = @core.InterleavedBufferAttribute::new(buffer, 1, 1)
   assert_eq(shifted.get_x(0), 2.0)
 }
+
+///|
+test "setX writes an interleaved component" {
+  let buffer = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
+  let written = attribute.set_x(1, 4.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(buffer.array[3], 4.0)
+  assert_eq(buffer.array[4], 9.0)
+  assert_eq(buffer.array[2], 0.0)
+}
