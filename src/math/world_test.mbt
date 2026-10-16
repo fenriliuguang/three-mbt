@@ -5690,6 +5690,16 @@ test "Quaternion.slerpQuaternions keeps an identical pair" {
 }
 
 ///|
+test "Quaternion.random stores a unit quaternion" {
+  let q = @math.Quaternion::new(x=1.0, w=0.0)
+  let hits = [0]
+  q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
+  ignore(q.random())
+  assert_close(q.length_sq(), 1.0)
+  assert_eq(hits[0], 1)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

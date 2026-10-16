@@ -493,3 +493,21 @@ pub fn Quaternion::slerp_quaternions(
 ) -> Quaternion {
   self.copy(qa).slerp(qb, t)
 }
+
+///|
+/// 写成一个均匀分布的单位四元数。
+/// r186: `random` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L782
+pub fn Quaternion::random(self : Quaternion) -> Quaternion {
+  let rng = @random.Rand::Rand()
+  let theta1 = 2.0 * @std.PI * rng.double()
+  let theta2 = 2.0 * @std.PI * rng.double()
+  let x0 = rng.double()
+  let r1 = (1.0 - x0).sqrt()
+  let r2 = x0.sqrt()
+  self.set(
+    r1 * @std.sin(theta1),
+    r1 * @std.cos(theta1),
+    r2 * @std.sin(theta2),
+    r2 * @std.cos(theta2),
+  )
+}

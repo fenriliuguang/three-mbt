@@ -957,6 +957,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Quaternion.slerpQuaternions` has landed. It copies the first quaternion and interpolates toward the second. `(0, 1, 0, 0)` toward itself with factor `0.25` stays `(0, 1, 0, 0)`. Later changes to either source leave the result alone.
 
+`Quaternion.random` has landed. It stores a uniformly random unit quaternion. The squared length is `1`. The change callback runs once.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1376,6 +1378,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Quaternion.rotateTowards` | `math` |
 | planned | 7 | `Quaternion.lengthSq` | `math` |
 | planned | 7 | `Quaternion.slerpQuaternions` | `math` |
+| planned | 7 | `Quaternion.random` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
