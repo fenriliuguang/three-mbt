@@ -228,6 +228,13 @@ pub fn Frustum::new() -> Self
 pub fn Frustum::set(Self, Plane, Plane, Plane, Plane, Plane, Plane) -> Self
 pub fn Frustum::set_from_projection_matrix(Self, Matrix4, coordinate_system? : @constants.CoordinateSystem, reversed_depth? : Bool) -> Self
 
+pub(all) struct FrustumArray {
+  mut coordinate_system : @constants.CoordinateSystem
+  frustums : Array[Frustum]
+  mut count : Int
+}
+pub fn FrustumArray::new() -> Self
+
 pub(all) struct Line3 {
   start : Vector3
   end : Vector3

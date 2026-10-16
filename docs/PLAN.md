@@ -1039,6 +1039,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `SphericalHarmonics3.getBasisAt` has landed. It writes nine basis weights for a unit normal and leaves the normal unchanged. An empty array grows to length `9`. Along `(0, 1, 0)`, the first weight is `0.282095`, the second is `0.488603`, the seventh is `-0.315392`, and the ninth is `-0.546274`.
 
+`FrustumArray` has landed. `new` stores no frustums and a count of `0`. The coordinate system starts as WebGL.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1499,6 +1501,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SphericalHarmonics3.fromArray` | `math` |
 | planned | 7 | `SphericalHarmonics3.toArray` | `math` |
 | planned | 7 | `SphericalHarmonics3.getBasisAt` | `math` |
+| planned | 7 | `FrustumArray` | `math` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

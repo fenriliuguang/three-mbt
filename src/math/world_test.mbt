@@ -6323,6 +6323,17 @@ test "SphericalHarmonics3.getBasisAt writes nine basis weights" {
 }
 
 ///|
+test "FrustumArray.new starts empty in WebGL coordinates" {
+  let frustums = @math.FrustumArray::new()
+  assert_eq(frustums.count, 0)
+  assert_eq(frustums.frustums.length(), 0)
+  match frustums.coordinate_system {
+    @constants.WebGL => assert_eq(true, true)
+    @constants.WebGPU => assert_eq(true, false)
+  }
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()
