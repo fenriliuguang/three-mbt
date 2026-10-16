@@ -5304,6 +5304,20 @@ test "Matrix3.toArray writes nine column-major elements" {
 }
 
 ///|
+test "Matrix4.copyPosition copies only the translation" {
+  let source = @math.Matrix4::new().make_translation(0.25, 0.5, 0.75)
+  let m = @math.Matrix4::new()
+  ignore(m.copy_position(source))
+  assert_eq(m.elements[12], 0.25)
+  assert_eq(m.elements[13], 0.5)
+  assert_eq(m.elements[14], 0.75)
+  assert_eq(m.elements[0], 1.0)
+  assert_eq(m.elements[15], 1.0)
+  source.elements[12] = 0.0
+  assert_eq(m.elements[12], 0.25)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

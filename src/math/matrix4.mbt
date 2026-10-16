@@ -85,6 +85,18 @@ pub fn Matrix4::clone(self : Matrix4) -> Matrix4 {
 }
 
 ///|
+/// 只复制平移分量。
+/// r186: `copyPosition` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix4.js#L196
+pub fn Matrix4::copy_position(self : Matrix4, m : Matrix4) -> Matrix4 {
+  let te = self.elements
+  let me = m.elements
+  te[12] = me[12]
+  te[13] = me[13]
+  te[14] = me[14]
+  self
+}
+
+///|
 pub fn Matrix4::make_translation(
   self : Matrix4,
   x : Double,

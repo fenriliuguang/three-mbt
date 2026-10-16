@@ -238,6 +238,7 @@ pub(all) struct Matrix4 {
 pub fn Matrix4::clone(Self) -> Self
 pub fn Matrix4::compose(Self, Vector3, Quaternion, Vector3) -> Self
 pub fn Matrix4::copy(Self, Self) -> Self
+pub fn Matrix4::copy_position(Self, Self) -> Self
 pub fn Matrix4::decompose(Self, Vector3, Quaternion, Vector3) -> Self
 pub fn Matrix4::determinant(Self) -> Double
 pub fn Matrix4::determinant_affine(Self) -> Double
