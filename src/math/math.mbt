@@ -228,3 +228,31 @@ pub fn set_quaternion_from_proper_euler(
     ZYZ => ignore(q.set(s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13))
   }
 }
+
+///|
+/// 数值分量的存储类型。上游用类型化数组的构造函数区分，这里没有类型化数组。
+pub(all) enum ArrayComponentType {
+  Float32
+  Uint32
+  Uint16
+  Uint8
+  Uint8Clamped
+  Int32
+  Int16
+  Int8
+}
+
+///|
+/// 按分量类型把整数范围展开到 `[0, 1]` 或 `[-1, 1]`。
+/// r186: `denormalize` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L388
+pub fn denormalize(value : Double, component : ArrayComponentType) -> Double {
+  match component {
+    Float32 => value
+    Uint32 => value / 4294967295.0
+    Uint16 => value / 65535.0
+    Uint8 | Uint8Clamped => value / 255.0
+    Int32 => (value / 2147483647.0).max(-1.0)
+    Int16 => (value / 32767.0).max(-1.0)
+    Int8 => (value / 127.0).max(-1.0)
+  }
+}

@@ -5930,6 +5930,20 @@ test "MathUtils.setQuaternionFromProperEuler writes a proper Euler rotation" {
 }
 
 ///|
+test "MathUtils.denormalize expands an integer range" {
+  assert_eq(@math.denormalize(0.25, @math.ArrayComponentType::Float32), 0.25)
+  assert_eq(@math.denormalize(0.0, @math.ArrayComponentType::Uint8), 0.0)
+  assert_eq(@math.denormalize(255.0, @math.ArrayComponentType::Uint8), 1.0)
+  assert_eq(@math.denormalize(255.0, @math.ArrayComponentType::Uint8Clamped), 1.0)
+  assert_eq(@math.denormalize(65535.0, @math.ArrayComponentType::Uint16), 1.0)
+  assert_eq(@math.denormalize(4294967295.0, @math.ArrayComponentType::Uint32), 1.0)
+  assert_eq(@math.denormalize(-127.0, @math.ArrayComponentType::Int8), -1.0)
+  assert_eq(@math.denormalize(-128.0, @math.ArrayComponentType::Int8), -1.0)
+  assert_eq(@math.denormalize(-32768.0, @math.ArrayComponentType::Int16), -1.0)
+  assert_eq(@math.denormalize(-2147483648.0, @math.ArrayComponentType::Int32), -1.0)
+}
+
+///|
 test "Vector4.toArray writes four components at an offset" {
   let v = @math.Vector4::new(x=1.0, y=2.0, z=3.0, w=4.0)
   let fresh = v.to_array()

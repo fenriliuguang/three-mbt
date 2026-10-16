@@ -14,6 +14,8 @@ pub fn damp(Double, Double, Double, Double) -> Double
 
 pub fn deg_to_rad(Double) -> Double
 
+pub fn denormalize(Double, ArrayComponentType) -> Double
+
 pub fn euclidean_modulo(Double, Double) -> Double
 
 pub fn floor_power_of_two(Double) -> Double
@@ -51,6 +53,17 @@ pub fn srgb_to_linear(Double) -> Double
 // Errors
 
 // Types and methods
+pub(all) enum ArrayComponentType {
+  Float32
+  Uint32
+  Uint16
+  Uint8
+  Uint8Clamped
+  Int32
+  Int16
+  Int8
+}
+
 pub(all) struct Box2 {
   min : Vector2
   max : Vector2
