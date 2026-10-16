@@ -1314,6 +1314,17 @@ test "getW reads the fourth channel" {
 }
 
 ///|
+test "setW writes the w channel" {
+  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0], 4)
+  let written = attribute.set_w(0, 9.0)
+  assert_eq(physical_equal(written, attribute), true)
+  assert_eq(attribute.get_x(0), 1.0)
+  assert_eq(attribute.get_y(0), 2.0)
+  assert_eq(attribute.get_z(0), 3.0)
+  assert_eq(attribute.get_w(0), 9.0)
+}
+
+///|
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(

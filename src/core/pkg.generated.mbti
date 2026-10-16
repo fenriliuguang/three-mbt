@@ -49,6 +49,7 @@ pub fn BufferAttribute::set(Self, Array[Double], offset? : Int) -> Self
 pub fn BufferAttribute::set_box3(Self, @math.Box3) -> @math.Box3
 pub fn BufferAttribute::set_component(Self, Int, Int, Double) -> Self
 pub fn BufferAttribute::set_triangle(Self, @math.Triangle, Int, Int, Int) -> @math.Triangle
+pub fn BufferAttribute::set_w(Self, Int, Double) -> Self
 pub fn BufferAttribute::set_x(Self, Int, Double) -> Self
 pub fn BufferAttribute::set_xyz(Self, Int, Double, Double, Double) -> Unit
 pub fn BufferAttribute::set_xyzw(Self, Int, Double, Double, Double, Double) -> Self
