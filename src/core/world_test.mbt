@@ -1484,3 +1484,39 @@ test "copy replaces a geometry with independent data" {
     Some(position) => assert_eq(position.get_x(0), 1.0)
   }
 }
+
+///|
+test "clone copies tangent, groups, and draw range" {
+  let source = @core.BufferGeometry::new()
+  ignore(
+    source.set_attribute(
+      "tangent",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 1.0], 4),
+    ),
+  )
+  ignore(source.set_index_array([0]))
+  source.add_group(0, 3, material_index=1)
+  source.set_draw_range(2.0, 4.0)
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  match cloned.get_attribute("tangent") {
+    None => assert_eq(false, true)
+    Some(tangent) => {
+      assert_eq(tangent.get_x(0), 1.0)
+      assert_eq(tangent.get_w(0), 1.0)
+      tangent.array[0] = 8.0
+    }
+  }
+  match source.get_attribute("tangent") {
+    None => assert_eq(false, true)
+    Some(tangent) => assert_eq(tangent.get_x(0), 1.0)
+  }
+  assert_eq(cloned.groups.length(), 1)
+  assert_eq(cloned.groups[0].material_index, 1)
+  assert_eq(cloned.draw_range.start, 2.0)
+  assert_eq(cloned.draw_range.count, 4.0)
+  match cloned.index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index.get_x(0), 0.0)
+  }
+}

@@ -761,51 +761,10 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
 }
 
 ///|
-/// 复制属性、索引和包围体。`version` 从 0 开始，供渲染器把这份几何当成新缓冲。
+/// 新建一份几何体并复制属性、索引、分组、包围体和绘制范围。`version` 从 0 开始。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1345
 pub fn BufferGeometry::clone(self : BufferGeometry) -> BufferGeometry {
-  let geometry = BufferGeometry::new()
-  copy_attribute(self, geometry, "position")
-  copy_attribute(self, geometry, "normal")
-  copy_attribute(self, geometry, "uv")
-  copy_attribute(self, geometry, "color")
-  match self.index {
-    None => ()
-    Some(index) =>
-      ignore(
-        geometry.set_index(
-          BufferAttribute::new(
-            index.array.copy(),
-            index.item_size,
-            normalized=index.normalized,
-          ),
-        ),
-      )
-  }
-  geometry.bounding_box = self.bounding_box
-  geometry.bounding_sphere = self.bounding_sphere
-  geometry
-}
-
-///|
-fn copy_attribute(
-  source : BufferGeometry,
-  geometry : BufferGeometry,
-  name : String,
-) -> Unit {
-  match source.get_attribute(name) {
-    None => ()
-    Some(attribute) =>
-      ignore(
-        geometry.set_attribute(
-          name,
-          BufferAttribute::new(
-            attribute.array.copy(),
-            attribute.item_size,
-            normalized=attribute.normalized,
-          ),
-        ),
-      )
-  }
+  BufferGeometry::new().copy(self)
 }
 
 ///|
