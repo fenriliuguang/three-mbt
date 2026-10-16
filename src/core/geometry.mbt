@@ -195,7 +195,7 @@ pub fn BufferGeometry::set_draw_range(
 }
 
 ///|
-/// 用矩阵变换 `position`，用法线矩阵变换 `normal`，用方向变换 `tangent`。包围体已有时重算。
+/// 用矩阵变换 `position`，用法线矩阵变换 `normal`，用方向变换 `tangent`。这三项的 `version` 加一。包围体已有时重算。
 /// r186: `applyMatrix4` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L376
 pub fn BufferGeometry::apply_matrix4(
   self : BufferGeometry,
@@ -203,18 +203,25 @@ pub fn BufferGeometry::apply_matrix4(
 ) -> BufferGeometry {
   match self.get_attribute("position") {
     None => ()
-    Some(position) => ignore(position.apply_matrix4(matrix))
+    Some(position) => {
+      ignore(position.apply_matrix4(matrix))
+      position.set_needs_update(true)
+    }
   }
   match self.get_attribute("normal") {
     None => ()
     Some(normal) => {
       let normal_matrix = @math.Matrix3::new().get_normal_matrix(matrix)
       ignore(normal.apply_normal_matrix(normal_matrix))
+      normal.set_needs_update(true)
     }
   }
   match self.get_attribute("tangent") {
     None => ()
-    Some(tangent) => ignore(tangent.transform_direction(matrix))
+    Some(tangent) => {
+      ignore(tangent.transform_direction(matrix))
+      tangent.set_needs_update(true)
+    }
   }
   if self.bounding_box is Some(_) {
     self.compute_bounding_box()

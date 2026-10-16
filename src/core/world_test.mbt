@@ -1816,3 +1816,22 @@ test "toJSON writes uuid, name, type, and userData" {
       }
   }
 }
+
+///|
+test "applyMatrix4 marks position, normal, and tangent for update" {
+  let geometry = @core.BufferGeometry::new()
+  let position = @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)
+  let normal = @core.BufferAttribute::new([0.0, 1.0, 0.0], 3)
+  let tangent = @core.BufferAttribute::new([1.0, 0.0, 0.0, 1.0], 4)
+  let uv = @core.BufferAttribute::new([0.0, 0.0], 2)
+  ignore(geometry.set_attribute("position", position))
+  ignore(geometry.set_attribute("normal", normal))
+  ignore(geometry.set_attribute("tangent", tangent))
+  ignore(geometry.set_attribute("uv", uv))
+  assert_eq(position.version, 0)
+  ignore(geometry.apply_matrix4(@math.Matrix4::new()))
+  assert_eq(position.version, 1)
+  assert_eq(normal.version, 1)
+  assert_eq(tangent.version, 1)
+  assert_eq(uv.version, 0)
+}
