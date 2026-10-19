@@ -14,6 +14,33 @@ test "wrapping and filters keep r186 numbers" {
 }
 
 ///|
+test "DataTexture stores rgba floats without flipping" {
+  let data = [1.0, 0.0, 0.0, 1.0]
+  let map = @textures.DataTexture::new(data)
+  assert_eq(map.width, 1)
+  assert_eq(map.height, 1)
+  assert_eq(map.data.length(), 4)
+  assert_eq(map.needs_update, false)
+  assert_eq(map.flip_y, false)
+  assert_eq(map.generate_mipmaps, false)
+  assert_eq(map.unpack_alignment, 1)
+  assert_eq(map.wrap_s is @constants.ClampToEdge, true)
+  assert_eq(map.wrap_t is @constants.ClampToEdge, true)
+  assert_eq(map.mag_filter is @constants.Nearest, true)
+  assert_eq(map.min_filter is @constants.Nearest, true)
+  assert_eq(map.data[0], 1.0)
+  data[0] = 0.25
+  assert_eq(map.data[0], 0.25)
+  map.dispose()
+  assert_eq(map.data[0], 0.25)
+}
+
+///|
+test "panic DataTexture aborts when the float count does not match" {
+  ignore(@textures.DataTexture::new([1.0, 2.0, 3.0]))
+}
+
+///|
 test "checker is rgba8 and flip_y reverses rows" {
   let map = @textures.Texture::checker(
     width=2,

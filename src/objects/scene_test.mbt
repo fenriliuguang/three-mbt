@@ -1722,14 +1722,62 @@ test "Skeleton.computeBoneTexture grows the matrix buffer" {
   assert_eq(arm.bone_matrices[13], 3.0)
   assert_eq(arm.bone_matrices[48], 0.0)
   assert_eq(arm.bone_matrices[63], 0.0)
+  match arm.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => {
+      assert_eq(texture.width, 4)
+      assert_eq(texture.height, 4)
+      assert_eq(texture.data.length(), 64)
+      assert_eq(texture.data[13], 3.0)
+      assert_eq(texture.data[63], 0.0)
+      assert_eq(texture.needs_update, true)
+      assert_eq(texture.flip_y, false)
+      assert_eq(texture.generate_mipmaps, false)
+      assert_eq(texture.unpack_alignment, 1)
+      assert_eq(texture.mag_filter is @constants.Nearest, true)
+      assert_eq(texture.min_filter is @constants.Nearest, true)
+      arm.bone_matrices[13] = 9.0
+      assert_eq(texture.data[13], 9.0)
+      arm.bone_matrices[13] = 3.0
+      texture.needs_update = false
+    }
+  }
+  arm.update()
+  match arm.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => {
+      assert_eq(texture.needs_update, true)
+      assert_eq(texture.data[13], 3.0)
+    }
+  }
+  let cloned = arm.clone()
+  assert_eq(cloned.bone_texture is None, true)
   ignore(arm.compute_bone_texture())
   assert_eq(arm.bone_matrices.length(), 64)
   assert_eq(arm.bone_matrices[13], 3.0)
+  match arm.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => {
+      assert_eq(texture.needs_update, true)
+      arm.bone_matrices[13] = 9.0
+      assert_eq(texture.data[13], 9.0)
+      arm.bone_matrices[13] = 3.0
+    }
+  }
   let empty = @objects.Skeleton::new()
   ignore(empty.compute_bone_texture())
   assert_eq(empty.bone_matrices.length(), 64)
   assert_eq(empty.bone_matrices[0], 0.0)
   assert_eq(empty.bone_matrices[63], 0.0)
+  match empty.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => {
+      assert_eq(texture.width, 4)
+      assert_eq(texture.height, 4)
+      assert_eq(texture.data[0], 0.0)
+      assert_eq(texture.data[63], 0.0)
+    }
+  }
   let bones = []
   let mut index = 0
   while index < 17 {
@@ -1745,6 +1793,15 @@ test "Skeleton.computeBoneTexture grows the matrix buffer" {
   assert_eq(wide.bone_matrices[271], 0.0)
   assert_eq(wide.bone_matrices[272], 0.0)
   assert_eq(wide.bone_matrices[575], 0.0)
+  match wide.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => {
+      assert_eq(texture.width, 12)
+      assert_eq(texture.height, 12)
+      assert_eq(texture.data.length(), 576)
+      assert_eq(texture.data[0], 4.0)
+    }
+  }
 }
 
 ///|
@@ -1761,7 +1818,12 @@ test "Skeleton.dispose leaves the matrix buffer in place" {
   ignore(arm.compute_bone_texture())
   assert_eq(arm.bone_matrices.length(), 64)
   assert_eq(arm.bone_matrices[13], 3.0)
+  match arm.bone_texture {
+    None => assert_eq(false, true)
+    Some(texture) => assert_eq(texture.data[13], 3.0)
+  }
   arm.dispose()
+  assert_eq(arm.bone_texture is None, true)
   assert_eq(arm.bone_matrices.length(), 64)
   assert_eq(arm.bone_matrices[13], 3.0)
   assert_eq(arm.bone_matrices[63], 0.0)

@@ -190,6 +190,7 @@ pub(all) struct Skeleton {
   bones : Array[Bone]
   mut bone_inverses : Array[@math.Matrix4]
   mut bone_matrices : Array[Double]
+  mut bone_texture : @textures.DataTexture?
 }
 pub fn Skeleton::calculate_inverses(Self) -> Unit
 pub fn Skeleton::clone(Self) -> Self

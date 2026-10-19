@@ -1559,6 +1559,8 @@ Point and line material arrays have landed. Four points with groups `(0, 2)` and
 
 Point and line raycast material indices have landed. Points at `x=0` and `x=2` with groups `(0, 1)` and `(1, 1)` miss while the group list is empty. A ray from `(0, 0.25, 0)` then hits `(0, 0, 0)` at material `0`, and a ray from `(2, 0.25, 0)` hits `(2, 0, 0)` at material `1`. `setDrawRange(1, 1)` keeps only the second hit. A line from `(0, 0, 0)` to `(1, 0, 0)` and `(2, 0, 0)` to `(3, 0, 0)` hits `(0.5, 0, 0)` at material `0` and `(2.5, 0, 0)` at material `1`. Line segments report the same second material. An out-of-range material index aborts. A point or line without a material array leaves `material_index` empty.
 
+`DataTexture` has landed for the float RGBA layout `Skeleton.computeBoneTexture` uses. A one-texel texture stores `[1, 0, 0, 1]`. Filters are nearest, `flipY` is false, mipmaps stay off, and `unpackAlignment` is `1`. `needsUpdate` starts false. Writing `0.25` into the source array changes the texture, and `dispose` leaves that `0.25` in place. Three bones whose update stored `3` at float `13` grow to a `4×4` texture. Float `13` is `3` in both the matrix buffer and the texture, and `needsUpdate` is true. Setting it false and calling `update` turns it true again, and float `13` stays `3`. A clone has no texture. Calling `computeBoneTexture` again keeps length `64` and shares the new buffer, so writing `9` into float `13` shows up in the texture. Dispose drops the texture and leaves float `13` at `3`. An empty skeleton grows a `4×4` texture of zeros. Seventeen bones grow a `12×12` texture, and a `4` written at the first float stays there. A float count that is not `width * height * 4` aborts. The instanced morph texture object stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2279,6 +2281,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | point and line draw ranges | `renderer` |
 | planned | 7 | point and line material arrays | `objects`, `renderer` |
 | planned | 7 | point and line raycast material indices | `core` |
+| planned | 7 | `DataTexture` for skeleton bone matrices | `textures`, `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

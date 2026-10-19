@@ -1,4 +1,4 @@
-// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32 ; `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15
+// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32 ; `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15 ; `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14
 
 ///|
 /// `rgba8` 纹理。字节按行优先，第 0 行是图像顶部。没有 DOM 图片路径。
@@ -160,4 +160,59 @@ pub fn RenderTarget::set_size(
   self.texture.width = next_width
   self.texture.height = next_height
   self.texture.version = self.texture.version + 1
+}
+
+///|
+/// 直接用浮点缓冲建的纹理。这一份只存 `RGBA` 浮点，四个数一个纹素。
+/// 过滤默认最近邻，`flipY` 关闭，不生成 mipmap，行对齐是 `1`。
+/// `needsUpdate` 跟 `Texture` 一样从 false 开始，调用方需要上传时自己打开。
+/// r186: `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14
+/// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
+/// r186: `generateMipmaps` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L60
+/// r186: `flipY` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L71
+/// r186: `unpackAlignment` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L81
+pub(all) struct DataTexture {
+  mut width : Int
+  mut height : Int
+  data : Array[Double]
+  mut needs_update : Bool
+  mut flip_y : Bool
+  mut generate_mipmaps : Bool
+  mut unpack_alignment : Int
+  mut wrap_s : @constants.Wrapping
+  mut wrap_t : @constants.Wrapping
+  mut mag_filter : @constants.TextureFilter
+  mut min_filter : @constants.TextureFilter
+}
+
+///|
+/// 浮点个数必须是 `width * height * 4`。宽或高小于 1 同样失败。
+/// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
+pub fn DataTexture::new(
+  data : Array[Double],
+  width? : Int = 1,
+  height? : Int = 1,
+) -> DataTexture {
+  if width < 1 || height < 1 || data.length() != width * height * 4 {
+    abort("DataTexture size does not match its floats")
+  }
+  {
+    width,
+    height,
+    data,
+    needs_update: false,
+    flip_y: false,
+    generate_mipmaps: false,
+    unpack_alignment: 1,
+    wrap_s: @constants.ClampToEdge,
+    wrap_t: @constants.ClampToEdge,
+    mag_filter: @constants.Nearest,
+    min_filter: @constants.Nearest,
+  }
+}
+
+///|
+/// 释放 GPU 资源。这里没有贴图事件，调用本身不改浮点。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L647
+pub fn DataTexture::dispose(_self : DataTexture) -> Unit {
 }

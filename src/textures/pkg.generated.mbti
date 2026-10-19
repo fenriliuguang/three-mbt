@@ -10,6 +10,22 @@ import {
 // Errors
 
 // Types and methods
+pub(all) struct DataTexture {
+  mut width : Int
+  mut height : Int
+  data : Array[Double]
+  mut needs_update : Bool
+  mut flip_y : Bool
+  mut generate_mipmaps : Bool
+  mut unpack_alignment : Int
+  mut wrap_s : @constants.Wrapping
+  mut wrap_t : @constants.Wrapping
+  mut mag_filter : @constants.TextureFilter
+  mut min_filter : @constants.TextureFilter
+}
+pub fn DataTexture::dispose(Self) -> Unit
+pub fn DataTexture::new(Array[Double], width? : Int, height? : Int) -> Self
+
 pub(all) struct RenderTarget {
   texture : Texture
 }

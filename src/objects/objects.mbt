@@ -100,13 +100,15 @@ pub fn Bone::clone(self : Bone, recursive? : Bool = true) -> Bone {
 
 ///|
 /// 由骨骼层级组成的骨架。构造时复制骨骼列表。逆绑定矩阵缺省时由当前 `matrixWorld` 求逆。
-/// 骨骼纹理留到后面。
+/// `bone_texture` 在 `compute_bone_texture` 之前为空。
 /// r186: `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37
+/// r186: `boneTexture` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L80
 pub(all) struct Skeleton {
   mut uuid : String
   bones : Array[Bone]
   mut bone_inverses : Array[@math.Matrix4]
   mut bone_matrices : Array[Double]
+  mut bone_texture : @textures.DataTexture?
 }
 
 ///|
@@ -127,6 +129,7 @@ pub fn Skeleton::new(
     bones,
     bone_inverses,
     bone_matrices: [],
+    bone_texture: None,
   }
   skeleton.init()
   skeleton
@@ -198,7 +201,7 @@ pub fn Skeleton::pose(self : Skeleton) -> Unit {
 
 ///|
 /// 把当前世界矩阵乘上逆绑定矩阵，按列主序写入骨骼矩阵缓冲。
-/// 骨骼纹理留到后面，所以这里不标记贴图更新。
+/// 已经有骨骼纹理时，把 `needs_update` 设为 true。
 /// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L199
 pub fn Skeleton::update(self : Skeleton) -> Unit {
   let offset = @math.Matrix4::new()
@@ -214,6 +217,10 @@ pub fn Skeleton::update(self : Skeleton) -> Unit {
       .to_array(array=self.bone_matrices, offset=index * 16),
     )
     index = index + 1
+  }
+  match self.bone_texture {
+    None => ()
+    Some(texture) => texture.needs_update = true
   }
 }
 
@@ -243,8 +250,10 @@ pub fn Skeleton::get_bone_by_name(self : Skeleton, name : String) -> Bone? {
 
 ///|
 /// 按骨骼数量把矩阵缓冲扩成贴图布局。边长至少是 4，并且是 4 的倍数。
-/// 已有的浮点按顺序拷进去，多出来的位置是 0。`DataTexture` 留到后面。
+/// 已有的浮点按顺序拷进去，多出来的位置是 0。
+/// 贴图是 `RGBA` 浮点 `DataTexture`，和矩阵缓冲共用这一份数组。`needs_update` 为 true。
 /// r186: `computeBoneTexture` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L243
+/// r186: `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14
 pub fn Skeleton::compute_bone_texture(self : Skeleton) -> Skeleton {
   let raw = (self.bones.length() * 4).to_double().sqrt()
   let mut size = (raw / 4.0).ceil().to_int() * 4
@@ -263,13 +272,21 @@ pub fn Skeleton::compute_bone_texture(self : Skeleton) -> Skeleton {
     index = index + 1
   }
   self.bone_matrices = matrices
+  let texture = @textures.DataTexture::new(matrices, width=size, height=size)
+  texture.needs_update = true
+  self.bone_texture = Some(texture)
   self
 }
 
 ///|
-/// 释放骨骼贴图。贴图对象还没有落地，所以矩阵缓冲和骨骼列表保持原样。
+/// 释放骨骼贴图并清空 `bone_texture`。矩阵缓冲和骨骼列表保持原样。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L298
-pub fn Skeleton::dispose(_self : Skeleton) -> Unit {
+pub fn Skeleton::dispose(self : Skeleton) -> Unit {
+  match self.bone_texture {
+    None => ()
+    Some(texture) => texture.dispose()
+  }
+  self.bone_texture = None
 }
 
 ///|
