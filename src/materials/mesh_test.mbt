@@ -1112,3 +1112,21 @@ test "Material displacementScale defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.displacement_scale, 1.0)
 }
+
+///|
+test "Material displacementBias defaults to zero and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.displacement_bias, 0.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.displacement_bias, 0.0)
+  lambert.displacement_bias = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.displacement_bias, 0.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.displacement_bias, 0.25)
+  destination.displacement_bias = -1.0
+  assert_eq(lambert.displacement_bias, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.displacement_bias, 0.0)
+}
