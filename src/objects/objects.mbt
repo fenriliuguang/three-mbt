@@ -698,6 +698,17 @@ pub fn SkinnedMesh::clone(
 }
 
 ///|
+/// 换成材质数组后，射线按几何分组使用各自的侧面，并写下 `material_index`。
+/// 顶点仍先做骨骼变换。直接改数组里的侧面不会更新节点，要再调用内层网格的 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
+pub fn SkinnedMesh::set_materials(
+  self : SkinnedMesh,
+  materials : Array[@materials.Material],
+) -> Unit {
+  self.mesh.set_materials(materials)
+}
+
+///|
 /// 用蒙皮后的包围球、包围盒和顶点做射线相交。没有包围球时先算。
 /// 包围盒在局部空间里挡掉射线时不写交点。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L178

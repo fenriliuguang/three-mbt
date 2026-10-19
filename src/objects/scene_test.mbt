@@ -2981,6 +2981,113 @@ test "panic InstancedMesh.raycast material index is out of range" {
 }
 
 ///|
+test "SkinnedMesh.raycast uses a material array" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  let back = @materials.Material::basic()
+  back.side = @constants.Back
+  let front = @materials.Material::basic()
+  let skin = @objects.SkinnedMesh::new(geometry, front)
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  skin.set_materials([back, front])
+  skin.mesh.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=5.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let hits = []
+  skin.raycast(raycaster, hits)
+  assert_eq(hits.length(), 0)
+  geometry.add_group(0, 3, material_index=1)
+  skin.raycast(raycaster, hits)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 5.25)
+  assert_eq(hits[0].point.z, 0.0)
+  match hits[0].face {
+    None => assert_eq(false, true)
+    Some(face) => assert_eq(face.material_index, 1)
+  }
+  let cloned = skin.clone()
+  match cloned.mesh.materials {
+    None => assert_eq(false, true)
+    Some(copied) => {
+      assert_eq(copied.length(), 2)
+      copied.push(@materials.Material::basic())
+      assert_eq(copied.length(), 3)
+    }
+  }
+  match skin.mesh.materials {
+    None => assert_eq(false, true)
+    Some(source) => assert_eq(source.length(), 2)
+  }
+}
+
+///|
+test "panic SkinnedMesh.raycast material index is out of range" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  geometry.add_group(0, 3, material_index=1)
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  skin.set_materials([@materials.Material::basic()])
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  ignore(skin.raycast(raycaster, []))
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

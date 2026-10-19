@@ -225,6 +225,7 @@ pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn SkinnedMesh::normalize_skin_weights(Self) -> Unit
 pub fn SkinnedMesh::pose(Self) -> Unit
 pub fn SkinnedMesh::raycast(Self, @core.Raycaster, Array[@core.Intersection]) -> Unit
+pub fn SkinnedMesh::set_materials(Self, Array[@materials.Material]) -> Unit
 pub fn SkinnedMesh::to_node(Self) -> @core.Object3D
 pub fn SkinnedMesh::update_matrix_world(Self, force? : Bool) -> Unit
 pub impl @core.AsNode for SkinnedMesh
