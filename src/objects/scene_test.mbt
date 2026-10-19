@@ -498,6 +498,87 @@ test "Line.copy shares geometry and material" {
 }
 
 ///|
+test "Line.copy leaves morph weights in place" {
+  let geometry = @core.BufferGeometry::new()
+  let wide = @core.BufferAttribute::new([2.0, 0.0, 0.0], 3)
+  wide.name = "wide"
+  let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
+  tall.name = "tall"
+  geometry.morph_attributes.set("position", [wide, tall])
+  let material = @materials.LineBasicMaterial::new()
+  let source = @objects.Line::new(geometry, material)
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => weights[0] = 0.5
+  }
+  let destination = @objects.Line::new(
+    @core.BufferGeometry::new(),
+    @materials.LineBasicMaterial::new(),
+  )
+  ignore(destination.copy(source))
+  assert_eq(destination.morph_target_influences is None, true)
+  assert_eq(destination.morph_target_dictionary is None, true)
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+  match source.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let same = @objects.Line::new(geometry, material)
+  ignore(same.copy(source))
+  match same.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights.length(), 2)
+      assert_eq(weights[0], 0.0)
+      assert_eq(weights[1], 0.0)
+      weights[0] = 1.0
+    }
+  }
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+  let kept = @objects.Line::new(geometry, material)
+  match kept.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => weights[0] = 0.25
+  }
+  let empty = @objects.Line::new(
+    @core.BufferGeometry::new(),
+    @materials.LineBasicMaterial::new(),
+  )
+  ignore(kept.copy(empty))
+  match kept.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.25)
+  }
+  match kept.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let cloned = source.clone()
+  match cloned.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights[0], 0.0)
+      assert_eq(weights[1], 0.0)
+      weights[0] = 1.0
+    }
+  }
+  match cloned.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("tall"), Some(1))
+  }
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+}
+
+///|
 test "Line.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

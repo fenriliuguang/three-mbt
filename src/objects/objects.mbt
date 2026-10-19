@@ -1375,6 +1375,7 @@ pub extend Line with @core.AsNode::{to_node}
 
 ///|
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// 形变权重和名字表留在目标上，不从源对象复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
 pub fn Line::copy(
   self : Line,
@@ -1573,6 +1574,7 @@ pub extend LineSegments with @core.AsNode::{to_node}
 ///|
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
 /// `LineSegments` 没有自己的 `copy`，行为来自 `Line.copy`。
+/// 形变权重和名字表留在目标上，不从源对象复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
 pub fn LineSegments::copy(
   self : LineSegments,
@@ -1782,6 +1784,7 @@ pub extend LineLoop with @core.AsNode::{to_node}
 ///|
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
 /// `LineLoop` 没有自己的 `copy`，行为来自 `Line.copy`。
+/// 形变权重和名字表留在目标上，不从源对象复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
 pub fn LineLoop::copy(
   self : LineLoop,
