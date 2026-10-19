@@ -45,3 +45,19 @@ test "Material alphaHash defaults off" {
   assert_eq(basic.material.alpha_hash, true)
   assert_eq(standard.material.alpha_hash, true)
 }
+
+///|
+test "Material alphaToCoverage defaults off" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.alpha_to_coverage, false)
+  basic.material.alpha_to_coverage = true
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.alpha_to_coverage, false)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.alpha_to_coverage, false)
+  standard.material.alpha_to_coverage = true
+  let other = @materials.Material::basic()
+  assert_eq(other.alpha_to_coverage, false)
+  assert_eq(basic.material.alpha_to_coverage, true)
+  assert_eq(standard.material.alpha_to_coverage, true)
+}
