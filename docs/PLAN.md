@@ -1605,6 +1605,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `SpriteMaterial.vertexColors` has landed. A new material stores false. Setting it to true leaves another new material at false. Copying onto a default material stores true. Setting the destination back to false leaves the source at true. The renderer still does not draw sprites.
 
+`Material.toneMapped` has landed. A new basic, Lambert, or Standard material stores true. Setting the basic material to false leaves another basic material at true. Setting the Standard material to false leaves the Lambert material at true. The tone-mapping pass still applies to every drawn material.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2348,6 +2350,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `PointsMaterial.vertexColors` | `materials` |
 | planned | 7 | `LineBasicMaterial.vertexColors` | `materials` |
 | planned | 7 | `SpriteMaterial.vertexColors` | `materials` |
+| planned | 7 | `Material.toneMapped` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
