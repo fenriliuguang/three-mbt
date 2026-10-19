@@ -1048,3 +1048,22 @@ test "LineBasicMaterial set_alpha_test bumps version across zero" {
   assert_eq(copied.line.version, 6)
   assert_eq(dashed.line.version, 1)
 }
+
+///|
+test "LineBasicMaterial id increments" {
+  let before = @materials.Material::basic()
+  let source = @materials.LineBasicMaterial::new()
+  assert_eq(source.id, before.id + 1)
+  let destination = @materials.LineBasicMaterial::new()
+  assert_eq(destination.id, source.id + 1)
+  ignore(destination.copy(source))
+  assert_eq(destination.id, source.id + 1)
+  assert_eq(source.id, before.id + 1)
+  let dashed = @materials.LineDashedMaterial::new()
+  assert_eq(dashed.line.id, destination.id + 1)
+  let other = @materials.LineDashedMaterial::new()
+  assert_eq(other.line.id, dashed.line.id + 1)
+  ignore(other.copy(dashed))
+  assert_eq(other.line.id, dashed.line.id + 1)
+  assert_eq(dashed.line.id, destination.id + 1)
+}

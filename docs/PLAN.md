@@ -1857,6 +1857,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `PointsMaterial.id` has landed. A new points material takes the next integer from the same counter as mesh materials. The following points material is one past that, and copying leaves both ids in place. A basic material created afterward is one past the second points material. Point draws still do not read this id.
 
+`LineBasicMaterial.id` has landed. A new line material takes the next integer from the same counter as mesh materials. The following line material is one past that, and copying leaves both ids in place. A dashed material takes the next id through its inner line. Copying that dashed material onto the next one leaves both inner ids in place. Line draws still do not read this id.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2726,6 +2728,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SpriteMaterial.setAlphaTest` | `materials` |
 | planned | 7 | `Material.id` | `materials` |
 | planned | 7 | `PointsMaterial.id` | `materials` |
+| planned | 7 | `LineBasicMaterial.id` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
