@@ -3600,3 +3600,29 @@ test "Material shader copies index0AttributeName only onto shader" {
   cloned.index0_attribute_name = Some("uv")
   assert_eq(shader.index0_attribute_name, Some("position"))
 }
+
+///|
+test "Material shader copies uniformsNeedUpdate only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.uniforms_need_update, false)
+  assert_eq(basic.uniforms_need_update, false)
+  assert_eq(phong.uniforms_need_update, false)
+  shader.uniforms_need_update = true
+  ignore(basic.copy(shader))
+  assert_eq(basic.uniforms_need_update, false)
+  assert_eq(shader.uniforms_need_update, true)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.uniforms_need_update, true)
+  onto.uniforms_need_update = false
+  assert_eq(shader.uniforms_need_update, true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.uniforms_need_update, false)
+  let cloned = shader.clone()
+  assert_eq(cloned.uniforms_need_update, true)
+  assert_eq(cloned.id == shader.id, false)
+  cloned.uniforms_need_update = false
+  assert_eq(shader.uniforms_need_update, true)
+}
