@@ -2351,6 +2351,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragment prefix gains one newline after `luminance` or `DEPTH_PACKING`. The default fragment string grows from `2040` to `2041`. The vertex string stays `1608`. `depth_packing` `3200` grows from `2067` to `2068` and the define slice stays `[1979:2005]`. A raw material stays at `61`. A Basic material stays `""`. `USE_GRADIENTMAP` stays later.
 
+`USE_GRADIENTMAP` has landed. A Shader material with an empty `gradient_map` adds nothing. The fragment string stays `2041` and the vertex string stays `1608`. A set map writes `#define USE_GRADIENTMAP` and a newline, `24` characters, so the fragment string is `2065`. The vertex string stays `1608`. `flat_shading` true keeps the vertex string at `1628` and writes the define before `FLAT_SHADED`, so the fragment string is `2085`. Clearing the map drops the line. A raw material stays at `61`. A Basic material stays `""`. `PREMULTIPLIED_ALPHA` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3467,6 +3469,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `getLuminanceFunction` | `materials` |
 | planned | 7 | `DEPTH_PACKING` | `materials` |
 | planned | 7 | `prefixFragment` newline | `materials` |
+| planned | 7 | `USE_GRADIENTMAP` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
