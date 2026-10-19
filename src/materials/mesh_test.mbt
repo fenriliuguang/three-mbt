@@ -700,3 +700,15 @@ test "Material set_alpha_test bumps version across zero" {
   assert_eq(lambert.material.version, 0)
   assert_eq(lambert.material.alpha_test, 0.0)
 }
+
+///|
+test "Material id increments" {
+  let basic = @materials.MeshBasicMaterial::new()
+  let other = @materials.Material::basic()
+  assert_eq(other.id, basic.material.id + 1)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.id, other.id + 1)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.id, lambert.material.id + 1)
+  assert_eq(basic.material.id + 3, standard.material.id)
+}
