@@ -43,6 +43,55 @@ pub(all) struct InstanceData {
   mut colors : BufferAttribute?
   mut count : Int
   mut version : Int
+  mut bounding_sphere : @math.Sphere?
+}
+
+///|
+fn read_instance_matrix(
+  attribute : BufferAttribute,
+  index : Int,
+  target : @math.Matrix4,
+) -> Unit {
+  let offset = index * attribute.item_size
+  let mut component = 0
+  while component < 16 {
+    target.elements[component] = attribute.array[offset + component]
+    component = component + 1
+  }
+}
+
+///|
+/// 局部包围球：几何体包围球按每个实例矩阵变换后再求并。
+/// r186: `computeBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L151
+pub fn InstanceData::compute_bounding_sphere(
+  self : InstanceData,
+  geometry : BufferGeometry,
+) -> @math.Sphere {
+  geometry.compute_bounding_sphere()
+  let sphere = match self.bounding_sphere {
+    Some(sphere) => sphere
+    None => {
+      let sphere = @math.Sphere::new()
+      self.bounding_sphere = Some(sphere)
+      sphere
+    }
+  }
+  ignore(sphere.make_empty())
+  match geometry.bounding_sphere {
+    None => ()
+    Some(geometry_sphere) => {
+      let matrix = @math.Matrix4::new()
+      let mut index = 0
+      while index < self.count {
+        read_instance_matrix(self.matrices, index, matrix)
+        let transformed = @math.Sphere::new()
+        ignore(transformed.copy(geometry_sphere).apply_matrix4(matrix))
+        ignore(sphere.union(transformed))
+        index = index + 1
+      }
+    }
+  }
+  sphere
 }
 
 ///|

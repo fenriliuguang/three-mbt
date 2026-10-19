@@ -881,20 +881,41 @@ pub fn Object3D::get_vertex_position(
 }
 
 ///|
-/// 用几何体的包围球对视锥做保守测试。没有网格或点线几何、或没有位置时返回假。实例化后的包围球留在后面。
+/// 用包围球对视锥做保守测试。带实例数据时用实例包围球，没有就算。否则用几何体的包围球。没有网格或点线几何时返回假；几何体没有位置时返回假。
 /// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
 pub fn Object3D::intersects_frustum(
   self : Object3D,
   frustum : @math.Frustum,
 ) -> Bool {
-  let geometry = match self.mesh {
-    Some(mesh) => mesh.geometry
+  match self.mesh {
+    Some(mesh) =>
+      match mesh.instances {
+        Some(instances) => {
+          let sphere = match instances.bounding_sphere {
+            Some(sphere) => sphere
+            None => instances.compute_bounding_sphere(mesh.geometry)
+          }
+          let copy = @math.Sphere::new()
+          ignore(copy.copy(sphere).apply_matrix4(self.matrix_world))
+          frustum.intersects_sphere(copy)
+        }
+        None => geometry_intersects_frustum(mesh.geometry, self, frustum)
+      }
     None =>
       match self.primitive {
-        Some(primitive) => primitive.geometry
-        None => return false
+        Some(primitive) =>
+          geometry_intersects_frustum(primitive.geometry, self, frustum)
+        None => false
       }
   }
+}
+
+///|
+fn geometry_intersects_frustum(
+  geometry : BufferGeometry,
+  node : Object3D,
+  frustum : @math.Frustum,
+) -> Bool {
   if geometry.bounding_sphere is None {
     geometry.compute_bounding_sphere()
   }
@@ -902,7 +923,7 @@ pub fn Object3D::intersects_frustum(
     None => false
     Some(sphere) => {
       let copy = @math.Sphere::new()
-      ignore(copy.copy(sphere).apply_matrix4(self.matrix_world))
+      ignore(copy.copy(sphere).apply_matrix4(node.matrix_world))
       frustum.intersects_sphere(copy)
     }
   }

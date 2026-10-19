@@ -1409,6 +1409,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `InstancedMesh.intersectsFrustumArray` has landed. A point at the origin, instanced at `(0.5, 0.5, 0.5)`, misses while `count` is `0`, including when a unit-cube frustum is stored, and the sphere stays uncomputed. `count` `1` meets that frustum and stores the sphere at `(0.5, 0.5, 0.5)` with radius `0`. Moving the instance to `(-2, 0.5, 0.5)` and recomputing makes that frustum miss. A second frustum of constant `10` accepts it only once `count` is `2`. The geometry sphere stays at the origin.
 
+`Object3D.intersectsFrustum` now uses the instanced bounding sphere when the mesh has instance data. A plain mesh of a point at the origin meets the unit-cube frustum. The same point instanced at `x=-2` misses, and the call stores the sphere at `(-2, 0, 0)` with radius `0` on the instance data. `computeBoundingSphere` returns that same sphere. The geometry sphere stays at the origin. Moving the instance to `(0.5, 0.5, 0.5)` and recomputing meets the frustum. With the instance back at the origin, moving the node by `(-2.5, 0, 0)` misses, and the stored sphere stays at the origin.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2054,6 +2056,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.computeBoundingSphere` | `objects` |
 | planned | 7 | `InstancedMesh.intersectsFrustum` | `objects` |
 | planned | 7 | `InstancedMesh.intersectsFrustumArray` | `objects` |
+| planned | 7 | `Object3D.intersectsFrustum` uses the instanced bounding sphere | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
