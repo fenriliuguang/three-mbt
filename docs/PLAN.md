@@ -2367,6 +2367,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `replaceClippingPlaneNums` has landed. It rewrites clipping-plane tokens in a shader string. Unset counts become `0`, so `NUM_CLIPPING_PLANES` and `UNION_CLIPPING_PLANES` both write `0`. `NUM_CLIPPING_PLANES` `5` with `num_clip_intersection` `2` writes `5` and `3`. `UNION_CLIPPING_PLANES` is the plane count minus the intersection count, so `1` and `7` write `-6`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `unrollLoops` stays later.
 
+`unrollLoops` has landed. It expands `#pragma unroll_loop_start` through `#pragma unroll_loop_end`. The loop is `for ( int i = start; i < end; i ++ )`. The start index is included and the end index is not. `[ i ]` becomes `[ 0 ]` with spaces, and `UNROLLED_LOOP_INDEX` becomes the same integer. A loop from `0` to `2` writes both indexes. A loop from `2` to `2` removes the block. A pragma that does not match stays unchanged. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `getProgramCacheKey` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3491,6 +3493,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `resolveIncludes` | `materials` |
 | planned | 7 | `replaceLightNums` | `materials` |
 | planned | 7 | `replaceClippingPlaneNums` | `materials` |
+| planned | 7 | `unrollLoops` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

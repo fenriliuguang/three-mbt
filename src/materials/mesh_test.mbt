@@ -7138,6 +7138,36 @@ test "Material shader replaceClippingPlaneNums writes plane counts" {
 }
 
 ///|
+test "Material shader unrollLoops expands indexed loops" {
+  assert_eq(@materials.unroll_loops("float x;"), "float x;")
+  assert_eq(
+    @materials.unroll_loops(
+      "before\n#pragma unroll_loop_start\nfor ( int i = 0; i < 2; i ++ ) {\n\ttexel[ i ] = UNROLLED_LOOP_INDEX;\n}\n#pragma unroll_loop_end\nafter",
+    ),
+    "before\n\n\ttexel[ 0 ] = 0;\n\n\ttexel[ 1 ] = 1;\n\nafter",
+  )
+  assert_eq(
+    @materials.unroll_loops(
+      "#pragma unroll_loop_start\nfor ( int i = 2; i < 2; i ++ ) {\n\tx;\n}\n#pragma unroll_loop_end",
+    ),
+    "",
+  )
+  assert_eq(
+    @materials.unroll_loops("#pragma unroll_loop_start for ("),
+    "#pragma unroll_loop_start for (",
+  )
+  assert_eq(
+    @materials.unroll_loops(
+      "#pragma unroll_loop_start for(int i=1;i<3;i++){[i] UNROLLED_LOOP_INDEX;}#pragma unroll_loop_end",
+    ),
+    "[ 1 ] 1;[ 2 ] 2;",
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
