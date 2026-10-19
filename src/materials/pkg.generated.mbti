@@ -33,6 +33,7 @@ pub(all) struct LineBasicMaterial {
   mut polygon_offset : Bool
   mut polygon_offset_factor : Double
   mut polygon_offset_units : Double
+  mut clip_shadows : Bool
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

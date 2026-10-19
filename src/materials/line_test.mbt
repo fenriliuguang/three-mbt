@@ -286,3 +286,24 @@ test "LineBasicMaterial stores and copies polygonOffset" {
   other.line.polygon_offset_factor = 9.0
   assert_eq(dashed.line.polygon_offset_factor, 1.0)
 }
+
+///|
+test "LineBasicMaterial stores and copies clipShadows" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.clip_shadows, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.clip_shadows = true
+  assert_eq(defaults.clip_shadows, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.clip_shadows, true)
+  destination.clip_shadows = false
+  assert_eq(source.clip_shadows, true)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.clip_shadows = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.clip_shadows, true)
+  other.line.clip_shadows = false
+  assert_eq(dashed.line.clip_shadows, true)
+}

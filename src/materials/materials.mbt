@@ -381,6 +381,7 @@ pub fn PointsMaterial::copy(
 /// `alpha_to_coverage` 默认关闭。线段绘制仍不打开 alpha to coverage。
 /// `dithering` 默认关闭。线段着色器仍不对颜色做抖动。
 /// `polygon_offset` 默认关闭，`polygon_offset_factor` 和 `polygon_offset_units` 默认 `0`。线段绘制仍不做多边形偏移。
+/// `clip_shadows` 默认关闭。线段仍不投射阴影。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -392,6 +393,7 @@ pub fn PointsMaterial::copy(
 /// r186: `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375
 /// r186: `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383
 /// r186: `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391
+/// r186: `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -413,6 +415,7 @@ pub(all) struct LineBasicMaterial {
   mut polygon_offset : Bool
   mut polygon_offset_factor : Double
   mut polygon_offset_units : Double
+  mut clip_shadows : Bool
 }
 
 ///|
@@ -438,12 +441,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     polygon_offset: false,
     polygon_offset_factor: 0.0,
     polygon_offset_units: 0.0,
+    clip_shadows: false,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering` 和多边形偏移一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移和 `clip_shadows` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -470,6 +474,7 @@ pub fn LineBasicMaterial::copy(
   self.polygon_offset = source.polygon_offset
   self.polygon_offset_factor = source.polygon_offset_factor
   self.polygon_offset_units = source.polygon_offset_units
+  self.clip_shadows = source.clip_shadows
   self
 }
 
