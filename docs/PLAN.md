@@ -1439,6 +1439,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Mesh.copy` now copies morph weights. A position group named `wide` and `tall`, with the first weight set to `0.5`, copies onto a mesh that had none. The copy stores `[0.5, 0]` and maps `wide` to `0` and `tall` to `1`. Setting the copy's first weight to `1` and `wide` to `9` leaves the source at `0.5` and `wide` at `0`. Copying a mesh with no morph data onto one whose first weight is `0.25` leaves that weight and `wide` at `0`. `Mesh.clone` uses the same copy, so the clone starts at `0.5`, and setting its first weight to `0` leaves the source at `0.5`.
 
+`Points.copy` has landed. A point cloud whose position is a single point at `(0.5, 0, 0)`, with material size `2`, node position `y=3`, and render order `4`, copies onto another cloud whose material size was `8`. Geometry and material are the source objects, and the node binding reads that same geometry at size `2`. A child named `marker` is cloned. `recursive` false keeps the transform and geometry and drops the child.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2099,6 +2101,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Mesh.count` | `objects` |
 | planned | 7 | `Mesh.updateMorphTargets` | `objects` |
 | planned | 7 | `Mesh.copy` copies morph weights | `objects` |
+| planned | 7 | `Points.copy` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

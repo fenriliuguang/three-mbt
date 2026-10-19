@@ -265,8 +265,8 @@ fn primitive_binding(
 /// r186: `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19
 pub(all) struct Points {
   node : Object3D
-  geometry : BufferGeometry
-  material : @materials.PointsMaterial
+  mut geometry : BufferGeometry
+  mut material : @materials.PointsMaterial
 }
 
 ///|
@@ -287,6 +287,21 @@ pub impl @core.AsNode for Points with fn to_node(self) {
 
 ///|
 pub extend Points with @core.AsNode::{to_node}
+
+///|
+/// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L81
+pub fn Points::copy(
+  self : Points,
+  source : Points,
+  recursive? : Bool = true,
+) -> Points {
+  ignore(self.node.copy(source.node, recursive~))
+  self.geometry = source.geometry
+  self.material = source.material
+  self.refresh()
+  self
+}
 
 ///|
 pub fn Points::refresh(self : Points) -> Unit {

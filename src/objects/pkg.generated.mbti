@@ -123,9 +123,10 @@ pub impl @core.AsNode for Mesh
 
 pub(all) struct Points {
   node : @core.Object3D
-  geometry : @core.BufferGeometry
-  material : @materials.PointsMaterial
+  mut geometry : @core.BufferGeometry
+  mut material : @materials.PointsMaterial
 }
+pub fn Points::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
 pub fn Points::refresh(Self) -> Unit
 pub fn Points::set_fog(Self, Bool) -> Unit
