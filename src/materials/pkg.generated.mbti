@@ -266,6 +266,7 @@ pub(all) struct SpriteMaterial {
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
+pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit
 
 // Type aliases

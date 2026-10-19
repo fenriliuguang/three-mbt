@@ -1851,6 +1851,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.setAlphaTest` has landed. Writing `0` keeps `alpha_test` at `0` and `version` at `0`. Writing `0.2` stores `0.2` and raises `version` to `1`. Writing `0.4` leaves `version` at `1`. Writing `0` raises `version` to `2`. Writing `-1` stores `-1` and leaves `version` at `2`. Another new material stays at `0`. Copying that `-1` onto a material at `version` `3` stores `-1` and leaves the counter at `3`. Writing `0.2` on the source raises it to `3`. Copying again stores `0.2` on the destination and raises its counter to `4`, leaving the source at `3`. A dashed material writes through its inner line: `0.2` stores that threshold and `version` `1`. Copying onto a dashed material at `version` `5` stores `0.2` and raises that counter to `6`, leaving the source at `1`. Line draws still discard fragments below the stored threshold.
 
+`SpriteMaterial.setAlphaTest` has landed. Writing `0` keeps `alpha_test` at `0` and `version` at `0`. Writing `0.2` stores `0.2` and raises `version` to `1`. Writing `0.4` leaves `version` at `1`. Writing `0` raises `version` to `2`. Writing `-1` stores `-1` and leaves `version` at `2`. Another new material stays at `0`. Copying that `-1` onto a material at `version` `3` stores `-1` and leaves the counter at `3`. Writing `0.2` on the source raises it to `3`. Copying again stores `0.2` on the destination and raises its counter to `4`, leaving the source at `3`. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2717,6 +2719,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.setAlphaTest` | `materials` |
 | planned | 7 | `PointsMaterial.setAlphaTest` | `materials` |
 | planned | 7 | `LineBasicMaterial.setAlphaTest` | `materials` |
+| planned | 7 | `SpriteMaterial.setAlphaTest` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
