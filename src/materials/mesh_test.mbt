@@ -7763,6 +7763,25 @@ test "Material shader precision uses capabilities unless set" {
 }
 
 ///|
+test "Material shader getMaxPrecision drops unavailable floats" {
+  assert_eq(@materials.max_precision("highp"), "highp")
+  assert_eq(@materials.max_precision("highp", vertex_highp=false), "mediump")
+  assert_eq(@materials.max_precision("highp", fragment_highp=false), "mediump")
+  assert_eq(
+    @materials.max_precision("highp", vertex_highp=false, fragment_mediump=false),
+    "lowp",
+  )
+  assert_eq(@materials.max_precision("mediump"), "mediump")
+  assert_eq(@materials.max_precision("mediump", vertex_mediump=false), "lowp")
+  assert_eq(@materials.max_precision("lowp", vertex_mediump=false), "lowp")
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.precision = Some(@constants.Precision::Highp)
+  assert_eq(shader.program_precision("lowp", vertex_highp=false), "mediump")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
