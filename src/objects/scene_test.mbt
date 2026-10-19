@@ -646,6 +646,56 @@ test "LineLoop.clone shares geometry and drops children when asked" {
 }
 
 ///|
+test "Sprite.copy shares material and copies the center" {
+  let material = @materials.SpriteMaterial::new(
+    rotation=0.5,
+    size_attenuation=false,
+  )
+  let source = @objects.Sprite::new(material)
+  ignore(source.center.set(0.25, 0.75))
+  source.count = 4
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let destination = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(physical_equal(destination.material, material), true)
+  assert_eq(destination.material.rotation, 0.5)
+  assert_eq(destination.material.size_attenuation, false)
+  assert_eq(destination.center.x, 0.25)
+  assert_eq(destination.center.y, 0.75)
+  assert_eq(destination.count, 1)
+  assert_eq(source.count, 4)
+  assert_eq(physical_equal(destination.geometry, source.geometry), true)
+  assert_eq(destination.node.position.y, 3.0)
+  assert_eq(destination.node.render_order, 4)
+  assert_eq(destination.node.children.length(), 1)
+  assert_eq(destination.node.children[0].name, "marker")
+  assert_eq(physical_equal(destination.node.children[0], child), false)
+  match destination.node.sprite {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.rotation, 0.5)
+      assert_eq(state.size_attenuation, false)
+      assert_eq(physical_equal(state.center, destination.center), true)
+      assert_eq(state.center.x, 0.25)
+    }
+  }
+  ignore(destination.center.set(0.1, 0.75))
+  assert_eq(source.center.x, 0.25)
+  let bare = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  ignore(bare.copy(source, recursive=false))
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.node.position.y, 3.0)
+  assert_eq(bare.center.x, 0.25)
+  assert_eq(bare.material.rotation, 0.5)
+  assert_eq(bare.count, 1)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

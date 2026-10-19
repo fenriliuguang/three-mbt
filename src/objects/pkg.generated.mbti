@@ -143,11 +143,12 @@ pub impl @core.AsNode for Points
 
 pub(all) struct Sprite {
   node : @core.Object3D
-  material : @materials.SpriteMaterial
+  mut material : @materials.SpriteMaterial
   center : @math.Vector2
   geometry : @core.BufferGeometry
   mut count : Int
 }
+pub fn Sprite::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Sprite::intersects_frustum(Self, @math.Frustum) -> Bool
 pub fn Sprite::intersects_frustum_array(Self, @math.FrustumArray) -> Bool
 pub fn Sprite::new(@materials.SpriteMaterial) -> Self

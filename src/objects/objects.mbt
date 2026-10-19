@@ -1034,7 +1034,7 @@ fn sprite_geometry() -> BufferGeometry {
 /// r186: `count` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L119
 pub(all) struct Sprite {
   node : Object3D
-  material : @materials.SpriteMaterial
+  mut material : @materials.SpriteMaterial
   center : @math.Vector2
   geometry : BufferGeometry
   mut count : Int
@@ -1059,6 +1059,21 @@ pub impl @core.AsNode for Sprite with fn to_node(self) {
 
 ///|
 pub extend Sprite with @core.AsNode::{to_node}
+
+///|
+/// 复制变换、锚点和材质。锚点写入已有的向量，材质沿用源对象。`count` 不复制。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L216
+pub fn Sprite::copy(
+  self : Sprite,
+  source : Sprite,
+  recursive? : Bool = true,
+) -> Sprite {
+  ignore(self.node.copy(source.node, recursive~))
+  ignore(self.center.copy(source.center))
+  self.material = source.material
+  self.refresh()
+  self
+}
 
 ///|
 /// 把材质上的旋转和尺寸衰减写回节点。直接改这两个字段不会更新射线用的状态。锚点是共享的。
