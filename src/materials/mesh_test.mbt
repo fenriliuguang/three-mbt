@@ -3371,7 +3371,7 @@ test "Material shader writes USE_ENVMAP" {
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1330)
   assert_eq(1658 - 1608, 50)
   assert_eq(
     shader.prefixed_vertex_shader()[683:701].to_owned(),
@@ -3403,7 +3403,7 @@ test "Material shader writes ENVMAP_MODE" {
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1330)
   assert_eq(1658 - 1627, 31)
   assert_eq(
     shader.prefixed_vertex_shader()[702:732].to_owned(),
@@ -3434,7 +3434,7 @@ test "Material shader writes ENVMAP_TYPE" {
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1330)
   assert_eq(1297 - 1272, 25)
   assert_eq(
     shader.prefixed_fragment_shader()[1098:1122].to_owned(),
@@ -3449,6 +3449,45 @@ test "Material shader writes ENVMAP_TYPE" {
   assert_eq(raw.prefixed_fragment_shader().length(), 61)
   let basic = @materials.Material::basic()
   basic.env_map = Some(env_map)
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
+test "Material shader writes ENVMAP_BLENDING" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.env_map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1330)
+  assert_eq(1330 - 1297, 33)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1154:1186].to_owned(),
+    "#define ENVMAP_BLENDING_MULTIPLY",
+  )
+  shader.combine = @constants.Combine::Mix
+  assert_eq(shader.prefixed_fragment_shader().length(), 1325)
+  assert_eq(1325 - 1297, 28)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1154:1181].to_owned(),
+    "#define ENVMAP_BLENDING_MIX",
+  )
+  shader.combine = @constants.Combine::Add
+  assert_eq(shader.prefixed_fragment_shader().length(), 1325)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1154:1181].to_owned(),
+    "#define ENVMAP_BLENDING_ADD",
+  )
+  let bare = @materials.Material::shader()
+  bare.combine = @constants.Combine::Mix
+  assert_eq(bare.prefixed_fragment_shader().length(), 1222)
+  let raw = @materials.Material::raw()
+  raw.env_map = Some(env_map)
+  raw.combine = @constants.Combine::Add
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.env_map = Some(env_map)
+  basic.combine = @constants.Combine::Add
   assert_eq(basic.prefixed_fragment_shader(), "")
 }
 
