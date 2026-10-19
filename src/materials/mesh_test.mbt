@@ -3195,11 +3195,12 @@ test "Material shader prefixes vertex uniforms" {
   let raw = @materials.Material::raw()
   let basic = @materials.Material::basic()
   let prefixed = shader.prefixed_vertex_shader()
-  assert_eq(prefixed.length() - shader.vertex_shader.length(), 833)
-  assert_eq(prefixed.length(), 925)
-  assert_eq(prefixed[0:25].to_owned(), "uniform mat4 modelMatrix;")
+  assert_eq(prefixed.length() - shader.vertex_shader.length(), 849)
+  assert_eq(prefixed.length(), 941)
+  assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
+  assert_eq(prefixed[16:41].to_owned(), "uniform mat4 modelMatrix;")
   assert_eq(
-    prefixed[392:416].to_owned(),
+    prefixed[408:432].to_owned(),
     "attribute vec3 position;",
   )
   assert_eq(
@@ -3212,7 +3213,7 @@ test "Material shader prefixes vertex uniforms" {
   assert_eq(basic.prefixed_vertex_shader(), "")
   shader.vertex_shader = "void main() {}"
   let custom = shader.prefixed_vertex_shader()
-  assert_eq(custom.length(), 847)
+  assert_eq(custom.length(), 863)
   assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
   raw.vertex_shader = "void main() {}"
   assert_eq(raw.prefixed_vertex_shader(), "void main() {}")
@@ -3225,11 +3226,12 @@ test "Material shader prefixes fragment uniforms" {
   let raw = @materials.Material::raw()
   let basic = @materials.Material::basic()
   let prefixed = shader.prefixed_fragment_shader()
-  assert_eq(prefixed.length() - shader.fragment_shader.length(), 546)
-  assert_eq(prefixed.length(), 607)
-  assert_eq(prefixed[0:18].to_owned(), "#define varying in")
-  assert_eq(prefixed[464:488].to_owned(), "uniform mat4 viewMatrix;")
-  assert_eq(prefixed[518:546].to_owned(), "uniform bool isOrthographic;")
+  assert_eq(prefixed.length() - shader.fragment_shader.length(), 562)
+  assert_eq(prefixed.length(), 623)
+  assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
+  assert_eq(prefixed[16:34].to_owned(), "#define varying in")
+  assert_eq(prefixed[480:504].to_owned(), "uniform mat4 viewMatrix;")
+  assert_eq(prefixed[534:562].to_owned(), "uniform bool isOrthographic;")
   assert_eq(
     prefixed[prefixed.length() - 61:prefixed.length()].to_owned(),
     shader.fragment_shader,
@@ -3239,7 +3241,7 @@ test "Material shader prefixes fragment uniforms" {
   assert_eq(basic.prefixed_fragment_shader(), "")
   shader.fragment_shader = "void main() {}"
   let custom = shader.prefixed_fragment_shader()
-  assert_eq(custom.length(), 560)
+  assert_eq(custom.length(), 576)
   assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
   raw.fragment_shader = "void main() {}"
   assert_eq(raw.prefixed_fragment_shader(), "void main() {}")
@@ -3250,20 +3252,22 @@ test "Material shader prefixes fragment uniforms" {
 test "Material shader adds GLSL3 fragment defines" {
   let shader = @materials.Material::shader()
   let prefixed = shader.prefixed_fragment_shader()
-  assert_eq(prefixed.length(), 607)
+  assert_eq(prefixed.length(), 623)
+  assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
   assert_eq(
-    prefixed[19:68].to_owned(),
+    prefixed[35:84].to_owned(),
     "layout(location = 0) out highp vec4 pc_fragColor;",
   )
-  assert_eq(prefixed[69:102].to_owned(), "#define gl_FragColor pc_fragColor")
+  assert_eq(prefixed[85:118].to_owned(), "#define gl_FragColor pc_fragColor")
   shader.glsl_version = Some(@materials.GlslVersion::GLSL1)
-  assert_eq(shader.prefixed_fragment_shader().length(), 607)
+  assert_eq(shader.prefixed_fragment_shader().length(), 623)
   shader.glsl_version = Some(@materials.GlslVersion::GLSL3)
   let g3 = shader.prefixed_fragment_shader()
-  assert_eq(g3.length(), 525)
-  assert_eq(607 - g3.length(), 82)
-  assert_eq(g3[18:21].to_owned(), "\n\n\n")
-  assert_eq(g3[21:57].to_owned(), "#define gl_FragDepthEXT gl_FragDepth")
+  assert_eq(g3.length(), 541)
+  assert_eq(623 - g3.length(), 82)
+  assert_eq(g3[0:15].to_owned(), "#version 300 es")
+  assert_eq(g3[34:37].to_owned(), "\n\n\n")
+  assert_eq(g3[37:73].to_owned(), "#define gl_FragDepthEXT gl_FragDepth")
   let raw = @materials.Material::raw()
   raw.glsl_version = Some(@materials.GlslVersion::GLSL3)
   assert_eq(raw.prefixed_fragment_shader().length(), 61)
