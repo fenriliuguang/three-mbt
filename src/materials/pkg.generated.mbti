@@ -120,6 +120,7 @@ pub(all) struct Material {
   mut displacement_scale : Double
   mut displacement_bias : Double
   mut specular_map : @textures.Texture?
+  mut env_map : @textures.Texture?
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
