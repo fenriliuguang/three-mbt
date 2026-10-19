@@ -228,7 +228,9 @@ pub(all) struct PointsMaterial {
   mut uuid : String
   mut name : String
   type_name : String
+  listeners : Map[String, Array[() -> Unit]]
 }
+pub fn PointsMaterial::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::clone(Self) -> Self
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

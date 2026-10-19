@@ -815,3 +815,27 @@ test "PointsMaterial clone keeps PointsMaterial and takes a new id" {
     Some(label) => assert_eq(label, "point")
   }
 }
+
+///|
+test "PointsMaterial addEventListener keeps one copy of a listener" {
+  let material = @materials.PointsMaterial::new()
+  let listener = fn() {}
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("dispose", listener)
+  match material.listeners.get("dispose") {
+    None => abort("dispose listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+  let source = @materials.PointsMaterial::new()
+  source.add_event_listener("dispose", listener)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  match destination.listeners.get("dispose") {
+    None => ()
+    Some(_) => abort("copy brought listeners")
+  }
+  match source.listeners.get("dispose") {
+    None => abort("source listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+}

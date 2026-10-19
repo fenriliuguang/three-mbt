@@ -563,6 +563,7 @@ pub fn Material::add_event_listener(
 /// `uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。点绘制仍不读它。
 /// `name` 默认空字符串。`copy` 把名字写进目标。点绘制仍不读它。
 /// `type_name` 对应上游 `type`，固定是 `PointsMaterial`。`copy` 不改目标上的这个名字。点绘制仍不读它。
+/// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。点绘制仍不读它。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -655,6 +656,7 @@ pub(all) struct PointsMaterial {
   mut uuid : String
   mut name : String
   type_name : String
+  listeners : Map[String, Array[() -> Unit]]
 }
 
 ///|
@@ -715,12 +717,13 @@ pub fn PointsMaterial::new(
     uuid: @math.generate_uuid(),
     name: "",
     type_name: "PointsMaterial",
+    listeners: Map([]),
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// `name`、尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
+/// `name`、尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -787,6 +790,26 @@ pub fn PointsMaterial::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
 pub fn PointsMaterial::clone(self : PointsMaterial) -> PointsMaterial {
   PointsMaterial::new().copy(self)
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。点绘制仍不读这张表。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn PointsMaterial::add_event_listener(
+  self : PointsMaterial,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
 }
 
 ///|
