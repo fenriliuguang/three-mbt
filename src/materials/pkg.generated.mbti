@@ -170,6 +170,7 @@ pub(all) struct PointsMaterial {
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
   mut blend_equation_alpha : @constants.BlendEquation?
+  mut stencil_write_mask : Int
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
