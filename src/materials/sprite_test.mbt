@@ -485,3 +485,18 @@ test "SpriteMaterial stores and copies stencilFunc" {
   assert_eq(source.stencil_func.to_int(), 512)
   assert_eq(destination.stencil_func.to_int(), 514)
 }
+
+///|
+test "SpriteMaterial stores and copies stencilRef" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.stencil_ref, 0)
+  let source = @materials.SpriteMaterial::new()
+  source.stencil_ref = 1
+  assert_eq(defaults.stencil_ref, 0)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_ref, 1)
+  destination.stencil_ref = 7
+  assert_eq(source.stencil_ref, 1)
+  assert_eq(destination.stencil_ref, 7)
+}
