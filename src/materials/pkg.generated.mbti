@@ -404,6 +404,7 @@ pub struct ShaderCache {
   shader_cache : Map[String, ShaderStage]
   material_cache : Map[Int, Array[ShaderStage]]
 }
+pub fn ShaderCache::custom_fragment_shader_id(Self, Material) -> Int?
 pub fn ShaderCache::custom_vertex_shader_id(Self, Material) -> Int?
 pub fn ShaderCache::dispose(Self) -> Unit
 pub fn ShaderCache::get_fragment_shader_stage(Self, Material) -> ShaderStage

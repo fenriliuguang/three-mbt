@@ -7530,6 +7530,53 @@ test "Material shader customVertexShaderID skips builtin types" {
 }
 
 ///|
+test "Material shader customFragmentShaderID skips builtin types" {
+  let cache = @materials.ShaderCache::new()
+  let shader = @materials.Material::shader()
+  let stage = cache.get_fragment_shader_stage(shader)
+  let vertex = cache.get_vertex_shader_stage(shader)
+  match cache.custom_fragment_shader_id(shader) {
+    Some(id) => assert_eq(id, stage.id)
+    None => abort("shader fragment id missing")
+  }
+  assert_eq(stage.id == vertex.id, false)
+  assert_eq(stage.used_times.val, 0)
+  let raw = @materials.Material::raw()
+  match cache.custom_fragment_shader_id(raw) {
+    Some(id) => assert_eq(id, stage.id)
+    None => abort("raw fragment id missing")
+  }
+  match cache.custom_fragment_shader_id(@materials.Material::basic()) {
+    None => ()
+    Some(_) => abort("basic gained a custom fragment id")
+  }
+  match cache.custom_fragment_shader_id(@materials.Material::lambert()) {
+    None => ()
+    Some(_) => abort("lambert gained a custom fragment id")
+  }
+  match cache.custom_fragment_shader_id(@materials.Material::physical()) {
+    None => ()
+    Some(_) => abort("physical gained a custom fragment id")
+  }
+  match cache.shader_cache.get("") {
+    None => ()
+    Some(_) => abort("builtin fragment id stored an empty stage")
+  }
+  match cache.material_cache.get(shader.id) {
+    None => ()
+    Some(_) => abort("fragment id wrote the material map")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.fragment_shader = "custom"
+  match cache.custom_fragment_shader_id(shader) {
+    Some(id) => assert_eq(id == stage.id, false)
+    None => abort("replaced fragment id missing")
+  }
+  assert_eq(stage.used_times.val, 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
