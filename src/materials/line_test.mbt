@@ -146,3 +146,24 @@ test "panic LineDashedMaterial zero period" {
   let material = @materials.LineDashedMaterial::new(dash_size=0.0, gap_size=0.0)
   ignore(material.keeps_distance(1.0))
 }
+
+///|
+test "LineBasicMaterial stores and copies vertex colors" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.vertex_colors, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.vertex_colors = true
+  assert_eq(defaults.vertex_colors, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.vertex_colors, true)
+  destination.vertex_colors = false
+  assert_eq(source.vertex_colors, true)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.vertex_colors = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.vertex_colors, true)
+  other.line.vertex_colors = false
+  assert_eq(dashed.line.vertex_colors, true)
+}
