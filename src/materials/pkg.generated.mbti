@@ -153,6 +153,7 @@ pub fn Material::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::basic(hex? : Int) -> Self
 pub fn Material::clone(Self) -> Self
 pub fn Material::copy(Self, Self) -> Self
+pub fn Material::dispatch_event(Self, String) -> Unit
 pub fn Material::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn Material::lambert(hex? : Int) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit

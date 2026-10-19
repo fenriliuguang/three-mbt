@@ -960,3 +960,21 @@ test "Material removeEventListener drops a registered listener" {
   material.remove_event_listener("dispose", listener)
   assert_eq(lambert.has_event_listener("dispose", listener), true)
 }
+
+///|
+test "Material dispatchEvent runs listeners of one kind" {
+  let material = @materials.Material::basic()
+  let hits = Ref::Ref(0)
+  material.add_event_listener("change", fn() { hits.val = hits.val + 1 })
+  material.add_event_listener("dispose", fn() { hits.val = hits.val + 10 })
+  material.dispatch_event("change")
+  assert_eq(hits.val, 1)
+  material.dispatch_event("missing")
+  assert_eq(hits.val, 1)
+  let lambert = @materials.Material::lambert()
+  lambert.dispatch_event("change")
+  assert_eq(hits.val, 1)
+  let standard = @materials.Material::standard()
+  standard.dispatch_event("dispose")
+  assert_eq(hits.val, 1)
+}

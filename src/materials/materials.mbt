@@ -573,6 +573,21 @@ pub fn Material::remove_event_listener(
 }
 
 ///|
+/// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
+pub fn Material::dispatch_event(self : Material, kind : String) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let snapshot = listeners.copy()
+      for listener in snapshot {
+        listener()
+      }
+    }
+  }
+}
+
+///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
