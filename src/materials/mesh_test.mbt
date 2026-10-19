@@ -5693,8 +5693,8 @@ test "Material shader writes USE_UV2" {
   )
   map.channel = 3
   shader.map = Some(map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1254)
   map.channel = 2
   shader.map = Some(map)
   let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
@@ -5709,6 +5709,54 @@ test "Material shader writes USE_UV2" {
   assert_eq(
     shader.prefixed_fragment_shader()[1132:1147].to_owned(),
     "#define USE_UV2",
+  )
+  let raw = @materials.Material::raw()
+  raw.map = Some(map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.map = Some(map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes USE_UV3" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  map.channel = 3
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1254)
+  assert_eq(1659 - 1643, 16)
+  assert_eq(
+    shader.prefixed_vertex_shader()[718:733].to_owned(),
+    "#define USE_UV3",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1095:1110].to_owned(),
+    "#define USE_UV3",
+  )
+  map.channel = 4
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  map.channel = 3
+  shader.map = Some(map)
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  alpha_map.channel = 2
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1720)
+  assert_eq(
+    shader.prefixed_vertex_shader()[779:794].to_owned(),
+    "#define USE_UV3",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1291)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1132:1147].to_owned(),
+    "#define USE_UV3",
   )
   let raw = @materials.Material::raw()
   raw.map = Some(map)
