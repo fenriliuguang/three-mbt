@@ -2195,6 +2195,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_EMISSIVEMAP` has landed. A Shader material with a 1×1 emissive map writes `#define USE_EMISSIVEMAP` and a newline, `24` characters, on both prefixed shaders. The vertex string grows from `1608` to `1632`, and the fragment string from `1222` to `1246`. A displacement map as well puts that line after `USE_DISPLACEMENTMAP` on the vertex string, which becomes `1660`. The fragment string stays `1246`. A raw material stays at `92`. A Basic material stays `""`. `USE_ANISOTROPY` stays later.
 
+`USE_ANISOTROPY` has landed. A Shader material with `anisotropy` set to `1` writes `#define USE_ANISOTROPY` and a newline, `23` characters, on both prefixed shaders. The vertex string grows from `1608` to `1631`, and the fragment string from `1222` to `1245`. `0` and `-1` add nothing. An emissive map as well puts that line after `USE_EMISSIVEMAP`, so the vertex string is `1655`. A raw material stays at `92`. A Basic material stays `""`. `USE_ANISOTROPYMAP` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3233,6 +3235,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_NORMALMAP_OBJECTSPACE` | `materials` |
 | planned | 7 | `USE_DISPLACEMENTMAP` | `materials` |
 | planned | 7 | `USE_EMISSIVEMAP` | `materials` |
+| planned | 7 | `USE_ANISOTROPY` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
