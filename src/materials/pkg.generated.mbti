@@ -65,6 +65,7 @@ pub(all) struct Material {
   mut roughness_map : @textures.Texture?
   mut metalness_map : @textures.Texture?
   mut alpha_map : @textures.Texture?
+  mut vertex_colors : Bool
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
