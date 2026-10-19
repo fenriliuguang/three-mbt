@@ -1417,6 +1417,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `InstancedMesh.copy` has landed. A point at the origin, with `count` `1`, instance translation `x=2`, and color `(0.25, 0.5, 1)`, copies onto another mesh. The node position `y=3`, frustum culling, and a child named `marker` come along. Geometry and material are the source objects. Before bounds exist, the destination sphere is cleared. After computing, the box is the point `(2, 0, 0)` and the sphere has radius `0`. Editing the copy's box, sphere, matrix, or color leaves the source unchanged. Morph textures stay later.
 
+`InstancedMesh.clone` has landed. The same point, stored in a mesh of capacity `2` with `count` `1`, produces a new mesh. Capacity stays `2`, count stays `1`, the matrix translation stays `x=2`, and the color stays `(0.25, 0.5, 1)`. The node position is `y=3`, and the child named `marker` is a new node. Geometry is shared. The cloned sphere is centered at `(2, 0, 0)` with radius `0`, and setting that radius to `5` leaves the source radius at `0`. `recursive` false keeps the instance data and drops the child.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2066,6 +2068,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | opaque list culling uses the instanced bounding sphere | `renderer` |
 | planned | 7 | `InstancedMesh.raycast` | `core` |
 | planned | 7 | `InstancedMesh.copy` | `objects` |
+| planned | 7 | `InstancedMesh.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

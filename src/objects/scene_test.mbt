@@ -299,6 +299,66 @@ test "InstancedMesh.copy clones bounds and shares geometry" {
 }
 
 ///|
+test "InstancedMesh.clone keeps capacity and detaches bounds" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let source = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
+  source.set_count(1)
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(2.0, 0.0, 0.0))
+  source.set_matrix_at(0, matrix)
+  source.set_color_at(0, @math.Color::new(r=0.25, g=0.5, b=1.0))
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  ignore(source.compute_bounding_sphere())
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.instances.matrices.count, 2)
+  assert_eq(cloned.instances.count, 1)
+  assert_eq(physical_equal(cloned.geometry, geometry), true)
+  assert_eq(cloned.node.position.y, 3.0)
+  assert_eq(cloned.node.children.length(), 1)
+  assert_eq(cloned.node.children[0].name, "marker")
+  assert_eq(physical_equal(cloned.node.children[0], child), false)
+  let read = @math.Matrix4::new()
+  ignore(cloned.get_matrix_at(0, read))
+  assert_eq(read.elements[12], 2.0)
+  let color = @math.Color::new(r=0.0, g=0.0, b=0.0)
+  ignore(cloned.get_color_at(0, color))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 1.0)
+  match cloned.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 2.0)
+      assert_eq(sphere.radius, 0.0)
+      sphere.radius = 5.0
+    }
+  }
+  match source.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => assert_eq(sphere.radius, 0.0)
+  }
+  let bare = source.clone(recursive=false)
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.instances.count, 1)
+  ignore(bare.get_matrix_at(0, read))
+  assert_eq(read.elements[12], 2.0)
+}
+
+///|
 test "mesh raycast interpolates uv" {
   let geometry = @core.BufferGeometry::new()
   ignore(

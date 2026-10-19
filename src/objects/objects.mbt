@@ -713,6 +713,20 @@ pub fn InstancedMesh::copy(
 }
 
 ///|
+/// 新建一份网格再复制。three.js 没有单独的 `InstancedMesh.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn InstancedMesh::clone(
+  self : InstancedMesh,
+  recursive? : Bool = true,
+) -> InstancedMesh {
+  InstancedMesh::new(
+    self.geometry,
+    self.material,
+    self.instances.matrices.count,
+  ).copy(self, recursive~)
+}
+
+///|
 /// 局部包围盒：几何体包围盒按每个实例矩阵变换后再求并。
 /// r186: `computeBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L115
 pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {

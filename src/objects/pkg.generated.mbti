@@ -30,6 +30,7 @@ pub(all) struct InstancedMesh {
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
 }
+pub fn InstancedMesh::clone(Self, recursive? : Bool) -> Self
 pub fn InstancedMesh::compute_bounding_box(Self) -> @math.Box3
 pub fn InstancedMesh::compute_bounding_sphere(Self) -> @math.Sphere
 pub fn InstancedMesh::copy(Self, Self, recursive? : Bool) -> Self
