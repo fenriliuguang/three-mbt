@@ -5996,6 +5996,56 @@ test "Material shader writes USE_MORPHCOLORS" {
 }
 
 ///|
+test "Material shader writes MORPHTARGETS_TEXTURE_STRIDE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=0, morph_texture_stride=1).length(),
+    1608,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(),
+    1646,
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1646 - 1608, 38)
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1)[683:720].to_owned(),
+    "#define MORPHTARGETS_TEXTURE_STRIDE 1",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=2, morph_texture_stride=1)[683:720].to_owned(),
+    "#define MORPHTARGETS_TEXTURE_STRIDE 1",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=3)[683:720].to_owned(),
+    "#define MORPHTARGETS_TEXTURE_STRIDE 3",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(
+      has_morph_colors=true,
+      morph_targets_count=1,
+      morph_texture_stride=1,
+    ).length(),
+    1670,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(
+      has_morph_colors=true,
+      morph_targets_count=1,
+      morph_texture_stride=1,
+    )[707:744].to_owned(),
+    "#define MORPHTARGETS_TEXTURE_STRIDE 1",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
