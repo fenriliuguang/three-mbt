@@ -3528,6 +3528,42 @@ test "Material shader writes USE_LIGHTMAP" {
 }
 
 ///|
+test "Material shader writes USE_AOMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let ao_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.ao_map = Some(ao_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1626)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1240)
+  assert_eq(1626 - 1608, 18)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:700].to_owned(),
+    "#define USE_AOMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1096].to_owned(),
+    "#define USE_AOMAP",
+  )
+  shader.light_map = Some(ao_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1647)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:721].to_owned(),
+    "#define USE_AOMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1261)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1100:1117].to_owned(),
+    "#define USE_AOMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.ao_map = Some(ao_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.ao_map = Some(ao_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

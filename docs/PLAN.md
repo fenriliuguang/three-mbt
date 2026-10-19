@@ -2181,6 +2181,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_LIGHTMAP` has landed. A Shader material with a 1×1 light map writes `#define USE_LIGHTMAP` and a newline, `21` characters, on both prefixed shaders. The vertex string grows from `1608` to `1629`, and the fragment string from `1222` to `1243`. An env map as well puts that line after the env-map defines, so the vertex string is `1679` and the fragment string is `1351`. A raw material stays at `92`. A Basic material stays `""`. `USE_AOMAP` stays later.
 
+`USE_AOMAP` has landed. A Shader material with a 1×1 ambient-occlusion map writes `#define USE_AOMAP` and a newline, `18` characters, on both prefixed shaders. The vertex string grows from `1608` to `1626`, and the fragment string from `1222` to `1240`. A light map as well puts that line after `USE_LIGHTMAP`, so the vertex string is `1647` and the fragment string is `1261`. A raw material stays at `92`. A Basic material stays `""`. `USE_BUMPMAP` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3212,6 +3214,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ENVMAP_TYPE` | `materials` |
 | planned | 7 | `ENVMAP_BLENDING` | `materials` |
 | planned | 7 | `USE_LIGHTMAP` | `materials` |
+| planned | 7 | `USE_AOMAP` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
