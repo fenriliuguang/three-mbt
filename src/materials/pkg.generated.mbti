@@ -171,6 +171,7 @@ pub(all) struct Material {
   mut retroreflectivity : Double
   mut sheen : Double
   mut transmission : Double
+  is_mesh_physical_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -218,6 +219,7 @@ pub fn Material::dispatch_event(Self, String) -> Unit
 pub fn Material::dispose(Self) -> Unit
 pub fn Material::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn Material::lambert(hex? : Int) -> Self
+pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
 pub fn Material::set_anisotropy(Self, Double) -> Unit
@@ -235,6 +237,7 @@ pub(all) enum MaterialKind {
   Basic
   Lambert
   Standard
+  Physical
 }
 
 pub(all) struct MeshBasicMaterial {

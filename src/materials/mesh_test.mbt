@@ -2418,3 +2418,67 @@ test "Material set_transmission bumps version across zero and copies" {
   assert_eq(standard.transmission, 0.0)
   assert_eq(standard.version, 0)
 }
+
+///|
+test "Material physical sets isMeshPhysicalMaterial and keeps it on copy" {
+  let basic = @materials.Material::basic()
+  let lambert = @materials.Material::lambert()
+  let standard = @materials.Material::standard()
+  assert_eq(basic.is_mesh_physical_material, false)
+  assert_eq(lambert.is_mesh_physical_material, false)
+  assert_eq(standard.is_mesh_physical_material, false)
+  assert_eq(standard.type_name, "MeshStandardMaterial")
+  let physical = @materials.Material::physical(hex=0xFF0000, roughness=0.25, metalness=0.5)
+  assert_eq(physical.is_mesh_physical_material, true)
+  assert_eq(physical.type_name, "MeshPhysicalMaterial")
+  assert_eq(physical.kind is @materials.MaterialKind::Physical, true)
+  assert_eq(physical.shading() is @constants.Standard, true)
+  assert_eq(physical.color.r, 1.0)
+  assert_eq(physical.roughness, 0.25)
+  assert_eq(physical.metalness, 0.5)
+  match physical.defines.get("STANDARD") {
+    None => abort("physical standard define")
+    Some(value) => assert_eq(value, "")
+  }
+  match physical.defines.get("PHYSICAL") {
+    None => abort("physical define")
+    Some(value) => assert_eq(value, "")
+  }
+  physical.defines.set("FOO", "1")
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(physical))
+  assert_eq(destination.is_mesh_physical_material, false)
+  assert_eq(destination.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(destination.type_name, "MeshBasicMaterial")
+  assert_eq(destination.roughness, 0.25)
+  assert_eq(physical.is_mesh_physical_material, true)
+  match destination.defines.get("PHYSICAL") {
+    None => ()
+    Some(_) => abort("basic gained physical define")
+  }
+  let onto = @materials.Material::physical()
+  onto.defines.set("FOO", "1")
+  ignore(onto.copy(standard))
+  assert_eq(onto.is_mesh_physical_material, true)
+  assert_eq(onto.kind is @materials.MaterialKind::Physical, true)
+  assert_eq(onto.type_name, "MeshPhysicalMaterial")
+  assert_eq(onto.roughness, 1.0)
+  match onto.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("physical copy kept source define")
+  }
+  match onto.defines.get("STANDARD") {
+    None => abort("physical copy standard define")
+    Some(value) => assert_eq(value, "")
+  }
+  match onto.defines.get("PHYSICAL") {
+    None => abort("physical copy physical define")
+    Some(value) => assert_eq(value, "")
+  }
+  let cloned = physical.clone()
+  assert_eq(cloned.is_mesh_physical_material, true)
+  assert_eq(cloned.type_name, "MeshPhysicalMaterial")
+  assert_eq(cloned.kind is @materials.MaterialKind::Physical, true)
+  assert_eq(cloned.roughness, 0.25)
+  assert_eq(cloned.id == physical.id, false)
+}

@@ -2069,6 +2069,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.transmission` has landed. A new Basic, Lambert, and Standard material each store `0` with `version` `0`. Setting `0` again leaves `version` at `0`. Setting `0.25` stores `0.25` and makes `version` `1`. Setting `0.5` keeps `version` at `1`. Setting `0` stores `0` and makes `version` `2`. Setting `-1` keeps `version` at `2`. A Lambert material set to `0.25` leaves another Lambert material at `0` with `version` `0`. Copying onto a Basic material stores `0.25` and makes the destination `version` `1`. Setting the destination back to `0` makes its `version` `2` and leaves the source at `0.25` with `version` `1`. A new Standard material stays at `0` with `version` `0`. The renderer still does not compute transmission. `isMeshPhysicalMaterial` stays later.
 
+`Material.isMeshPhysicalMaterial` has landed. Basic, Lambert, and Standard stay false. `Material::physical` with hex `0xFF0000`, roughness `0.25`, and metalness `0.5` stores true, type `MeshPhysicalMaterial`, kind `Physical`, and shading `Standard`. Its defines map `STANDARD` and `PHYSICAL` to empty strings. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`, and stores roughness `0.25`. Copying a Standard material onto a Physical material keeps the destination true and resets its defines to `STANDARD` and `PHYSICAL`, dropping a `FOO` key. Cloning keeps the flag, the type, the kind, and roughness `0.25`, with a new id. The renderer still shades it as Standard. `MeshToonMaterial` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3044,6 +3046,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.retroreflectivity` | `materials` |
 | planned | 7 | `Material.sheen` | `materials` |
 | planned | 7 | `Material.transmission` | `materials` |
+| planned | 7 | `Material.isMeshPhysicalMaterial` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
