@@ -1700,6 +1700,67 @@ test "Skeleton.getBoneByName returns the first match" {
 }
 
 ///|
+test "Skeleton.computeBoneTexture grows the matrix buffer" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  arm.update()
+  assert_eq(arm.bone_matrices.length(), 48)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  let computed = arm.compute_bone_texture()
+  assert_eq(physical_equal(computed, arm), true)
+  assert_eq(arm.bone_matrices.length(), 64)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  assert_eq(arm.bone_matrices[48], 0.0)
+  assert_eq(arm.bone_matrices[63], 0.0)
+  ignore(arm.compute_bone_texture())
+  assert_eq(arm.bone_matrices.length(), 64)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  let empty = @objects.Skeleton::new()
+  ignore(empty.compute_bone_texture())
+  assert_eq(empty.bone_matrices.length(), 64)
+  assert_eq(empty.bone_matrices[0], 0.0)
+  assert_eq(empty.bone_matrices[63], 0.0)
+  let bones = []
+  let mut index = 0
+  while index < 17 {
+    bones.push(@objects.Bone::new())
+    index = index + 1
+  }
+  let wide = @objects.Skeleton::new(bones=bones)
+  assert_eq(wide.bone_matrices.length(), 272)
+  wide.bone_matrices[0] = 4.0
+  ignore(wide.compute_bone_texture())
+  assert_eq(wide.bone_matrices.length(), 576)
+  assert_eq(wide.bone_matrices[0], 4.0)
+  assert_eq(wide.bone_matrices[271], 0.0)
+  assert_eq(wide.bone_matrices[272], 0.0)
+  assert_eq(wide.bone_matrices[575], 0.0)
+}
+
+///|
+test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
+  let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
+  let big = []
+  let mut index = 0
+  while index < 65 {
+    big.push(1.0)
+    index = index + 1
+  }
+  arm.bone_matrices = big
+  ignore(arm.compute_bone_texture())
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

@@ -238,7 +238,32 @@ pub fn Skeleton::get_bone_by_name(self : Skeleton, name : String) -> Bone? {
     }
     index = index + 1
   }
-  None
+    None
+}
+
+///|
+/// 按骨骼数量把矩阵缓冲扩成贴图布局。边长至少是 4，并且是 4 的倍数。
+/// 已有的浮点按顺序拷进去，多出来的位置是 0。`DataTexture` 留到后面。
+/// r186: `computeBoneTexture` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L243
+pub fn Skeleton::compute_bone_texture(self : Skeleton) -> Skeleton {
+  let raw = (self.bones.length() * 4).to_double().sqrt()
+  let mut size = (raw / 4.0).ceil().to_int() * 4
+  if size < 4 {
+    size = 4
+  }
+  let length = size * size * 4
+  if self.bone_matrices.length() > length {
+    abort("Skeleton.compute_bone_texture bone data does not fit")
+  }
+  let matrices = zero_doubles(length)
+  let count = self.bone_matrices.length()
+  let mut index = 0
+  while index < count {
+    matrices[index] = self.bone_matrices[index]
+    index = index + 1
+  }
+  self.bone_matrices = matrices
+  self
 }
 
 ///|

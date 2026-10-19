@@ -181,6 +181,7 @@ pub(all) struct Skeleton {
 }
 pub fn Skeleton::calculate_inverses(Self) -> Unit
 pub fn Skeleton::clone(Self) -> Self
+pub fn Skeleton::compute_bone_texture(Self) -> Self
 pub fn Skeleton::get_bone_by_name(Self, String) -> Bone?
 pub fn Skeleton::init(Self) -> Unit
 pub fn Skeleton::new(bones? : Array[Bone], bone_inverses? : Array[@math.Matrix4]) -> Self
