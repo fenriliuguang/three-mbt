@@ -60,6 +60,7 @@ pub(all) struct LineBasicMaterial {
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
+pub fn LineBasicMaterial::set_needs_update(Self, Bool) -> Unit
 
 pub(all) struct LineDashedMaterial {
   line : LineBasicMaterial

@@ -659,7 +659,7 @@ pub fn PointsMaterial::set_needs_update(
 /// `clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。线段绘制仍不按这些平面裁剪。
 /// `precision` 默认空。空着时沿用渲染器默认精度。管线仍不读这个字段。
 /// `user_data` 默认空表。自定义字符串键值。线段绘制仍不读这张表。
-/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`copy` 不改目标上的这个计数。线段绘制仍不读它。
+/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。线段绘制仍不读它。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -850,6 +850,18 @@ pub fn LineBasicMaterial::copy(
   self.allow_override = source.allow_override
   self.blend_alpha = source.blend_alpha
   self
+}
+
+///|
+/// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。线段绘制仍不因这次标记重新编译。
+/// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
+pub fn LineBasicMaterial::set_needs_update(
+  self : LineBasicMaterial,
+  value : Bool,
+) -> Unit {
+  if value {
+    self.version = self.version + 1
+  }
 }
 
 ///|

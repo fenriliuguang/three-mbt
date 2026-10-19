@@ -977,3 +977,31 @@ test "LineBasicMaterial stores version" {
   other.line.version = 6
   assert_eq(dashed.line.version, 4)
 }
+
+///|
+test "LineBasicMaterial needsUpdate increments version" {
+  let source = @materials.LineBasicMaterial::new()
+  source.set_needs_update(false)
+  assert_eq(source.version, 0)
+  source.set_needs_update(true)
+  assert_eq(source.version, 1)
+  source.set_needs_update(true)
+  assert_eq(source.version, 2)
+  let other = @materials.LineBasicMaterial::new()
+  assert_eq(other.version, 0)
+  let destination = @materials.LineBasicMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 2)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.set_needs_update(true)
+  assert_eq(dashed.line.version, 1)
+  let copied = @materials.LineDashedMaterial::new()
+  copied.line.version = 5
+  ignore(copied.copy(dashed))
+  assert_eq(copied.line.version, 5)
+  assert_eq(dashed.line.version, 1)
+  dashed.line.set_needs_update(false)
+  assert_eq(dashed.line.version, 1)
+}
