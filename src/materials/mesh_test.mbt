@@ -1760,3 +1760,21 @@ test "Material iridescenceMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.iridescence_map is None, true)
 }
+
+///|
+test "Material iridescenceIOR defaults to 1.3 and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.iridescence_ior, 1.3)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.iridescence_ior, 1.3)
+  lambert.iridescence_ior = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.iridescence_ior, 1.3)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.iridescence_ior, 2.0)
+  destination.iridescence_ior = 1.0
+  assert_eq(lambert.iridescence_ior, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.iridescence_ior, 1.3)
+}
