@@ -1625,6 +1625,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `PointsMaterial.alphaToCoverage` has landed. A new material stores false. Setting it to true leaves another new material at false. Copying onto a default material stores true. Setting the destination back to false leaves the source at true. Point drawing still does not enable alpha to coverage.
 
+`LineBasicMaterial.alphaToCoverage` has landed. A new material stores false. Setting it to true leaves another new material at false. Copying onto a default material stores true. Setting the destination back to false leaves the source at true. A dashed material copies the flag through its inner line material. Line drawing still does not enable alpha to coverage.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2378,6 +2380,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SpriteMaterial.alphaHash` | `materials` |
 | planned | 7 | `Material.alphaToCoverage` | `materials` |
 | planned | 7 | `PointsMaterial.alphaToCoverage` | `materials` |
+| planned | 7 | `LineBasicMaterial.alphaToCoverage` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
