@@ -3654,13 +3654,46 @@ test "Material shader writes USE_NORMALMAP_TANGENTSPACE" {
     "#define USE_NORMALMAP_TANGENTSPACE",
   )
   shader.normal_map_type = @constants.NormalMapType::ObjectSpace
-  assert_eq(shader.prefixed_vertex_shader().length(), 1630)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1244)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1278)
   let raw = @materials.Material::raw()
   raw.normal_map = Some(normal_map)
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.normal_map = Some(normal_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes USE_NORMALMAP_OBJECTSPACE" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.normal_map = Some(normal_map)
+  shader.normal_map_type = @constants.NormalMapType::ObjectSpace
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1278)
+  assert_eq(1664 - 1630, 34)
+  assert_eq(
+    shader.prefixed_vertex_shader()[705:738].to_owned(),
+    "#define USE_NORMALMAP_OBJECTSPACE",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1101:1134].to_owned(),
+    "#define USE_NORMALMAP_OBJECTSPACE",
+  )
+  shader.normal_map_type = @constants.NormalMapType::TangentSpace
+  assert_eq(
+    shader.prefixed_vertex_shader()[705:739].to_owned(),
+    "#define USE_NORMALMAP_TANGENTSPACE",
+  )
+  let raw = @materials.Material::raw()
+  raw.normal_map = Some(normal_map)
+  raw.normal_map_type = @constants.NormalMapType::ObjectSpace
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.normal_map = Some(normal_map)
+  basic.normal_map_type = @constants.NormalMapType::ObjectSpace
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
