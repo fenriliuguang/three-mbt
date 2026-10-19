@@ -308,6 +308,7 @@ pub fn Material::program_env_map_cube_uv_height(Self, Int, scene_environment_hei
 pub fn Material::program_env_map_mode(Self, Int, has_scene_environment? : Bool) -> Int?
 pub fn Material::program_fragment_shader(Self) -> String?
 pub fn Material::program_glsl_version(Self) -> GlslVersion?
+pub fn Material::program_gradient_map(Self) -> Bool
 pub fn Material::program_iridescence(Self) -> Bool
 pub fn Material::program_iridescence_map(Self) -> Bool
 pub fn Material::program_iridescence_thickness_map(Self) -> Bool
