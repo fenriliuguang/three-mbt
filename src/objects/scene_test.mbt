@@ -396,6 +396,39 @@ test "LOD.copy clones levels and leaves the current level" {
 }
 
 ///|
+test "LOD.clone starts at level zero with new objects" {
+  let source = @objects.LOD::new()
+  let near = @core.Object3D::new()
+  near.name = "near"
+  ignore(near.position.set(0.0, 1.0, 0.0))
+  let far = @core.Object3D::new()
+  far.name = "far"
+  ignore(source.add_level(near, distance=0.0, hysteresis=0.0))
+  ignore(source.add_level(far, distance=10.0, hysteresis=0.25))
+  source.auto_update = false
+  source.current_level = 1
+  ignore(source.node.position.set(0.0, 4.0, 0.0))
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.auto_update, false)
+  assert_eq(cloned.current_level, 0)
+  assert_eq(cloned.node.position.y, 4.0)
+  assert_eq(cloned.levels.length(), 2)
+  assert_eq(cloned.levels[0].distance, 0.0)
+  assert_eq(cloned.levels[0].hysteresis, 0.0)
+  assert_eq(cloned.levels[1].distance, 10.0)
+  assert_eq(cloned.levels[1].hysteresis, 0.25)
+  assert_eq(cloned.levels[0].object.name, "near")
+  assert_eq(cloned.levels[0].object.position.y, 1.0)
+  assert_eq(cloned.levels[1].object.name, "far")
+  assert_eq(physical_equal(cloned.levels[0].object, near), false)
+  assert_eq(physical_equal(cloned.levels[1].object, far), false)
+  assert_eq(source.current_level, 1)
+  cloned.levels[1].object.name = "copy"
+  assert_eq(far.name, "far")
+}
+
+///|
 test "mesh raycast interpolates uv" {
   let geometry = @core.BufferGeometry::new()
   ignore(

@@ -1043,3 +1043,10 @@ pub fn LOD::copy(self : LOD, source : LOD) -> LOD {
   self.auto_update = source.auto_update
   self
 }
+
+///|
+/// 新建一份 LOD 再复制。three.js 没有单独的 `LOD.clone`，用的是 `Object3D.clone`。新对象的 `current_level` 从 `0` 开始。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn LOD::clone(self : LOD) -> LOD {
+  LOD::new().copy(self)
+}

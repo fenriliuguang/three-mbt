@@ -1421,6 +1421,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `LOD.copy` has landed. Levels at distance `0` and `10`, the farther one with hysteresis `0.25`, copy onto a LOD whose current level is `3`. The copy keeps current level `3`, sets `autoUpdate` false, and moves the node to `y=4`. The near clone is named `near` at `y=1`, and the far clone is named `far`. Both clones are new objects. Renaming the near clone leaves the source name `near`.
 
+`LOD.clone` has landed. The same two levels, with `autoUpdate` false, current level `1`, and the node at `y=4`, produce a new LOD. Its current level is `0`. The near object is a new node named `near` at `y=1`, and the far object is a new node named `far` at distance `10` with hysteresis `0.25`. Renaming the far clone leaves the source name `far`. The source current level stays `1`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2072,6 +2074,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.copy` | `objects` |
 | planned | 7 | `InstancedMesh.clone` | `objects` |
 | planned | 7 | `LOD.copy` | `objects` |
+| planned | 7 | `LOD.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
