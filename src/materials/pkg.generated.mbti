@@ -350,6 +350,7 @@ pub fn Material::program_sheen_color_map_uv(Self) -> String
 pub fn Material::program_sheen_roughness_map(Self) -> Bool
 pub fn Material::program_sheen_roughness_map_uv(Self) -> String
 pub fn Material::program_specular_color_map(Self) -> Bool
+pub fn Material::program_specular_color_map_uv(Self) -> String
 pub fn Material::program_specular_intensity_map(Self) -> Bool
 pub fn Material::program_specular_map(Self) -> Bool
 pub fn Material::program_specular_map_uv(Self) -> String
