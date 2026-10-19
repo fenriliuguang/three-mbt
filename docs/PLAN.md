@@ -2497,6 +2497,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `opaque` has landed. Shader, Raw, and Basic start `true`. Turning transparency on makes the parameter `false`. Additive blending also makes it `false`. Alpha to coverage makes it `false`. Restoring an opaque, normally blended material with coverage off returns `true`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while those three fields are still at their defaults. `alphaMap` stays later.
 
+`alphaMap` has landed. Shader, Raw, and Basic start `false`. Giving Shader a 1×1 alpha map makes the parameter `true`. Clearing it returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the alpha map is still empty. `alphaTest` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3686,6 +3688,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `thicknessMap` | `materials` |
 | planned | 7 | `gradientMap` | `materials` |
 | planned | 7 | `opaque` | `materials` |
+| planned | 7 | `alphaMap` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
