@@ -839,3 +839,17 @@ test "PointsMaterial addEventListener keeps one copy of a listener" {
     Some(listeners) => assert_eq(listeners.length(), 1)
   }
 }
+
+///|
+test "PointsMaterial hasEventListener reports a registered listener" {
+  let material = @materials.PointsMaterial::new()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), true)
+  assert_eq(material.has_event_listener("dispose", other_listener), false)
+  assert_eq(material.has_event_listener("change", listener), false)
+  let other = @materials.PointsMaterial::new()
+  assert_eq(other.has_event_listener("dispose", listener), false)
+}
