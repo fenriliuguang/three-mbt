@@ -55,6 +55,7 @@ pub(all) struct LineBasicMaterial {
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
+  mut user_data : Map[String, String]
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

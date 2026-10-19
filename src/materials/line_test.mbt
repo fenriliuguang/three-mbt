@@ -904,3 +904,50 @@ test "LineBasicMaterial stores and copies precision" {
     Some(precision) => assert_eq(precision is @constants.Precision::Lowp, true)
   }
 }
+
+///|
+test "LineBasicMaterial stores and copies userData" {
+  let defaults = @materials.LineBasicMaterial::new()
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("default user data")
+  }
+  let source = @materials.LineBasicMaterial::new()
+  source.user_data.set("label", "line")
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("other user data")
+  }
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.user_data.get("label") {
+    None => abort("copied user data")
+    Some(label) => assert_eq(label, "line")
+  }
+  destination.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "line")
+  }
+  match destination.user_data.get("label") {
+    None => abort("destination user data")
+    Some(label) => assert_eq(label, "copy")
+  }
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.user_data.set("label", "dash")
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  match other.line.user_data.get("label") {
+    None => abort("dashed user data")
+    Some(label) => assert_eq(label, "dash")
+  }
+  other.line.user_data.set("label", "other")
+  match dashed.line.user_data.get("label") {
+    None => abort("dashed source user data")
+    Some(label) => assert_eq(label, "dash")
+  }
+  match other.line.user_data.get("label") {
+    None => abort("dashed destination user data")
+    Some(label) => assert_eq(label, "other")
+  }
+}
