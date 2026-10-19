@@ -2159,6 +2159,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 Shader `#version 300 es` has landed. `prefixed_vertex_shader` and `prefixed_fragment_shader` on a Shader material both start with those 16 characters. The default vertex string is `941` and the default fragment string is `623`. `GLSL3` still starts with `#version 300 es` and keeps the fragment string at `541`, which is `82` shorter than `623`. A raw material stays at `92` vertex characters and `61` fragment characters, with no version line. A Basic material stays `""`. Vertex GLSL3 defines stay later.
 
+Shader vertex GLSL3 defines have landed. With both extension flags off, `prefixed_vertex_shader` is `917` characters longer than `vertex_shader` and `1009` with the default body. Index `17` is `#define attribute in`. Turning on `clip_cull_distance` makes the string `1057`, which is `48` longer. `multi_draw` alone makes it `1049`, which is `40` longer. Both flags make it `1098`, which is `89` longer. A raw material with both flags stays at `92`. Precision and `SHADER_TYPE` stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3179,6 +3181,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial` fragment prefix | `materials` |
 | planned | 7 | `ShaderMaterial` GLSL3 fragment defines | `materials` |
 | planned | 7 | Shader `#version 300 es` | `materials` |
+| planned | 7 | Shader vertex GLSL3 defines | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

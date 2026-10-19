@@ -3195,12 +3195,15 @@ test "Material shader prefixes vertex uniforms" {
   let raw = @materials.Material::raw()
   let basic = @materials.Material::basic()
   let prefixed = shader.prefixed_vertex_shader()
-  assert_eq(prefixed.length() - shader.vertex_shader.length(), 849)
-  assert_eq(prefixed.length(), 941)
+  assert_eq(prefixed.length() - shader.vertex_shader.length(), 917)
+  assert_eq(prefixed.length(), 1009)
   assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
-  assert_eq(prefixed[16:41].to_owned(), "uniform mat4 modelMatrix;")
+  assert_eq(prefixed[17:37].to_owned(), "#define attribute in")
+  assert_eq(prefixed[38:57].to_owned(), "#define varying out")
+  assert_eq(prefixed[58:83].to_owned(), "#define texture2D texture")
+  assert_eq(prefixed[84:109].to_owned(), "uniform mat4 modelMatrix;")
   assert_eq(
-    prefixed[408:432].to_owned(),
+    prefixed[476:500].to_owned(),
     "attribute vec3 position;",
   )
   assert_eq(
@@ -3213,11 +3216,40 @@ test "Material shader prefixes vertex uniforms" {
   assert_eq(basic.prefixed_vertex_shader(), "")
   shader.vertex_shader = "void main() {}"
   let custom = shader.prefixed_vertex_shader()
-  assert_eq(custom.length(), 863)
+  assert_eq(custom.length(), 931)
   assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
   raw.vertex_shader = "void main() {}"
   assert_eq(raw.prefixed_vertex_shader(), "void main() {}")
   assert_eq(raw.prefixed_vertex_shader().length(), 14)
+}
+
+///|
+test "Material shader adds vertex GLSL3 defines" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1009)
+  shader.extensions.clip_cull_distance = true
+  let clip = shader.prefixed_vertex_shader()
+  assert_eq(clip.length(), 1057)
+  assert_eq(
+    clip[16:64].to_owned(),
+    "#extension GL_ANGLE_clip_cull_distance : require",
+  )
+  shader.extensions.clip_cull_distance = false
+  shader.extensions.multi_draw = true
+  let multi = shader.prefixed_vertex_shader()
+  assert_eq(multi.length(), 1049)
+  assert_eq(
+    multi[16:56].to_owned(),
+    "#extension GL_ANGLE_multi_draw : require",
+  )
+  shader.extensions.clip_cull_distance = true
+  let both = shader.prefixed_vertex_shader()
+  assert_eq(both.length(), 1098)
+  assert_eq(1098 - 1009, 89)
+  let raw = @materials.Material::raw()
+  raw.extensions.clip_cull_distance = true
+  raw.extensions.multi_draw = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
 }
 
 ///|
