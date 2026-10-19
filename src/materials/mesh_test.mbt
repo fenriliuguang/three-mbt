@@ -7979,6 +7979,43 @@ test "Material shader envMapMode is the mapping when a map exists" {
 }
 
 ///|
+test "Material shader envMapCubeUVHeight needs cube UV mapping" {
+  let shader = @materials.Material::shader()
+  match shader.program_env_map_cube_uv_height(306) {
+    None => ()
+    Some(_) => abort("cube UV height without an env map")
+  }
+  match @materials.Material::basic().program_env_map_cube_uv_height(
+    306,
+    scene_environment_height=512,
+    has_scene_environment=true,
+  ) {
+    None => ()
+    Some(_) => abort("basic cube UV height from the scene")
+  }
+  match @materials.Material::lambert().program_env_map_cube_uv_height(
+    306,
+    scene_environment_height=512,
+    has_scene_environment=true,
+  ) {
+    Some(height) => assert_eq(height, 512)
+    None => abort("lambert cube UV height missing")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.env_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  match shader.program_env_map_cube_uv_height(301) {
+    None => ()
+    Some(_) => abort("reflection mapping wrote a cube UV height")
+  }
+  match shader.program_env_map_cube_uv_height(306) {
+    Some(height) => assert_eq(height, 1)
+    None => abort("shader cube UV height missing")
+  }
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
