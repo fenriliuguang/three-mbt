@@ -204,6 +204,7 @@ pub(all) struct SpriteMaterial {
   mut blend_dst : @constants.BlendFactor
   mut blend_equation : @constants.BlendEquation
   mut blend_src_alpha : @constants.BlendFactor?
+  mut blend_dst_alpha : @constants.BlendFactor?
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
