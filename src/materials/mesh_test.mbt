@@ -3703,15 +3703,15 @@ test "Material shader writes USE_DISPLACEMENTMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let displacement_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.displacement_map = Some(displacement_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1636)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1666)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(1636 - 1608, 28)
+  assert_eq(1666 - 1608, 58)
   assert_eq(
     shader.prefixed_vertex_shader()[683:710].to_owned(),
     "#define USE_DISPLACEMENTMAP",
   )
   shader.normal_map = Some(displacement_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1717)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1747)
   assert_eq(
     shader.prefixed_vertex_shader()[740:767].to_owned(),
     "#define USE_DISPLACEMENTMAP",
@@ -3743,7 +3743,7 @@ test "Material shader writes USE_EMISSIVEMAP" {
     "#define USE_EMISSIVEMAP",
   )
   shader.displacement_map = Some(emissive_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1716)
   assert_eq(
     shader.prefixed_vertex_shader()[711:734].to_owned(),
     "#define USE_EMISSIVEMAP",
@@ -4728,6 +4728,46 @@ test "Material shader writes NORMALMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.normal_map = Some(normal_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes DISPLACEMENTMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let displacement_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(displacement_map.channel, 0)
+  shader.displacement_map = Some(displacement_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1666)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1666 - 1608, 58)
+  assert_eq(
+    shader.prefixed_vertex_shader()[711:740].to_owned(),
+    "#define DISPLACEMENTMAP_UV uv",
+  )
+  displacement_map.channel = 1
+  shader.displacement_map = Some(displacement_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1667)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1667 - 1608, 59)
+  assert_eq(
+    shader.prefixed_vertex_shader()[711:741].to_owned(),
+    "#define DISPLACEMENTMAP_UV uv1",
+  )
+  displacement_map.channel = 0
+  shader.displacement_map = Some(displacement_map)
+  let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1747)
+  assert_eq(
+    shader.prefixed_vertex_shader()[792:821].to_owned(),
+    "#define DISPLACEMENTMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.displacement_map = Some(displacement_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.displacement_map = Some(displacement_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 

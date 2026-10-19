@@ -2249,6 +2249,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `NORMALMAP_UV` has landed. A Shader material with a 1×1 normal map writes `#define NORMALMAP_UV uv` and a newline, `24` characters, on the vertex prefix only. The default tangent-space lines stay, so the vertex string grows from `1608` to `1689`. The fragment string grows only by those normal-map lines, from `1222` to `1279`. Setting the texture `channel` to `1` writes `#define NORMALMAP_UV uv1`, `25` characters, and the vertex string is `1690`. A bump map as well puts that line after `BUMPMAP_UV`, so channel `0` makes the vertex string `1731`. A raw material stays at `92`. A Basic material stays `""`. `DISPLACEMENTMAP_UV` stays later.
 
+`DISPLACEMENTMAP_UV` has landed. A Shader material with a 1×1 displacement map writes `#define DISPLACEMENTMAP_UV uv` and a newline, `30` characters, on the vertex prefix only. The vertex string grows from `1608` to `1666`. The fragment string stays `1222`. Setting the texture `channel` to `1` writes `#define DISPLACEMENTMAP_UV uv1`, `31` characters, and the vertex string is `1667`. A normal map as well puts that line after `NORMALMAP_UV`, so channel `0` makes the vertex string `1747`. A raw material stays at `92`. A Basic material stays `""`. `METALNESSMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3314,6 +3316,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `EMISSIVEMAP_UV` | `materials` |
 | planned | 7 | `BUMPMAP_UV` | `materials` |
 | planned | 7 | `NORMALMAP_UV` | `materials` |
+| planned | 7 | `DISPLACEMENTMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
