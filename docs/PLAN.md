@@ -1867,6 +1867,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.uuid` has landed. A new material stores a 36-character id whose version nibble is `4`. Copying onto another new material leaves the destination string in place. Setting the source to `line` and the destination to `copy` leaves the source at `line`. A dashed material stores its own 36-character id on the inner line. Copying onto another dashed material leaves that destination string in place. Setting the source to `dash` and the destination to `other` leaves the source at `dash`. Line draws still do not read this string.
 
+`SpriteMaterial.uuid` has landed. A new material stores a 36-character id whose version nibble is `4`. Copying onto another new material leaves the destination string in place. Setting the source to `sprite` and the destination to `copy` leaves the source at `sprite`. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2741,6 +2743,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.uuid` | `materials` |
 | planned | 7 | `PointsMaterial.uuid` | `materials` |
 | planned | 7 | `LineBasicMaterial.uuid` | `materials` |
+| planned | 7 | `SpriteMaterial.uuid` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

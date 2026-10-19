@@ -744,3 +744,21 @@ test "SpriteMaterial id increments" {
   let after = @materials.PointsMaterial::new()
   assert_eq(after.id, destination.id + 1)
 }
+
+///|
+test "SpriteMaterial uuid is a version-4 id" {
+  let source = @materials.SpriteMaterial::new()
+  assert_eq(source.uuid.length(), 36)
+  assert_eq(source.uuid[14:15].to_owned(), "4")
+  let destination = @materials.SpriteMaterial::new()
+  let kept = destination.uuid
+  assert_eq(kept.length(), 36)
+  assert_eq(kept[14:15].to_owned(), "4")
+  source.uuid = "sprite"
+  ignore(destination.copy(source))
+  assert_eq(destination.uuid, kept)
+  assert_eq(source.uuid, "sprite")
+  destination.uuid = "copy"
+  assert_eq(source.uuid, "sprite")
+  assert_eq(destination.uuid, "copy")
+}

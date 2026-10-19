@@ -1003,7 +1003,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// `alpha_test` 默认 `0`。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。`blend_src_alpha` 默认空。`blend_dst_alpha` 默认空。`blend_equation_alpha` 默认空。`stencil_write_mask` 默认 `0xFF`。`stencil_func` 默认 `Always`。`stencil_ref` 默认 `0`。`stencil_func_mask` 默认 `0xFF`。`stencil_fail` 默认 `Keep`。比较失败时的模板操作。`stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。`stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。`stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。`clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。`precision` 默认空。空着时沿用渲染器默认精度。`user_data` 默认空表。自定义字符串键值。`version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。`id` 与网格材质共用从 `0` 起的计数。每新建一份精灵材质取下一个编号。`copy` 不改目标上的这个编号。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data`。空着时 alpha 通道分别沿用 `blend_src`、`blend_dst` 与 `blend_equation`。
+/// `alpha_test` 默认 `0`。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。`blend_src_alpha` 默认空。`blend_dst_alpha` 默认空。`blend_equation_alpha` 默认空。`stencil_write_mask` 默认 `0xFF`。`stencil_func` 默认 `Always`。`stencil_ref` 默认 `0`。`stencil_func_mask` 默认 `0xFF`。`stencil_fail` 默认 `Keep`。比较失败时的模板操作。`stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。`stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。`stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。`clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。`precision` 默认空。空着时沿用渲染器默认精度。`user_data` 默认空表。自定义字符串键值。`version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。`id` 与网格材质共用从 `0` 起的计数。每新建一份精灵材质取下一个编号。`copy` 不改目标上的这个编号。`uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data`。空着时 alpha 通道分别沿用 `blend_src`、`blend_dst` 与 `blend_equation`。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
@@ -1038,6 +1038,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466
 /// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44
+/// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L82
@@ -1102,6 +1103,7 @@ pub(all) struct SpriteMaterial {
   mut user_data : Map[String, String]
   mut version : Int
   id : Int
+  mut uuid : String
 }
 
 ///|
@@ -1162,6 +1164,7 @@ pub fn SpriteMaterial::new(
     user_data: Map([]),
     version: 0,
     id: fresh_material_id(),
+    uuid: @math.generate_uuid(),
   }
 }
 
