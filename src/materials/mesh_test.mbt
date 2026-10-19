@@ -2052,3 +2052,21 @@ test "Material attenuationColor starts white and copies into the destination" {
   assert_eq(standard.attenuation_color.g, 1.0)
   assert_eq(standard.attenuation_color.b, 1.0)
 }
+
+///|
+test "Material specularIntensity defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.specular_intensity, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.specular_intensity, 1.0)
+  lambert.specular_intensity = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.specular_intensity, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.specular_intensity, 0.25)
+  destination.specular_intensity = 0.0
+  assert_eq(lambert.specular_intensity, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.specular_intensity, 1.0)
+}

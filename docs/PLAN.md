@@ -2047,6 +2047,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.attenuationColor` has landed. A new Basic, Lambert, and Standard material each store white. A Lambert material set to `(0.25, 0.5, 0.75)` leaves another Lambert material white. Copying onto a Basic material stores those components in the destination color. Setting the destination to red leaves the source at `(0.25, 0.5, 0.75)`. A new Standard material stays white. The renderer still does not compute attenuation. `specularIntensity` stays later.
 
+`Material.specularIntensity` has landed. A new Basic, Lambert, and Standard material each store `1`. A Lambert material set to `0.25` leaves another Lambert material at `1`. Copying onto a Basic material stores `0.25`. Setting the destination to `0` leaves the source at `0.25`. A new Standard material stays at `1`. The renderer still does not scale specular intensity. `specularIntensityMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3011,6 +3013,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.thicknessMap` | `materials` |
 | planned | 7 | `Material.attenuationDistance` | `materials` |
 | planned | 7 | `Material.attenuationColor` | `materials` |
+| planned | 7 | `Material.specularIntensity` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
