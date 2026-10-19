@@ -190,3 +190,27 @@ test "PointsMaterial stores and copies dithering" {
   destination.dithering = false
   assert_eq(source.dithering, true)
 }
+
+///|
+test "PointsMaterial stores and copies polygonOffset" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.polygon_offset, false)
+  assert_eq(defaults.polygon_offset_factor, 0.0)
+  assert_eq(defaults.polygon_offset_units, 0.0)
+  let source = @materials.PointsMaterial::new()
+  source.polygon_offset = true
+  source.polygon_offset_factor = 1.0
+  source.polygon_offset_units = -2.0
+  assert_eq(defaults.polygon_offset, false)
+  assert_eq(defaults.polygon_offset_factor, 0.0)
+  assert_eq(defaults.polygon_offset_units, 0.0)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.polygon_offset, true)
+  assert_eq(destination.polygon_offset_factor, 1.0)
+  assert_eq(destination.polygon_offset_units, -2.0)
+  destination.polygon_offset_factor = 3.0
+  destination.polygon_offset_units = 5.0
+  assert_eq(source.polygon_offset_factor, 1.0)
+  assert_eq(source.polygon_offset_units, -2.0)
+}

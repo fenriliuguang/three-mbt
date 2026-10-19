@@ -127,6 +127,9 @@ pub(all) struct PointsMaterial {
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
   mut dithering : Bool
+  mut polygon_offset : Bool
+  mut polygon_offset_factor : Double
+  mut polygon_offset_units : Double
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
