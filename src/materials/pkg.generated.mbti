@@ -59,6 +59,7 @@ pub(all) struct LineBasicMaterial {
   mut version : Int
   id : Int
   mut uuid : String
+  mut name : String
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

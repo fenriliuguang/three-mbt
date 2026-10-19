@@ -1095,3 +1095,26 @@ test "LineBasicMaterial uuid is a version-4 id" {
   other.line.uuid = "other"
   assert_eq(dashed.line.uuid, "dash")
 }
+
+///|
+test "LineBasicMaterial stores and copies name" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.name, "")
+  let source = @materials.LineBasicMaterial::new()
+  source.name = "line"
+  assert_eq(defaults.name, "")
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "line")
+  destination.name = "copy"
+  assert_eq(source.name, "line")
+  assert_eq(destination.name, "copy")
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.name = "dash"
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.name, "dash")
+  other.line.name = "other"
+  assert_eq(dashed.line.name, "dash")
+  assert_eq(other.line.name, "other")
+}
