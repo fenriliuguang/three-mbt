@@ -2247,6 +2247,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `BUMPMAP_UV` has landed. A Shader material with a 1×1 bump map and `wireframe` left false writes `#define BUMPMAP_UV uv` and a newline, `22` characters, on the vertex prefix only. The vertex string grows from `1608` to `1650`. The fragment string grows only by `USE_BUMPMAP`, from `1222` to `1242`. Setting the texture `channel` to `1` writes `#define BUMPMAP_UV uv1`, `23` characters, and the vertex string is `1651`. Turning `wireframe` on drops the line, so the vertex string is `1628`. An emissive map as well puts that line after `EMISSIVEMAP_UV`, so channel `0` makes the vertex string `1700`. A raw material stays at `92`. A Basic material stays `""`. `NORMALMAP_UV` stays later.
 
+`NORMALMAP_UV` has landed. A Shader material with a 1×1 normal map writes `#define NORMALMAP_UV uv` and a newline, `24` characters, on the vertex prefix only. The default tangent-space lines stay, so the vertex string grows from `1608` to `1689`. The fragment string grows only by those normal-map lines, from `1222` to `1279`. Setting the texture `channel` to `1` writes `#define NORMALMAP_UV uv1`, `25` characters, and the vertex string is `1690`. A bump map as well puts that line after `BUMPMAP_UV`, so channel `0` makes the vertex string `1731`. A raw material stays at `92`. A Basic material stays `""`. `DISPLACEMENTMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3311,6 +3313,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `AOMAP_UV` | `materials` |
 | planned | 7 | `EMISSIVEMAP_UV` | `materials` |
 | planned | 7 | `BUMPMAP_UV` | `materials` |
+| planned | 7 | `NORMALMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

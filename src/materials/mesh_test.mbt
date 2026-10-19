@@ -3605,9 +3605,9 @@ test "Material shader writes USE_NORMALMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.normal_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
   assert_eq(shader.prefixed_fragment_shader().length(), 1279)
-  assert_eq(1665 - 1608, 57)
+  assert_eq(1689 - 1608, 81)
   assert_eq(
     shader.prefixed_vertex_shader()[683:704].to_owned(),
     "#define USE_NORMALMAP",
@@ -3617,7 +3617,7 @@ test "Material shader writes USE_NORMALMAP" {
     "#define USE_NORMALMAP",
   )
   shader.bump_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1707)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1731)
   assert_eq(
     shader.prefixed_vertex_shader()[703:724].to_owned(),
     "#define USE_NORMALMAP",
@@ -3642,9 +3642,9 @@ test "Material shader writes USE_NORMALMAP_TANGENTSPACE" {
   let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   shader.normal_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
   assert_eq(shader.prefixed_fragment_shader().length(), 1279)
-  assert_eq(1665 - 1630, 35)
+  assert_eq(1689 - 1654, 35)
   assert_eq(
     shader.prefixed_vertex_shader()[705:739].to_owned(),
     "#define USE_NORMALMAP_TANGENTSPACE",
@@ -3654,7 +3654,7 @@ test "Material shader writes USE_NORMALMAP_TANGENTSPACE" {
     "#define USE_NORMALMAP_TANGENTSPACE",
   )
   shader.normal_map_type = @constants.NormalMapType::ObjectSpace
-  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1688)
   assert_eq(shader.prefixed_fragment_shader().length(), 1278)
   let raw = @materials.Material::raw()
   raw.normal_map = Some(normal_map)
@@ -3671,9 +3671,9 @@ test "Material shader writes USE_NORMALMAP_OBJECTSPACE" {
   let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.normal_map = Some(normal_map)
   shader.normal_map_type = @constants.NormalMapType::ObjectSpace
-  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1688)
   assert_eq(shader.prefixed_fragment_shader().length(), 1278)
-  assert_eq(1664 - 1630, 34)
+  assert_eq(1688 - 1654, 34)
   assert_eq(
     shader.prefixed_vertex_shader()[705:738].to_owned(),
     "#define USE_NORMALMAP_OBJECTSPACE",
@@ -3711,7 +3711,7 @@ test "Material shader writes USE_DISPLACEMENTMAP" {
     "#define USE_DISPLACEMENTMAP",
   )
   shader.normal_map = Some(displacement_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1693)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1717)
   assert_eq(
     shader.prefixed_vertex_shader()[740:767].to_owned(),
     "#define USE_DISPLACEMENTMAP",
@@ -4688,6 +4688,46 @@ test "Material shader writes BUMPMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.bump_map = Some(bump_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes NORMALMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(normal_map.channel, 0)
+  shader.normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
+  assert_eq(1689 - 1608, 81)
+  assert_eq(
+    shader.prefixed_vertex_shader()[740:763].to_owned(),
+    "#define NORMALMAP_UV uv",
+  )
+  normal_map.channel = 1
+  shader.normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1690)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
+  assert_eq(1690 - 1608, 82)
+  assert_eq(
+    shader.prefixed_vertex_shader()[740:764].to_owned(),
+    "#define NORMALMAP_UV uv1",
+  )
+  normal_map.channel = 0
+  shader.normal_map = Some(normal_map)
+  let bump_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.bump_map = Some(bump_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1731)
+  assert_eq(
+    shader.prefixed_vertex_shader()[782:805].to_owned(),
+    "#define NORMALMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.normal_map = Some(normal_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.normal_map = Some(normal_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
