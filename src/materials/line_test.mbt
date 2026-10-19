@@ -251,3 +251,38 @@ test "LineBasicMaterial stores and copies dithering" {
   other.line.dithering = false
   assert_eq(dashed.line.dithering, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies polygonOffset" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.polygon_offset, false)
+  assert_eq(defaults.polygon_offset_factor, 0.0)
+  assert_eq(defaults.polygon_offset_units, 0.0)
+  let source = @materials.LineBasicMaterial::new()
+  source.polygon_offset = true
+  source.polygon_offset_factor = 1.0
+  source.polygon_offset_units = -2.0
+  assert_eq(defaults.polygon_offset, false)
+  assert_eq(defaults.polygon_offset_factor, 0.0)
+  assert_eq(defaults.polygon_offset_units, 0.0)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.polygon_offset, true)
+  assert_eq(destination.polygon_offset_factor, 1.0)
+  assert_eq(destination.polygon_offset_units, -2.0)
+  destination.polygon_offset_factor = 3.0
+  destination.polygon_offset_units = 5.0
+  assert_eq(source.polygon_offset_factor, 1.0)
+  assert_eq(source.polygon_offset_units, -2.0)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.polygon_offset = true
+  dashed.line.polygon_offset_factor = 1.0
+  dashed.line.polygon_offset_units = -2.0
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.polygon_offset, true)
+  assert_eq(other.line.polygon_offset_factor, 1.0)
+  assert_eq(other.line.polygon_offset_units, -2.0)
+  other.line.polygon_offset_factor = 9.0
+  assert_eq(dashed.line.polygon_offset_factor, 1.0)
+}
