@@ -1226,6 +1226,24 @@ test "LineBasicMaterial hasEventListener reports a registered listener" {
 }
 
 ///|
+test "LineBasicMaterial removeEventListener drops a registered listener" {
+  let material = @materials.LineBasicMaterial::new()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("change", other_listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  assert_eq(material.has_event_listener("change", other_listener), true)
+  let other = @materials.LineBasicMaterial::new()
+  other.add_event_listener("dispose", listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(other.has_event_listener("dispose", listener), true)
+}
+
+///|
 test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
   let defaults = @materials.LineDashedMaterial::new()
   let defaults_clone = defaults.clone()
