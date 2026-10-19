@@ -445,6 +445,22 @@ pub fn SkinnedMesh::normalize_skin_weights(self : SkinnedMesh) -> Unit {
 }
 
 ///|
+/// 更新世界矩阵，再按绑定模式重写逆绑定矩阵。附着时用世界矩阵，分离时用绑定矩阵。
+/// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L290
+pub fn SkinnedMesh::update_matrix_world(
+  self : SkinnedMesh,
+  force? : Bool = false,
+) -> Unit {
+  self.mesh.node.update_matrix_world(force~)
+  match self.bind_mode {
+    @constants.Attached =>
+      ignore(self.bind_matrix_inverse.copy(self.mesh.node.matrix_world).invert())
+    @constants.Detached =>
+      ignore(self.bind_matrix_inverse.copy(self.bind_matrix).invert())
+  }
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39

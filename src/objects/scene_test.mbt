@@ -2022,6 +2022,31 @@ test "panic SkinnedMesh.normalizeSkinWeights requires skinWeight" {
 }
 
 ///|
+test "SkinnedMesh.updateMatrixWorld refreshes the inverse bind matrix" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.mesh.node.position.set(0.0, 3.0, 0.0))
+  skin.update_matrix_world()
+  assert_eq(skin.mesh.node.matrix_world.elements[13], 3.0)
+  assert_eq(skin.bind_matrix.elements[13], 0.0)
+  assert_eq(skin.bind_matrix_inverse.elements[13], -3.0)
+  assert_eq(skin.bind_matrix_inverse.elements[0], 1.0)
+  ignore(
+    skin.bind_matrix.set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    ),
+  )
+  skin.bind_mode = @constants.Detached
+  ignore(skin.mesh.node.position.set(0.0, 9.0, 0.0))
+  skin.update_matrix_world(force=true)
+  assert_eq(skin.mesh.node.matrix_world.elements[13], 9.0)
+  assert_eq(skin.bind_matrix.elements[13], 4.0)
+  assert_eq(skin.bind_matrix_inverse.elements[13], -4.0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []
