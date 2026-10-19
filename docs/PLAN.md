@@ -1751,6 +1751,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.stencilFunc` has landed. A new basic, Lambert, or Standard material stores `Always`, whose integer is `519`. `Never` is `512`, `Less` is `513`, `Equal` is `514`, `LessEqual` is `515`, `Greater` is `516`, `NotEqual` is `517`, and `GreaterEqual` is `518`. Setting the basic material to `Never` leaves another basic material at `Always`. Setting the Standard material to `Equal` leaves the Lambert material at `Always`. The pipeline still does not read this field.
 
+`PointsMaterial.stencilFunc` has landed. A new material stores `Always`, whose integer is `519`. Setting it to `Never` (`512`) leaves another new material at `Always`. Copying onto a default material stores `Never`. Setting the destination to `Equal` (`514`) leaves the source at `Never`. Point draws still do not read this field.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2567,6 +2569,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.stencilWriteMask` | `materials` |
 | planned | 7 | `SpriteMaterial.stencilWriteMask` | `materials` |
 | planned | 7 | `Material.stencilFunc` | `materials` |
+| planned | 7 | `PointsMaterial.stencilFunc` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

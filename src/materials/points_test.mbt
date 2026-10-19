@@ -457,3 +457,20 @@ test "PointsMaterial stores and copies stencilWriteMask" {
   assert_eq(source.stencil_write_mask, 0)
   assert_eq(destination.stencil_write_mask, 1)
 }
+
+///|
+test "PointsMaterial stores and copies stencilFunc" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(defaults.stencil_func.to_int(), 519)
+  let source = @materials.PointsMaterial::new()
+  source.stencil_func = @constants.StencilFunc::Never
+  assert_eq(defaults.stencil_func is @constants.StencilFunc::Always, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_func is @constants.StencilFunc::Never, true)
+  assert_eq(destination.stencil_func.to_int(), 512)
+  destination.stencil_func = @constants.StencilFunc::Equal
+  assert_eq(source.stencil_func.to_int(), 512)
+  assert_eq(destination.stencil_func.to_int(), 514)
+}
