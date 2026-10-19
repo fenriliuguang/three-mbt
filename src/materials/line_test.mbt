@@ -1067,3 +1067,31 @@ test "LineBasicMaterial id increments" {
   assert_eq(other.line.id, dashed.line.id + 1)
   assert_eq(dashed.line.id, destination.id + 1)
 }
+
+///|
+test "LineBasicMaterial uuid is a version-4 id" {
+  let source = @materials.LineBasicMaterial::new()
+  assert_eq(source.uuid.length(), 36)
+  assert_eq(source.uuid[14:15].to_owned(), "4")
+  let destination = @materials.LineBasicMaterial::new()
+  let kept = destination.uuid
+  assert_eq(kept.length(), 36)
+  assert_eq(kept[14:15].to_owned(), "4")
+  source.uuid = "line"
+  ignore(destination.copy(source))
+  assert_eq(destination.uuid, kept)
+  assert_eq(source.uuid, "line")
+  destination.uuid = "copy"
+  assert_eq(source.uuid, "line")
+  let dashed = @materials.LineDashedMaterial::new()
+  assert_eq(dashed.line.uuid.length(), 36)
+  assert_eq(dashed.line.uuid[14:15].to_owned(), "4")
+  let other = @materials.LineDashedMaterial::new()
+  let other_kept = other.line.uuid
+  dashed.line.uuid = "dash"
+  ignore(other.copy(dashed))
+  assert_eq(other.line.uuid, other_kept)
+  assert_eq(dashed.line.uuid, "dash")
+  other.line.uuid = "other"
+  assert_eq(dashed.line.uuid, "dash")
+}

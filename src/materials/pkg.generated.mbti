@@ -58,6 +58,7 @@ pub(all) struct LineBasicMaterial {
   mut user_data : Map[String, String]
   mut version : Int
   id : Int
+  mut uuid : String
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

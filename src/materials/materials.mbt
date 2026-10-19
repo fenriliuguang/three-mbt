@@ -710,6 +710,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// `user_data` 默认空表。自定义字符串键值。线段绘制仍不读这张表。
 /// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。线段绘制仍不读它。
 /// `id` 与网格材质共用从 `0` 起的计数。每新建一份线材质取下一个编号。`copy` 不改目标上的这个编号。线段绘制仍不读它。
+/// `uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。线段绘制仍不读它。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -746,6 +747,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466
 /// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44
+/// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -792,6 +794,7 @@ pub(all) struct LineBasicMaterial {
   mut user_data : Map[String, String]
   mut version : Int
   id : Int
+  mut uuid : String
 }
 
 ///|
@@ -842,6 +845,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     user_data: Map([]),
     version: 0,
     id: fresh_material_id(),
+    uuid: @math.generate_uuid(),
   }
 }
 
