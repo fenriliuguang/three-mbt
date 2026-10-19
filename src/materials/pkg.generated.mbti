@@ -398,6 +398,7 @@ pub struct ProgramCache {
 }
 pub fn ProgramCache::acquire(Self, String) -> CachedProgram
 pub fn ProgramCache::new() -> Self
+pub fn ProgramCache::release(Self, CachedProgram) -> Unit
 
 pub(all) struct ShaderExtensions {
   mut clip_cull_distance : Bool

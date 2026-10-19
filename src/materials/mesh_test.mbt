@@ -7288,6 +7288,45 @@ test "Material shader acquireProgram reuses a cache key" {
 }
 
 ///|
+test "Material shader releaseProgram drops a zero count" {
+  let cache = @materials.ProgramCache::new()
+  let first = cache.acquire("a")
+  ignore(cache.acquire("a"))
+  cache.release(first)
+  assert_eq(first.used_times.val, 1)
+  assert_eq(cache.programs.length(), 1)
+  assert_eq(cache.by_key.get("a") is Some(_), true)
+  cache.release(first)
+  assert_eq(first.used_times.val, 0)
+  assert_eq(cache.programs.length(), 0)
+  match cache.by_key.get("a") {
+    None => ()
+    Some(_) => abort("released program stayed in the key map")
+  }
+  let again = cache.acquire("a")
+  assert_eq(again.used_times.val, 1)
+  assert_eq(first.used_times.val, 0)
+  let left = cache.acquire("b")
+  let middle = cache.acquire("c")
+  let right = cache.acquire("d")
+  cache.release(middle)
+  assert_eq(middle.used_times.val, 0)
+  assert_eq(cache.programs.length(), 3)
+  assert_eq(cache.programs[0].cache_key, "a")
+  assert_eq(cache.programs[1].cache_key, "b")
+  assert_eq(cache.programs[2].cache_key, "d")
+  assert_eq(left.used_times.val, 1)
+  assert_eq(right.used_times.val, 1)
+  match cache.by_key.get("c") {
+    None => ()
+    Some(_) => abort("swapped program stayed in the key map")
+  }
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

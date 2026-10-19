@@ -2375,6 +2375,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `acquireProgram` has landed. An empty cache holds no programs. The first acquire of a key stores one record with `usedTimes` `1`. Acquiring that key again increments the same record, so the count is `2` and the list length stays `1`. A second key is appended, and the first record stays at `2`. No WebGL program is compiled. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `releaseProgram` stays later.
 
+`releaseProgram` has landed. Releasing a program decrements `usedTimes`. A count of `2` becomes `1` and the list stays. A count of `1` becomes `0`, that entry is removed, and the last list item moves into the empty slot. Acquiring the same key afterwards starts again at `1`. No WebGL program is destroyed. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `releaseShaderCache` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3503,6 +3505,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `getProgramCacheKey` | `materials` |
 | planned | 7 | `getUniforms` | `materials` |
 | planned | 7 | `acquireProgram` | `materials` |
+| planned | 7 | `releaseProgram` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
