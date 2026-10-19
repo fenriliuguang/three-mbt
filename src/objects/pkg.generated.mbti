@@ -126,6 +126,7 @@ pub(all) struct Points {
   mut geometry : @core.BufferGeometry
   mut material : @materials.PointsMaterial
 }
+pub fn Points::clone(Self, recursive? : Bool) -> Self
 pub fn Points::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
 pub fn Points::refresh(Self) -> Unit

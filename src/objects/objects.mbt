@@ -304,6 +304,13 @@ pub fn Points::copy(
 }
 
 ///|
+/// 新建一份点云再复制。three.js 没有单独的 `Points.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Points::clone(self : Points, recursive? : Bool = true) -> Points {
+  Points::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
 pub fn Points::refresh(self : Points) -> Unit {
   self.node.primitive = Some(
     primitive_binding(
