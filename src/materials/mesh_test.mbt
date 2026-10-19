@@ -5551,6 +5551,39 @@ test "Material shader writes HAS_NORMAL" {
 }
 
 ///|
+test "Material shader writes USE_COLOR" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.vertex_colors, false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.vertex_colors = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1626)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1240)
+  assert_eq(1626 - 1608, 18)
+  assert_eq(shader.prefixed_vertex_shader()[683:700].to_owned(), "#define USE_COLOR")
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1096].to_owned(),
+    "#define USE_COLOR",
+  )
+  shader.vertex_colors = false
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.vertex_colors = true
+  assert_eq(shader.prefixed_vertex_shader(has_normal=true).length(), 1645)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_normal=true)[702:719].to_owned(),
+    "#define USE_COLOR",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1240)
+  let raw = @materials.Material::raw()
+  raw.vertex_colors = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.vertex_colors = true
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
