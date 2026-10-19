@@ -2003,3 +2003,24 @@ test "Material thicknessMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.thickness_map is None, true)
 }
+
+///|
+test "Material attenuationDistance defaults to positive infinity and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.attenuation_distance.is_inf(), true)
+  assert_eq(basic.attenuation_distance > 0.0, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.attenuation_distance.is_inf(), true)
+  lambert.attenuation_distance = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.attenuation_distance.is_inf(), true)
+  assert_eq(other.attenuation_distance > 0.0, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.attenuation_distance, 2.0)
+  destination.attenuation_distance = 1.0
+  assert_eq(lambert.attenuation_distance, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.attenuation_distance.is_inf(), true)
+  assert_eq(standard.attenuation_distance > 0.0, true)
+}
