@@ -2269,6 +2269,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `SHEEN_COLORMAP_UV` has landed. A Shader material with `sheen` at `0` and a 1×1 sheen color map adds nothing. Setting `sheen` to `1` writes `#define SHEEN_COLORMAP_UV uv` and a newline, `29` characters, on the vertex prefix only. The vertex string grows from `1608` to `1664`. The fragment string grows only by `USE_SHEEN_COLORMAP`, from `1222` to `1249`. Setting the texture `channel` to `1` writes `#define SHEEN_COLORMAP_UV uv1`, `30` characters, and the vertex string is `1665`. Putting `sheen` back to `0` drops the line. An iridescence thickness map with `iridescence` at `1` puts that line after `IRIDESCENCE_THICKNESSMAP_UV`, so channel `0` makes the vertex string `1740`. A raw material stays at `92`. A Basic material stays `""`. `SHEEN_ROUGHNESSMAP_UV` stays later.
 
+`SHEEN_ROUGHNESSMAP_UV` has landed. A Shader material with `sheen` at `0` and a 1×1 sheen roughness map adds nothing. Setting `sheen` to `1` writes `#define SHEEN_ROUGHNESSMAP_UV uv` and a newline, `33` characters, on the vertex prefix only. The vertex string grows from `1608` to `1672`. The fragment string grows only by `USE_SHEEN_ROUGHNESSMAP`, from `1222` to `1253`. Setting the texture `channel` to `1` writes `#define SHEEN_ROUGHNESSMAP_UV uv1`, `34` characters, and the vertex string is `1673`. Putting `sheen` back to `0` drops the line. A sheen color map as well puts that line after `SHEEN_COLORMAP_UV`, so channel `0` makes the vertex string `1728`. A raw material stays at `92`. A Basic material stays `""`. `SPECULARMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3344,6 +3346,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `IRIDESCENCEMAP_UV` | `materials` |
 | planned | 7 | `IRIDESCENCE_THICKNESSMAP_UV` | `materials` |
 | planned | 7 | `SHEEN_COLORMAP_UV` | `materials` |
+| planned | 7 | `SHEEN_ROUGHNESSMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

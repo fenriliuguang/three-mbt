@@ -4419,9 +4419,9 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.sheen = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1639)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1672)
   assert_eq(shader.prefixed_fragment_shader().length(), 1253)
-  assert_eq(1639 - 1608, 31)
+  assert_eq(1672 - 1608, 64)
   assert_eq(
     shader.prefixed_vertex_shader()[683:713].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
@@ -4431,7 +4431,7 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
   shader.sheen_color_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1695)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1728)
   assert_eq(
     shader.prefixed_vertex_shader()[710:740].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
@@ -4475,7 +4475,7 @@ test "Material shader writes MAP_UV" {
   shader.map = Some(map)
   shader.sheen = 1.0
   shader.sheen_roughness_map = Some(map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1673)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1706)
   assert_eq(
     shader.prefixed_vertex_shader()[730:747].to_owned(),
     "#define MAP_UV uv",
@@ -5187,6 +5187,54 @@ test "Material shader writes SHEEN_COLORMAP_UV" {
   let basic = @materials.Material::basic()
   basic.sheen = 1.0
   basic.sheen_color_map = Some(sheen_color_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes SHEEN_ROUGHNESSMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let sheen_roughness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(sheen_roughness_map.channel, 0)
+  shader.sheen_roughness_map = Some(sheen_roughness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.sheen = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1672)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1253)
+  assert_eq(1672 - 1608, 64)
+  assert_eq(
+    shader.prefixed_vertex_shader()[714:746].to_owned(),
+    "#define SHEEN_ROUGHNESSMAP_UV uv",
+  )
+  sheen_roughness_map.channel = 1
+  shader.sheen_roughness_map = Some(sheen_roughness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1673)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1253)
+  assert_eq(1673 - 1608, 65)
+  assert_eq(
+    shader.prefixed_vertex_shader()[714:747].to_owned(),
+    "#define SHEEN_ROUGHNESSMAP_UV uv1",
+  )
+  shader.sheen = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.sheen = 1.0
+  sheen_roughness_map.channel = 0
+  shader.sheen_roughness_map = Some(sheen_roughness_map)
+  let sheen_color_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.sheen_color_map = Some(sheen_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1728)
+  assert_eq(
+    shader.prefixed_vertex_shader()[770:802].to_owned(),
+    "#define SHEEN_ROUGHNESSMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.sheen = 1.0
+  raw.sheen_roughness_map = Some(sheen_roughness_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.sheen = 1.0
+  basic.sheen_roughness_map = Some(sheen_roughness_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
