@@ -6168,6 +6168,43 @@ test "Material shader writes FLIP_SIDED" {
 }
 
 ///|
+test "Material shader writes USE_SHADOWMAP" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1630)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1244)
+  assert_eq(1630 - 1608, 22)
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true)[683:704].to_owned(),
+    "#define USE_SHADOWMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true)[1079:1100].to_owned(),
+    "#define USE_SHADOWMAP",
+  )
+  shader.side = @constants.Back
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1649)
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true)[702:723].to_owned(),
+    "#define USE_SHADOWMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1263)
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true)[1098:1119].to_owned(),
+    "#define USE_SHADOWMAP",
+  )
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=false).length(), 1627)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=false).length(), 1241)
+  let raw = @materials.Material::raw()
+  raw.side = @constants.Back
+  assert_eq(raw.prefixed_vertex_shader(shadow_map_enabled=true).length(), 92)
+  let basic = @materials.Material::basic()
+  basic.side = @constants.Back
+  assert_eq(basic.prefixed_vertex_shader(shadow_map_enabled=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
