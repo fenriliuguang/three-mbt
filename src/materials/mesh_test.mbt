@@ -1094,3 +1094,21 @@ test "Material displacementMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.displacement_map is None, true)
 }
+
+///|
+test "Material displacementScale defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.displacement_scale, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.displacement_scale, 1.0)
+  lambert.displacement_scale = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.displacement_scale, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.displacement_scale, 0.25)
+  destination.displacement_scale = 2.0
+  assert_eq(lambert.displacement_scale, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.displacement_scale, 1.0)
+}
