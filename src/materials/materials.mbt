@@ -353,7 +353,7 @@ pub fn LineBasicMaterial::copy(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// 渲染器仍不画精灵。
+/// `alpha_test` 默认 `0`。渲染器仍不画精灵。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
@@ -363,6 +363,7 @@ pub fn LineBasicMaterial::copy(
 /// r186: `transparent` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L107
 /// r186: `fog` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L115
 /// r186: `opacity` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L111
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
 /// r186: `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211
 /// r186: `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220
 /// r186: `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231
@@ -374,6 +375,7 @@ pub(all) struct SpriteMaterial {
   mut map : @textures.Texture?
   mut alpha_map : @textures.Texture?
   mut opacity : Double
+  mut alpha_test : Double
   mut transparent : Bool
   mut fog : Bool
   mut rotation : Double
@@ -400,6 +402,7 @@ pub fn SpriteMaterial::new(
     map: None,
     alpha_map: None,
     opacity,
+    alpha_test: 0.0,
     transparent,
     fog,
     rotation,
@@ -415,7 +418,7 @@ pub fn SpriteMaterial::new(
 
 ///|
 /// 把颜色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘和可见性一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘和可见性一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -426,6 +429,7 @@ pub fn SpriteMaterial::copy(
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.opacity = source.opacity
+  self.alpha_test = source.alpha_test
   self.transparent = source.transparent
   self.fog = source.fog
   self.rotation = source.rotation

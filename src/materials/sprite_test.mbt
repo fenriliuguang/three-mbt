@@ -120,3 +120,17 @@ test "SpriteMaterial.copy writes color and shares maps" {
   assert_eq(source.opacity, 0.25)
   assert_eq(source.rotation, 0.5)
 }
+
+///|
+test "SpriteMaterial stores and copies alphaTest" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.alpha_test, 0.0)
+  let source = @materials.SpriteMaterial::new()
+  source.alpha_test = 0.4
+  assert_eq(defaults.alpha_test, 0.0)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_test, 0.4)
+  destination.alpha_test = 0.8
+  assert_eq(source.alpha_test, 0.4)
+}
