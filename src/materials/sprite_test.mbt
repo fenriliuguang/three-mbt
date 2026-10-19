@@ -662,3 +662,20 @@ test "SpriteMaterial stores and copies userData" {
     Some(label) => assert_eq(label, "copy")
   }
 }
+
+///|
+test "SpriteMaterial stores version" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.version, 0)
+  let source = @materials.SpriteMaterial::new()
+  source.version = 1
+  assert_eq(defaults.version, 0)
+  let destination = @materials.SpriteMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 1)
+  destination.version = 2
+  assert_eq(source.version, 1)
+  assert_eq(destination.version, 2)
+}
