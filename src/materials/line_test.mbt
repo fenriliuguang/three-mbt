@@ -328,3 +328,24 @@ test "LineBasicMaterial stores and copies clipIntersection" {
   other.line.clip_intersection = false
   assert_eq(dashed.line.clip_intersection, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies allowOverride" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.allow_override, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.allow_override = false
+  assert_eq(defaults.allow_override, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.allow_override, false)
+  destination.allow_override = true
+  assert_eq(source.allow_override, false)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.allow_override = false
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.allow_override, false)
+  other.line.allow_override = true
+  assert_eq(dashed.line.allow_override, false)
+}
