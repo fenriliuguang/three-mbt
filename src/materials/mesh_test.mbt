@@ -1484,3 +1484,65 @@ test "Material wireframeLinejoin defaults to round and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.wireframe_linejoin is @materials.WireframeJoin::Round, true)
 }
+
+///|
+test "Material defines starts empty except standard and resets on copy" {
+  let basic = @materials.Material::basic()
+  match basic.defines.get("STANDARD") {
+    None => ()
+    Some(_) => abort("basic defines")
+  }
+  let lambert = @materials.Material::lambert()
+  match lambert.defines.get("STANDARD") {
+    None => ()
+    Some(_) => abort("lambert defines")
+  }
+  let standard = @materials.Material::standard()
+  match standard.defines.get("STANDARD") {
+    None => abort("standard defines")
+    Some(value) => assert_eq(value, "")
+  }
+  standard.defines.set("FOO", "1")
+  let other = @materials.Material::standard()
+  match other.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("other foo")
+  }
+  match other.defines.get("STANDARD") {
+    None => abort("other standard")
+    Some(value) => assert_eq(value, "")
+  }
+  let basic_dest = @materials.Material::basic()
+  ignore(basic_dest.copy(standard))
+  match basic_dest.defines.get("STANDARD") {
+    None => ()
+    Some(_) => abort("basic dest standard")
+  }
+  match basic_dest.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("basic dest foo")
+  }
+  match standard.defines.get("FOO") {
+    None => abort("source foo")
+    Some(value) => assert_eq(value, "1")
+  }
+  let standard_dest = @materials.Material::standard()
+  ignore(standard_dest.copy(standard))
+  match standard_dest.defines.get("STANDARD") {
+    None => abort("dest standard")
+    Some(value) => assert_eq(value, "")
+  }
+  match standard_dest.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("dest foo")
+  }
+  match standard.defines.get("FOO") {
+    None => abort("source foo after copy")
+    Some(value) => assert_eq(value, "1")
+  }
+  standard_dest.defines.set("STANDARD", "x")
+  match standard.defines.get("STANDARD") {
+    None => abort("source standard")
+    Some(value) => assert_eq(value, "")
+  }
+}
