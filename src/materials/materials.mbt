@@ -288,12 +288,15 @@ pub fn PointsMaterial::copy(
 ///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
+/// `alpha_test` 默认 `0`。线段着色器仍不按它丢弃片元。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
   mut opacity : Double
+  mut alpha_test : Double
   mut transparent : Bool
   mut fog : Bool
   mut depth_write : Bool
@@ -310,6 +313,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     color: @math.Color::new().set_hex(hex),
     map: None,
     opacity: 1.0,
+    alpha_test: 0.0,
     transparent: false,
     fog: true,
     depth_write: true,
@@ -323,7 +327,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、透明开关、雾、深度、颜色写入、预乘和可见性一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘和可见性一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -333,6 +337,7 @@ pub fn LineBasicMaterial::copy(
   ignore(self.color.copy(source.color))
   self.map = source.map
   self.opacity = source.opacity
+  self.alpha_test = source.alpha_test
   self.transparent = source.transparent
   self.fog = source.fog
   self.depth_write = source.depth_write

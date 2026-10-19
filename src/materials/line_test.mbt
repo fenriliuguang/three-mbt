@@ -64,3 +64,17 @@ test "LineBasicMaterial.copy writes color and shares the map" {
   assert_eq(source.color.g, 1.0)
   assert_eq(source.opacity, 0.25)
 }
+
+///|
+test "LineBasicMaterial stores and copies alphaTest" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.alpha_test, 0.0)
+  let source = @materials.LineBasicMaterial::new()
+  source.alpha_test = 0.4
+  assert_eq(defaults.alpha_test, 0.0)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_test, 0.4)
+  destination.alpha_test = 0.8
+  assert_eq(source.alpha_test, 0.4)
+}
