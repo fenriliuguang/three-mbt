@@ -329,6 +329,7 @@ pub fn Material::program_sheen_roughness_map(Self) -> Bool
 pub fn Material::program_specular_color_map(Self) -> Bool
 pub fn Material::program_specular_intensity_map(Self) -> Bool
 pub fn Material::program_specular_map(Self) -> Bool
+pub fn Material::program_transmission(Self) -> Bool
 pub fn Material::program_vertex_shader(Self) -> String?
 pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
