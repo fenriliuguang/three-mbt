@@ -926,3 +926,19 @@ test "Material addEventListener keeps one copy of a listener" {
     Some(_) => abort("standard listeners")
   }
 }
+
+///|
+test "Material hasEventListener reports a registered listener" {
+  let material = @materials.Material::basic()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), true)
+  assert_eq(material.has_event_listener("dispose", other_listener), false)
+  assert_eq(material.has_event_listener("change", listener), false)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.has_event_listener("dispose", listener), false)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.has_event_listener("dispose", listener), false)
+}

@@ -526,6 +526,28 @@ pub fn Material::add_event_listener(
 }
 
 ///|
+/// 同一种事件里是否已经有这个监听。
+/// r186: `hasEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L58
+pub fn Material::has_event_listener(
+  self : Material,
+  kind : String,
+  listener : () -> Unit,
+) -> Bool {
+  match self.listeners.get(kind) {
+    None => false
+    Some(listeners) => {
+      let mut found = false
+      for existing in listeners {
+        if physical_equal(existing, listener) {
+          found = true
+        }
+      }
+      found
+    }
+  }
+}
+
+///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
