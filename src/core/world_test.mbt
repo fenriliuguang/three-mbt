@@ -2489,6 +2489,34 @@ test "meshPerAttribute defaults to one on an interleaved buffer" {
 }
 
 ///|
+test "Raycaster defaults to a ray down negative z" {
+  let raycaster = @core.Raycaster::new()
+  assert_eq(raycaster.ray.origin.x, 0.0)
+  assert_eq(raycaster.ray.origin.y, 0.0)
+  assert_eq(raycaster.ray.origin.z, 0.0)
+  assert_eq(raycaster.ray.direction.x, 0.0)
+  assert_eq(raycaster.ray.direction.y, 0.0)
+  assert_eq(raycaster.ray.direction.z, -1.0)
+  assert_eq(raycaster.near, 0.0)
+  assert_eq(raycaster.far.is_inf(), true)
+  assert_eq(raycaster.far > 0.0, true)
+  let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let aimed = @core.Raycaster::new(
+    origin=origin,
+    direction=@math.Vector3::new(y=1.0),
+    near=0.5,
+    far=10.0,
+  )
+  origin.x = 9.0
+  assert_eq(aimed.ray.origin.x, 1.0)
+  assert_eq(aimed.ray.origin.y, 2.0)
+  assert_eq(aimed.ray.origin.z, 3.0)
+  assert_eq(aimed.ray.direction.y, 1.0)
+  assert_eq(aimed.near, 0.5)
+  assert_eq(aimed.far, 10.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

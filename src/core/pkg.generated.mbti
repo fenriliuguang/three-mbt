@@ -487,6 +487,13 @@ pub(all) enum ProjectionKind {
   Orthographic
 }
 
+pub(all) struct Raycaster {
+  ray : @math.Ray
+  mut near : Double
+  mut far : Double
+}
+pub fn Raycaster::new(origin? : @math.Vector3, direction? : @math.Vector3, near? : Double, far? : Double) -> Self
+
 pub(all) struct ShadowState {
   camera : Object3D
   mut map_size : Int
