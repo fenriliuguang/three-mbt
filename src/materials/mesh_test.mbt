@@ -3573,3 +3573,30 @@ test "Material shader copies glslVersion only onto shader" {
   cloned.glsl_version = Some(@materials.GlslVersion::GLSL1)
   assert_eq(shader.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
 }
+
+///|
+test "Material shader copies index0AttributeName only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.index0_attribute_name is None, true)
+  assert_eq(basic.index0_attribute_name is None, true)
+  assert_eq(phong.index0_attribute_name is None, true)
+  shader.index0_attribute_name = Some("position")
+  ignore(basic.copy(shader))
+  assert_eq(basic.index0_attribute_name is None, true)
+  assert_eq(shader.index0_attribute_name, Some("position"))
+  let onto = @materials.Material::shader()
+  onto.index0_attribute_name = Some("normal")
+  ignore(onto.copy(shader))
+  assert_eq(onto.index0_attribute_name, Some("position"))
+  onto.index0_attribute_name = Some("changed")
+  assert_eq(shader.index0_attribute_name, Some("position"))
+  ignore(onto.copy(phong))
+  assert_eq(onto.index0_attribute_name is None, true)
+  let cloned = shader.clone()
+  assert_eq(cloned.index0_attribute_name, Some("position"))
+  assert_eq(cloned.id == shader.id, false)
+  cloned.index0_attribute_name = Some("uv")
+  assert_eq(shader.index0_attribute_name, Some("position"))
+}

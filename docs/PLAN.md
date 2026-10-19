@@ -2123,6 +2123,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.glslVersion` has landed. A new Shader, Basic, and Phong material each store nothing. `GLSL1` codes to `100` and `GLSL3` codes to `300 es`. Setting the Shader material to `GLSL3` and copying it onto a Basic material leaves the Basic material empty and the source at `GLSL3`. Copying that Shader material onto another Shader material that was `GLSL1` stores `GLSL3`. Setting the destination back to empty leaves the source at `GLSL3`. Copying a Phong material onto that destination stores nothing. Cloning the source keeps `GLSL3`, with a new id, and setting the clone to `GLSL1` leaves the source at `GLSL3`. The renderer still does not write a `#version` line from this field. `index0AttributeName` stays later.
 
+`ShaderMaterial.index0AttributeName` has landed. A new Shader, Basic, and Phong material each store nothing. Setting the Shader material to `position` and copying it onto a Basic material leaves the Basic material empty and the source at `position`. Copying that Shader material onto another Shader material that was `normal` stores `position`. Setting the destination to `changed` leaves the source at `position`. Copying a Phong material onto that destination stores nothing. Cloning the source keeps `position`, with a new id, and setting the clone to `uv` leaves the source at `position`. The renderer still does not call `bindAttribLocation`. `uniformsNeedUpdate` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3125,6 +3127,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.extensions` | `materials` |
 | planned | 7 | `ShaderMaterial.defaultAttributeValues` | `materials` |
 | planned | 7 | `ShaderMaterial.glslVersion` | `materials` |
+| planned | 7 | `ShaderMaterial.index0AttributeName` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
