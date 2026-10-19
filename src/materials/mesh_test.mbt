@@ -6392,6 +6392,37 @@ test "Material shader writes USE_SIZEATTENUATION" {
 }
 
 ///|
+test "Material shader writes USE_LIGHT_PROBES" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader(num_light_probes=0).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probes=0).length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(num_light_probes=1).length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probes=1).length(), 1247)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader(num_light_probes=1)[683:707].to_owned(),
+    "#define USE_LIGHT_PROBES",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1)[1079:1103].to_owned(),
+    "#define USE_LIGHT_PROBES",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(size_attenuation=true, num_light_probes=2).length(),
+    1661,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(size_attenuation=true, num_light_probes=2)[711:735].to_owned(),
+    "#define USE_LIGHT_PROBES",
+  )
+  assert_eq(shader.prefixed_fragment_shader(num_light_probes=2).length(), 1247)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(num_light_probes=1).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(num_light_probes=1), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
