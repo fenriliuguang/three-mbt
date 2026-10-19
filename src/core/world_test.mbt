@@ -2592,6 +2592,18 @@ test "params starts line and points thresholds at one" {
 }
 
 ///|
+test "Object3D.raycast reports no hit" {
+  let object = @core.Object3D::new()
+  let raycaster = @core.Raycaster::new()
+  let hits : Array[@core.Intersection] = []
+  match object.raycast(raycaster, hits) {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+  assert_eq(hits.length(), 0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

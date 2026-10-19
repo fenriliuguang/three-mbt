@@ -19,6 +19,15 @@ pub(all) struct Raycaster {
 }
 
 ///|
+/// 一次射线相交。上游没有单独的类，记录来自 `Raycaster~Intersection`。
+/// r186: `Raycaster~Intersection` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L160
+pub(all) struct Intersection {
+  distance : Double
+  point : @math.Vector3
+  object : Object3D
+}
+
+///|
 /// 上游没有单独的类。线段相交的世界单位容差，来自 `params.Line.threshold`，默认 `1`。
 /// r186: `params` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L88
 pub(all) struct RaycasterLineParams {

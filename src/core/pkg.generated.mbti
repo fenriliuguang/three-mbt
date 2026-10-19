@@ -273,6 +273,12 @@ pub(all) struct InterleavedJson {
   is_instanced_interleaved_buffer : Bool?
 }
 
+pub(all) struct Intersection {
+  distance : Double
+  point : @math.Vector3
+  object : Object3D
+}
+
 pub(all) struct Layers {
   mut mask : Int
 }
@@ -425,6 +431,7 @@ pub fn Object3D::look_at(Self, Double, Double, Double) -> Unit
 pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit
 pub fn Object3D::new(kind? : NodeKind) -> Self
 pub fn Object3D::project_point(Self, @math.Vector3) -> @math.Vector3
+pub fn Object3D::raycast(Self, Raycaster, Array[Intersection]) -> Bool?
 pub fn Object3D::remove(Self, Self) -> Self
 pub fn Object3D::remove_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
 pub fn Object3D::remove_from_parent(Self) -> Self
