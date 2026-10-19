@@ -489,6 +489,16 @@ pub fn LineSegments::copy(
 }
 
 ///|
+/// 新建一份成对线段再复制。three.js 没有单独的 `LineSegments.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn LineSegments::clone(
+  self : LineSegments,
+  recursive? : Bool = true,
+) -> LineSegments {
+  LineSegments::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
 pub fn LineSegments::refresh(self : LineSegments) -> Unit {
   self.node.primitive = Some(
     primitive_binding(

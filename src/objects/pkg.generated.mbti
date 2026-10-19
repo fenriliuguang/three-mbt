@@ -96,6 +96,7 @@ pub(all) struct LineSegments {
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
 }
+pub fn LineSegments::clone(Self, recursive? : Bool) -> Self
 pub fn LineSegments::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineSegments::refresh(Self) -> Unit
