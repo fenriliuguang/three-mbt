@@ -188,6 +188,7 @@ pub(all) struct PointsMaterial {
   mut stencil_func_mask : Int
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
+  mut stencil_z_pass : @constants.StencilOp
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

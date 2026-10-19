@@ -538,3 +538,20 @@ test "PointsMaterial stores and copies stencilZFail" {
   assert_eq(source.stencil_z_fail.to_int(), 0)
   assert_eq(destination.stencil_z_fail.to_int(), 7681)
 }
+
+///|
+test "PointsMaterial stores and copies stencilZPass" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.stencil_z_pass is @constants.StencilOp::Keep, true)
+  assert_eq(defaults.stencil_z_pass.to_int(), 7680)
+  let source = @materials.PointsMaterial::new()
+  source.stencil_z_pass = @constants.StencilOp::Zero
+  assert_eq(defaults.stencil_z_pass is @constants.StencilOp::Keep, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_z_pass is @constants.StencilOp::Zero, true)
+  assert_eq(destination.stencil_z_pass.to_int(), 0)
+  destination.stencil_z_pass = @constants.StencilOp::Replace
+  assert_eq(source.stencil_z_pass.to_int(), 0)
+  assert_eq(destination.stencil_z_pass.to_int(), 7681)
+}
