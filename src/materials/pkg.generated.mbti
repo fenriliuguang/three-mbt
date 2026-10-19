@@ -405,6 +405,7 @@ pub struct ShaderCache {
   material_cache : Map[Int, Array[ShaderStage]]
 }
 pub fn ShaderCache::dispose(Self) -> Unit
+pub fn ShaderCache::get_vertex_shader_stage(Self, Material) -> ShaderStage
 pub fn ShaderCache::new() -> Self
 pub fn ShaderCache::release_shader_cache(Self, Int) -> Unit
 pub fn ShaderCache::update(Self, Int, String, String) -> Unit
