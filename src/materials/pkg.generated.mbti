@@ -97,6 +97,7 @@ pub(all) struct Material {
   mut blending : @constants.Blending
   mut blend_src : @constants.BlendFactor
   mut blend_dst : @constants.BlendFactor
+  mut blend_equation : @constants.BlendEquation
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

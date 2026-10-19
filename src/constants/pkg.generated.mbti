@@ -6,6 +6,8 @@ pub const ACES_FILMIC_TONE_MAPPING : Int = 4
 
 pub const ADDITIVE_BLENDING : Int = 2
 
+pub const ADD_EQUATION : Int = 100
+
 pub const AGX_TONE_MAPPING : Int = 6
 
 pub const ALWAYS_DEPTH : Int = 1
@@ -72,6 +74,10 @@ pub const LOOP_PING_PONG : Int = 2202
 
 pub const LOOP_REPEAT : Int = 2201
 
+pub const MAX_EQUATION : Int = 104
+
+pub const MIN_EQUATION : Int = 103
+
 pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
 
 pub const MULTIPLY_BLENDING : Int = 4
@@ -112,6 +118,8 @@ pub const REINHARD_TONE_MAPPING : Int = 2
 
 pub const REPEAT_WRAPPING : Int = 1000
 
+pub const REVERSE_SUBTRACT_EQUATION : Int = 102
+
 pub const SRC_ALPHA_FACTOR : Int = 204
 
 pub const SRC_ALPHA_SATURATE_FACTOR : Int = 210
@@ -132,6 +140,8 @@ pub const STREAM_READ_USAGE : Int = 35041
 
 pub const SUBTRACTIVE_BLENDING : Int = 3
 
+pub const SUBTRACT_EQUATION : Int = 101
+
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
 pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
@@ -151,6 +161,15 @@ pub(all) enum BindMode {
   Attached
   Detached
 }
+
+pub(all) enum BlendEquation {
+  Add
+  Subtract
+  ReverseSubtract
+  Min
+  Max
+}
+pub fn BlendEquation::to_int(Self) -> Int
 
 pub(all) enum BlendFactor {
   Zero

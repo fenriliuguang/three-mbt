@@ -282,3 +282,25 @@ test "Material blendDst defaults to one minus source alpha" {
     true,
   )
 }
+
+///|
+test "Material blendEquation defaults to add" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(basic.material.blend_equation.to_int(), 100)
+  basic.material.blend_equation = @constants.BlendEquation::Subtract
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_equation is @constants.BlendEquation::Add, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_equation is @constants.BlendEquation::Add, true)
+  standard.material.blend_equation = @constants.BlendEquation::Max
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(basic.material.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(basic.material.blend_equation.to_int(), 101)
+  assert_eq(standard.material.blend_equation is @constants.BlendEquation::Max, true)
+  assert_eq(standard.material.blend_equation.to_int(), 104)
+  assert_eq(lambert.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(@constants.BlendEquation::ReverseSubtract.to_int(), 102)
+  assert_eq(@constants.BlendEquation::Min.to_int(), 103)
+}

@@ -205,6 +205,48 @@ pub fn BlendFactor::to_int(self : BlendFactor) -> Int {
 }
 
 ///|
+/// 源加目标。对齐 `AddEquation`（100）。
+pub const ADD_EQUATION : Int = 100
+
+///|
+/// 源减目标。对齐 `SubtractEquation`（101）。
+pub const SUBTRACT_EQUATION : Int = 101
+
+///|
+/// 目标减源。对齐 `ReverseSubtractEquation`（102）。
+pub const REVERSE_SUBTRACT_EQUATION : Int = 102
+
+///|
+/// 取源和目标的较小值。对齐 `MinEquation`（103）。
+pub const MIN_EQUATION : Int = 103
+
+///|
+/// 取源和目标的较大值。对齐 `MaxEquation`（104）。
+pub const MAX_EQUATION : Int = 104
+
+///|
+/// 混合方程。数值与 r186 `src/constants.js` 一致。默认是 `Add`。
+/// r186: `AddEquation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L173 ; `SubtractEquation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L181 ; `ReverseSubtractEquation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L189 ; `MinEquation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L197 ; `MaxEquation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L205
+pub(all) enum BlendEquation {
+  Add
+  Subtract
+  ReverseSubtract
+  Min
+  Max
+}
+
+///|
+pub fn BlendEquation::to_int(self : BlendEquation) -> Int {
+  match self {
+    Add => ADD_EQUATION
+    Subtract => SUBTRACT_EQUATION
+    ReverseSubtract => REVERSE_SUBTRACT_EQUATION
+    Min => MIN_EQUATION
+    Max => MAX_EQUATION
+  }
+}
+
+///|
 /// 深度测试通过的条件。数值与 r186 `src/constants.js` 一致。默认是 `LessEqual`。
 /// r186: `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `LessEqualDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L359
 pub(all) enum DepthFunc {
