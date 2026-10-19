@@ -4264,6 +4264,40 @@ test "Material shader writes USE_ALPHAHASH" {
 }
 
 ///|
+test "Material shader writes USE_TRANSMISSION" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.transmission = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:707].to_owned(),
+    "#define USE_TRANSMISSION",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1103].to_owned(),
+    "#define USE_TRANSMISSION",
+  )
+  shader.transmission = -1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.transmission = 1.0
+  shader.alpha_hash = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1655)
+  assert_eq(
+    shader.prefixed_vertex_shader()[705:729].to_owned(),
+    "#define USE_TRANSMISSION",
+  )
+  let raw = @materials.Material::raw()
+  raw.transmission = 1.0
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.transmission = 1.0
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
