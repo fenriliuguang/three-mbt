@@ -479,3 +479,29 @@ test "LineBasicMaterial stores and copies blendDst" {
   assert_eq(dashed.line.blend_dst is @constants.BlendFactor::Zero, true)
   assert_eq(other.line.blend_dst.to_int(), 208)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendEquation" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(defaults.blend_equation.to_int(), 100)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_equation = @constants.BlendEquation::Subtract
+  assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(destination.blend_equation.to_int(), 101)
+  destination.blend_equation = @constants.BlendEquation::Max
+  assert_eq(source.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(destination.blend_equation.to_int(), 104)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_equation = @constants.BlendEquation::Subtract
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(other.line.blend_equation.to_int(), 101)
+  other.line.blend_equation = @constants.BlendEquation::Min
+  assert_eq(dashed.line.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(other.line.blend_equation.to_int(), 103)
+}
