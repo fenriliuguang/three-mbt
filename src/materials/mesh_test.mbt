@@ -3497,9 +3497,9 @@ test "Material shader writes USE_LIGHTMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let light_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.light_map = Some(light_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1629)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1652)
   assert_eq(shader.prefixed_fragment_shader().length(), 1243)
-  assert_eq(1629 - 1608, 21)
+  assert_eq(1652 - 1608, 44)
   assert_eq(
     shader.prefixed_vertex_shader()[683:703].to_owned(),
     "#define USE_LIGHTMAP",
@@ -3509,7 +3509,7 @@ test "Material shader writes USE_LIGHTMAP" {
     "#define USE_LIGHTMAP",
   )
   shader.env_map = Some(light_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1679)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1702)
   assert_eq(
     shader.prefixed_vertex_shader()[733:753].to_owned(),
     "#define USE_LIGHTMAP",
@@ -3545,7 +3545,7 @@ test "Material shader writes USE_AOMAP" {
     "#define USE_AOMAP",
   )
   shader.light_map = Some(ao_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1647)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1670)
   assert_eq(
     shader.prefixed_vertex_shader()[704:721].to_owned(),
     "#define USE_AOMAP",
@@ -4525,6 +4525,46 @@ test "Material shader writes ALPHAMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.alpha_map = Some(alpha_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes LIGHTMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let light_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(light_map.channel, 0)
+  shader.light_map = Some(light_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1652)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1652 - 1608, 44)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:726].to_owned(),
+    "#define LIGHTMAP_UV uv",
+  )
+  light_map.channel = 1
+  shader.light_map = Some(light_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1653)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1653 - 1608, 45)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:727].to_owned(),
+    "#define LIGHTMAP_UV uv1",
+  )
+  light_map.channel = 0
+  shader.light_map = Some(light_map)
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1696)
+  assert_eq(
+    shader.prefixed_vertex_shader()[748:770].to_owned(),
+    "#define LIGHTMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.light_map = Some(light_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.light_map = Some(light_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 

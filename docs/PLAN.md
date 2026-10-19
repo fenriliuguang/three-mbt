@@ -2239,6 +2239,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `ALPHAMAP_UV` has landed. A Shader material with a 1×1 alpha map writes `#define ALPHAMAP_UV uv` and a newline, `23` characters, on the vertex prefix only. The vertex string grows from `1608` to `1652`. The fragment string grows only by `USE_ALPHAMAP`, from `1222` to `1243`. Setting the texture `channel` to `1` writes `#define ALPHAMAP_UV uv1`, `24` characters, and the vertex string is `1653`. A color map as well puts that line after `MAP_UV`, so channel `0` makes the vertex string `1686`. A raw material stays at `92`. A Basic material stays `""`. `LIGHTMAP_UV` stays later.
 
+`LIGHTMAP_UV` has landed. A Shader material with a 1×1 light map writes `#define LIGHTMAP_UV uv` and a newline, `23` characters, on the vertex prefix only. The vertex string grows from `1608` to `1652`. The fragment string grows only by `USE_LIGHTMAP`, from `1222` to `1243`. Setting the texture `channel` to `1` writes `#define LIGHTMAP_UV uv1`, `24` characters, and the vertex string is `1653`. An alpha map as well puts that line after `ALPHAMAP_UV`, so channel `0` makes the vertex string `1696`. A raw material stays at `92`. A Basic material stays `""`. `AOMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3299,6 +3301,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_SHEEN_ROUGHNESSMAP` | `materials` |
 | planned | 7 | `MAP_UV` | `materials` |
 | planned | 7 | `ALPHAMAP_UV` | `materials` |
+| planned | 7 | `LIGHTMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
