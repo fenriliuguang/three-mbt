@@ -210,6 +210,7 @@ pub(all) struct PointsMaterial {
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
   mut version : Int
+  id : Int
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
