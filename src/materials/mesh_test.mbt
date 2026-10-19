@@ -751,3 +751,15 @@ test "Material name starts empty" {
   assert_eq(lambert.material.name, "")
   assert_eq(standard.material.name, "lit")
 }
+
+///|
+test "Material type_name matches the mesh class" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.type_name, "MeshBasicMaterial")
+  let other = @materials.Material::basic()
+  assert_eq(other.type_name, "MeshBasicMaterial")
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.type_name, "MeshLambertMaterial")
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.type_name, "MeshStandardMaterial")
+}
