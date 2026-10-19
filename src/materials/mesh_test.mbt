@@ -77,3 +77,34 @@ test "Material dithering defaults off" {
   assert_eq(basic.material.dithering, true)
   assert_eq(standard.material.dithering, true)
 }
+
+///|
+test "Material polygonOffset defaults off" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.polygon_offset, false)
+  assert_eq(basic.material.polygon_offset_factor, 0.0)
+  assert_eq(basic.material.polygon_offset_units, 0.0)
+  basic.material.polygon_offset = true
+  basic.material.polygon_offset_factor = 1.0
+  basic.material.polygon_offset_units = -2.0
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.polygon_offset, false)
+  assert_eq(lambert.material.polygon_offset_factor, 0.0)
+  assert_eq(lambert.material.polygon_offset_units, 0.0)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.polygon_offset, false)
+  standard.material.polygon_offset = true
+  standard.material.polygon_offset_factor = 2.0
+  standard.material.polygon_offset_units = 4.0
+  let other = @materials.Material::basic()
+  assert_eq(other.polygon_offset, false)
+  assert_eq(other.polygon_offset_factor, 0.0)
+  assert_eq(other.polygon_offset_units, 0.0)
+  assert_eq(basic.material.polygon_offset, true)
+  assert_eq(basic.material.polygon_offset_factor, 1.0)
+  assert_eq(basic.material.polygon_offset_units, -2.0)
+  assert_eq(standard.material.polygon_offset, true)
+  assert_eq(standard.material.polygon_offset_factor, 2.0)
+  assert_eq(standard.material.polygon_offset_units, 4.0)
+  assert_eq(lambert.material.polygon_offset, false)
+}
