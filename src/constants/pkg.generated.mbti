@@ -12,6 +12,8 @@ pub const AGX_TONE_MAPPING : Int = 6
 
 pub const ALWAYS_DEPTH : Int = 1
 
+pub const ALWAYS_STENCIL_FUNC : Int = 519
+
 pub const BACK_SIDE : Int = 1
 
 pub const CINEON_TONE_MAPPING : Int = 3
@@ -40,6 +42,8 @@ pub const DYNAMIC_READ_USAGE : Int = 35049
 
 pub const EQUAL_DEPTH : Int = 4
 
+pub const EQUAL_STENCIL_FUNC : Int = 514
+
 pub const FLOAT_TYPE : Int = 1015
 
 pub const FRONT_SIDE : Int = 0
@@ -47,6 +51,10 @@ pub const FRONT_SIDE : Int = 0
 pub const GREATER_DEPTH : Int = 6
 
 pub const GREATER_EQUAL_DEPTH : Int = 5
+
+pub const GREATER_EQUAL_STENCIL_FUNC : Int = 518
+
+pub const GREATER_STENCIL_FUNC : Int = 516
 
 pub const INTERPOLATE_DISCRETE : Int = 2300
 
@@ -59,6 +67,10 @@ pub const INT_TYPE : Int = 1013
 pub const LESS_DEPTH : Int = 2
 
 pub const LESS_EQUAL_DEPTH : Int = 3
+
+pub const LESS_EQUAL_STENCIL_FUNC : Int = 515
+
+pub const LESS_STENCIL_FUNC : Int = 513
 
 pub const LINEAR_FILTER : Int = 1006
 
@@ -92,9 +104,13 @@ pub const NEUTRAL_TONE_MAPPING : Int = 7
 
 pub const NEVER_DEPTH : Int = 0
 
+pub const NEVER_STENCIL_FUNC : Int = 512
+
 pub const NORMAL_BLENDING : Int = 1
 
 pub const NOT_EQUAL_DEPTH : Int = 7
+
+pub const NOT_EQUAL_STENCIL_FUNC : Int = 517
 
 pub const NO_BLENDING : Int = 0
 
@@ -259,6 +275,18 @@ pub(all) enum SplineEnding {
   WrapAround
 }
 pub fn SplineEnding::to_int(Self) -> Int
+
+pub(all) enum StencilFunc {
+  Never
+  Less
+  Equal
+  LessEqual
+  Greater
+  NotEqual
+  GreaterEqual
+  Always
+}
+pub fn StencilFunc::to_int(Self) -> Int
 
 pub(all) enum TextureFilter {
   Nearest

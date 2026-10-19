@@ -408,3 +408,29 @@ test "Material stencilWriteMask defaults to 255" {
   assert_eq(standard.material.stencil_write_mask, 1)
   assert_eq(lambert.material.stencil_write_mask, 255)
 }
+
+///|
+test "Material stencilFunc defaults to Always" {
+  assert_eq(@constants.StencilFunc::Never.to_int(), 512)
+  assert_eq(@constants.StencilFunc::Less.to_int(), 513)
+  assert_eq(@constants.StencilFunc::Equal.to_int(), 514)
+  assert_eq(@constants.StencilFunc::LessEqual.to_int(), 515)
+  assert_eq(@constants.StencilFunc::Greater.to_int(), 516)
+  assert_eq(@constants.StencilFunc::NotEqual.to_int(), 517)
+  assert_eq(@constants.StencilFunc::GreaterEqual.to_int(), 518)
+  assert_eq(@constants.StencilFunc::Always.to_int(), 519)
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(basic.material.stencil_func.to_int(), 519)
+  basic.material.stencil_func = @constants.StencilFunc::Never
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_func is @constants.StencilFunc::Always, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_func is @constants.StencilFunc::Always, true)
+  standard.material.stencil_func = @constants.StencilFunc::Equal
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(basic.material.stencil_func.to_int(), 512)
+  assert_eq(standard.material.stencil_func.to_int(), 514)
+  assert_eq(lambert.material.stencil_func.to_int(), 519)
+}

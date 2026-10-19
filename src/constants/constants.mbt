@@ -323,6 +323,66 @@ pub fn DepthFunc::reversed(self : DepthFunc) -> DepthFunc {
 }
 
 ///|
+/// 模板比较永不通过。对齐 `NeverStencilFunc`（512）。
+pub const NEVER_STENCIL_FUNC : Int = 512
+
+///|
+/// 参考值小于模板值才通过。对齐 `LessStencilFunc`（513）。
+pub const LESS_STENCIL_FUNC : Int = 513
+
+///|
+/// 参考值等于模板值才通过。对齐 `EqualStencilFunc`（514）。
+pub const EQUAL_STENCIL_FUNC : Int = 514
+
+///|
+/// 参考值小于或等于模板值才通过。对齐 `LessEqualStencilFunc`（515）。
+pub const LESS_EQUAL_STENCIL_FUNC : Int = 515
+
+///|
+/// 参考值大于模板值才通过。对齐 `GreaterStencilFunc`（516）。
+pub const GREATER_STENCIL_FUNC : Int = 516
+
+///|
+/// 参考值不等于模板值才通过。对齐 `NotEqualStencilFunc`（517）。
+pub const NOT_EQUAL_STENCIL_FUNC : Int = 517
+
+///|
+/// 参考值大于或等于模板值才通过。对齐 `GreaterEqualStencilFunc`（518）。
+pub const GREATER_EQUAL_STENCIL_FUNC : Int = 518
+
+///|
+/// 模板比较始终通过。对齐 `AlwaysStencilFunc`（519）。
+pub const ALWAYS_STENCIL_FUNC : Int = 519
+
+///|
+/// 模板比较函数。数值与 r186 `src/constants.js` 一致。默认是 `Always`。
+/// r186: `NeverStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1431 ; `LessStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1439 ; `EqualStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1447 ; `LessEqualStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1455 ; `GreaterStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1463 ; `NotEqualStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1471 ; `GreaterEqualStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1479 ; `AlwaysStencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1487
+pub(all) enum StencilFunc {
+  Never
+  Less
+  Equal
+  LessEqual
+  Greater
+  NotEqual
+  GreaterEqual
+  Always
+}
+
+///|
+pub fn StencilFunc::to_int(self : StencilFunc) -> Int {
+  match self {
+    Never => NEVER_STENCIL_FUNC
+    Less => LESS_STENCIL_FUNC
+    Equal => EQUAL_STENCIL_FUNC
+    LessEqual => LESS_EQUAL_STENCIL_FUNC
+    Greater => GREATER_STENCIL_FUNC
+    NotEqual => NOT_EQUAL_STENCIL_FUNC
+    GreaterEqual => GREATER_EQUAL_STENCIL_FUNC
+    Always => ALWAYS_STENCIL_FUNC
+  }
+}
+
+///|
 /// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
 /// r186: 没有同名枚举。`Basic` `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14 ; `Lambert` `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24 ; `Standard` `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) enum Shading {
