@@ -2299,6 +2299,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `FLAT_SHADED` has landed. A Shader material with `flat_shading` false adds nothing. Setting it to true writes `#define FLAT_SHADED` and a newline, `20` characters, on both prefixes. The vertex string grows from `1608` to `1628`. The fragment string grows from `1222` to `1242`. Turning `wireframe` on drops both lines. A 1×1 map with `has_points_uv` true puts that line after `USE_POINTS_UV`, so the vertex string is `1684` and the fragment string is `1280`. Putting `flat_shading` back to false leaves those map lengths at `1664` and `1260`. A normal map with a tangent attribute and `flat_shading` true replaces `USE_TANGENT` with this line, so both strings stay `1709` and `1299`. Turning `wireframe` on restores `USE_TANGENT`. A raw material stays at `92`. A Basic material stays `""`. A lit mesh with no normals still does not imply this line. `USE_SKINNING` stays later.
 
+`USE_SKINNING` has landed. A Shader material with `has_skinning` false adds nothing. Passing `has_skinning` as true writes `#define USE_SKINNING` and a newline, `21` characters, on the vertex prefix only. The vertex string grows from `1608` to `1629`. The fragment string stays `1222`. `flat_shading` true puts that line after `FLAT_SHADED`, so the vertex string is `1649` and the fragment string is `1242`. Passing `has_skinning` as false drops the line. A raw material stays at `92`. A Basic material stays `""`. `USE_MORPHTARGETS` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3389,6 +3391,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_UV3` | `materials` |
 | planned | 7 | `USE_POINTS_UV` | `materials` |
 | planned | 7 | `FLAT_SHADED` | `materials` |
+| planned | 7 | `USE_SKINNING` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

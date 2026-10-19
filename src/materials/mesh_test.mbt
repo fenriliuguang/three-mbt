@@ -5876,6 +5876,33 @@ test "Material shader writes FLAT_SHADED" {
 }
 
 ///|
+test "Material shader writes USE_SKINNING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(has_skinning=true).length(), 1629)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1629 - 1608, 21)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_skinning=true)[683:703].to_owned(),
+    "#define USE_SKINNING",
+  )
+  shader.flat_shading = true
+  assert_eq(shader.prefixed_vertex_shader(has_skinning=true).length(), 1649)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_skinning=true)[703:723].to_owned(),
+    "#define USE_SKINNING",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
+  shader.flat_shading = false
+  assert_eq(shader.prefixed_vertex_shader(has_skinning=false).length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(has_skinning=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(has_skinning=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
