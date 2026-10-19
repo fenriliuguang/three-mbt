@@ -116,6 +116,7 @@ pub(all) struct Material {
   mut normal_map : @textures.Texture?
   mut normal_map_type : @constants.NormalMapType
   normal_scale : @math.Vector2
+  mut displacement_map : @textures.Texture?
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
