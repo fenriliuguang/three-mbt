@@ -1531,6 +1531,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.computeBoundingBox` has landed. Vertices `(1, 0, 0)` and `(0, 4, 0)` with weight `1` on a bone that moved to `y=5` produce a box from `(0, 5, 0)` to `(1, 9, 0)`. Moving the bone to `y=1` and computing again writes `(0, 1, 0)` to `(1, 5, 0)` into the same box. An empty position attribute leaves the box empty. A mesh without `position` aborts. `computeBoundingSphere` stays later.
 
+`SkinnedMesh.computeBoundingSphere` has landed. Vertices `(1, 0, 0)` and `(-1, 0, 0)` with weight `1` on a bone that moved to `y=5` produce a sphere centered at `(0, 5, 0)` with radius `1`. Moving the bone to `y=1` and computing again writes center `(0, 1, 0)` and radius `1` into the same sphere. An empty position attribute leaves the sphere empty, with radius `-1`. A mesh without `position` aborts. `copy` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2237,6 +2239,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.applyBoneTransform` for `Vector4` | `objects` |
 | planned | 7 | `SkinnedMesh.getVertexPosition` | `objects` |
 | planned | 7 | `SkinnedMesh.computeBoundingBox` | `objects` |
+| planned | 7 | `SkinnedMesh.computeBoundingSphere` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

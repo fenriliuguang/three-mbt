@@ -213,6 +213,7 @@ pub fn SkinnedMesh::apply_bone_transform(Self, Int, @math.Vector3) -> @math.Vect
 pub fn SkinnedMesh::apply_bone_transform_vector4(Self, Int, @math.Vector4) -> @math.Vector4
 pub fn SkinnedMesh::bind(Self, Skeleton, bind_matrix? : @math.Matrix4) -> Unit
 pub fn SkinnedMesh::compute_bounding_box(Self) -> @math.Box3
+pub fn SkinnedMesh::compute_bounding_sphere(Self) -> @math.Sphere
 pub fn SkinnedMesh::get_vertex_position(Self, Int, @math.Vector3) -> @math.Vector3
 pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn SkinnedMesh::normalize_skin_weights(Self) -> Unit

@@ -2299,6 +2299,79 @@ test "panic SkinnedMesh.computeBoundingBox requires a position attribute" {
 }
 
 ///|
+test "SkinnedMesh.computeBoundingSphere encloses skinned vertices" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, -1.0, 0.0, 0.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  let sphere = skin.compute_bounding_sphere()
+  match skin.bounding_sphere {
+    None => abort("bounding sphere was not stored")
+    Some(stored) => assert_eq(physical_equal(sphere, stored), true)
+  }
+  assert_eq(sphere.center.x, 0.0)
+  assert_eq(sphere.center.y, 5.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 1.0)
+  ignore(bone.node.position.set(0.0, 1.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let again = skin.compute_bounding_sphere()
+  assert_eq(physical_equal(again, sphere), true)
+  assert_eq(sphere.center.x, 0.0)
+  assert_eq(sphere.center.y, 1.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 1.0)
+  let empty_geometry = @core.BufferGeometry::new()
+  ignore(
+    empty_geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([], 3),
+    ),
+  )
+  let empty_skin = @objects.SkinnedMesh::new(
+    empty_geometry,
+    @materials.Material::basic(),
+  )
+  let empty_sphere = empty_skin.compute_bounding_sphere()
+  assert_eq(empty_sphere.is_empty(), true)
+  let empty_again = empty_skin.compute_bounding_sphere()
+  assert_eq(physical_equal(empty_again, empty_sphere), true)
+  assert_eq(empty_sphere.is_empty(), true)
+  assert_eq(empty_sphere.radius, -1.0)
+}
+
+///|
+test "panic SkinnedMesh.computeBoundingSphere requires a position attribute" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.compute_bounding_sphere())
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

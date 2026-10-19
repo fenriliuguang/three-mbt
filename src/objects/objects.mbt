@@ -626,6 +626,34 @@ pub fn SkinnedMesh::compute_bounding_box(self : SkinnedMesh) -> @math.Box3 {
 }
 
 ///|
+/// 用蒙皮后的顶点重算局部包围球。没有球时新建一个空球，已有的球先清空再写入。
+/// 没有 `position` 时中止。
+/// r186: `computeBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L138
+pub fn SkinnedMesh::compute_bounding_sphere(self : SkinnedMesh) -> @math.Sphere {
+  let position = match self.mesh.geometry.get_attribute("position") {
+    None => abort("SkinnedMesh.computeBoundingSphere requires a position attribute")
+    Some(position) => position
+  }
+  let sphere = match self.bounding_sphere {
+    Some(sphere) => sphere
+    None => {
+      let sphere = @math.Sphere::new()
+      self.bounding_sphere = Some(sphere)
+      sphere
+    }
+  }
+  ignore(sphere.make_empty())
+  let vertex = @math.Vector3::new()
+  let mut index = 0
+  while index < position.count {
+    ignore(self.get_vertex_position(index, vertex))
+    ignore(sphere.expand_by_point(vertex))
+    index = index + 1
+  }
+  sphere
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
