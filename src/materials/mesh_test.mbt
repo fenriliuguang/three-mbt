@@ -333,3 +333,32 @@ test "Material blendSrcAlpha defaults to empty" {
   }
   assert_eq(lambert.material.blend_src_alpha is None, true)
 }
+
+///|
+test "Material blendDstAlpha defaults to empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_dst_alpha is None, true)
+  basic.material.blend_dst_alpha = Some(@constants.BlendFactor::One)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_dst_alpha is None, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_dst_alpha is None, true)
+  standard.material.blend_dst_alpha = Some(@constants.BlendFactor::Zero)
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_dst_alpha is None, true)
+  match basic.material.blend_dst_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::One, true)
+      assert_eq(factor.to_int(), 201)
+    }
+    None => abort("basic blendDstAlpha is empty")
+  }
+  match standard.material.blend_dst_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::Zero, true)
+      assert_eq(factor.to_int(), 200)
+    }
+    None => abort("standard blendDstAlpha is empty")
+  }
+  assert_eq(lambert.material.blend_dst_alpha is None, true)
+}
