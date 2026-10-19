@@ -1340,3 +1340,30 @@ test "Material lightMapIntensity defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.light_map_intensity, 1.0)
 }
+
+///|
+test "Material aoMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.ao_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.ao_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.ao_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.ao_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.ao_map {
+    None => abort("copied ao map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.ao_map = None
+  match lambert.ao_map {
+    None => abort("source ao map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.ao_map is None, true)
+}
