@@ -4172,9 +4172,9 @@ test "Material shader writes USE_METALNESSMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let metalness_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.metalness_map = Some(metalness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1633)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
   assert_eq(shader.prefixed_fragment_shader().length(), 1247)
-  assert_eq(1633 - 1608, 25)
+  assert_eq(1660 - 1608, 52)
   assert_eq(
     shader.prefixed_vertex_shader()[683:707].to_owned(),
     "#define USE_METALNESSMAP",
@@ -4184,7 +4184,7 @@ test "Material shader writes USE_METALNESSMAP" {
     "#define USE_METALNESSMAP",
   )
   shader.roughness_map = Some(metalness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
   assert_eq(
     shader.prefixed_vertex_shader()[708:732].to_owned(),
     "#define USE_METALNESSMAP",
@@ -4215,7 +4215,7 @@ test "Material shader writes USE_ALPHAMAP" {
     "#define USE_ALPHAMAP",
   )
   shader.metalness_map = Some(alpha_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1677)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1704)
   assert_eq(
     shader.prefixed_vertex_shader()[708:728].to_owned(),
     "#define USE_ALPHAMAP",
@@ -4768,6 +4768,46 @@ test "Material shader writes DISPLACEMENTMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.displacement_map = Some(displacement_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes METALNESSMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let metalness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(metalness_map.channel, 0)
+  shader.metalness_map = Some(metalness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
+  assert_eq(1660 - 1608, 52)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:734].to_owned(),
+    "#define METALNESSMAP_UV uv",
+  )
+  metalness_map.channel = 1
+  shader.metalness_map = Some(metalness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
+  assert_eq(1661 - 1608, 53)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:735].to_owned(),
+    "#define METALNESSMAP_UV uv1",
+  )
+  metalness_map.channel = 0
+  shader.metalness_map = Some(metalness_map)
+  let displacement_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.displacement_map = Some(displacement_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1718)
+  assert_eq(
+    shader.prefixed_vertex_shader()[766:792].to_owned(),
+    "#define METALNESSMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.metalness_map = Some(metalness_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.metalness_map = Some(metalness_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 

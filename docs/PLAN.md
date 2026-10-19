@@ -2251,6 +2251,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `DISPLACEMENTMAP_UV` has landed. A Shader material with a 1×1 displacement map writes `#define DISPLACEMENTMAP_UV uv` and a newline, `30` characters, on the vertex prefix only. The vertex string grows from `1608` to `1666`. The fragment string stays `1222`. Setting the texture `channel` to `1` writes `#define DISPLACEMENTMAP_UV uv1`, `31` characters, and the vertex string is `1667`. A normal map as well puts that line after `NORMALMAP_UV`, so channel `0` makes the vertex string `1747`. A raw material stays at `92`. A Basic material stays `""`. `METALNESSMAP_UV` stays later.
 
+`METALNESSMAP_UV` has landed. A Shader material with a 1×1 metalness map writes `#define METALNESSMAP_UV uv` and a newline, `27` characters, on the vertex prefix only. The vertex string grows from `1608` to `1660`. The fragment string grows only by `USE_METALNESSMAP`, from `1222` to `1247`. Setting the texture `channel` to `1` writes `#define METALNESSMAP_UV uv1`, `28` characters, and the vertex string is `1661`. A displacement map as well puts that line after `DISPLACEMENTMAP_UV`, so channel `0` makes the vertex string `1718`. A raw material stays at `92`. A Basic material stays `""`. `ROUGHNESSMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3317,6 +3319,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `BUMPMAP_UV` | `materials` |
 | planned | 7 | `NORMALMAP_UV` | `materials` |
 | planned | 7 | `DISPLACEMENTMAP_UV` | `materials` |
+| planned | 7 | `METALNESSMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
