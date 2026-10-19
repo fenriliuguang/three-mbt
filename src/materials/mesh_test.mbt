@@ -3698,6 +3698,34 @@ test "Material shader writes USE_NORMALMAP_OBJECTSPACE" {
 }
 
 ///|
+test "Material shader writes USE_DISPLACEMENTMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let displacement_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.displacement_map = Some(displacement_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1636)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1636 - 1608, 28)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:710].to_owned(),
+    "#define USE_DISPLACEMENTMAP",
+  )
+  shader.normal_map = Some(displacement_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1693)
+  assert_eq(
+    shader.prefixed_vertex_shader()[740:767].to_owned(),
+    "#define USE_DISPLACEMENTMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
+  let raw = @materials.Material::raw()
+  raw.displacement_map = Some(displacement_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.displacement_map = Some(displacement_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

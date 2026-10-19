@@ -2191,6 +2191,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_NORMALMAP_OBJECTSPACE` has landed. A Shader material with a 1×1 normal map and object-space type writes `#define USE_NORMALMAP_OBJECTSPACE` and a newline, `34` characters, after `USE_NORMALMAP` and instead of the tangent-space line. The vertex string grows from `1630` to `1664`, and the fragment string from `1244` to `1278`. Switching back to tangent space writes `USE_NORMALMAP_TANGENTSPACE` at the same index. A raw material stays at `92`. A Basic material stays `""`. `USE_DISPLACEMENTMAP` stays later.
 
+`USE_DISPLACEMENTMAP` has landed. A Shader material with a 1×1 displacement map writes `#define USE_DISPLACEMENTMAP` and a newline, `28` characters, on the vertex prefix only. The vertex string grows from `1608` to `1636`. The fragment string stays `1222`. A tangent-space normal map as well puts that line after `USE_NORMALMAP_TANGENTSPACE`, so the vertex string is `1693` and the fragment string stays `1279`. A raw material stays at `92`. A Basic material stays `""`. `USE_EMISSIVEMAP` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3227,6 +3229,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_NORMALMAP` | `materials` |
 | planned | 7 | `USE_NORMALMAP_TANGENTSPACE` | `materials` |
 | planned | 7 | `USE_NORMALMAP_OBJECTSPACE` | `materials` |
+| planned | 7 | `USE_DISPLACEMENTMAP` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
