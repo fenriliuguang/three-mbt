@@ -1687,6 +1687,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.blending` has landed. A new basic, Lambert, or Standard material stores `Normal`, whose integer is `1`. Setting the basic material to `Additive` (`2`) leaves another basic material at `Normal`. Setting the Standard material to `Multiply` (`4`) leaves the Lambert material at `Normal`. `No` is `0`, `Subtractive` is `3`, and `Custom` is `5`. Transparent draws still use the existing source-alpha blend. The pipeline still does not read this field.
 
+`PointsMaterial.blending` has landed. A new material stores `Normal`, whose integer is `1`. Setting it to `Additive` (`2`) leaves another new material at `Normal`. Copying onto a default material stores `Additive`. Setting the destination to `Multiply` (`4`) leaves the source at `Additive`. Point draws still use the existing source-alpha blend. The pipeline still does not read this field.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2471,6 +2473,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.blendColor` | `materials` |
 | planned | 7 | `SpriteMaterial.blendColor` | `materials` |
 | planned | 7 | `Material.blending` | `materials` |
+| planned | 7 | `PointsMaterial.blending` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

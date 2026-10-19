@@ -290,3 +290,20 @@ test "PointsMaterial stores and copies blendColor" {
   destination.blend_color.r = 0.5
   assert_eq(source.blend_color.r, 1.0)
 }
+
+///|
+test "PointsMaterial stores and copies blending" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.blending is @constants.Blending::Normal, true)
+  assert_eq(defaults.blending.to_int(), 1)
+  let source = @materials.PointsMaterial::new()
+  source.blending = @constants.Blending::Additive
+  assert_eq(defaults.blending is @constants.Blending::Normal, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blending is @constants.Blending::Additive, true)
+  assert_eq(destination.blending.to_int(), 2)
+  destination.blending = @constants.Blending::Multiply
+  assert_eq(source.blending is @constants.Blending::Additive, true)
+  assert_eq(destination.blending.to_int(), 4)
+}
