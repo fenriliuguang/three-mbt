@@ -2517,6 +2517,21 @@ test "Raycaster defaults to a ray down negative z" {
 }
 
 ///|
+test "set replaces the ray origin and direction" {
+  let raycaster = @core.Raycaster::new()
+  let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
+  let direction = @math.Vector3::new(y=1.0)
+  raycaster.set(origin, direction)
+  origin.x = 9.0
+  assert_eq(raycaster.ray.origin.x, 1.0)
+  assert_eq(raycaster.ray.origin.y, 2.0)
+  assert_eq(raycaster.ray.origin.z, 3.0)
+  assert_eq(raycaster.ray.direction.x, 0.0)
+  assert_eq(raycaster.ray.direction.y, 1.0)
+  assert_eq(raycaster.ray.direction.z, 0.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

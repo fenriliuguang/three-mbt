@@ -30,3 +30,14 @@ pub fn Raycaster::new(
   }
   { ray, near, far }
 }
+
+///|
+/// 用新的原点和方向更新射线。方向按已经归一化处理，这里不再归一化。之后改来源向量不影响射线。
+/// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L104
+pub fn Raycaster::set(
+  self : Raycaster,
+  origin : @math.Vector3,
+  direction : @math.Vector3,
+) -> Unit {
+  ignore(self.ray.set(origin, direction))
+}
