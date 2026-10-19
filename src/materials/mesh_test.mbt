@@ -8031,6 +8031,21 @@ test "Material shader aoMap follows the occlusion texture" {
 }
 
 ///|
+test "Material shader lightMap follows the light texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_light_map(), false)
+  assert_eq(@materials.Material::raw().program_light_map(), false)
+  assert_eq(@materials.Material::lambert().program_light_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.light_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_light_map(), true)
+  shader.light_map = None
+  assert_eq(shader.program_light_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
