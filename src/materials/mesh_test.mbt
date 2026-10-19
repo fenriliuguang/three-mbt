@@ -108,3 +108,19 @@ test "Material polygonOffset defaults off" {
   assert_eq(standard.material.polygon_offset_units, 4.0)
   assert_eq(lambert.material.polygon_offset, false)
 }
+
+///|
+test "Material clipShadows defaults off" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.clip_shadows, false)
+  basic.material.clip_shadows = true
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.clip_shadows, false)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.clip_shadows, false)
+  standard.material.clip_shadows = true
+  let other = @materials.Material::basic()
+  assert_eq(other.clip_shadows, false)
+  assert_eq(basic.material.clip_shadows, true)
+  assert_eq(standard.material.clip_shadows, true)
+}
