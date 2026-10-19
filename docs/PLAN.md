@@ -1573,6 +1573,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 `Line.copy` leaves morph weights in place. A position group named `wide` and `tall`, with the first weight set to `0.5`, copies onto a line that had none. The destination influences and dictionary stay empty, and the source stays at `0.5` with `wide` at `0`. A destination built from that geometry starts at `[0, 0]`. Copying the weighted line onto it leaves the first weight at `0`. Setting that weight to `1` leaves the source at `0.5`. Copying a line with no morph data onto one whose first weight is `0.25` leaves that weight and `wide` at `0`. `Line.clone` builds a new line first, so the clone starts at `0` with `tall` at `1`, and setting its first weight to `1` leaves the source at `0.5`. `LineSegments` and `LineLoop` use that same copy.
 
+`PointsMaterial.map` has landed. A new material has an empty map, size `1`, and size attenuation on. A 1×1 map stays that texture object. Another new material stays empty. The point shader still draws from the material color and does not sample this map. `alphaMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2300,6 +2302,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SpriteMaterial` alpha map and fog | `materials` |
 | planned | 7 | `SpriteMaterial.copy` | `materials` |
 | planned | 7 | `Line.copy` leaves morph weights in place | `objects` |
+| planned | 7 | `PointsMaterial.map` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

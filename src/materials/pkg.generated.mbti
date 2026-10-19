@@ -82,6 +82,7 @@ pub fn MeshStandardMaterial::new(hex? : Int, roughness? : Double, metalness? : D
 
 pub(all) struct PointsMaterial {
   color : @math.Color
+  mut map : @textures.Texture?
   mut size : Double
   mut size_attenuation : Bool
   mut opacity : Double
