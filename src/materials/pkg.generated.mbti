@@ -302,6 +302,7 @@ pub fn Material::program_clearcoat(Self) -> Bool
 pub fn Material::program_clearcoat_map(Self) -> Bool
 pub fn Material::program_clearcoat_normal_map(Self) -> Bool
 pub fn Material::program_clearcoat_roughness_map(Self) -> Bool
+pub fn Material::program_combine(Self) -> @constants.Combine
 pub fn Material::program_defines(Self) -> Map[String, String]
 pub fn Material::program_dispersion(Self) -> Bool
 pub fn Material::program_displacement_map(Self) -> Bool

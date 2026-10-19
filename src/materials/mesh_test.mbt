@@ -8650,6 +8650,25 @@ test "Material shader alphaHash follows the flag" {
 }
 
 ///|
+test "Material shader combine returns the operation" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_combine() is @constants.Multiply, true)
+  assert_eq(shader.program_combine().to_int(), 0)
+  assert_eq(@materials.Material::raw().program_combine().to_int(), 0)
+  assert_eq(@materials.Material::phong().program_combine().to_int(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.combine = @constants.Mix
+  assert_eq(shader.program_combine() is @constants.Mix, true)
+  assert_eq(shader.program_combine().to_int(), 1)
+  shader.combine = @constants.Add
+  assert_eq(shader.program_combine() is @constants.Add, true)
+  assert_eq(shader.program_combine().to_int(), 2)
+  shader.combine = @constants.Multiply
+  assert_eq(shader.program_combine().to_int(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
