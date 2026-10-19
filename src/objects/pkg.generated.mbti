@@ -38,6 +38,7 @@ pub(all) struct InstancedMesh {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.Material
+  mut materials : Array[@materials.Material]?
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
@@ -59,6 +60,7 @@ pub fn InstancedMesh::set_color_at(Self, Int, @math.Color) -> Unit
 pub fn InstancedMesh::set_count(Self, Int) -> Unit
 pub fn InstancedMesh::set_fog(Self, Bool) -> Unit
 pub fn InstancedMesh::set_map(Self, @textures.Texture?) -> Unit
+pub fn InstancedMesh::set_materials(Self, Array[@materials.Material]) -> Unit
 pub fn InstancedMesh::set_matrix_at(Self, Int, @math.Matrix4) -> Unit
 pub fn InstancedMesh::set_morph_at(Self, Int, Mesh) -> Self
 pub fn InstancedMesh::set_side(Self, @constants.Side) -> Unit

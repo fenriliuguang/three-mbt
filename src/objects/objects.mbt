@@ -1736,6 +1736,7 @@ pub(all) struct InstancedMesh {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.Material
+  mut materials : Array[@materials.Material]?
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
@@ -1761,6 +1762,7 @@ pub fn InstancedMesh::new(
     node,
     geometry,
     material,
+    materials: None,
     instances,
     bounding_box: None,
     bounding_sphere: None,
@@ -1809,8 +1811,24 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     metalness_map: self.material.metalness_map,
     alpha_map: self.material.alpha_map,
     instances: Some(self.instances),
-    group_sides: None,
+    group_sides: material_sides(self.materials),
   })
+}
+
+///|
+/// 换成材质数组后，每个实例的射线按几何分组使用各自的侧面，并写下 `material_index`。
+/// 直接改数组里的侧面不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
+pub fn InstancedMesh::set_materials(
+  self : InstancedMesh,
+  materials : Array[@materials.Material],
+) -> Unit {
+  let copied : Array[@materials.Material] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
 }
 
 ///|
@@ -2001,6 +2019,7 @@ pub fn InstancedMesh::get_morph_at(
 
 ///|
 /// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。
+/// 材质数组会复制一份新列表，里面的材质仍是原来的对象。源对象没有数组时，目标的数组清掉。
 /// 源对象有形变缓冲时复制一份。源对象没有时，目标上已有的缓冲留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L182
 pub fn InstancedMesh::copy(
@@ -2011,6 +2030,16 @@ pub fn InstancedMesh::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = match source.materials {
+    None => None
+    Some(materials) => {
+      let copied : Array[@materials.Material] = []
+      for material in materials {
+        copied.push(material)
+      }
+      Some(copied)
+    }
+  }
   ignore(self.instances.matrices.copy(source.instances.matrices))
   self.instances.colors = match source.instances.colors {
     None => None

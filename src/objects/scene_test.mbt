@@ -2877,6 +2877,110 @@ test "panic mesh raycast material index is out of range" {
 }
 
 ///|
+test "InstancedMesh.raycast uses a material array" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let back = @materials.Material::basic()
+  back.side = @constants.Back
+  let front = @materials.Material::basic()
+  let mesh = @objects.InstancedMesh::new(geometry, front, 2)
+  mesh.set_materials([back, front])
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(2.0, 0.0, 0.0))
+  mesh.set_matrix_at(1, matrix)
+  mesh.node.update_matrix_world()
+  let near = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  assert_eq(near.intersect_object(mesh.node, recursive=false).length(), 0)
+  geometry.add_group(0, 3, material_index=1)
+  let first = near.intersect_object(mesh.node, recursive=false)
+  assert_eq(first.length(), 1)
+  assert_eq(first[0].distance, 1.0)
+  assert_eq(first[0].point.x, 0.25)
+  assert_eq(first[0].point.y, 0.25)
+  assert_eq(first[0].point.z, 0.0)
+  match first[0].instance_id {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  match first[0].face {
+    None => assert_eq(false, true)
+    Some(face) => assert_eq(face.material_index, 1)
+  }
+  let far = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=2.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let second = far.intersect_object(mesh.node, recursive=false)
+  assert_eq(second.length(), 1)
+  assert_eq(second[0].point.x, 2.25)
+  assert_eq(second[0].point.y, 0.25)
+  assert_eq(second[0].point.z, 0.0)
+  match second[0].instance_id {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  match second[0].face {
+    None => assert_eq(false, true)
+    Some(face) => assert_eq(face.material_index, 1)
+  }
+  let destination = @objects.InstancedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+    2,
+  )
+  ignore(destination.copy(mesh))
+  match destination.materials {
+    None => assert_eq(false, true)
+    Some(copied) => {
+      assert_eq(copied.length(), 2)
+      copied.push(@materials.Material::basic())
+      assert_eq(copied.length(), 3)
+    }
+  }
+  match mesh.materials {
+    None => assert_eq(false, true)
+    Some(source) => assert_eq(source.length(), 2)
+  }
+}
+
+///|
+test "panic InstancedMesh.raycast material index is out of range" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  geometry.add_group(0, 3, material_index=1)
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    1,
+  )
+  mesh.set_materials([@materials.Material::basic()])
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  ignore(raycaster.intersect_object(mesh.node, recursive=false))
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []
