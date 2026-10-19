@@ -230,3 +230,24 @@ test "LineBasicMaterial stores and copies alphaToCoverage" {
   other.line.alpha_to_coverage = false
   assert_eq(dashed.line.alpha_to_coverage, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies dithering" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.dithering, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.dithering = true
+  assert_eq(defaults.dithering, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.dithering, true)
+  destination.dithering = false
+  assert_eq(source.dithering, true)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.dithering = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.dithering, true)
+  other.line.dithering = false
+  assert_eq(dashed.line.dithering, true)
+}

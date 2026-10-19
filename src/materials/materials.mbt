@@ -343,6 +343,7 @@ pub fn PointsMaterial::copy(
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的线段生效。
 /// `alpha_hash` 默认关闭。线段着色器仍不做哈希透明。
 /// `alpha_to_coverage` 默认关闭。线段绘制仍不打开 alpha to coverage。
+/// `dithering` 默认关闭。线段着色器仍不对颜色做抖动。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -350,6 +351,7 @@ pub fn PointsMaterial::copy(
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
 /// r186: `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135
 /// r186: `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409
+/// r186: `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -367,6 +369,7 @@ pub(all) struct LineBasicMaterial {
   mut tone_mapped : Bool
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
+  mut dithering : Bool
 }
 
 ///|
@@ -388,12 +391,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     tone_mapped: true,
     alpha_hash: false,
     alpha_to_coverage: false,
+    dithering: false,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash` 和 `alpha_to_coverage` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage` 和 `dithering` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -416,6 +420,7 @@ pub fn LineBasicMaterial::copy(
   self.tone_mapped = source.tone_mapped
   self.alpha_hash = source.alpha_hash
   self.alpha_to_coverage = source.alpha_to_coverage
+  self.dithering = source.dithering
   self
 }
 
