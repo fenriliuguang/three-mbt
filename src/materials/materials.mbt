@@ -317,6 +317,29 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
 }
 
 ///|
+/// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
+/// 不透明度、透明开关、雾、深度、颜色写入、预乘和可见性一并复制。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
+pub fn LineBasicMaterial::copy(
+  self : LineBasicMaterial,
+  source : LineBasicMaterial,
+) -> LineBasicMaterial {
+  ignore(self.color.copy(source.color))
+  self.map = source.map
+  self.opacity = source.opacity
+  self.transparent = source.transparent
+  self.fog = source.fog
+  self.depth_write = source.depth_write
+  self.depth_test = source.depth_test
+  self.depth_func = source.depth_func
+  self.color_write = source.color_write
+  self.premultiplied_alpha = source.premultiplied_alpha
+  self.visible = source.visible
+  self
+}
+
+///|
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
