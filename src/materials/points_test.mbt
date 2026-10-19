@@ -853,3 +853,21 @@ test "PointsMaterial hasEventListener reports a registered listener" {
   let other = @materials.PointsMaterial::new()
   assert_eq(other.has_event_listener("dispose", listener), false)
 }
+
+///|
+test "PointsMaterial removeEventListener drops a registered listener" {
+  let material = @materials.PointsMaterial::new()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("change", other_listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  assert_eq(material.has_event_listener("change", other_listener), true)
+  let other = @materials.PointsMaterial::new()
+  other.add_event_listener("dispose", listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(other.has_event_listener("dispose", listener), true)
+}
