@@ -3484,6 +3484,23 @@ test "UniformsGroup setName replaces the name" {
 }
 
 ///|
+test "UniformsGroup setUsage replaces the usage" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  assert_eq(frame.usage, 35044)
+  let chained = frame.set_usage(35048)
+  assert_eq(frame.usage, 35048)
+  assert_eq(chained.usage, 35048)
+  assert_eq(chained.id, frame.id)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  ignore(shader.uniforms_groups[0].set_usage(35044))
+  assert_eq(shader.uniforms_groups[0].usage, 35044)
+  assert_eq(onto.uniforms_groups[0].usage, 35048)
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
