@@ -63,6 +63,7 @@ pub fn BufferAttribute::get_x(Self, Int) -> Double
 pub fn BufferAttribute::get_y(Self, Int) -> Double
 pub fn BufferAttribute::get_z(Self, Int) -> Double
 pub fn BufferAttribute::has_event_listener(Self, String, () -> Unit) -> Bool
+pub fn BufferAttribute::interpolate_vector2(Self, Int, Int, Int, @math.Vector3, @math.Vector2) -> @math.Vector2
 pub fn BufferAttribute::interpolate_vector3(Self, Int, Int, Int, @math.Vector3, @math.Vector3) -> @math.Vector3
 pub fn BufferAttribute::new(Array[Double], Int, normalized? : Bool, mesh_per_attribute? : Int) -> Self
 pub fn BufferAttribute::on_upload(Self, () -> Unit) -> Self

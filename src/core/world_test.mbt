@@ -2669,6 +2669,17 @@ test "intersectObjects sorts hits from several roots" {
 }
 
 ///|
+test "getInterpolatedAttribute blends three uv vertices" {
+  let attribute = @core.BufferAttribute::new([0.0, 0.0, 1.0, 0.0, 0.0, 1.0], 2)
+  let barycoord = @math.Vector3::new(x=0.5, y=0.25, z=0.25)
+  let target = @math.Vector2::new()
+  let written = attribute.interpolate_vector2(0, 1, 2, barycoord, target)
+  assert_eq(physical_equal(written, target), true)
+  assert_eq(target.x, 0.25)
+  assert_eq(target.y, 0.25)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

@@ -416,6 +416,29 @@ pub fn BufferAttribute::copy_to_vector2(
 }
 
 ///|
+/// 按重心坐标插值三个顶点的 x、y。上游写在 `Triangle` 上，属性不在 `math` 里，所以放在这里。
+/// r186: `getInterpolatedAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L195
+pub fn BufferAttribute::interpolate_vector2(
+  self : BufferAttribute,
+  i1 : Int,
+  i2 : Int,
+  i3 : Int,
+  barycoord : @math.Vector3,
+  target : @math.Vector2,
+) -> @math.Vector2 {
+  let a = @math.Vector2::new()
+  let b = @math.Vector2::new()
+  let c = @math.Vector2::new()
+  ignore(self.copy_to_vector2(i1, a))
+  ignore(self.copy_to_vector2(i2, b))
+  ignore(self.copy_to_vector2(i3, c))
+  ignore(target.set(0.0, 0.0))
+  ignore(target.add_scaled_vector(a, barycoord.x))
+  ignore(target.add_scaled_vector(b, barycoord.y))
+  target.add_scaled_vector(c, barycoord.z)
+}
+
+///|
 /// 写入 `target` 的 x、y、z 和 w。`math` 不依赖 `core`，所以这个函数放在属性上。
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L1024
 pub fn BufferAttribute::copy_to_vector4(
