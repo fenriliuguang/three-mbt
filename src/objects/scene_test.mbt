@@ -789,3 +789,86 @@ test "InstancedMesh.intersectsFrustum uses the instanced bounding sphere" {
     }
   }
 }
+
+///|
+test "InstancedMesh.intersectsFrustumArray uses only the counted frustums" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    1,
+  )
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(0.5, 0.5, 0.5))
+  mesh.set_matrix_at(0, matrix)
+  mesh.node.update_matrix_world()
+  let frustums = @math.FrustumArray::new()
+  assert_eq(mesh.intersects_frustum_array(frustums), false)
+  assert_eq(mesh.bounding_sphere is None, true)
+  let cube = @math.Frustum::new()
+  ignore(
+    cube.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  frustums.frustums.push(cube)
+  assert_eq(mesh.intersects_frustum_array(frustums), false)
+  assert_eq(mesh.bounding_sphere is None, true)
+  frustums.count = 1
+  assert_eq(mesh.intersects_frustum_array(frustums), true)
+  match mesh.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 0.5)
+      assert_eq(sphere.center.y, 0.5)
+      assert_eq(sphere.center.z, 0.5)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+  ignore(matrix.make_translation(-2.0, 0.5, 0.5))
+  mesh.set_matrix_at(0, matrix)
+  ignore(mesh.compute_bounding_sphere())
+  assert_eq(mesh.intersects_frustum_array(frustums), false)
+  let wide = @math.Frustum::new()
+  ignore(
+    wide.set(
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+    ),
+  )
+  frustums.frustums.push(wide)
+  assert_eq(mesh.intersects_frustum_array(frustums), false)
+  frustums.count = 2
+  assert_eq(mesh.intersects_frustum_array(frustums), true)
+  match mesh.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, -2.0)
+      assert_eq(sphere.center.y, 0.5)
+      assert_eq(sphere.center.z, 0.5)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(geometry_sphere) => {
+      assert_eq(geometry_sphere.center.x, 0.0)
+      assert_eq(geometry_sphere.radius, 0.0)
+    }
+  }
+}

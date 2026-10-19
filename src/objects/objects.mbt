@@ -757,6 +757,22 @@ pub fn InstancedMesh::intersects_frustum(
 }
 
 ///|
+/// 任一已用视锥碰到这份实例包围球则为真。`count` 为 0 时为假，也不会先去计算包围球。
+/// three.js 没有 `InstancedMesh.intersectsFrustumArray`。对象自带包围球时，每个视锥走 `Frustum.intersectsObject`。
+/// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L86
+pub fn InstancedMesh::intersects_frustum_array(
+  self : InstancedMesh,
+  frustums : @math.FrustumArray,
+) -> Bool {
+  for i in 0..<frustums.count {
+    if self.intersects_frustum(frustums.frustums[i]) {
+      return true
+    }
+  }
+  false
+}
+
+///|
 /// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。
 /// r186: `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
 /// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L110
