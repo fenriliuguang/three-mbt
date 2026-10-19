@@ -590,6 +590,7 @@ pub fn PointsMaterial::copy(
 /// `stencil_fail` 默认 `Keep`。比较失败时的模板操作。管线仍不读这个字段。
 /// `stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。管线仍不读这个字段。
 /// `stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。管线仍不读这个字段。
+/// `stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。管线仍不读这个字段。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -620,6 +621,7 @@ pub fn PointsMaterial::copy(
 /// r186: `stencilFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L271
 /// r186: `stencilZFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L280
 /// r186: `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289
+/// r186: `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -660,6 +662,7 @@ pub(all) struct LineBasicMaterial {
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
+  mut stencil_write : Bool
 }
 
 ///|
@@ -704,12 +707,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     stencil_fail: @constants.StencilOp::Keep,
     stencil_z_fail: @constants.StencilOp::Keep,
     stencil_z_pass: @constants.StencilOp::Keep,
+    stencil_write: false,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail` 和 `stencil_z_pass` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass` 和 `stencil_write` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -732,6 +736,7 @@ pub fn LineBasicMaterial::copy(
   self.stencil_fail = source.stencil_fail
   self.stencil_z_fail = source.stencil_z_fail
   self.stencil_z_pass = source.stencil_z_pass
+  self.stencil_write = source.stencil_write
   self.map = source.map
   self.opacity = source.opacity
   self.alpha_test = source.alpha_test

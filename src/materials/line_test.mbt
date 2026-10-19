@@ -796,3 +796,26 @@ test "LineBasicMaterial stores and copies stencilZPass" {
   assert_eq(dashed.line.stencil_z_pass.to_int(), 0)
   assert_eq(other.line.stencil_z_pass.to_int(), 7682)
 }
+
+///|
+test "LineBasicMaterial stores and copies stencilWrite" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.stencil_write, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.stencil_write = true
+  assert_eq(defaults.stencil_write, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_write, true)
+  destination.stencil_write = false
+  assert_eq(source.stencil_write, true)
+  assert_eq(destination.stencil_write, false)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.stencil_write = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.stencil_write, true)
+  other.line.stencil_write = false
+  assert_eq(dashed.line.stencil_write, true)
+  assert_eq(other.line.stencil_write, false)
+}
