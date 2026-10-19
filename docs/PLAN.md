@@ -1495,6 +1495,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Skeleton` has landed. A shoulder at local `y=-5`, an elbow at `0`, and a hand at `5` are copied into the skeleton after their world matrices update. The shoulder and elbow inverses translate by `y=5`, and the hand inverse is identity. The bone matrix buffer holds 48 zeros. Moving the shoulder to `y=-2` and calculating again stores inverses at `y=2`, `y=2`, and `y=-3`. An empty skeleton has no bones, no inverses, and an empty buffer. A caller-supplied inverse list of the same length is kept. A list of the wrong length is replaced by one identity matrix per bone, and the supplied matrix stays at translation `y=9`. `pose`, `update`, and the bone texture stay later.
 
+`Skeleton.pose` has landed. The same chain is moved so the shoulder sits at `y=-2`, then pose restores local positions `-5`, `0`, and `5`. The world translations are `y=-5`, `y=-5`, and `0`. The shoulder quaternion stays identity and the scales stay `1`. The stored inverses stay at `y=5`. A bone at local `y=5` under a group at `y=10` becomes local `y=15`, because that parent is not a bone. An empty skeleton stays empty. `update` and the bone texture stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2183,6 +2185,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Bone.copy` | `objects` |
 | planned | 7 | `Bone.clone` | `objects` |
 | planned | 7 | `Skeleton` | `objects` |
+| planned | 7 | `Skeleton.pose` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

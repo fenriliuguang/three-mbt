@@ -1545,6 +1545,45 @@ test "Skeleton.init replaces a mismatched inverse list" {
 }
 
 ///|
+test "Skeleton.pose restores the bind positions" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  assert_eq(shoulder.node.position.y, -2.0)
+  arm.pose()
+  assert_eq(shoulder.node.position.y, -5.0)
+  assert_eq(elbow.node.position.y, 0.0)
+  assert_eq(hand.node.position.y, 5.0)
+  assert_eq(shoulder.node.matrix_world.elements[13], -5.0)
+  assert_eq(elbow.node.matrix_world.elements[13], -5.0)
+  assert_eq(hand.node.matrix_world.elements[13], 0.0)
+  assert_eq(shoulder.node.quaternion.w, 1.0)
+  assert_eq(shoulder.node.quaternion.x, 0.0)
+  assert_eq(elbow.node.scale.y, 1.0)
+  assert_eq(hand.node.scale.y, 1.0)
+  assert_eq(arm.bone_inverses[0].elements[13], 5.0)
+  let group = @objects.Group::new()
+  ignore(group.node.position.set(0.0, 10.0, 0.0))
+  let lone = @objects.Bone::new()
+  ignore(lone.node.position.set(0.0, 5.0, 0.0))
+  ignore(group.add(lone))
+  group.node.update_matrix_world(force=true)
+  let flat = @objects.Skeleton::new(bones=[lone])
+  flat.pose()
+  assert_eq(lone.node.position.y, 15.0)
+  @objects.Skeleton::new().pose()
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

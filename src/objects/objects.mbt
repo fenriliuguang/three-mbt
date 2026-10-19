@@ -167,6 +167,36 @@ pub fn Skeleton::calculate_inverses(self : Skeleton) -> Unit {
 }
 
 ///|
+/// 用逆绑定矩阵恢复绑定姿态，再分解出每根骨骼的局部位置、旋转和缩放。
+/// 父节点也是骨骼时，局部矩阵是父世界矩阵的逆乘上自己的世界矩阵。
+/// r186: `pose` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L153
+pub fn Skeleton::pose(self : Skeleton) -> Unit {
+  let count = self.bones.length()
+  let mut index = 0
+  while index < count {
+    let bone = self.bones[index].node
+    ignore(bone.matrix_world.copy(self.bone_inverses[index]).invert())
+    index = index + 1
+  }
+  index = 0
+  while index < count {
+    let bone = self.bones[index].node
+    match bone.parent {
+      Some(parent) =>
+        if parent.kind is @core.NodeKind::Bone {
+          ignore(bone.matrix.copy(parent.matrix_world).invert())
+          ignore(bone.matrix.multiply(bone.matrix_world))
+        } else {
+          ignore(bone.matrix.copy(bone.matrix_world))
+        }
+      None => ignore(bone.matrix.copy(bone.matrix_world))
+    }
+    ignore(bone.matrix.decompose(bone.position, bone.quaternion, bone.scale))
+    index = index + 1
+  }
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0
