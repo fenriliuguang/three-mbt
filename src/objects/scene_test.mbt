@@ -198,6 +198,107 @@ test "InstancedMesh.raycast hits one instance and records its index" {
 }
 
 ///|
+test "InstancedMesh.copy clones bounds and shares geometry" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let source = @objects.InstancedMesh::new(geometry, material, 2)
+  source.set_count(1)
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(2.0, 0.0, 0.0))
+  source.set_matrix_at(0, matrix)
+  source.set_color_at(0, @math.Color::new(r=0.25, g=0.5, b=1.0))
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.frustum_culled = true
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let destination = @objects.InstancedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+    1,
+  )
+  ignore(
+    destination.geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 1.0, 1.0], 3),
+    ),
+  )
+  ignore(destination.compute_bounding_sphere())
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(destination.instances.count, 1)
+  assert_eq(destination.bounding_sphere is None, true)
+  assert_eq(physical_equal(destination.geometry, geometry), true)
+  assert_eq(physical_equal(destination.material, material), true)
+  assert_eq(destination.node.position.y, 3.0)
+  assert_eq(destination.node.frustum_culled, true)
+  assert_eq(destination.node.children.length(), 1)
+  assert_eq(destination.node.children[0].name, "marker")
+  assert_eq(physical_equal(destination.node.children[0], child), false)
+  ignore(source.compute_bounding_box())
+  ignore(source.compute_bounding_sphere())
+  ignore(destination.copy(source, recursive=false))
+  assert_eq(destination.node.children.length(), 1)
+  let read = @math.Matrix4::new()
+  ignore(destination.get_matrix_at(0, read))
+  assert_eq(read.elements[12], 2.0)
+  let color = @math.Color::new(r=0.0, g=0.0, b=0.0)
+  ignore(destination.get_color_at(0, color))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 1.0)
+  match destination.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => {
+      assert_eq(box.min.x, 2.0)
+      assert_eq(box.max.x, 2.0)
+      assert_eq(box.min.y, 0.0)
+      assert_eq(box.max.y, 0.0)
+      assert_eq(box.min.z, 0.0)
+      assert_eq(box.max.z, 0.0)
+      box.max.x = 8.0
+    }
+  }
+  match source.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => assert_eq(box.max.x, 2.0)
+  }
+  match destination.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 2.0)
+      assert_eq(sphere.center.y, 0.0)
+      assert_eq(sphere.center.z, 0.0)
+      assert_eq(sphere.radius, 0.0)
+      sphere.radius = 5.0
+    }
+  }
+  match source.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => assert_eq(sphere.radius, 0.0)
+  }
+  match destination.instances.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => assert_eq(sphere.radius, 5.0)
+  }
+  ignore(matrix.make_translation(9.0, 0.0, 0.0))
+  destination.set_matrix_at(0, matrix)
+  ignore(source.get_matrix_at(0, read))
+  assert_eq(read.elements[12], 2.0)
+  destination.set_color_at(0, @math.Color::new(r=0.0, g=0.0, b=0.0))
+  ignore(source.get_color_at(0, color))
+  assert_eq(color.r, 0.25)
+  assert_eq(color.g, 0.5)
+  assert_eq(color.b, 1.0)
+}
+
+///|
 test "mesh raycast interpolates uv" {
   let geometry = @core.BufferGeometry::new()
   ignore(

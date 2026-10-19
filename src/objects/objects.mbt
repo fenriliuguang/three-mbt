@@ -486,8 +486,8 @@ fn read_matrix(
 /// r186: `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 pub(all) struct InstancedMesh {
   node : Object3D
-  geometry : BufferGeometry
-  material : @materials.Material
+  mut geometry : BufferGeometry
+  mut material : @materials.Material
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
@@ -674,6 +674,42 @@ pub fn InstancedMesh::get_color_at(
         colors.get_z(index),
       )
   }
+}
+
+///|
+/// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。没有形变纹理。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L182
+pub fn InstancedMesh::copy(
+  self : InstancedMesh,
+  source : InstancedMesh,
+  recursive? : Bool = true,
+) -> InstancedMesh {
+  ignore(self.node.copy(source.node, recursive~))
+  self.geometry = source.geometry
+  self.material = source.material
+  ignore(self.instances.matrices.copy(source.instances.matrices))
+  self.instances.colors = match source.instances.colors {
+    None => None
+    Some(colors) => Some(BufferAttribute::new([], 3).copy(colors))
+  }
+  self.instances.count = source.instances.count
+  self.instances.version = self.instances.version + 1
+  let sphere = match source.bounding_sphere {
+    Some(sphere) => Some(sphere.clone())
+    None =>
+      match source.instances.bounding_sphere {
+        None => None
+        Some(sphere) => Some(sphere.clone())
+      }
+  }
+  self.instances.bounding_sphere = sphere
+  self.bounding_sphere = sphere
+  self.bounding_box = match source.bounding_box {
+    None => None
+    Some(box) => Some(box.clone())
+  }
+  self.refresh()
+  self
 }
 
 ///|
