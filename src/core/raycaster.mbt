@@ -25,6 +25,7 @@ pub(all) struct Raycaster {
 /// r186: `face` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L489
 /// r186: `faceIndex` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L406
 /// r186: `barycoord` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L500
+/// r186: `uv` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L467
 pub(all) struct Intersection {
   distance : Double
   point : @math.Vector3
@@ -32,6 +33,7 @@ pub(all) struct Intersection {
   face : Face?
   face_index : Int?
   barycoord : @math.Vector3?
+  uv : @math.Vector2?
 }
 
 ///|

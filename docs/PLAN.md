@@ -1367,6 +1367,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Triangle.getInterpolatedAttribute` has landed for a `Vector2` target on `BufferAttribute`. UVs `(0, 0)`, `(1, 0)`, and `(0, 1)` with barycentric coordinates `(0.5, 0.25, 0.25)` blend to `(0.25, 0.25)`.
 
+`Mesh.raycast` now writes `uv` when the geometry has that attribute. The same triangle and ray store `(0.25, 0.25)`. A geometry without `uv` leaves the field empty.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1991,6 +1993,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Mesh.raycast` | `core` |
 | planned | 7 | `Mesh.raycast` face | `core` |
 | planned | 7 | `Triangle.getInterpolatedAttribute` for `Vector2` | `core` |
+| planned | 7 | `Mesh.raycast` uv | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

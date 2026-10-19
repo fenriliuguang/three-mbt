@@ -152,6 +152,27 @@ fn Object3D::push_triangle(
           corner_c,
           @math.Vector3::new(),
         )
+        let uv = match barycoord {
+          None => None
+          Some(bary) =>
+            match self.mesh {
+              None => None
+              Some(mesh) =>
+                match mesh.geometry.get_attribute("uv") {
+                  None => None
+                  Some(attribute) =>
+                    Some(
+                      attribute.interpolate_vector2(
+                        a,
+                        b,
+                        c,
+                        bary,
+                        @math.Vector2::new(),
+                      ),
+                    )
+                }
+            }
+        }
         intersects.push({
           distance,
           point: world,
@@ -159,6 +180,7 @@ fn Object3D::push_triangle(
           face: Some({ a, b, c, normal, material_index: 0 }),
           face_index: Some(face_index),
           barycoord,
+          uv,
         })
       }
     }
