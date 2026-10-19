@@ -1225,6 +1225,31 @@ pub fn InstancedMesh::set_morph_at(
 }
 
 ///|
+/// 从第 `index` 个实例读出形变权重，写进网格已有的权重数组。跳过缓冲开头的底权重。
+/// r186: `getMorphAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L240
+pub fn InstancedMesh::get_morph_at(
+  self : InstancedMesh,
+  index : Int,
+  object : Mesh,
+) -> Unit {
+  let influences = match object.morph_target_influences {
+    None => abort("InstancedMesh.getMorphAt requires morphTargetInfluences")
+    Some(influences) => influences
+  }
+  let data = match self.morph_texture {
+    None => abort("InstancedMesh.getMorphAt requires morphTexture")
+    Some(data) => data
+  }
+  let len = influences.length() + 1
+  let data_index = index * len + 1
+  let mut cursor = 0
+  while cursor < influences.length() {
+    influences[cursor] = data[data_index + cursor]
+    cursor = cursor + 1
+  }
+}
+
+///|
 /// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。没有形变纹理。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L182
 pub fn InstancedMesh::copy(

@@ -1475,6 +1475,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `InstancedMesh.setMorphAt` has landed. A mesh of count `2` starts with no morph data. Weights `[0.25, 0.5]` written to instance `1` allocate six zeros and store `[0, 0, 0, 0.25, 0.25, 0.5]`. The base influence is `1 - 0.75`. Turning `morphTargetsRelative` on and writing instance `0` keeps that length and stores `[1, 0.25, 0.5, 0.25, 0.25, 0.5]`. The value is the `DataTexture` float buffer. The texture object, `getMorphAt`, and copying the buffer stay later.
 
+`InstancedMesh.getMorphAt` has landed. The same buffer is read into a mesh whose weights started at `[9, 9]`. Instance `1` becomes `[0.25, 0.5]`. Instance `0` also becomes `[0.25, 0.5]`, and the stored base `1` stays in the buffer. The source mesh stays at `[0.25, 0.5]`. The texture object and copying the buffer stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2153,6 +2155,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineSegments.updateMorphTargets` | `objects` |
 | planned | 7 | `LineLoop.updateMorphTargets` | `objects` |
 | planned | 7 | `InstancedMesh.setMorphAt` | `objects` |
+| planned | 7 | `InstancedMesh.getMorphAt` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

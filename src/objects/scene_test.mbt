@@ -1188,6 +1188,46 @@ test "InstancedMesh.setMorphAt stores base influence and weights" {
 }
 
 ///|
+test "InstancedMesh.getMorphAt reads weights and skips the base" {
+  let geometry = @core.BufferGeometry::new()
+  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let source = @objects.Mesh::new(geometry, @materials.Material::basic())
+  source.morph_target_influences = Some([0.25, 0.5])
+  ignore(mesh.set_morph_at(1, source))
+  geometry.morph_targets_relative = true
+  ignore(mesh.set_morph_at(0, source))
+  let reader = @objects.Mesh::new(geometry, @materials.Material::basic())
+  reader.morph_target_influences = Some([9.0, 9.0])
+  mesh.get_morph_at(1, reader)
+  match reader.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights[0], 0.25)
+      assert_eq(weights[1], 0.5)
+    }
+  }
+  mesh.get_morph_at(0, reader)
+  match reader.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights[0], 0.25)
+      assert_eq(weights[1], 0.5)
+    }
+  }
+  match mesh.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => assert_eq(data[0], 1.0)
+  }
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights[0], 0.25)
+      assert_eq(weights[1], 0.5)
+    }
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
