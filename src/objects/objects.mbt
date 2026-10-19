@@ -80,6 +80,18 @@ pub fn[T : @core.AsNode] Bone::add(self : Bone, child : T) -> Bone {
 }
 
 ///|
+/// 复制变换和子节点。`Bone` 没有自己的 `copy`，行为来自 `Object3D.copy`。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1605
+pub fn Bone::copy(
+  self : Bone,
+  source : Bone,
+  recursive? : Bool = true,
+) -> Bone {
+  ignore(self.node.copy(source.node, recursive~))
+  self
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
