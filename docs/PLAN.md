@@ -2563,6 +2563,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `fog` has landed. Shader, Raw, and Basic start at `false` when the scene has no fog. Passing scene fog returns `true`. Turning the material `fog` flag on does not make a fogless scene true. Turning the material flag off does not clear a scene that has fog. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the material flag is still at its default. `useFog` stays later.
 
+`useFog` has landed. Shader and Raw start at `false`. Basic starts at `true`. Setting Shader `fog` to `true` returns `true`. Setting it back to `false` returns `false`. A scene with fog does not turn the material flag on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while Shader `fog` is still off. `fogExp2` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3785,6 +3787,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `vertexAlphas` | `materials` |
 | planned | 7 | `pointsUvs` | `materials` |
 | planned | 7 | `fog` | `materials` |
+| planned | 7 | `useFog` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
