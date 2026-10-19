@@ -8080,6 +8080,27 @@ test "Material shader normalMap follows the normal texture" {
 }
 
 ///|
+test "Material shader normalMapObjectSpace follows object space" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_normal_map_object_space(), false)
+  assert_eq(@materials.Material::raw().program_normal_map_object_space(), false)
+  assert_eq(@materials.Material::standard().program_normal_map_object_space(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.normal_map_type = @constants.ObjectSpace
+  assert_eq(shader.program_normal_map_object_space(), false)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_normal_map_object_space(), true)
+  shader.normal_map_type = @constants.TangentSpace
+  assert_eq(shader.program_normal_map_object_space(), false)
+  shader.normal_map_type = @constants.ObjectSpace
+  assert_eq(shader.program_normal_map_object_space(), true)
+  shader.normal_map = None
+  assert_eq(shader.program_normal_map_object_space(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
