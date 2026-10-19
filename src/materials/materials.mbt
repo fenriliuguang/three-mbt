@@ -612,6 +612,7 @@ pub fn PointsMaterial::copy(
 /// `stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。管线仍不读这个字段。
 /// `stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。管线仍不读这个字段。
 /// `clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。线段绘制仍不按这些平面裁剪。
+/// `precision` 默认空。空着时沿用渲染器默认精度。管线仍不读这个字段。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -644,6 +645,7 @@ pub fn PointsMaterial::copy(
 /// r186: `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289
 /// r186: `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299
 /// r186: `clippingPlanes` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L311
+/// r186: `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -686,6 +688,7 @@ pub(all) struct LineBasicMaterial {
   mut stencil_z_pass : @constants.StencilOp
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
+  mut precision : @constants.Precision?
 }
 
 ///|
@@ -732,12 +735,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     stencil_z_pass: @constants.StencilOp::Keep,
     stencil_write: false,
     clipping_planes: None,
+    precision: None,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write` 和 `clipping_planes` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes` 和 `precision` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -762,6 +766,7 @@ pub fn LineBasicMaterial::copy(
   self.stencil_z_pass = source.stencil_z_pass
   self.stencil_write = source.stencil_write
   self.clipping_planes = source.clipping_planes
+  self.precision = source.precision
   self.map = source.map
   self.opacity = source.opacity
   self.alpha_test = source.alpha_test

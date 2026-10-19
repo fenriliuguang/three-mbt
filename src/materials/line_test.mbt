@@ -863,3 +863,44 @@ test "LineBasicMaterial stores and copies clippingPlanes" {
     Some(planes) => assert_eq(planes[0].constant, 3.0)
   }
 }
+
+///|
+test "LineBasicMaterial stores and copies precision" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.precision is None, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.precision = Some(@constants.Precision::Highp)
+  assert_eq(defaults.precision is None, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.precision {
+    None => abort("copied precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  destination.precision = Some(@constants.Precision::Mediump)
+  match source.precision {
+    None => abort("source precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  match destination.precision {
+    None => abort("destination precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+  }
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.precision = Some(@constants.Precision::Highp)
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  match other.line.precision {
+    None => abort("dashed precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  other.line.precision = Some(@constants.Precision::Lowp)
+  match dashed.line.precision {
+    None => abort("dashed source precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  match other.line.precision {
+    None => abort("dashed destination precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Lowp, true)
+  }
+}
