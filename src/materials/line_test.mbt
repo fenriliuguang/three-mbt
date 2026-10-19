@@ -307,3 +307,24 @@ test "LineBasicMaterial stores and copies clipShadows" {
   other.line.clip_shadows = false
   assert_eq(dashed.line.clip_shadows, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies clipIntersection" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.clip_intersection, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.clip_intersection = true
+  assert_eq(defaults.clip_intersection, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.clip_intersection, true)
+  destination.clip_intersection = false
+  assert_eq(source.clip_intersection, true)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.clip_intersection = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.clip_intersection, true)
+  other.line.clip_intersection = false
+  assert_eq(dashed.line.clip_intersection, true)
+}
