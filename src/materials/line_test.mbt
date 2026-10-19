@@ -1351,6 +1351,20 @@ test "LineBasicMaterial shadowSide defaults to empty and copies" {
 }
 
 ///|
+test "LineBasicMaterial forceSinglePass defaults to false and copies" {
+  let material = @materials.LineBasicMaterial::new()
+  assert_eq(material.force_single_pass, false)
+  material.force_single_pass = true
+  let other = @materials.LineBasicMaterial::new()
+  assert_eq(other.force_single_pass, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.force_single_pass, true)
+  destination.force_single_pass = false
+  assert_eq(material.force_single_pass, true)
+}
+
+///|
 test "LineDashedMaterial dispose runs only the inner dispose listeners" {
   let material = @materials.LineDashedMaterial::new()
   let hits = Ref::Ref(0)
