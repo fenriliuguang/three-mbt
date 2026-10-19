@@ -166,6 +166,7 @@ pub(all) struct Material {
   mut specular_color_map : @textures.Texture?
   mut anisotropy : Double
   mut clearcoat : Double
+  mut iridescence : Double
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -217,6 +218,7 @@ pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
 pub fn Material::set_anisotropy(Self, Double) -> Unit
 pub fn Material::set_clearcoat(Self, Double) -> Unit
+pub fn Material::set_iridescence(Self, Double) -> Unit
 pub fn Material::set_needs_update(Self, Bool) -> Unit
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
