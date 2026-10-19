@@ -3370,9 +3370,9 @@ test "Material shader writes USE_ENVMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1627)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1241)
-  assert_eq(1627 - 1608, 19)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(1658 - 1608, 50)
   assert_eq(
     shader.prefixed_vertex_shader()[683:701].to_owned(),
     "#define USE_ENVMAP",
@@ -3382,11 +3382,42 @@ test "Material shader writes USE_ENVMAP" {
     "#define USE_ENVMAP",
   )
   shader.map = Some(env_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
-  assert_eq(1643 - 1627, 16)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
+  assert_eq(1674 - 1658, 16)
   assert_eq(
     shader.prefixed_vertex_shader()[699:717].to_owned(),
     "#define USE_ENVMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.env_map = Some(env_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.env_map = Some(env_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes ENVMAP_MODE" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.env_map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(1658 - 1627, 31)
+  assert_eq(
+    shader.prefixed_vertex_shader()[702:732].to_owned(),
+    "#define ENVMAP_MODE_REFLECTION",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1098:1128].to_owned(),
+    "#define ENVMAP_MODE_REFLECTION",
+  )
+  shader.map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
+  assert_eq(
+    shader.prefixed_vertex_shader()[718:748].to_owned(),
+    "#define ENVMAP_MODE_REFLECTION",
   )
   let raw = @materials.Material::raw()
   raw.env_map = Some(env_map)
