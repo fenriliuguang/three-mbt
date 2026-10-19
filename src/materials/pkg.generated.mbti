@@ -180,6 +180,7 @@ pub(all) struct Material {
   is_mesh_depth_material : Bool
   mut depth_packing : @constants.DepthPacking
   is_mesh_distance_material : Bool
+  is_mesh_phong_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -231,6 +232,7 @@ pub fn Material::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn Material::lambert(hex? : Int) -> Self
 pub fn Material::matcap(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::normal(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+pub fn Material::phong(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
@@ -256,6 +258,7 @@ pub(all) enum MaterialKind {
   Normal
   Depth
   Distance
+  Phong
 }
 
 pub(all) struct MeshBasicMaterial {
