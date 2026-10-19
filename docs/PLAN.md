@@ -1413,6 +1413,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 Opaque list culling uses that same instance sphere when `frustum_culled` is true. A point at the origin instanced at `x=-2` drops out of the unit-cube frustum, and the sphere is stored at `(-2, 0, 0)` with radius `0`. The same point instanced at `(0.5, 0.5, 0.5)` stays. The geometry sphere stays at the origin. Setting `frustum_culled` back to false keeps both. New instanced meshes still start with culling off.
 
+`InstancedMesh.raycast` has landed. A triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` is drawn at the origin and at `x=2`. A ray from `(0.25, 0.25, 1)` along `(0, 0, -1)` hits `(0.25, 0.25, 0)` at distance `1`, instance `0`. A ray from `(2.25, 0.25, 1)` hits `(2.25, 0.25, 0)`, instance `1`. `matrixWorld` stays the identity. The geometry sphere stays centered at `(0.5, 0.5, 0)`. Moving both instances to `x=10` and `x=12` and recomputing misses. `count` `0` also misses.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2060,6 +2062,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.intersectsFrustumArray` | `objects` |
 | planned | 7 | `Object3D.intersectsFrustum` uses the instanced bounding sphere | `core` |
 | planned | 7 | opaque list culling uses the instanced bounding sphere | `renderer` |
+| planned | 7 | `InstancedMesh.raycast` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

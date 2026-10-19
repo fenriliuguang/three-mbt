@@ -116,6 +116,85 @@ test "mesh raycast hits a front-facing triangle" {
     None => ()
     Some(_) => assert_eq(false, true)
   }
+  match hits[0].instance_id {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
+test "InstancedMesh.raycast hits one instance and records its index" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(2.0, 0.0, 0.0))
+  mesh.set_matrix_at(1, matrix)
+  mesh.node.update_matrix_world()
+  let near = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let first = near.intersect_object(mesh.node, recursive=false)
+  assert_eq(first.length(), 1)
+  assert_eq(first[0].distance, 1.0)
+  assert_eq(first[0].point.x, 0.25)
+  assert_eq(first[0].point.y, 0.25)
+  assert_eq(first[0].point.z, 0.0)
+  match first[0].instance_id {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  assert_eq(physical_equal(first[0].object, mesh.node), true)
+  let far = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=2.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let second = far.intersect_object(mesh.node, recursive=false)
+  assert_eq(second.length(), 1)
+  assert_eq(second[0].point.x, 2.25)
+  assert_eq(second[0].point.y, 0.25)
+  assert_eq(second[0].point.z, 0.0)
+  assert_eq(second[0].distance, 1.0)
+  match second[0].instance_id {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  assert_eq(mesh.node.matrix_world.elements[0], 1.0)
+  assert_eq(mesh.node.matrix_world.elements[12], 0.0)
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(geometry_sphere) => {
+      assert_eq(geometry_sphere.center.x, 0.5)
+      assert_eq(geometry_sphere.center.y, 0.5)
+      assert_eq(geometry_sphere.center.z, 0.0)
+    }
+  }
+  ignore(matrix.make_translation(10.0, 0.0, 0.0))
+  mesh.set_matrix_at(0, matrix)
+  ignore(matrix.make_translation(12.0, 0.0, 0.0))
+  mesh.set_matrix_at(1, matrix)
+  ignore(mesh.compute_bounding_sphere())
+  let missed = near.intersect_object(mesh.node, recursive=false)
+  assert_eq(missed.length(), 0)
+  mesh.set_count(0)
+  ignore(mesh.compute_bounding_sphere())
+  ignore(matrix.make_translation(0.0, 0.0, 0.0))
+  mesh.set_matrix_at(0, matrix)
+  let none_drawn = near.intersect_object(mesh.node, recursive=false)
+  assert_eq(none_drawn.length(), 0)
 }
 
 ///|

@@ -7,6 +7,7 @@ fn Object3D::raycast_mesh(
   self : Object3D,
   raycaster : Raycaster,
   intersects : Array[Intersection],
+  instance_id? : Int? = None,
 ) -> Unit {
   let mesh = match self.mesh {
     None => return
@@ -48,7 +49,7 @@ fn Object3D::raycast_mesh(
         return
       }
   }
-  self.raycast_triangles(raycaster, intersects, ray, mesh.side)
+  self.raycast_triangles(raycaster, intersects, ray, mesh.side, instance_id~)
 }
 
 ///|
@@ -58,6 +59,7 @@ fn Object3D::raycast_triangles(
   intersects : Array[Intersection],
   ray : @math.Ray,
   side : @constants.Side,
+  instance_id? : Int? = None,
 ) -> Unit {
   let geometry = match self.mesh {
     None => return
@@ -81,6 +83,7 @@ fn Object3D::raycast_triangles(
           index.get_x(i + 1).to_int(),
           index.get_x(i + 2).to_int(),
           i / 3,
+          instance_id~,
         )
         i = i + 3
       }
@@ -105,6 +108,7 @@ fn Object3D::raycast_triangles(
               i + 1,
               i + 2,
               i / 3,
+              instance_id~,
             )
             i = i + 3
           }
@@ -124,6 +128,7 @@ fn Object3D::push_triangle(
   b : Int,
   c : Int,
   face_index : Int,
+  instance_id? : Int? = None,
 ) -> Unit {
   let point = @math.Vector3::new()
   let corner_a = @math.Vector3::new()
@@ -167,6 +172,7 @@ fn Object3D::push_triangle(
           normal: shading,
           index: None,
           distance_to_ray: None,
+          instance_id,
         })
       }
     }

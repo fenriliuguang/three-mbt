@@ -794,7 +794,7 @@ pub fn Object3D::dispose(self : Object3D) -> Unit {
 }
 
 ///|
-/// 网格会把三角形交点写入列表，折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点，精灵会写入朝向相机的四边形交点，LOD 会把选中那一级的交点写入列表。其他种类不产生交点。
+/// 网格会把三角形交点写入列表。带实例数据时先用实例包围球，再按每个实例矩阵测试，并写下 `instance_id`。折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点，精灵会写入朝向相机的四边形交点，LOD 会把选中那一级的交点写入列表。其他种类不产生交点。
 /// 返回 `None` 表示继续访问子节点；只有 `Some(false)` 会停住。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1061
 pub fn Object3D::raycast(
@@ -806,7 +806,11 @@ pub fn Object3D::raycast(
     Mesh =>
       match self.mesh {
         None => ()
-        Some(_) => self.raycast_mesh(raycaster, intersects)
+        Some(mesh) =>
+          match mesh.instances {
+            None => self.raycast_mesh(raycaster, intersects)
+            Some(_) => self.raycast_instances(raycaster, intersects)
+          }
       }
     Line | LineSegments | LineLoop =>
       match self.primitive {

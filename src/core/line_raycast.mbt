@@ -157,5 +157,6 @@ fn Object3D::push_line_segment(
     normal: None,
     index: Some(index),
     distance_to_ray: None,
+    instance_id: None,
   })
 }

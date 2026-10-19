@@ -298,6 +298,7 @@ pub(all) struct Intersection {
   normal : @math.Vector3?
   index : Int?
   distance_to_ray : Double?
+  instance_id : Int?
 }
 
 pub(all) struct Layers {

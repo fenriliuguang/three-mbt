@@ -118,5 +118,6 @@ fn Object3D::push_point(
     normal: None,
     index: Some(index),
     distance_to_ray: Some(dist_sq.sqrt()),
+    instance_id: None,
   })
 }
