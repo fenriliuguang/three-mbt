@@ -64,6 +64,50 @@ test "getVertexPosition applies a relative morph" {
 }
 
 ///|
+test "Mesh.copy shares geometry and material" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let source = @objects.Mesh::new(geometry, material)
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let destination = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+  )
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(physical_equal(destination.geometry, geometry), true)
+  assert_eq(physical_equal(destination.material, material), true)
+  assert_eq(destination.node.position.y, 3.0)
+  assert_eq(destination.node.render_order, 4)
+  assert_eq(destination.node.children.length(), 1)
+  assert_eq(destination.node.children[0].name, "marker")
+  assert_eq(physical_equal(destination.node.children[0], child), false)
+  match destination.node.mesh {
+    None => assert_eq(false, true)
+    Some(binding) =>
+      assert_eq(physical_equal(binding.geometry, geometry), true)
+  }
+  let bare = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+  )
+  ignore(bare.copy(source, recursive=false))
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.node.position.y, 3.0)
+  assert_eq(physical_equal(bare.geometry, geometry), true)
+}
+
+///|
 test "mesh raycast hits a front-facing triangle" {
   let geometry = @core.BufferGeometry::new()
   ignore(

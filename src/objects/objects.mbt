@@ -39,8 +39,8 @@ pub fn[T : @core.AsNode] Group::add(self : Group, child : T) -> Group {
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
 pub(all) struct Mesh {
   node : Object3D
-  geometry : BufferGeometry
-  material : @materials.Material
+  mut geometry : BufferGeometry
+  mut material : @materials.Material
 }
 
 ///|
@@ -61,6 +61,21 @@ pub impl @core.AsNode for Mesh with fn to_node(self) {
 
 ///|
 pub extend Mesh with @core.AsNode::{to_node}
+
+///|
+/// 复制变换、几何体和材质。几何体与材质沿用源对象。形变权重留在后面。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L110
+pub fn Mesh::copy(
+  self : Mesh,
+  source : Mesh,
+  recursive? : Bool = true,
+) -> Mesh {
+  ignore(self.node.copy(source.node, recursive~))
+  self.geometry = source.geometry
+  self.material = source.material
+  self.refresh()
+  self
+}
 
 ///|
 /// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、金属度贴图、透明贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。

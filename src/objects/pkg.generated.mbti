@@ -103,9 +103,10 @@ pub impl @core.AsNode for LineSegments
 
 pub(all) struct Mesh {
   node : @core.Object3D
-  geometry : @core.BufferGeometry
-  material : @materials.Material
+  mut geometry : @core.BufferGeometry
+  mut material : @materials.Material
 }
+pub fn Mesh::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Mesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn Mesh::refresh(Self) -> Unit
 pub fn Mesh::set_fog(Self, Bool) -> Unit

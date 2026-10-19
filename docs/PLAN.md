@@ -1429,6 +1429,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Sprite.count` has landed. A new sprite has count `1`. Setting it to `4` leaves another new sprite at `1`.
 
+`Mesh.copy` has landed. A mesh whose position is a single point at `(0.5, 0, 0)`, with node position `y=3` and render order `4`, copies onto another mesh. Geometry and material are the source objects, and the node binding reads that same geometry. A child named `marker` is cloned. `recursive` false keeps the transform and geometry and drops the child. Morph weights stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2084,6 +2086,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LOD.getCurrentLevel` | `objects` |
 | planned | 7 | `Sprite.geometry` | `objects` |
 | planned | 7 | `Sprite.count` | `objects` |
+| planned | 7 | `Mesh.copy` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
