@@ -802,3 +802,50 @@ pub fn Object3D::raycast(
   ignore(intersects)
   None
 }
+
+///|
+/// 读局部顶点。有形变目标和权重时加上权重：相对形变直接累加增量，绝对形变先减去当前顶点。
+/// r186: `getVertexPosition` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L176
+pub fn Object3D::get_vertex_position(
+  self : Object3D,
+  index : Int,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  let geometry = match self.mesh {
+    None => abort("Object3D.get_vertex_position requires a mesh")
+    Some(mesh) => mesh.geometry
+  }
+  let position = match geometry.get_attribute("position") {
+    None => abort("Object3D.get_vertex_position requires a position attribute")
+    Some(position) => position
+  }
+  ignore(position.copy_to_vector3(index, target))
+  match geometry.morph_attributes.get("position") {
+    None => target
+    Some(morph_position) =>
+      match self.morph {
+        None => target
+        Some(morph) => {
+          let morph_a = @math.Vector3::new()
+          let temp = @math.Vector3::new()
+          for i in 0..<morph_position.length() {
+            let influence = if i < morph.weights.length() {
+              morph.weights[i]
+            } else {
+              0.0
+            }
+            if influence != 0.0 {
+              ignore(morph_position[i].copy_to_vector3(index, temp))
+              if geometry.morph_targets_relative {
+                ignore(morph_a.add_scaled_vector(temp, influence))
+              } else {
+                ignore(temp.sub(target))
+                ignore(morph_a.add_scaled_vector(temp, influence))
+              }
+            }
+          }
+          target.add(morph_a)
+        }
+      }
+  }
+}
