@@ -9195,6 +9195,20 @@ test "Material shader vertexNormals reads the geometry normal attribute" {
 }
 
 ///|
+test "Material shader vertexColors reads the material flag" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_vertex_colors(), false)
+  assert_eq(@materials.Material::raw().program_vertex_colors(), false)
+  assert_eq(@materials.Material::basic().program_vertex_colors(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.vertex_colors = true
+  assert_eq(shader.program_vertex_colors(), true)
+  shader.vertex_colors = false
+  assert_eq(shader.program_vertex_colors(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
