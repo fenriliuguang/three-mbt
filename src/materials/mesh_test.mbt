@@ -6302,6 +6302,68 @@ test "Material shader writes SHADOWMAP_TYPE_PCF" {
 }
 
 ///|
+test "Material shader writes SHADOWMAP_TYPE_VSM" {
+  let shader = @materials.Material::shader()
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=false, shadow_map_vsm=true).length(),
+    1608,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=false, shadow_map_vsm=true).length(),
+    1222,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true).length(),
+    1657,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true, shadow_map_vsm=true).length(),
+    1271,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true)[705:731].to_owned(),
+    "#define SHADOWMAP_TYPE_VSM",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true, shadow_map_vsm=true)[1101:1127].to_owned(),
+    "#define SHADOWMAP_TYPE_VSM",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(
+      shadow_map_enabled=true,
+      shadow_map_pcf=true,
+      shadow_map_vsm=true,
+    )[705:731].to_owned(),
+    "#define SHADOWMAP_TYPE_VSM",
+  )
+  shader.side = @constants.Back
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true).length(),
+    1676,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true)[724:750].to_owned(),
+    "#define SHADOWMAP_TYPE_VSM",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true, shadow_map_vsm=true).length(),
+    1290,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true, shadow_map_vsm=true)[1120:1146].to_owned(),
+    "#define SHADOWMAP_TYPE_VSM",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_pcf=true, shadow_map_vsm=false)[724:750].to_owned(),
+    "#define SHADOWMAP_TYPE_PCF",
+  )
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(shadow_map_enabled=true, shadow_map_vsm=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
