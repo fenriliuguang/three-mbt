@@ -2567,6 +2567,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `fogExp2` has landed. Shader, Raw, and Basic start at `false`. Scene fog that is not exponential stays `false`. An exponential flag without scene fog stays `false`. Both together return `true`. Turning the material `fog` flag on does not make a fogless scene exponential. Turning it off does not clear exponential scene fog. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the material flag is still off. `flatShading` stays later.
 
+`flatShading` has landed. Shader, Raw, Basic, and Toon start at `false`. Lambert, Phong, Standard, and Physical start at `true` when the geometry has no normal and the normal map is empty. Giving Lambert a normal attribute returns `false`. A normal map does the same. Shader with `flat_shading` on returns `true`, and a wireframe returns `false`. Lambert with `flat_shading` on and a normal attribute stays `false` while wireframe is on, then returns `true` when the wireframe is off. The vertex prefix stays `1608` and the fragment prefix stays `2041` while Shader `flat_shading` and `wireframe` are still off. `sizeAttenuation` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3791,6 +3793,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `fog` | `materials` |
 | planned | 7 | `useFog` | `materials` |
 | planned | 7 | `fogExp2` | `materials` |
+| planned | 7 | `flatShading` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -9295,6 +9295,37 @@ test "Material shader fogExp2 needs scene fog of that kind" {
 }
 
 ///|
+test "Material shader flatShading skips wireframes and derived lit meshes" {
+  let shader = @materials.Material::shader()
+  let lambert = @materials.Material::lambert()
+  assert_eq(shader.program_flat_shading(), false)
+  assert_eq(@materials.Material::raw().program_flat_shading(), false)
+  assert_eq(@materials.Material::basic().program_flat_shading(), false)
+  assert_eq(@materials.Material::toon().program_flat_shading(), false)
+  assert_eq(lambert.program_flat_shading(), true)
+  assert_eq(@materials.Material::phong().program_flat_shading(), true)
+  assert_eq(@materials.Material::standard().program_flat_shading(), true)
+  assert_eq(@materials.Material::physical().program_flat_shading(), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(lambert.program_flat_shading(has_normal=true), false)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.normal_map = Some(map)
+  assert_eq(lambert.program_flat_shading(), false)
+  lambert.normal_map = None
+  shader.flat_shading = true
+  assert_eq(shader.program_flat_shading(), true)
+  shader.wireframe = true
+  assert_eq(shader.program_flat_shading(), false)
+  lambert.flat_shading = true
+  lambert.wireframe = true
+  assert_eq(lambert.program_flat_shading(has_normal=true), false)
+  lambert.wireframe = false
+  assert_eq(lambert.program_flat_shading(has_normal=true), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
