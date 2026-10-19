@@ -1771,6 +1771,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.stencilFuncMask` has landed. A new material stores `255`. Setting it to `0` leaves another new material at `255`. Copying onto a default material stores `0`. Setting the destination to `1` leaves the source at `0`. A dashed material copies the mask through its inner line material. Setting the destination to `9` leaves the source at `0`. Line draws still do not read this field.
 
+`SpriteMaterial.stencilFuncMask` has landed. A new material stores `255`. Setting it to `0` leaves another new material at `255`. Copying onto a default material stores `0`. Setting the destination to `1` leaves the source at `0`. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2597,6 +2599,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.stencilFuncMask` | `materials` |
 | planned | 7 | `PointsMaterial.stencilFuncMask` | `materials` |
 | planned | 7 | `LineBasicMaterial.stencilFuncMask` | `materials` |
+| planned | 7 | `SpriteMaterial.stencilFuncMask` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
