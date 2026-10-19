@@ -115,6 +115,7 @@ pub(all) struct Material {
   mut stencil_ref : Int
   mut stencil_func_mask : Int
   mut stencil_fail : @constants.StencilOp
+  mut stencil_z_fail : @constants.StencilOp
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
