@@ -66,6 +66,7 @@ pub(all) struct LineBasicMaterial {
 pub fn LineBasicMaterial::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn LineBasicMaterial::clone(Self) -> Self
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
+pub fn LineBasicMaterial::dispatch_event(Self, String) -> Unit
 pub fn LineBasicMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
 pub fn LineBasicMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
