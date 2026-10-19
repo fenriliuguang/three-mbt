@@ -162,3 +162,17 @@ test "PointsMaterial stores and copies alphaHash" {
   destination.alpha_hash = false
   assert_eq(source.alpha_hash, true)
 }
+
+///|
+test "PointsMaterial stores and copies alphaToCoverage" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.alpha_to_coverage, false)
+  let source = @materials.PointsMaterial::new()
+  source.alpha_to_coverage = true
+  assert_eq(defaults.alpha_to_coverage, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_to_coverage, true)
+  destination.alpha_to_coverage = false
+  assert_eq(source.alpha_to_coverage, true)
+}
