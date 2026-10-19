@@ -2540,3 +2540,34 @@ test "Material toon sets isMeshToonMaterial and keeps defines on copy" {
   assert_eq(cloned.color.g, 1.0)
   assert_eq(cloned.id == toon.id, false)
 }
+
+///|
+test "Material gradientMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.gradient_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.gradient_map is None, true)
+  let toon = @materials.Material::toon()
+  assert_eq(toon.gradient_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  toon.gradient_map = Some(map)
+  let other = @materials.Material::toon()
+  assert_eq(other.gradient_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(toon))
+  match destination.gradient_map {
+    None => abort("copied gradient map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.gradient_map = None
+  match toon.gradient_map {
+    None => abort("source gradient map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.gradient_map is None, true)
+  let physical = @materials.Material::physical()
+  assert_eq(physical.gradient_map is None, true)
+}

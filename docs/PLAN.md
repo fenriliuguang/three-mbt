@@ -2073,6 +2073,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.isMeshToonMaterial` has landed. Basic, Lambert, Standard, and Physical stay false. `Material::toon` with hex `0x00FF00` stores true, type `MeshToonMaterial`, kind `Toon`, and shading `Lambert`. The green channel is `1` and the red channel is `0`. Its defines map `TOON` to an empty string and have no `STANDARD` key. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`, and stores red `0` with green `1`. Copying a blue Basic material onto a Toon material keeps the destination true, stores blue `1`, and keeps a `FOO` define set to `1`, along with `TOON`. Cloning keeps the flag, the type, the kind, and green `1`, with a new id. The renderer still shades it as Lambert. `gradientMap` stays later.
 
+`Material.gradientMap` has landed. A new Basic, Lambert, Toon, Standard, and Physical material each start with an empty gradient map. A Toon material stores a 1×1 map whose second byte is `0x80`. Another Toon material stays empty. Copying onto a Basic material keeps that same texture object. Clearing the destination leaves the source map in place. The renderer still does not sample this map. `matcap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3050,6 +3052,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.transmission` | `materials` |
 | planned | 7 | `Material.isMeshPhysicalMaterial` | `materials` |
 | planned | 7 | `Material.isMeshToonMaterial` | `materials` |
+| planned | 7 | `Material.gradientMap` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
