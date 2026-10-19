@@ -599,3 +599,37 @@ test "Material precision defaults to empty" {
   }
   assert_eq(lambert.material.precision is None, true)
 }
+
+///|
+test "Material userData starts empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  match basic.material.user_data.get("label") {
+    None => ()
+    Some(_) => abort("basic user data")
+  }
+  basic.material.user_data.set("label", "mesh")
+  let lambert = @materials.MeshLambertMaterial::new()
+  match lambert.material.user_data.get("label") {
+    None => ()
+    Some(_) => abort("lambert user data")
+  }
+  let standard = @materials.MeshStandardMaterial::new()
+  match standard.material.user_data.get("label") {
+    None => ()
+    Some(_) => abort("standard user data")
+  }
+  standard.material.user_data.set("label", "lit")
+  let other = @materials.Material::basic()
+  match other.user_data.get("label") {
+    None => ()
+    Some(_) => abort("other user data")
+  }
+  match basic.material.user_data.get("label") {
+    None => abort("basic label")
+    Some(label) => assert_eq(label, "mesh")
+  }
+  match standard.material.user_data.get("label") {
+    None => abort("standard label")
+    Some(label) => assert_eq(label, "lit")
+  }
+}

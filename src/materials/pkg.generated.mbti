@@ -125,6 +125,7 @@ pub(all) struct Material {
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
+  mut user_data : Map[String, String]
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
