@@ -142,6 +142,7 @@ pub(all) struct Material {
   mut anisotropy_rotation : Double
   mut anisotropy_map : @textures.Texture?
   mut clearcoat_map : @textures.Texture?
+  mut clearcoat_roughness : Double
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
