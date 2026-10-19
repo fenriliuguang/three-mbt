@@ -1259,3 +1259,21 @@ test "Material reflectivity defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.reflectivity, 1.0)
 }
+
+///|
+test "Material envMapIntensity defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.env_map_intensity, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.env_map_intensity, 1.0)
+  lambert.env_map_intensity = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.env_map_intensity, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.env_map_intensity, 2.0)
+  destination.env_map_intensity = 0.0
+  assert_eq(lambert.env_map_intensity, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.env_map_intensity, 1.0)
+}
