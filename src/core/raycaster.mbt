@@ -28,6 +28,7 @@ pub(all) struct Raycaster {
 /// r186: `uv` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L467
 /// r186: `uv1` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L473
 /// r186: `normal` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L479
+/// r186: `index` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L331
 pub(all) struct Intersection {
   distance : Double
   point : @math.Vector3
@@ -38,6 +39,7 @@ pub(all) struct Intersection {
   uv : @math.Vector2?
   uv1 : @math.Vector2?
   normal : @math.Vector3?
+  index : Int?
 }
 
 ///|

@@ -292,6 +292,7 @@ pub(all) struct Intersection {
   uv : @math.Vector2?
   uv1 : @math.Vector2?
   normal : @math.Vector3?
+  index : Int?
 }
 
 pub(all) struct Layers {

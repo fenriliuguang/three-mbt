@@ -230,3 +230,30 @@ test "mesh raycast flips a back-facing shading normal" {
     }
   }
 }
+
+///|
+test "line raycast hits the nearest point on a segment" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 1.0, 0.0, 0.0], 3),
+    ),
+  )
+  let line = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  line.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.5, y=0.5, z=0.0),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  let hits = raycaster.intersect_object(line.node)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 0.5)
+  assert_eq(hits[0].point.x, 0.5)
+  assert_eq(hits[0].point.y, 0.0)
+  assert_eq(hits[0].point.z, 0.0)
+  match hits[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+}
