@@ -834,3 +834,27 @@ test "SpriteMaterial clone keeps SpriteMaterial and takes a new id" {
     Some(label) => assert_eq(label, "sprite")
   }
 }
+
+///|
+test "SpriteMaterial addEventListener keeps one copy of a listener" {
+  let material = @materials.SpriteMaterial::new()
+  let listener = fn() {}
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("dispose", listener)
+  match material.listeners.get("dispose") {
+    None => abort("dispose listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+  let source = @materials.SpriteMaterial::new()
+  source.add_event_listener("dispose", listener)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  match destination.listeners.get("dispose") {
+    None => ()
+    Some(_) => abort("copy brought listeners")
+  }
+  match source.listeners.get("dispose") {
+    None => abort("source listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+}
