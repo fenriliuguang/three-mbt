@@ -3864,9 +3864,9 @@ test "Material shader writes USE_CLEARCOATMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.clearcoat = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1633)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
   assert_eq(shader.prefixed_fragment_shader().length(), 1269)
-  assert_eq(1633 - 1608, 25)
+  assert_eq(1660 - 1608, 52)
   assert_eq(1269 - 1244, 25)
   assert_eq(
     shader.prefixed_vertex_shader()[683:707].to_owned(),
@@ -3914,7 +3914,7 @@ test "Material shader writes USE_CLEARCOAT_ROUGHNESSMAP" {
     "#define USE_CLEARCOAT_ROUGHNESSMAP",
   )
   shader.clearcoat_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1668)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1695)
   assert_eq(
     shader.prefixed_vertex_shader()[708:742].to_owned(),
     "#define USE_CLEARCOAT_ROUGHNESSMAP",
@@ -4896,6 +4896,55 @@ test "Material shader writes ANISOTROPYMAP_UV" {
   let basic = @materials.Material::basic()
   basic.anisotropy = 1.0
   basic.anisotropy_map = Some(anisotropy_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes CLEARCOATMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let clearcoat_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(clearcoat_map.channel, 0)
+  shader.clearcoat_map = Some(clearcoat_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.clearcoat = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1269)
+  assert_eq(1660 - 1608, 52)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:734].to_owned(),
+    "#define CLEARCOATMAP_UV uv",
+  )
+  clearcoat_map.channel = 1
+  shader.clearcoat_map = Some(clearcoat_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1269)
+  assert_eq(1661 - 1608, 53)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:735].to_owned(),
+    "#define CLEARCOATMAP_UV uv1",
+  )
+  shader.clearcoat = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.clearcoat = 1.0
+  clearcoat_map.channel = 0
+  shader.clearcoat_map = Some(clearcoat_map)
+  let anisotropy_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.anisotropy = 1.0
+  shader.anisotropy_map = Some(anisotropy_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1737)
+  assert_eq(
+    shader.prefixed_vertex_shader()[785:811].to_owned(),
+    "#define CLEARCOATMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.clearcoat = 1.0
+  raw.clearcoat_map = Some(clearcoat_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.clearcoat = 1.0
+  basic.clearcoat_map = Some(clearcoat_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
