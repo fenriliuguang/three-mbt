@@ -7577,6 +7577,28 @@ test "Material shader customFragmentShaderID skips builtin types" {
 }
 
 ///|
+test "Material shader shaderType reads the material type" {
+  assert_eq(@materials.Material::basic().shader_type(), "MeshBasicMaterial")
+  assert_eq(@materials.Material::lambert().shader_type(), "MeshLambertMaterial")
+  assert_eq(@materials.Material::standard().shader_type(), "MeshStandardMaterial")
+  assert_eq(@materials.Material::physical().shader_type(), "MeshPhysicalMaterial")
+  assert_eq(@materials.Material::toon().shader_type(), "MeshToonMaterial")
+  assert_eq(@materials.Material::matcap().shader_type(), "MeshMatcapMaterial")
+  assert_eq(@materials.Material::normal().shader_type(), "MeshNormalMaterial")
+  assert_eq(@materials.Material::depth().shader_type(), "MeshDepthMaterial")
+  assert_eq(@materials.Material::distance().shader_type(), "MeshDistanceMaterial")
+  assert_eq(@materials.Material::phong().shader_type(), "MeshPhongMaterial")
+  assert_eq(@materials.Material::shadow().shader_type(), "ShadowMaterial")
+  let shader = @materials.Material::shader()
+  assert_eq(shader.shader_type(), "ShaderMaterial")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.name = "renamed"
+  assert_eq(shader.shader_type(), "ShaderMaterial")
+  assert_eq(@materials.Material::raw().shader_type(), "RawShaderMaterial")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

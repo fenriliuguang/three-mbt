@@ -288,6 +288,7 @@ pub fn Material::set_retroreflectivity(Self, Double) -> Unit
 pub fn Material::set_sheen(Self, Double) -> Unit
 pub fn Material::set_transmission(Self, Double) -> Unit
 pub fn Material::shader(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+pub fn Material::shader_type(Self) -> String
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::shadow(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
