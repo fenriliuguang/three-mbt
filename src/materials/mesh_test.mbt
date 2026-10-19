@@ -4167,6 +4167,37 @@ test "Material shader writes USE_ROUGHNESSMAP" {
 }
 
 ///|
+test "Material shader writes USE_METALNESSMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let metalness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.metalness_map = Some(metalness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:707].to_owned(),
+    "#define USE_METALNESSMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1103].to_owned(),
+    "#define USE_METALNESSMAP",
+  )
+  shader.roughness_map = Some(metalness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:732].to_owned(),
+    "#define USE_METALNESSMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.metalness_map = Some(metalness_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.metalness_map = Some(metalness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
