@@ -23,3 +23,26 @@ test "PointsMaterial stores a color map" {
   assert_eq(defaults.map is None, true)
   assert_eq(defaults.size, 1.0)
 }
+
+///|
+test "PointsMaterial stores an alpha map" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.alpha_map is None, true)
+  assert_eq(defaults.fog, true)
+  let pixels = FixedArray::make(4, b'\x00')
+  pixels[1] = b'\x80'
+  let alpha = @textures.Texture::from_rgba8(1, 1, pixels)
+  let material = @materials.PointsMaterial::new()
+  material.alpha_map = Some(alpha)
+  assert_eq(material.fog, true)
+  match material.alpha_map {
+    None => assert_eq(false, true)
+    Some(stored) => {
+      assert_eq(physical_equal(stored, alpha), true)
+      assert_eq(stored.width, 1)
+      assert_eq(stored.data[1], b'\x80')
+    }
+  }
+  assert_eq(defaults.alpha_map is None, true)
+  assert_eq(defaults.fog, true)
+}

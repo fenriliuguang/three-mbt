@@ -209,12 +209,14 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 
 ///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
-/// 颜色贴图默认空。点着色器仍按材质颜色绘制，不采样这张贴图。
+/// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
+/// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
+  mut alpha_map : @textures.Texture?
   mut size : Double
   mut size_attenuation : Bool
   mut opacity : Double
@@ -237,6 +239,7 @@ pub fn PointsMaterial::new(
   {
     color: @math.Color::new().set_hex(hex),
     map: None,
+    alpha_map: None,
     size,
     size_attenuation,
     opacity: 1.0,
