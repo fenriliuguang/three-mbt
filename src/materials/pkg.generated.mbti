@@ -216,6 +216,7 @@ pub(all) struct PointsMaterial {
   mut version : Int
   id : Int
   mut uuid : String
+  mut name : String
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

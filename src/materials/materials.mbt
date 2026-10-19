@@ -446,6 +446,7 @@ pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
 /// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。点绘制仍不读它。
 /// `id` 与网格材质共用从 `0` 起的计数。每新建一份点材质取下一个编号。`copy` 不改目标上的这个编号。点绘制仍不读它。
 /// `uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。点绘制仍不读它。
+/// `name` 默认空字符串。`copy` 把名字写进目标。点绘制仍不读它。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -484,6 +485,7 @@ pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
 /// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52
+/// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L59
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -534,6 +536,7 @@ pub(all) struct PointsMaterial {
   mut version : Int
   id : Int
   mut uuid : String
+  mut name : String
 }
 
 ///|
@@ -592,18 +595,20 @@ pub fn PointsMaterial::new(
     version: 0,
     id: fresh_material_id(),
     uuid: @math.generate_uuid(),
+    name: "",
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
+/// `name`、尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
   self : PointsMaterial,
   source : PointsMaterial,
 ) -> PointsMaterial {
+  self.name = source.name
   ignore(self.color.copy(source.color))
   ignore(self.blend_color.copy(source.blend_color))
   self.blending = source.blending

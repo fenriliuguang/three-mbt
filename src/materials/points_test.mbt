@@ -751,3 +751,18 @@ test "PointsMaterial uuid is a version-4 id" {
   assert_eq(source.uuid, "point")
   assert_eq(destination.uuid, "copy")
 }
+
+///|
+test "PointsMaterial stores and copies name" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.name, "")
+  let source = @materials.PointsMaterial::new()
+  source.name = "point"
+  assert_eq(defaults.name, "")
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "point")
+  destination.name = "copy"
+  assert_eq(source.name, "point")
+  assert_eq(destination.name, "copy")
+}
