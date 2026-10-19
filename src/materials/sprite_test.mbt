@@ -762,3 +762,18 @@ test "SpriteMaterial uuid is a version-4 id" {
   assert_eq(source.uuid, "sprite")
   assert_eq(destination.uuid, "copy")
 }
+
+///|
+test "SpriteMaterial stores and copies name" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.name, "")
+  let source = @materials.SpriteMaterial::new()
+  source.name = "sprite"
+  assert_eq(defaults.name, "")
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "sprite")
+  destination.name = "copy"
+  assert_eq(source.name, "sprite")
+  assert_eq(destination.name, "copy")
+}
