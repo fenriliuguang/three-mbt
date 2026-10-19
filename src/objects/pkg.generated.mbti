@@ -18,6 +18,7 @@ pub(all) struct Group {
   node : @core.Object3D
 }
 pub fn[T : @core.AsNode] Group::add(Self, T) -> Self
+pub fn Group::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Group::new() -> Self
 pub fn Group::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Group
