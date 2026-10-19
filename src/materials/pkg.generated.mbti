@@ -133,6 +133,7 @@ pub(all) struct Material {
   mut bump_map : @textures.Texture?
   mut bump_scale : Double
   mut wireframe_linewidth : Double
+  mut wireframe_linecap : WireframeCap
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -336,6 +337,12 @@ pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : 
 pub fn SpriteMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit
+
+pub(all) enum WireframeCap {
+  Round
+  Bevel
+  Miter
+}
 
 // Type aliases
 

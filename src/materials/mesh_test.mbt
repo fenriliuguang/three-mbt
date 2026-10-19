@@ -1448,3 +1448,21 @@ test "Material wireframeLinewidth defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.wireframe_linewidth, 1.0)
 }
+
+///|
+test "Material wireframeLinecap defaults to round and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.wireframe_linecap is @materials.WireframeCap::Round, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.wireframe_linecap is @materials.WireframeCap::Round, true)
+  lambert.wireframe_linecap = @materials.WireframeCap::Bevel
+  let other = @materials.Material::lambert()
+  assert_eq(other.wireframe_linecap is @materials.WireframeCap::Round, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.wireframe_linecap is @materials.WireframeCap::Bevel, true)
+  destination.wireframe_linecap = @materials.WireframeCap::Miter
+  assert_eq(lambert.wireframe_linecap is @materials.WireframeCap::Bevel, true)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.wireframe_linecap is @materials.WireframeCap::Round, true)
+}
