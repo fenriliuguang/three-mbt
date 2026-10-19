@@ -48,6 +48,7 @@ pub(all) struct LineBasicMaterial {
   mut stencil_write_mask : Int
   mut stencil_func : @constants.StencilFunc
   mut stencil_ref : Int
+  mut stencil_func_mask : Int
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

@@ -695,3 +695,26 @@ test "LineBasicMaterial stores and copies stencilRef" {
   assert_eq(dashed.line.stencil_ref, 1)
   assert_eq(other.line.stencil_ref, 9)
 }
+
+///|
+test "LineBasicMaterial stores and copies stencilFuncMask" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.stencil_func_mask, 255)
+  let source = @materials.LineBasicMaterial::new()
+  source.stencil_func_mask = 0
+  assert_eq(defaults.stencil_func_mask, 255)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_func_mask, 0)
+  destination.stencil_func_mask = 1
+  assert_eq(source.stencil_func_mask, 0)
+  assert_eq(destination.stencil_func_mask, 1)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.stencil_func_mask = 0
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.stencil_func_mask, 0)
+  other.line.stencil_func_mask = 9
+  assert_eq(dashed.line.stencil_func_mask, 0)
+  assert_eq(other.line.stencil_func_mask, 9)
+}
