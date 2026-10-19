@@ -358,3 +358,33 @@ test "PointsMaterial stores and copies blendEquation" {
   assert_eq(source.blend_equation is @constants.BlendEquation::Subtract, true)
   assert_eq(destination.blend_equation.to_int(), 104)
 }
+
+///|
+test "PointsMaterial stores and copies blendSrcAlpha" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.blend_src_alpha is None, true)
+  let source = @materials.PointsMaterial::new()
+  source.blend_src_alpha = Some(@constants.BlendFactor::One)
+  assert_eq(defaults.blend_src_alpha is None, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  match destination.blend_src_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::One, true)
+      assert_eq(factor.to_int(), 201)
+    }
+    None => abort("destination blendSrcAlpha is empty")
+  }
+  destination.blend_src_alpha = Some(@constants.BlendFactor::Zero)
+  match source.blend_src_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::One, true)
+      assert_eq(factor.to_int(), 201)
+    }
+    None => abort("source blendSrcAlpha is empty")
+  }
+  match destination.blend_src_alpha {
+    Some(factor) => assert_eq(factor.to_int(), 200)
+    None => abort("changed destination blendSrcAlpha is empty")
+  }
+}
