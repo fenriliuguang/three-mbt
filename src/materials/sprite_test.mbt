@@ -426,3 +426,30 @@ test "SpriteMaterial stores and copies blendDstAlpha" {
     None => abort("changed destination blendDstAlpha is empty")
   }
 }
+
+///|
+test "SpriteMaterial stores and copies blendEquationAlpha" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.blend_equation_alpha is None, true)
+  let source = @materials.SpriteMaterial::new()
+  source.blend_equation_alpha = Some(@constants.BlendEquation::Subtract)
+  assert_eq(defaults.blend_equation_alpha is None, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  match destination.blend_equation_alpha {
+    Some(equation) => {
+      assert_eq(equation is @constants.BlendEquation::Subtract, true)
+      assert_eq(equation.to_int(), 101)
+    }
+    None => abort("destination blendEquationAlpha is empty")
+  }
+  destination.blend_equation_alpha = Some(@constants.BlendEquation::Max)
+  match source.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 101)
+    None => abort("source blendEquationAlpha is empty")
+  }
+  match destination.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 104)
+    None => abort("changed destination blendEquationAlpha is empty")
+  }
+}
