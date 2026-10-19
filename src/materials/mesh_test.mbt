@@ -4330,6 +4330,42 @@ test "Material shader writes USE_TRANSMISSIONMAP" {
 }
 
 ///|
+test "Material shader writes USE_THICKNESSMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let thickness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.thickness_map = Some(thickness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.transmission = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(1658 - 1633, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:732].to_owned(),
+    "#define USE_THICKNESSMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1104:1128].to_owned(),
+    "#define USE_THICKNESSMAP",
+  )
+  shader.transmission_map = Some(thickness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
+  assert_eq(
+    shader.prefixed_vertex_shader()[736:760].to_owned(),
+    "#define USE_THICKNESSMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.transmission = 1.0
+  raw.thickness_map = Some(thickness_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.transmission = 1.0
+  basic.thickness_map = Some(thickness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
