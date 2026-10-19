@@ -272,6 +272,12 @@ pub(all) enum PixelFormat {
 pub fn PixelFormat::components(Self) -> Int
 pub fn PixelFormat::to_int(Self) -> Int
 
+pub(all) enum Precision {
+  Highp
+  Mediump
+  Lowp
+}
+
 pub(all) enum Shading {
   Basic
   Lambert

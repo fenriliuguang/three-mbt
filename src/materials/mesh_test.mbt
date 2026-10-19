@@ -576,3 +576,26 @@ test "Material clippingPlanes defaults to empty" {
   }
   assert_eq(lambert.material.clipping_planes is None, true)
 }
+
+///|
+test "Material precision defaults to empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.precision is None, true)
+  basic.material.precision = Some(@constants.Precision::Highp)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.precision is None, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.precision is None, true)
+  standard.material.precision = Some(@constants.Precision::Mediump)
+  let other = @materials.Material::basic()
+  assert_eq(other.precision is None, true)
+  match basic.material.precision {
+    None => abort("basic precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  match standard.material.precision {
+    None => abort("standard precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+  }
+  assert_eq(lambert.material.precision is None, true)
+}

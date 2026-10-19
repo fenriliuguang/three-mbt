@@ -123,6 +123,7 @@ pub(all) struct Material {
   mut stencil_z_pass : @constants.StencilOp
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
+  mut precision : @constants.Precision?
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

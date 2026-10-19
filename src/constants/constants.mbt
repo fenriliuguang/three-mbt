@@ -443,6 +443,15 @@ pub fn StencilOp::to_int(self : StencilOp) -> Int {
 }
 
 ///|
+/// 材质精度覆盖。three.js 用字符串 `'highp'`、`'mediump'`、`'lowp'`，没有同名枚举。空值表示沿用渲染器默认精度。
+/// r186: `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361
+pub(all) enum Precision {
+  Highp
+  Mediump
+  Lowp
+}
+
+///|
 /// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
 /// r186: 没有同名枚举。`Basic` `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14 ; `Lambert` `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24 ; `Standard` `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) enum Shading {
