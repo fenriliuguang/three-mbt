@@ -135,6 +135,7 @@ pub(all) struct Material {
   mut version : Int
   id : Int
   mut uuid : String
+  mut name : String
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

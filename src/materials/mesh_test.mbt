@@ -735,3 +735,19 @@ test "Material uuid is a version-4 id" {
   assert_eq(lambert.material.uuid, "lambert")
   assert_eq(standard.material.uuid, "lit")
 }
+
+///|
+test "Material name starts empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.name, "")
+  basic.material.name = "mesh"
+  let other = @materials.Material::basic()
+  assert_eq(other.name, "")
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.name, "")
+  let standard = @materials.MeshStandardMaterial::new()
+  standard.material.name = "lit"
+  assert_eq(basic.material.name, "mesh")
+  assert_eq(lambert.material.name, "")
+  assert_eq(standard.material.name, "lit")
+}
