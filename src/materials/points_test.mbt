@@ -106,3 +106,17 @@ test "PointsMaterial.copy writes color and shares maps" {
   assert_eq(source.size, 4.0)
   assert_eq(source.opacity, 0.25)
 }
+
+///|
+test "PointsMaterial stores and copies alphaTest" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.alpha_test, 0.0)
+  let source = @materials.PointsMaterial::new()
+  source.alpha_test = 0.4
+  assert_eq(defaults.alpha_test, 0.0)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_test, 0.4)
+  destination.alpha_test = 0.8
+  assert_eq(source.alpha_test, 0.4)
+}

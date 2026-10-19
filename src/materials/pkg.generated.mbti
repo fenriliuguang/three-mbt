@@ -89,6 +89,7 @@ pub(all) struct PointsMaterial {
   mut size : Double
   mut size_attenuation : Bool
   mut opacity : Double
+  mut alpha_test : Double
   mut transparent : Bool
   mut fog : Bool
   mut depth_write : Bool
