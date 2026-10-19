@@ -4203,9 +4203,9 @@ test "Material shader writes USE_ALPHAMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.alpha_map = Some(alpha_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1629)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1652)
   assert_eq(shader.prefixed_fragment_shader().length(), 1243)
-  assert_eq(1629 - 1608, 21)
+  assert_eq(1652 - 1608, 44)
   assert_eq(
     shader.prefixed_vertex_shader()[683:703].to_owned(),
     "#define USE_ALPHAMAP",
@@ -4215,7 +4215,7 @@ test "Material shader writes USE_ALPHAMAP" {
     "#define USE_ALPHAMAP",
   )
   shader.metalness_map = Some(alpha_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1654)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1677)
   assert_eq(
     shader.prefixed_vertex_shader()[708:728].to_owned(),
     "#define USE_ALPHAMAP",
@@ -4250,7 +4250,7 @@ test "Material shader writes USE_ALPHAHASH" {
   shader.alpha_hash = true
   let pixels = FixedArray::make(4, b'\xFF')
   shader.alpha_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
-  assert_eq(shader.prefixed_vertex_shader().length(), 1651)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
   assert_eq(
     shader.prefixed_vertex_shader()[704:725].to_owned(),
     "#define USE_ALPHAHASH",
@@ -4485,6 +4485,46 @@ test "Material shader writes MAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.map = Some(map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes ALPHAMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(alpha_map.channel, 0)
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1652)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1652 - 1608, 44)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:726].to_owned(),
+    "#define ALPHAMAP_UV uv",
+  )
+  alpha_map.channel = 1
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1653)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1653 - 1608, 45)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:727].to_owned(),
+    "#define ALPHAMAP_UV uv1",
+  )
+  alpha_map.channel = 0
+  shader.alpha_map = Some(alpha_map)
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
+  assert_eq(
+    shader.prefixed_vertex_shader()[738:760].to_owned(),
+    "#define ALPHAMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.alpha_map = Some(alpha_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.alpha_map = Some(alpha_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
