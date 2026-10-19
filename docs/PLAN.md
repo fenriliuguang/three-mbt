@@ -2147,6 +2147,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `UniformsGroup.clone` has landed. A group named `Frame` with usage `35048` and numbers `[1, 2]` clones to the same name, usage, and numbers. The clone has a new id and an empty listener table. Setting the clone's first number to `9` and its name to `Other` leaves the source at `1` and `Frame`. `UniformsGroup.copy` stays later.
 
+`UniformsGroup.copy` has landed. A group named `Other` with number `[9]` copies a group named `Frame`, usage `35048`, and numbers `[1, 2]`. The destination keeps its id and its `change` listener. The source `dispose` listener stays off the destination. The destination's original number array becomes `[1, 2]`. Setting the destination's first number to `8` and its name to `Renamed` leaves the source at `1` and `Frame`. `RawShaderMaterial` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3161,6 +3163,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `UniformsGroup.removeEventListener` | `materials` |
 | planned | 7 | `UniformsGroup.dispatchEvent` | `materials` |
 | planned | 7 | `UniformsGroup.clone` | `materials` |
+| planned | 7 | `UniformsGroup.copy` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

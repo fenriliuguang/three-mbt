@@ -3601,6 +3601,33 @@ test "UniformsGroup clone keeps values and drops listeners" {
 }
 
 ///|
+test "UniformsGroup copy keeps id and listeners" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  ignore(frame.set_usage(35048))
+  ignore(frame.add(1.0).add(2.0))
+  let source_listener = fn() {}
+  frame.add_event_listener("dispose", source_listener)
+  let onto = @materials.UniformsGroup::new(name="Other")
+  ignore(onto.add(9.0))
+  let kept = onto.uniforms
+  let dest_listener = fn() {}
+  onto.add_event_listener("change", dest_listener)
+  let id = onto.id
+  ignore(onto.copy(frame))
+  assert_eq(onto.name, "Frame")
+  assert_eq(onto.usage, 35048)
+  assert_eq(onto.uniforms, [1.0, 2.0])
+  assert_eq(kept, [1.0, 2.0])
+  assert_eq(onto.id, id)
+  assert_eq(onto.has_event_listener("change", dest_listener), true)
+  assert_eq(onto.has_event_listener("dispose", source_listener), false)
+  onto.uniforms[0] = 8.0
+  onto.name = "Renamed"
+  assert_eq(frame.uniforms[0], 1.0)
+  assert_eq(frame.name, "Frame")
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
