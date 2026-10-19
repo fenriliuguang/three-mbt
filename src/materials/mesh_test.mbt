@@ -7747,6 +7747,22 @@ test "Material shader glslVersion starts empty" {
 }
 
 ///|
+test "Material shader precision uses capabilities unless set" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_precision("highp"), "highp")
+  assert_eq(shader.program_precision("mediump"), "mediump")
+  assert_eq(@materials.Material::basic().program_precision("lowp"), "lowp")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.precision = Some(@constants.Precision::Mediump)
+  assert_eq(shader.program_precision("highp"), "mediump")
+  shader.precision = Some(@constants.Precision::Lowp)
+  assert_eq(shader.program_precision("highp"), "lowp")
+  shader.precision = Some(@constants.Precision::Highp)
+  assert_eq(shader.program_precision("lowp"), "highp")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
