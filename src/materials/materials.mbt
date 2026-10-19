@@ -222,11 +222,13 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。
 /// `vertex_colors` 默认关闭。点着色器仍不读顶点色。
+/// `tone_mapped` 默认打开。色调映射仍对每份绘制过的点生效。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
+/// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -244,6 +246,7 @@ pub(all) struct PointsMaterial {
   mut premultiplied_alpha : Bool
   mut visible : Bool
   mut vertex_colors : Bool
+  mut tone_mapped : Bool
 }
 
 ///|
@@ -269,12 +272,13 @@ pub fn PointsMaterial::new(
     premultiplied_alpha: false,
     visible: true,
     vertex_colors: false,
+    tone_mapped: true,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性和顶点色一并复制。
+/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色和色调映射一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -297,6 +301,7 @@ pub fn PointsMaterial::copy(
   self.premultiplied_alpha = source.premultiplied_alpha
   self.visible = source.visible
   self.vertex_colors = source.vertex_colors
+  self.tone_mapped = source.tone_mapped
   self
 }
 

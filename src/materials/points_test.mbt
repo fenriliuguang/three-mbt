@@ -134,3 +134,17 @@ test "PointsMaterial stores and copies vertex colors" {
   destination.vertex_colors = false
   assert_eq(source.vertex_colors, true)
 }
+
+///|
+test "PointsMaterial stores and copies toneMapped" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.tone_mapped, true)
+  let source = @materials.PointsMaterial::new()
+  source.tone_mapped = false
+  assert_eq(defaults.tone_mapped, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.tone_mapped, false)
+  destination.tone_mapped = true
+  assert_eq(source.tone_mapped, false)
+}
