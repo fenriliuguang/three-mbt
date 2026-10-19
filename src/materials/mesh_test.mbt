@@ -2097,3 +2097,31 @@ test "Material specularIntensityMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.specular_intensity_map is None, true)
 }
+
+///|
+test "Material specularColor starts white and copies into the destination" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.specular_color.r, 1.0)
+  assert_eq(basic.specular_color.g, 1.0)
+  assert_eq(basic.specular_color.b, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.specular_color.r, 1.0)
+  ignore(lambert.specular_color.set_rgb(0.25, 0.5, 0.75))
+  let other = @materials.Material::lambert()
+  assert_eq(other.specular_color.r, 1.0)
+  assert_eq(other.specular_color.g, 1.0)
+  assert_eq(other.specular_color.b, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.specular_color.r, 0.25)
+  assert_eq(destination.specular_color.g, 0.5)
+  assert_eq(destination.specular_color.b, 0.75)
+  ignore(destination.specular_color.set_rgb(1.0, 0.0, 0.0))
+  assert_eq(lambert.specular_color.r, 0.25)
+  assert_eq(lambert.specular_color.g, 0.5)
+  assert_eq(lambert.specular_color.b, 0.75)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.specular_color.r, 1.0)
+  assert_eq(standard.specular_color.g, 1.0)
+  assert_eq(standard.specular_color.b, 1.0)
+}
