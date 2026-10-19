@@ -8319,6 +8319,22 @@ test "Material shader clearcoatRoughnessMap needs strength and a texture" {
 }
 
 ///|
+test "Material shader dispersion is true above zero" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_dispersion(), false)
+  assert_eq(@materials.Material::raw().program_dispersion(), false)
+  assert_eq(@materials.Material::physical().program_dispersion(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.dispersion = -1.0
+  assert_eq(shader.program_dispersion(), false)
+  shader.dispersion = 0.25
+  assert_eq(shader.program_dispersion(), true)
+  shader.dispersion = 0.0
+  assert_eq(shader.program_dispersion(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
