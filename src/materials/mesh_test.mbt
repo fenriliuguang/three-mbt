@@ -1976,3 +1976,30 @@ test "Material thickness defaults to zero and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.thickness, 0.0)
 }
+
+///|
+test "Material thicknessMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.thickness_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.thickness_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.thickness_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.thickness_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.thickness_map {
+    None => abort("copied thickness map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.thickness_map = None
+  match lambert.thickness_map {
+    None => abort("source thickness map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.thickness_map is None, true)
+}
