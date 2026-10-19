@@ -1715,3 +1715,21 @@ test "Material clearcoatNormalMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.clearcoat_normal_map is None, true)
 }
+
+///|
+test "Material ior defaults to one and a half and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.ior, 1.5)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.ior, 1.5)
+  lambert.ior = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.ior, 1.5)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.ior, 2.0)
+  destination.ior = 1.0
+  assert_eq(lambert.ior, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.ior, 1.5)
+}
