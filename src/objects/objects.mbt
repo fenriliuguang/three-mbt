@@ -78,6 +78,13 @@ pub fn Mesh::copy(
 }
 
 ///|
+/// 新建一份网格再复制。three.js 没有单独的 `Mesh.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Mesh::clone(self : Mesh, recursive? : Bool = true) -> Mesh {
+  Mesh::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
 /// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、金属度贴图、透明贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。
 pub fn Mesh::refresh(self : Mesh) -> Unit {
   self.node.mesh = Some(MeshBinding::{

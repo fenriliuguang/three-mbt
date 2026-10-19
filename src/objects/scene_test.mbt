@@ -108,6 +108,43 @@ test "Mesh.copy shares geometry and material" {
 }
 
 ///|
+test "Mesh.clone shares geometry and drops children when asked" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let source = @objects.Mesh::new(geometry, material)
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(physical_equal(cloned.geometry, geometry), true)
+  assert_eq(physical_equal(cloned.material, material), true)
+  assert_eq(cloned.node.position.y, 3.0)
+  assert_eq(cloned.node.render_order, 4)
+  assert_eq(cloned.node.children.length(), 1)
+  assert_eq(cloned.node.children[0].name, "marker")
+  assert_eq(physical_equal(cloned.node.children[0], child), false)
+  match cloned.node.mesh {
+    None => assert_eq(false, true)
+    Some(binding) =>
+      assert_eq(physical_equal(binding.geometry, geometry), true)
+  }
+  let bare = source.clone(recursive=false)
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.node.position.y, 3.0)
+  assert_eq(physical_equal(bare.geometry, geometry), true)
+  assert_eq(source.node.children.length(), 1)
+}
+
+///|
 test "mesh raycast hits a front-facing triangle" {
   let geometry = @core.BufferGeometry::new()
   ignore(
