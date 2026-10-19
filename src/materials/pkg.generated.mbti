@@ -143,6 +143,7 @@ pub(all) struct PointsMaterial {
   mut clip_shadows : Bool
   mut clip_intersection : Bool
   mut allow_override : Bool
+  mut blend_alpha : Double
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

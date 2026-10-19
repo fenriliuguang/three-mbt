@@ -256,3 +256,17 @@ test "PointsMaterial stores and copies allowOverride" {
   destination.allow_override = true
   assert_eq(source.allow_override, false)
 }
+
+///|
+test "PointsMaterial stores and copies blendAlpha" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.blend_alpha, 0.0)
+  let source = @materials.PointsMaterial::new()
+  source.blend_alpha = 0.25
+  assert_eq(defaults.blend_alpha, 0.0)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blend_alpha, 0.25)
+  destination.blend_alpha = 0.5
+  assert_eq(source.blend_alpha, 0.25)
+}
