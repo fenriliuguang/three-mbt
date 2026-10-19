@@ -5492,11 +5492,23 @@ test "Material shader writes USE_TANGENT" {
   assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1608)
   shader.normal_map = Some(normal_map)
   shader.flat_shading = true
-  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1689)
-  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1279)
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1709)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1299)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_tangent=true)[764:783].to_owned(),
+    "#define FLAT_SHADED",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_tangent=true)[1136:1155].to_owned(),
+    "#define FLAT_SHADED",
+  )
   shader.wireframe = true
   assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1709)
   assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1299)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_tangent=true)[764:783].to_owned(),
+    "#define USE_TANGENT",
+  )
   shader.wireframe = false
   shader.flat_shading = false
   shader.normal_map = None
@@ -5819,6 +5831,48 @@ test "Material shader writes USE_POINTS_UV" {
   let basic = @materials.Material::basic()
   basic.map = Some(map)
   assert_eq(basic.prefixed_vertex_shader(has_points_uv=true), "")
+}
+
+///|
+test "Material shader writes FLAT_SHADED" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.flat_shading = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1628)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
+  assert_eq(1628 - 1608, 20)
+  assert_eq(shader.prefixed_vertex_shader()[683:702].to_owned(), "#define FLAT_SHADED")
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1098].to_owned(),
+    "#define FLAT_SHADED",
+  )
+  shader.wireframe = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.wireframe = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1684)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_points_uv=true)[739:758].to_owned(),
+    "#define FLAT_SHADED",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1280)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_points_uv=true)[1117:1136].to_owned(),
+    "#define FLAT_SHADED",
+  )
+  shader.flat_shading = false
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1260)
+  let raw = @materials.Material::raw()
+  raw.flat_shading = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.flat_shading = true
+  assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
 ///|
