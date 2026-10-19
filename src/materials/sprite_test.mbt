@@ -787,3 +787,50 @@ test "SpriteMaterial type_name stays SpriteMaterial" {
   assert_eq(destination.type_name, "SpriteMaterial")
   assert_eq(source.type_name, "SpriteMaterial")
 }
+
+///|
+test "SpriteMaterial clone keeps SpriteMaterial and takes a new id" {
+  let defaults = @materials.SpriteMaterial::new()
+  let defaults_clone = defaults.clone()
+  assert_eq(defaults_clone.type_name, "SpriteMaterial")
+  assert_eq(defaults_clone.version, 0)
+  assert_eq(defaults_clone.rotation, 0.0)
+  assert_eq(defaults_clone.size_attenuation, true)
+  assert_eq(defaults_clone.id == defaults.id, false)
+  let source = @materials.SpriteMaterial::new(
+    rotation=0.5,
+    size_attenuation=false,
+  )
+  source.name = "sprite"
+  ignore(source.color.set_rgb(0.0, 0.0, 1.0))
+  source.opacity = 0.25
+  source.fog = false
+  source.set_alpha_test(0.2)
+  source.version = 5
+  source.uuid = "sprite"
+  source.user_data.set("label", "sprite")
+  let cloned = source.clone()
+  assert_eq(cloned.name, "sprite")
+  assert_eq(cloned.color.b, 1.0)
+  assert_eq(cloned.opacity, 0.25)
+  assert_eq(cloned.fog, false)
+  assert_eq(cloned.rotation, 0.5)
+  assert_eq(cloned.size_attenuation, false)
+  assert_eq(cloned.alpha_test, 0.2)
+  assert_eq(cloned.version, 1)
+  assert_eq(cloned.type_name, "SpriteMaterial")
+  assert_eq(cloned.id == source.id, false)
+  assert_eq(cloned.uuid.length(), 36)
+  assert_eq(cloned.uuid[14:15].to_owned(), "4")
+  assert_eq(source.uuid, "sprite")
+  assert_eq(source.version, 5)
+  cloned.rotation = 1.0
+  cloned.color.b = 0.5
+  assert_eq(source.rotation, 0.5)
+  assert_eq(source.color.b, 1.0)
+  cloned.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "sprite")
+  }
+}

@@ -285,6 +285,7 @@ pub(all) struct SpriteMaterial {
   mut name : String
   type_name : String
 }
+pub fn SpriteMaterial::clone(Self) -> Self
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
