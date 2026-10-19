@@ -8689,6 +8689,26 @@ test "Material shader mapUv names the color texture channel" {
 }
 
 ///|
+test "Material shader aoMapUv names the occlusion texture channel" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_ao_map_uv(), "false")
+  assert_eq(@materials.Material::raw().program_ao_map_uv(), "false")
+  assert_eq(@materials.Material::standard().program_ao_map_uv(), "false")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.ao_map = Some(map)
+  assert_eq(shader.program_ao_map_uv(), "uv")
+  map.channel = 1
+  assert_eq(shader.program_ao_map_uv(), "uv1")
+  map.channel = 2
+  assert_eq(shader.program_ao_map_uv(), "uv2")
+  shader.ao_map = None
+  assert_eq(shader.program_ao_map_uv(), "false")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
