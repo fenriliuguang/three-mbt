@@ -8850,6 +8850,29 @@ test "Material shader roughnessMapUv names the roughness texture channel" {
 }
 
 ///|
+test "Material shader anisotropyMapUv needs strength and a channel" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_anisotropy_map_uv(), "false")
+  assert_eq(@materials.Material::raw().program_anisotropy_map_uv(), "false")
+  assert_eq(@materials.Material::physical().program_anisotropy_map_uv(), "false")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.anisotropy_map = Some(map)
+  assert_eq(shader.program_anisotropy_map_uv(), "false")
+  shader.anisotropy = 0.25
+  assert_eq(shader.program_anisotropy_map_uv(), "uv")
+  shader.anisotropy = 0.0
+  assert_eq(shader.program_anisotropy_map_uv(), "false")
+  shader.anisotropy = 0.25
+  map.channel = 1
+  assert_eq(shader.program_anisotropy_map_uv(), "uv1")
+  shader.anisotropy_map = None
+  assert_eq(shader.program_anisotropy_map_uv(), "false")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
