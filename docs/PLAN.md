@@ -1399,6 +1399,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Sprite.intersectsFrustumArray` has landed. A sprite at `(0.5, 0.5, 0.5)` with the default center misses while `count` is `0`, including when a unit-cube frustum is stored, and meets it once `count` is `1`. Moving the sprite to `(-2, 0.5, 0.5)` makes that frustum miss. A second frustum of constant `10` accepts it only once `count` is `2`.
 
+`ArrayCamera` has landed. It is a perspective camera with fov `50`, aspect `1`, near `0.1`, and far `2000`. A new array has no sub cameras. Passing one perspective camera of fov `40` stores that camera. `setFromArrayCamera` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2039,6 +2041,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Object3D.intersectsFrustum` | `core` |
 | planned | 7 | `Object3D.intersectsFrustumArray` | `core` |
 | planned | 7 | `Sprite.intersectsFrustumArray` | `objects` |
+| planned | 7 | `ArrayCamera` | `cameras` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -142,6 +142,8 @@ pub using @animation {type AnimationClip}
 
 pub using @animation {type AnimationMixer}
 
+pub using @cameras {type ArrayCamera}
+
 pub using @post {type BloomPass}
 
 pub using @math {type Box3}

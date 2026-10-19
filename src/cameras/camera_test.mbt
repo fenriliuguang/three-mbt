@@ -468,3 +468,30 @@ test "panic Vector3.unproject requires a camera" {
   let node = @core.Object3D::new()
   ignore(node.unproject_point(@math.Vector3::new()))
 }
+
+///|
+test "ArrayCamera stores its perspective sub cameras" {
+  let empty = @cameras.ArrayCamera::new()
+  assert_eq(empty.cameras.length(), 0)
+  match empty.node.kind {
+    @core.PerspectiveCamera => assert_eq(true, true)
+    _ => assert_eq(false, true)
+  }
+  match empty.node.camera {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.fov, 50.0)
+      assert_eq(state.aspect, 1.0)
+      assert_eq(state.near, 0.1)
+      assert_eq(state.far, 2000.0)
+    }
+  }
+  let eye = @cameras.PerspectiveCamera::new(fov=40.0)
+  let array = @cameras.ArrayCamera::new(cameras=[eye])
+  assert_eq(array.cameras.length(), 1)
+  assert_eq(physical_equal(array.cameras[0].node, eye.node), true)
+  match array.cameras[0].node.camera {
+    None => assert_eq(false, true)
+    Some(state) => assert_eq(state.fov, 40.0)
+  }
+}

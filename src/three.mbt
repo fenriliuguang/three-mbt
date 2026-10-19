@@ -89,7 +89,11 @@ pub using @core {
 }
 
 ///|
-pub using @cameras {type OrthographicCamera, type PerspectiveCamera}
+pub using @cameras {
+  type ArrayCamera,
+  type OrthographicCamera,
+  type PerspectiveCamera,
+}
 
 ///|
 pub using @compute {type StoragePositions, wave_position, workgroup_count}

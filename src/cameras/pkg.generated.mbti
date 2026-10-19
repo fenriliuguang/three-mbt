@@ -11,6 +11,14 @@ import {
 // Errors
 
 // Types and methods
+pub(all) struct ArrayCamera {
+  node : @core.Object3D
+  cameras : Array[PerspectiveCamera]
+}
+pub fn ArrayCamera::new(cameras? : Array[PerspectiveCamera]) -> Self
+pub fn ArrayCamera::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for ArrayCamera
+
 pub(all) struct OrthographicCamera {
   node : @core.Object3D
 }
