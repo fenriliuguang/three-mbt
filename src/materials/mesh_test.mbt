@@ -3467,6 +3467,23 @@ test "UniformsGroup remove drops the first matching number" {
 }
 
 ///|
+test "UniformsGroup setName replaces the name" {
+  let frame = @materials.UniformsGroup::new()
+  assert_eq(frame.name, "")
+  let chained = frame.set_name("Frame").set_name("Lights")
+  assert_eq(frame.name, "Lights")
+  assert_eq(chained.name, "Lights")
+  assert_eq(chained.id, frame.id)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  ignore(shader.uniforms_groups[0].set_name("Renamed"))
+  assert_eq(shader.uniforms_groups[0].name, "Renamed")
+  assert_eq(onto.uniforms_groups[0].name, "Lights")
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()

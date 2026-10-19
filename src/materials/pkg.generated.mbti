@@ -452,6 +452,7 @@ pub(all) struct UniformsGroup {
 pub fn UniformsGroup::add(Self, Double) -> Self
 pub fn UniformsGroup::new(name? : String) -> Self
 pub fn UniformsGroup::remove(Self, Double) -> Self
+pub fn UniformsGroup::set_name(Self, String) -> Self
 
 pub(all) enum WireframeCap {
   Round
