@@ -278,6 +278,24 @@ test "dispose notifies listeners" {
 }
 
 ///|
+test "uuid is a version-4 id that object copy keeps" {
+  let source = @core.Object3D::new()
+  assert_eq(source.uuid.length(), 36)
+  assert_eq(source.uuid[14:15].to_owned(), "4")
+  let destination = @core.Object3D::new()
+  let kept = destination.uuid
+  ignore(destination.copy(source))
+  assert_eq(destination.uuid, kept)
+  assert_eq(destination.uuid.length(), 36)
+  source.name = "box"
+  let cloned = source.clone()
+  assert_eq(cloned.uuid.length(), 36)
+  assert_eq(cloned.uuid[14:15].to_owned(), "4")
+  assert_eq(cloned.name, "box")
+  assert_eq(cloned.id == source.id, false)
+}
+
+///|
 test "clone copies the transform and the children" {
   let source = @core.Object3D::new(kind=@core.NodeKind::Mesh)
   source.name = "box"

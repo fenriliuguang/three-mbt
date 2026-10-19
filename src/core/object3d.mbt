@@ -45,9 +45,12 @@ fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
 ///|
 /// 场景图节点。欧拉角和四元数通过回调保持同步；直接写 `rotation.x` 不会更新四元数，
 /// 请用 `rotation.set` 或 `set_x` / `set_y` / `set_z`。
+/// `uuid` 在新建时生成，`copy` 不改写目标自己的编号。
 /// r186: `Object3D` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L64
+/// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L97
 pub(all) struct Object3D {
   id : Int
+  uuid : String
   mut name : String
   kind : NodeKind
   position : @math.Vector3
@@ -89,6 +92,7 @@ pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
   bind_rotation(rotation, quaternion)
   {
     id: fresh_object_id(),
+    uuid: @math.generate_uuid(),
     name: "",
     kind,
     position: @math.Vector3::new(),
