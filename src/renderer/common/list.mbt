@@ -655,7 +655,7 @@ fn on_camera_layer(node : Object3D, camera : Object3D?) -> Bool {
 }
 
 ///|
-/// 没传视锥，或 `frustum_culled` 为假时保留。否则用世界空间包围球。
+/// 没传视锥，或 `frustum_culled` 为假时保留。否则用世界空间包围球。带实例数据时用实例包围球，没有就算。几何体没有位置时保留。
 /// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
 fn kept_by_frustum(
   node : Object3D,
@@ -668,10 +668,7 @@ fn kept_by_frustum(
       if !node.frustum_culled {
         true
       } else {
-        if geometry.bounding_sphere is None {
-          geometry.compute_bounding_sphere()
-        }
-        match geometry.bounding_sphere {
+        match cull_sphere(node, geometry) {
           None => true
           Some(sphere) => {
             let world = @math.Sphere::new()
@@ -682,6 +679,30 @@ fn kept_by_frustum(
         }
       }
   }
+}
+
+///|
+fn cull_sphere(node : Object3D, geometry : BufferGeometry) -> @math.Sphere? {
+  match node.mesh {
+    Some(mesh) =>
+      match mesh.instances {
+        Some(instances) =>
+          Some(match instances.bounding_sphere {
+            Some(sphere) => sphere
+            None => instances.compute_bounding_sphere(mesh.geometry)
+          })
+        None => geometry_bounding_sphere(geometry)
+      }
+    None => geometry_bounding_sphere(geometry)
+  }
+}
+
+///|
+fn geometry_bounding_sphere(geometry : BufferGeometry) -> @math.Sphere? {
+  if geometry.bounding_sphere is None {
+    geometry.compute_bounding_sphere()
+  }
+  geometry.bounding_sphere
 }
 
 ///|

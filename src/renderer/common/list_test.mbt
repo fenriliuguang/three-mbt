@@ -2051,3 +2051,71 @@ test "transparent render order precedes view depth" {
   assert_eq(physical_equal(strokes[0].node, sooner.node), true)
   assert_eq(physical_equal(strokes[1].node, solid.node), true)
 }
+
+///|
+test "frustum culls instanced meshes with their bounding sphere" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let outside = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    1,
+  )
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(-2.0, 0.0, 0.0))
+  outside.set_matrix_at(0, matrix)
+  outside.node.frustum_culled = true
+  outside.node.update_matrix_world()
+  let inside = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    1,
+  )
+  ignore(matrix.make_translation(0.5, 0.5, 0.5))
+  inside.set_matrix_at(0, matrix)
+  inside.node.frustum_culled = true
+  inside.node.update_matrix_world()
+  let scene = @scenes.Scene::new()
+  ignore(scene.add(outside))
+  ignore(scene.add(inside))
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  let drawn = @common.collect_opaque(scene.node, frustum=frustum)
+  assert_eq(drawn.length(), 1)
+  assert_eq(physical_equal(drawn[0].node, inside.node), true)
+  match outside.instances.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, -2.0)
+      assert_eq(sphere.center.y, 0.0)
+      assert_eq(sphere.center.z, 0.0)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(geometry_sphere) => {
+      assert_eq(geometry_sphere.center.x, 0.0)
+      assert_eq(geometry_sphere.radius, 0.0)
+    }
+  }
+  outside.node.frustum_culled = false
+  let kept = @common.collect_opaque(scene.node, frustum=frustum)
+  assert_eq(kept.length(), 2)
+  assert_eq(physical_equal(kept[0].node, outside.node), true)
+  assert_eq(physical_equal(kept[1].node, inside.node), true)
+}
