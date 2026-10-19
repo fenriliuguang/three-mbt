@@ -322,3 +322,23 @@ pub fn SpriteMaterial::new(
     size_attenuation,
   }
 }
+
+///|
+/// 把颜色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
+/// 不透明度、透明开关、雾、旋转和尺寸衰减一并复制。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
+pub fn SpriteMaterial::copy(
+  self : SpriteMaterial,
+  source : SpriteMaterial,
+) -> SpriteMaterial {
+  ignore(self.color.copy(source.color))
+  self.map = source.map
+  self.alpha_map = source.alpha_map
+  self.opacity = source.opacity
+  self.transparent = source.transparent
+  self.fog = source.fog
+  self.rotation = source.rotation
+  self.size_attenuation = source.size_attenuation
+  self
+}
