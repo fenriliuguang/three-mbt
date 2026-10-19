@@ -361,6 +361,7 @@ pub fn Material::program_thickness_map_uv(Self) -> String
 pub fn Material::program_transmission(Self) -> Bool
 pub fn Material::program_transmission_map(Self) -> Bool
 pub fn Material::program_transmission_map_uv(Self) -> String
+pub fn Material::program_vertex_alphas(Self, has_vertex_alpha? : Bool) -> Bool
 pub fn Material::program_vertex_colors(Self) -> Bool
 pub fn Material::program_vertex_normals(Self, has_normal? : Bool) -> Bool
 pub fn Material::program_vertex_shader(Self) -> String?
