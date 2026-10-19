@@ -2311,6 +2311,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `MORPHTARGETS_COUNT` has landed. A Shader material with `morph_targets_count` at `0` adds nothing. A count of `1` and a stride of `1` writes `#define MORPHTARGETS_COUNT 1` and a newline, `29` characters, on the vertex prefix only, after `MORPHTARGETS_TEXTURE_STRIDE`. The vertex string is `1675`. The fragment string stays `1222`. A count of `2` writes `2`. A count of `10` writes `10` and the vertex string is `1676`. `has_morph_colors` true puts that line after the stride line, so the vertex string is `1699` and the fragment string stays `1222`. A raw material stays at `92`. A Basic material stays `""`. `DOUBLE_SIDED` stays later.
 
+`DOUBLE_SIDED` has landed. A Shader material with `side` front adds nothing. Setting `side` to double writes `#define DOUBLE_SIDED` and a newline, `21` characters, on both prefixes. The vertex string grows from `1608` to `1629`. The fragment string grows from `1222` to `1243`. Back and front drop the line. A morph target count of `1` and stride `1` puts the vertex line after `MORPHTARGETS_COUNT`, so the vertex string is `1696` and the fragment string stays `1243`. A raw material stays at `92`. A Basic material stays `""`. `FLIP_SIDED` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3407,6 +3409,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_MORPHCOLORS` | `materials` |
 | planned | 7 | `MORPHTARGETS_TEXTURE_STRIDE` | `materials` |
 | planned | 7 | `MORPHTARGETS_COUNT` | `materials` |
+| planned | 7 | `DOUBLE_SIDED` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

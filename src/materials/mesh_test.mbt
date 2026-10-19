@@ -6096,6 +6096,43 @@ test "Material shader writes MORPHTARGETS_COUNT" {
 }
 
 ///|
+test "Material shader writes DOUBLE_SIDED" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.side = @constants.Double
+  assert_eq(shader.prefixed_vertex_shader().length(), 1629)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1629 - 1608, 21)
+  assert_eq(shader.prefixed_vertex_shader()[683:703].to_owned(), "#define DOUBLE_SIDED")
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1099].to_owned(),
+    "#define DOUBLE_SIDED",
+  )
+  shader.side = @constants.Back
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.side = @constants.Front
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.side = @constants.Double
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(),
+    1696,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1)[750:770].to_owned(),
+    "#define DOUBLE_SIDED",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  let raw = @materials.Material::raw()
+  raw.side = @constants.Double
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.side = @constants.Double
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
