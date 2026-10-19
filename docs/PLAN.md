@@ -2415,6 +2415,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `instancingColor` has landed. It is `true` only when the object is an instanced mesh and it has `instanceColor`. Either flag alone stays `false`. The default is `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `instancingMorph` stays later.
 
+`instancingMorph` has landed. It is `true` only when the object is an instanced mesh and it has `morphTexture`. Either flag alone stays `false`. The default is `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `outputColorSpace` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3563,6 +3565,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `batchingColor` | `materials` |
 | planned | 7 | `instancing` | `materials` |
 | planned | 7 | `instancingColor` | `materials` |
+| planned | 7 | `instancingMorph` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

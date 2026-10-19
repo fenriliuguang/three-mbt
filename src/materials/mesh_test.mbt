@@ -7833,6 +7833,23 @@ test "Material shader instancingColor needs instance color" {
 }
 
 ///|
+test "Material shader instancingMorph needs a morph texture" {
+  assert_eq(@materials.program_instancing_morph(), false)
+  assert_eq(@materials.program_instancing_morph(is_instanced_mesh=true), false)
+  assert_eq(@materials.program_instancing_morph(has_morph_texture=true), false)
+  assert_eq(
+    @materials.program_instancing_morph(
+      is_instanced_mesh=true,
+      has_morph_texture=true,
+    ),
+    true,
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
