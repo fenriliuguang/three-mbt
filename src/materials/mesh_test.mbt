@@ -3726,6 +3726,38 @@ test "Material shader writes USE_DISPLACEMENTMAP" {
 }
 
 ///|
+test "Material shader writes USE_EMISSIVEMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let emissive_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.emissive_map = Some(emissive_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1632)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
+  assert_eq(1632 - 1608, 24)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:706].to_owned(),
+    "#define USE_EMISSIVEMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1102].to_owned(),
+    "#define USE_EMISSIVEMAP",
+  )
+  shader.displacement_map = Some(emissive_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
+  assert_eq(
+    shader.prefixed_vertex_shader()[711:734].to_owned(),
+    "#define USE_EMISSIVEMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
+  let raw = @materials.Material::raw()
+  raw.emissive_map = Some(emissive_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.emissive_map = Some(emissive_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
