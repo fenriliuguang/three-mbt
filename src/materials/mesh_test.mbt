@@ -250,3 +250,35 @@ test "Material blendSrc defaults to source alpha" {
   assert_eq(@constants.BlendFactor::ConstantAlpha.to_int(), 213)
   assert_eq(@constants.BlendFactor::OneMinusConstantAlpha.to_int(), 214)
 }
+
+///|
+test "Material blendDst defaults to one minus source alpha" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(
+    basic.material.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
+  assert_eq(basic.material.blend_dst.to_int(), 205)
+  basic.material.blend_dst = @constants.BlendFactor::Zero
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(
+    lambert.material.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(
+    standard.material.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
+  standard.material.blend_dst = @constants.BlendFactor::One
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha, true)
+  assert_eq(basic.material.blend_dst is @constants.BlendFactor::Zero, true)
+  assert_eq(basic.material.blend_dst.to_int(), 200)
+  assert_eq(standard.material.blend_dst is @constants.BlendFactor::One, true)
+  assert_eq(standard.material.blend_dst.to_int(), 201)
+  assert_eq(
+    lambert.material.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
+}
