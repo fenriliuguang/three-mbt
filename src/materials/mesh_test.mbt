@@ -3409,3 +3409,29 @@ test "Material shader copies uniforms groups" {
   assert_eq(cloned.uniforms_groups[0].name, "Clone")
   assert_eq(shader.uniforms_groups[0].name, "Frame")
 }
+
+///|
+test "Material shader keeps its own linewidth on copy" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.linewidth, 1.0)
+  assert_eq(basic.linewidth, 1.0)
+  assert_eq(phong.linewidth, 1.0)
+  assert_eq(shader.wireframe_linewidth, 1.0)
+  shader.linewidth = 4.0
+  shader.wireframe_linewidth = 5.0
+  ignore(basic.copy(shader))
+  assert_eq(basic.linewidth, 1.0)
+  assert_eq(basic.wireframe_linewidth, 5.0)
+  assert_eq(shader.linewidth, 4.0)
+  let onto = @materials.Material::shader()
+  onto.linewidth = 3.0
+  ignore(onto.copy(shader))
+  assert_eq(onto.linewidth, 3.0)
+  assert_eq(shader.linewidth, 4.0)
+  let cloned = shader.clone()
+  assert_eq(cloned.linewidth, 1.0)
+  assert_eq(cloned.id == shader.id, false)
+  assert_eq(shader.linewidth, 4.0)
+}

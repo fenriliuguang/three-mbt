@@ -2113,6 +2113,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.uniformsGroups` has landed for the group name and usage. A new Shader, Basic, and Phong material each store an empty array. A group named `Frame` starts with usage `35044`. A second group named `Other` with usage `35048` is copied onto another Shader material that held a group named `Drop`. The destination then has length `2`, names `Frame` and `Other`, and usages `35044` and `35048`. Each copied group has a new id. Renaming the destination's first group to `Renamed` leaves the source named `Frame`. Copying onto a Basic material leaves that array empty. Copying an empty Phong material onto the destination makes its length `0`. Cloning keeps length `2`, name `Frame`, and usage `35048`, with a new id. Renaming the clone's first group to `Clone` leaves the source named `Frame`. The uniforms stored inside a group stay later. `linewidth` stays later.
 
+`ShaderMaterial.linewidth` has landed. A new Shader, Basic, and Phong material each store `1`. It is separate from `wireframe_linewidth`. Setting the Shader material's linewidth to `4` and its wireframe linewidth to `5`, then copying it onto a Basic material, leaves the Basic linewidth at `1` and stores wireframe linewidth `5`. The source linewidth stays `4`. Copying that Shader material onto another Shader material whose linewidth is `3` leaves the destination at `3`. Cloning the source stores `1`, with a new id, and the source stays `4`. The renderer still draws lines one pixel wide. Shader `forceSinglePass` default true stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3110,6 +3112,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.fragmentShader` | `materials` |
 | planned | 7 | `ShaderMaterial.uniforms` | `materials` |
 | planned | 7 | `ShaderMaterial.uniformsGroups` | `materials` |
+| planned | 7 | `ShaderMaterial.linewidth` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
