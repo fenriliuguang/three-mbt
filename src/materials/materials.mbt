@@ -302,6 +302,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// `blend_color` 默认黑色 `(0, 0, 0)`。点绘制的混合仍不用常量颜色。
 /// `blending` 默认 `Normal`。点绘制的透明混合仍用现有的源 alpha，管线仍不读这个字段。
 /// `blend_src` 默认 `SrcAlpha`。点绘制的透明混合仍用现有的源 alpha，管线仍不读这个字段。
+/// `blend_dst` 默认 `OneMinusSrcAlpha`。点绘制的透明混合仍用现有的源 alpha，管线仍不读这个字段。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -321,6 +322,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// r186: `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193
 /// r186: `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80
 /// r186: `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143
+/// r186: `blendDst` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L151
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -352,6 +354,7 @@ pub(all) struct PointsMaterial {
   blend_color : @math.Color
   mut blending : @constants.Blending
   mut blend_src : @constants.BlendFactor
+  mut blend_dst : @constants.BlendFactor
 }
 
 ///|
@@ -391,12 +394,13 @@ pub fn PointsMaterial::new(
     blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
     blending: @constants.Normal,
     blend_src: @constants.SrcAlpha,
+    blend_dst: @constants.OneMinusSrcAlpha,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending` 和 `blend_src` 一并复制。
+/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src` 和 `blend_dst` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -407,6 +411,7 @@ pub fn PointsMaterial::copy(
   ignore(self.blend_color.copy(source.blend_color))
   self.blending = source.blending
   self.blend_src = source.blend_src
+  self.blend_dst = source.blend_dst
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.size = source.size

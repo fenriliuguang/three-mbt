@@ -155,6 +155,7 @@ pub(all) struct PointsMaterial {
   blend_color : @math.Color
   mut blending : @constants.Blending
   mut blend_src : @constants.BlendFactor
+  mut blend_dst : @constants.BlendFactor
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
