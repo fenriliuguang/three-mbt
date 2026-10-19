@@ -7912,6 +7912,21 @@ test "Material shader map follows the color texture" {
 }
 
 ///|
+test "Material shader matcap follows the matcap texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_matcap(), false)
+  assert_eq(@materials.Material::raw().program_matcap(), false)
+  assert_eq(@materials.Material::matcap().program_matcap(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.matcap = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_matcap(), true)
+  shader.matcap = None
+  assert_eq(shader.program_matcap(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
