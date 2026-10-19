@@ -3411,6 +3411,27 @@ test "Material shader copies uniforms groups" {
 }
 
 ///|
+test "UniformsGroup copies numeric uniforms" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  assert_eq(frame.uniforms.length(), 0)
+  frame.uniforms.push(1.0)
+  frame.uniforms.push(2.0)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.uniforms_groups[0].uniforms, [1.0, 2.0])
+  assert_eq(onto.uniforms_groups[0].id == shader.uniforms_groups[0].id, false)
+  onto.uniforms_groups[0].uniforms[0] = 9.0
+  assert_eq(onto.uniforms_groups[0].uniforms[0], 9.0)
+  assert_eq(shader.uniforms_groups[0].uniforms[0], 1.0)
+  let cloned = shader.clone()
+  assert_eq(cloned.uniforms_groups[0].uniforms, [1.0, 2.0])
+  cloned.uniforms_groups[0].uniforms[0] = 8.0
+  assert_eq(shader.uniforms_groups[0].uniforms[0], 1.0)
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()

@@ -447,6 +447,7 @@ pub(all) struct UniformsGroup {
   id : Int
   mut name : String
   mut usage : Int
+  mut uniforms : Array[Double]
 }
 pub fn UniformsGroup::new(name? : String) -> Self
 
