@@ -1931,3 +1931,30 @@ test "Material sheenRoughnessMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.sheen_roughness_map is None, true)
 }
+
+///|
+test "Material transmissionMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.transmission_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.transmission_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.transmission_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.transmission_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.transmission_map {
+    None => abort("copied transmission map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.transmission_map = None
+  match lambert.transmission_map {
+    None => abort("source transmission map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.transmission_map is None, true)
+}

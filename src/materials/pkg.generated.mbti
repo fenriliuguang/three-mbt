@@ -155,6 +155,7 @@ pub(all) struct Material {
   mut sheen_color_map : @textures.Texture?
   mut sheen_roughness : Double
   mut sheen_roughness_map : @textures.Texture?
+  mut transmission_map : @textures.Texture?
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
