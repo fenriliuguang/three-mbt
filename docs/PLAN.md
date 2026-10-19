@@ -1707,6 +1707,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.blendDst` has landed. A new material stores `OneMinusSrcAlpha`, whose integer is `205`. Setting it to `Zero` (`200`) leaves another new material at `OneMinusSrcAlpha`. Copying onto a default material stores `Zero`. Setting the destination to `One` (`201`) leaves the source at `Zero`. A dashed material copies the factor through its inner line material. Setting the destination to `DstColor` (`208`) leaves the source at `Zero`. Line draws still use the existing source-alpha blend. The pipeline still does not read this field.
 
+`SpriteMaterial.blendDst` has landed. A new material stores `OneMinusSrcAlpha`, whose integer is `205`. Setting it to `Zero` (`200`) leaves another new material at `OneMinusSrcAlpha`. Copying onto a default material stores `Zero`. Setting the destination to `One` (`201`) leaves the source at `Zero`. The renderer still does not draw sprites. The pipeline still does not read this field.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2501,6 +2503,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.blendDst` | `materials` |
 | planned | 7 | `PointsMaterial.blendDst` | `materials` |
 | planned | 7 | `LineBasicMaterial.blendDst` | `materials` |
+| planned | 7 | `SpriteMaterial.blendDst` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
