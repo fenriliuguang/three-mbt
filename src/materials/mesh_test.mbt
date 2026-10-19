@@ -7885,6 +7885,18 @@ test "Material shader outputColorSpace picks the active space" {
 }
 
 ///|
+test "Material shader alphaToCoverage starts off" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_alpha_to_coverage(), false)
+  assert_eq(@materials.Material::raw().program_alpha_to_coverage(), false)
+  assert_eq(@materials.Material::basic().program_alpha_to_coverage(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.alpha_to_coverage = true
+  assert_eq(shader.program_alpha_to_coverage(), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
