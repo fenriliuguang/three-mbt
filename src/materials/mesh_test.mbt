@@ -1831,3 +1831,31 @@ test "Material iridescenceThicknessMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.iridescence_thickness_map is None, true)
 }
+
+///|
+test "Material sheenColor starts black and copies into the destination" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.sheen_color.r, 0.0)
+  assert_eq(basic.sheen_color.g, 0.0)
+  assert_eq(basic.sheen_color.b, 0.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.sheen_color.r, 0.0)
+  ignore(lambert.sheen_color.set_rgb(0.25, 0.5, 0.75))
+  let other = @materials.Material::lambert()
+  assert_eq(other.sheen_color.r, 0.0)
+  assert_eq(other.sheen_color.g, 0.0)
+  assert_eq(other.sheen_color.b, 0.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.sheen_color.r, 0.25)
+  assert_eq(destination.sheen_color.g, 0.5)
+  assert_eq(destination.sheen_color.b, 0.75)
+  ignore(destination.sheen_color.set_rgb(1.0, 0.0, 0.0))
+  assert_eq(lambert.sheen_color.r, 0.25)
+  assert_eq(lambert.sheen_color.g, 0.5)
+  assert_eq(lambert.sheen_color.b, 0.75)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.sheen_color.r, 0.0)
+  assert_eq(standard.sheen_color.g, 0.0)
+  assert_eq(standard.sheen_color.b, 0.0)
+}
