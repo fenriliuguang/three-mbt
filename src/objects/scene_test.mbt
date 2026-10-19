@@ -1774,6 +1774,43 @@ test "Skeleton.dispose leaves the matrix buffer in place" {
 }
 
 ///|
+test "Skeleton.toJSON writes bone uuids and inverse matrices" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  let data = arm.to_json()
+  assert_eq(data.version, 4.7)
+  assert_eq(data.type_name, "Skeleton")
+  assert_eq(data.generator, "Skeleton.toJSON")
+  assert_eq(data.uuid, arm.uuid)
+  assert_eq(data.bones.length(), 3)
+  assert_eq(data.bones[0], shoulder.node.uuid)
+  assert_eq(data.bones[1], elbow.node.uuid)
+  assert_eq(data.bones[2], hand.node.uuid)
+  assert_eq(data.bone_inverses.length(), 3)
+  assert_eq(data.bone_inverses[0].length(), 16)
+  assert_eq(data.bone_inverses[0][0], 1.0)
+  assert_eq(data.bone_inverses[0][13], 5.0)
+  assert_eq(data.bone_inverses[1][13], 5.0)
+  assert_eq(data.bone_inverses[2][0], 1.0)
+  assert_eq(data.bone_inverses[2][13], 0.0)
+  assert_eq(data.bone_inverses[2][15], 1.0)
+  data.bone_inverses[0][13] = 9.0
+  assert_eq(arm.bone_inverses[0].elements[13], 5.0)
+  let empty = @objects.Skeleton::new().to_json()
+  assert_eq(empty.bones.length(), 0)
+  assert_eq(empty.bone_inverses.length(), 0)
+  assert_eq(empty.version, 4.7)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

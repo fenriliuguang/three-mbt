@@ -1509,6 +1509,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Object3D.uuid` has landed. A new node stores a 36-character version-4 id. Copying another node onto it leaves that id in place. Cloning a node named `box` keeps a 36-character version-4 uuid and the name `box`, and the numeric id is new.
 
+`Skeleton.toJSON` has landed. The shoulder, elbow, and hand chain writes version `4.7`, type `Skeleton`, and generator `Skeleton.toJSON`. The skeleton uuid is its own. The bone list is the shoulder, elbow, and hand uuids. The shoulder and elbow inverses translate by `y=5`, and the hand inverse is identity. Writing `9` into the serialized shoulder inverse leaves the stored matrix at `y=5`. An empty skeleton writes two empty lists. `fromJSON` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2204,6 +2206,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Skeleton.computeBoneTexture` | `objects` |
 | planned | 7 | `Skeleton.dispose` | `objects` |
 | planned | 7 | `Object3D.uuid` | `core` |
+| planned | 7 | `Skeleton.toJSON` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

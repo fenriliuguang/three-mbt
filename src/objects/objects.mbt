@@ -273,6 +273,41 @@ pub fn Skeleton::dispose(_self : Skeleton) -> Unit {
 }
 
 ///|
+/// `Skeleton.toJSON` 返回的数据。上游没有单独的类。`type_name` 对应元数据里的 `type`。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L350
+pub(all) struct SkeletonJson {
+  version : Double
+  type_name : String
+  generator : String
+  uuid : String
+  bones : Array[String]
+  bone_inverses : Array[Array[Double]]
+}
+
+///|
+/// 写出骨架编号、每根骨骼的编号，以及逆绑定矩阵的十六个列主序元素。
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L350
+pub fn Skeleton::to_json(self : Skeleton) -> SkeletonJson {
+  let bones = []
+  let inverses = []
+  let count = self.bones.length()
+  let mut index = 0
+  while index < count {
+    bones.push(self.bones[index].node.uuid)
+    inverses.push(self.bone_inverses[index].to_array())
+    index = index + 1
+  }
+  {
+    version: 4.7,
+    type_name: "Skeleton",
+    generator: "Skeleton.toJSON",
+    uuid: self.uuid,
+    bones,
+    bone_inverses: inverses,
+  }
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0
