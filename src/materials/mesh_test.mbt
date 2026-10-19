@@ -7684,6 +7684,38 @@ test "Material shader fragmentShader keeps builtin source out" {
 }
 
 ///|
+test "Material shader defines returns the material map" {
+  let shader = @materials.Material::shader()
+  let defines = shader.program_defines()
+  match defines.get("FOO") {
+    None => ()
+    Some(_) => abort("shader defines started with FOO")
+  }
+  let basic = @materials.Material::basic()
+  match basic.program_defines().get("STANDARD") {
+    None => ()
+    Some(_) => abort("basic defines gained STANDARD")
+  }
+  match @materials.Material::standard().program_defines().get("STANDARD") {
+    Some(value) => assert_eq(value, "")
+    None => abort("standard defines missing STANDARD")
+  }
+  let physical = @materials.Material::physical().program_defines()
+  match physical.get("STANDARD") {
+    Some(value) => assert_eq(value, "")
+    None => abort("physical defines missing STANDARD")
+  }
+  match physical.get("PHYSICAL") {
+    Some(value) => assert_eq(value, "")
+    None => abort("physical defines missing PHYSICAL")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  defines.set("FOO", "1")
+  assert_eq(shader.defines.get("FOO"), Some("1"))
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
