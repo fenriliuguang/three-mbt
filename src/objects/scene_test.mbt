@@ -2086,12 +2086,74 @@ test "SkinnedMesh.applyBoneTransform blends bone translations" {
 }
 
 ///|
+test "SkinnedMesh.applyBoneTransform keeps a Vector4 homogeneous weight" {
+  let bone0 = @objects.Bone::new()
+  let bone1 = @objects.Bone::new()
+  bone0.node.update_matrix_world(force=true)
+  bone1.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone0, bone1])
+  ignore(bone0.node.position.set(0.0, 5.0, 0.0))
+  bone0.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+        4,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new(
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0],
+        4,
+      ),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  assert_eq(skin.bind_matrix.elements[0], 1.0)
+  assert_eq(skin.bind_matrix.elements[13], 0.0)
+  let point = @math.Vector4::new(x=1.0, y=0.0, z=0.0, w=1.0)
+  let transformed = skin.apply_bone_transform_vector4(0, point)
+  assert_eq(physical_equal(transformed, point), true)
+  assert_eq(point.x, 1.0)
+  assert_eq(point.y, 5.0)
+  assert_eq(point.z, 0.0)
+  assert_eq(point.w, 1.0)
+  let direction = @math.Vector4::new(x=1.0, y=0.0, z=0.0, w=0.0)
+  ignore(skin.apply_bone_transform_vector4(1, direction))
+  assert_eq(direction.x, 1.0)
+  assert_eq(direction.y, 0.0)
+  assert_eq(direction.z, 0.0)
+  assert_eq(direction.w, 0.0)
+  let weighted = @math.Vector4::new(x=0.0, y=0.0, z=0.0, w=2.0)
+  ignore(skin.apply_bone_transform_vector4(2, weighted))
+  assert_eq(weighted.x, 0.0)
+  assert_eq(weighted.y, 0.0)
+  assert_eq(weighted.z, 0.0)
+  assert_eq(weighted.w, 2.0)
+}
+
+///|
 test "panic SkinnedMesh.applyBoneTransform requires a skeleton" {
   let skin = @objects.SkinnedMesh::new(
     @core.BufferGeometry::new(),
     @materials.Material::basic(),
   )
   ignore(skin.apply_bone_transform(0, @math.Vector3::new()))
+}
+
+///|
+test "panic SkinnedMesh.applyBoneTransform Vector4 requires a skeleton" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.apply_bone_transform_vector4(0, @math.Vector4::new()))
 }
 
 ///|
