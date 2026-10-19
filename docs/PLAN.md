@@ -1969,6 +1969,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.lightMap` has landed. A new Basic, Lambert, and Standard material each start with an empty light map. A Lambert material stores a 1×1 map whose second byte is `0x80`. Another Lambert material stays empty. Copying onto a Basic material keeps that same texture object. Clearing the destination leaves the source map in place. A new Standard material stays empty. The renderer still does not sample this map. `lightMapIntensity` stays later.
 
+`Material.lightMapIntensity` has landed. A new Basic, Lambert, and Standard material each store `1`. A Lambert material set to `2` leaves another Lambert material at `1`. Copying onto a Basic material stores `2`. Setting the destination to `0` leaves the source at `2`. A new Standard material stays at `1`. The renderer still does not sample the light map. `aoMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2894,6 +2896,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.envMapIntensity` | `materials` |
 | planned | 7 | `Material.refractionRatio` | `materials` |
 | planned | 7 | `Material.lightMap` | `materials` |
+| planned | 7 | `Material.lightMapIntensity` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

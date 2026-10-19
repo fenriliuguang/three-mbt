@@ -1322,3 +1322,21 @@ test "Material lightMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.light_map is None, true)
 }
+
+///|
+test "Material lightMapIntensity defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.light_map_intensity, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.light_map_intensity, 1.0)
+  lambert.light_map_intensity = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.light_map_intensity, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.light_map_intensity, 2.0)
+  destination.light_map_intensity = 0.0
+  assert_eq(lambert.light_map_intensity, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.light_map_intensity, 1.0)
+}
