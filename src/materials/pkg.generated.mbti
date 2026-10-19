@@ -230,6 +230,7 @@ pub(all) struct PointsMaterial {
   mut color_write : Bool
   mut premultiplied_alpha : Bool
   mut visible : Bool
+  mut force_single_pass : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

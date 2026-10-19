@@ -922,6 +922,20 @@ test "PointsMaterial shadowSide defaults to empty and copies" {
 }
 
 ///|
+test "PointsMaterial forceSinglePass defaults to false and copies" {
+  let material = @materials.PointsMaterial::new()
+  assert_eq(material.force_single_pass, false)
+  material.force_single_pass = true
+  let other = @materials.PointsMaterial::new()
+  assert_eq(other.force_single_pass, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.force_single_pass, true)
+  destination.force_single_pass = false
+  assert_eq(material.force_single_pass, true)
+}
+
+///|
 test "PointsMaterial dispose runs only dispose listeners" {
   let material = @materials.PointsMaterial::new()
   let hits = Ref::Ref(0)
