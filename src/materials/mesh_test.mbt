@@ -9181,6 +9181,20 @@ test "Material shader vertexTangents needs a tangent and a normal source" {
 }
 
 ///|
+test "Material shader vertexNormals reads the geometry normal attribute" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_vertex_normals(), false)
+  assert_eq(@materials.Material::raw().program_vertex_normals(), false)
+  assert_eq(@materials.Material::basic().program_vertex_normals(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_vertex_normals(has_normal=true), true)
+  assert_eq(shader.program_vertex_normals(has_normal=false), false)
+  shader.vertex_colors = true
+  assert_eq(shader.program_vertex_normals(has_normal=true), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
