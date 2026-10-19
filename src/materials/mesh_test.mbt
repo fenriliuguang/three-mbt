@@ -3195,17 +3195,18 @@ test "Material shader prefixes vertex uniforms" {
   let raw = @materials.Material::raw()
   let basic = @materials.Material::basic()
   let prefixed = shader.prefixed_vertex_shader()
-  assert_eq(prefixed.length() - shader.vertex_shader.length(), 1460)
-  assert_eq(prefixed.length(), 1552)
+  assert_eq(prefixed.length() - shader.vertex_shader.length(), 1495)
+  assert_eq(prefixed.length(), 1587)
   assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
   assert_eq(prefixed[17:37].to_owned(), "#define attribute in")
   assert_eq(prefixed[38:57].to_owned(), "#define varying out")
   assert_eq(prefixed[58:83].to_owned(), "#define texture2D texture")
   assert_eq(prefixed[84:106].to_owned(), "precision highp float;")
   assert_eq(prefixed[605:627].to_owned(), "#define HIGH_PRECISION")
-  assert_eq(prefixed[627:652].to_owned(), "uniform mat4 modelMatrix;")
+  assert_eq(prefixed[627:661].to_owned(), "#define SHADER_TYPE ShaderMaterial")
+  assert_eq(prefixed[662:687].to_owned(), "uniform mat4 modelMatrix;")
   assert_eq(
-    prefixed[1019:1043].to_owned(),
+    prefixed[1054:1078].to_owned(),
     "attribute vec3 position;",
   )
   assert_eq(
@@ -3218,7 +3219,7 @@ test "Material shader prefixes vertex uniforms" {
   assert_eq(basic.prefixed_vertex_shader(), "")
   shader.vertex_shader = "void main() {}"
   let custom = shader.prefixed_vertex_shader()
-  assert_eq(custom.length(), 1474)
+  assert_eq(custom.length(), 1509)
   assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
   raw.vertex_shader = "void main() {}"
   assert_eq(raw.prefixed_vertex_shader(), "void main() {}")
@@ -3228,10 +3229,10 @@ test "Material shader prefixes vertex uniforms" {
 ///|
 test "Material shader adds vertex GLSL3 defines" {
   let shader = @materials.Material::shader()
-  assert_eq(shader.prefixed_vertex_shader().length(), 1552)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1587)
   shader.extensions.clip_cull_distance = true
   let clip = shader.prefixed_vertex_shader()
-  assert_eq(clip.length(), 1600)
+  assert_eq(clip.length(), 1635)
   assert_eq(
     clip[16:64].to_owned(),
     "#extension GL_ANGLE_clip_cull_distance : require",
@@ -3239,15 +3240,15 @@ test "Material shader adds vertex GLSL3 defines" {
   shader.extensions.clip_cull_distance = false
   shader.extensions.multi_draw = true
   let multi = shader.prefixed_vertex_shader()
-  assert_eq(multi.length(), 1592)
+  assert_eq(multi.length(), 1627)
   assert_eq(
     multi[16:56].to_owned(),
     "#extension GL_ANGLE_multi_draw : require",
   )
   shader.extensions.clip_cull_distance = true
   let both = shader.prefixed_vertex_shader()
-  assert_eq(both.length(), 1641)
-  assert_eq(1641 - 1552, 89)
+  assert_eq(both.length(), 1676)
+  assert_eq(1676 - 1587, 89)
   let raw = @materials.Material::raw()
   raw.extensions.clip_cull_distance = true
   raw.extensions.multi_draw = true
@@ -3257,20 +3258,20 @@ test "Material shader adds vertex GLSL3 defines" {
 ///|
 test "Material shader writes precision prefix" {
   let shader = @materials.Material::shader()
-  assert_eq(shader.prefixed_vertex_shader().length(), 1552)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1166)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1587)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1201)
   shader.precision = Some(@constants.Precision::Mediump)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1588)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1202)
-  assert_eq(1588 - 1552, 36)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1623)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1237)
+  assert_eq(1623 - 1587, 36)
   assert_eq(
     shader.prefixed_vertex_shader()[84:108].to_owned(),
     "precision mediump float;",
   )
   shader.precision = Some(@constants.Precision::Lowp)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1534)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1148)
-  assert_eq(1552 - 1534, 18)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1569)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1183)
+  assert_eq(1587 - 1569, 18)
   assert_eq(
     shader.prefixed_vertex_shader()[84:105].to_owned(),
     "precision lowp float;",
@@ -3287,13 +3288,14 @@ test "Material shader prefixes fragment uniforms" {
   let raw = @materials.Material::raw()
   let basic = @materials.Material::basic()
   let prefixed = shader.prefixed_fragment_shader()
-  assert_eq(prefixed.length() - shader.fragment_shader.length(), 1105)
-  assert_eq(prefixed.length(), 1166)
+  assert_eq(prefixed.length() - shader.fragment_shader.length(), 1140)
+  assert_eq(prefixed.length(), 1201)
   assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
   assert_eq(prefixed[16:34].to_owned(), "#define varying in")
   assert_eq(prefixed[480:502].to_owned(), "precision highp float;")
-  assert_eq(prefixed[1023:1047].to_owned(), "uniform mat4 viewMatrix;")
-  assert_eq(prefixed[1077:1105].to_owned(), "uniform bool isOrthographic;")
+  assert_eq(prefixed[1023:1057].to_owned(), "#define SHADER_TYPE ShaderMaterial")
+  assert_eq(prefixed[1058:1082].to_owned(), "uniform mat4 viewMatrix;")
+  assert_eq(prefixed[1112:1140].to_owned(), "uniform bool isOrthographic;")
   assert_eq(
     prefixed[prefixed.length() - 61:prefixed.length()].to_owned(),
     shader.fragment_shader,
@@ -3303,7 +3305,7 @@ test "Material shader prefixes fragment uniforms" {
   assert_eq(basic.prefixed_fragment_shader(), "")
   shader.fragment_shader = "void main() {}"
   let custom = shader.prefixed_fragment_shader()
-  assert_eq(custom.length(), 1119)
+  assert_eq(custom.length(), 1154)
   assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
   raw.fragment_shader = "void main() {}"
   assert_eq(raw.prefixed_fragment_shader(), "void main() {}")
@@ -3314,7 +3316,7 @@ test "Material shader prefixes fragment uniforms" {
 test "Material shader adds GLSL3 fragment defines" {
   let shader = @materials.Material::shader()
   let prefixed = shader.prefixed_fragment_shader()
-  assert_eq(prefixed.length(), 1166)
+  assert_eq(prefixed.length(), 1201)
   assert_eq(prefixed[0:15].to_owned(), "#version 300 es")
   assert_eq(
     prefixed[35:84].to_owned(),
@@ -3322,11 +3324,11 @@ test "Material shader adds GLSL3 fragment defines" {
   )
   assert_eq(prefixed[85:118].to_owned(), "#define gl_FragColor pc_fragColor")
   shader.glsl_version = Some(@materials.GlslVersion::GLSL1)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1166)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1201)
   shader.glsl_version = Some(@materials.GlslVersion::GLSL3)
   let g3 = shader.prefixed_fragment_shader()
-  assert_eq(g3.length(), 1084)
-  assert_eq(1166 - g3.length(), 82)
+  assert_eq(g3.length(), 1119)
+  assert_eq(1201 - g3.length(), 82)
   assert_eq(g3[0:15].to_owned(), "#version 300 es")
   assert_eq(g3[34:37].to_owned(), "\n\n\n")
   assert_eq(g3[37:73].to_owned(), "#define gl_FragDepthEXT gl_FragDepth")

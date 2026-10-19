@@ -2163,6 +2163,8 @@ Shader vertex GLSL3 defines have landed. With both extension flags off, `prefixe
 
 Shader precision prefix has landed. An empty `precision` writes 17 `precision highp` lines and `#define HIGH_PRECISION`, `543` characters, on both prefixed shaders. The default vertex string is `1552` and the default fragment string is `1166`. `mediump` adds `36`, so those lengths become `1588` and `1202`. `lowp` subtracts `18`, so they become `1534` and `1148`. A raw material set to `lowp` stays at `92` and `61`. `SHADER_TYPE` stays later.
 
+`SHADER_TYPE` has landed. A Shader material writes `#define SHADER_TYPE ShaderMaterial` after the precision block. That line is `35` characters with the newline. The default vertex string is `1587` and the default fragment string is `1201`. `mediump` still adds `36`, so those lengths are `1623` and `1237`. `lowp` still subtracts `18`, so they are `1569` and `1183`. A raw material stays at `92` and `61`. `SHADER_NAME` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3185,6 +3187,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Shader `#version 300 es` | `materials` |
 | planned | 7 | Shader vertex GLSL3 defines | `materials` |
 | planned | 7 | Shader precision prefix | `materials` |
+| planned | 7 | `SHADER_TYPE` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
