@@ -871,3 +871,18 @@ test "PointsMaterial removeEventListener drops a registered listener" {
   material.remove_event_listener("dispose", listener)
   assert_eq(other.has_event_listener("dispose", listener), true)
 }
+
+///|
+test "PointsMaterial dispatchEvent runs listeners of one kind" {
+  let material = @materials.PointsMaterial::new()
+  let hits = Ref::Ref(0)
+  material.add_event_listener("change", fn() { hits.val = hits.val + 1 })
+  material.add_event_listener("dispose", fn() { hits.val = hits.val + 10 })
+  material.dispatch_event("change")
+  assert_eq(hits.val, 1)
+  material.dispatch_event("missing")
+  assert_eq(hits.val, 1)
+  let other = @materials.PointsMaterial::new()
+  other.dispatch_event("change")
+  assert_eq(hits.val, 1)
+}

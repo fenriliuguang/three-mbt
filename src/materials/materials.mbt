@@ -922,6 +922,21 @@ pub fn PointsMaterial::remove_event_listener(
 }
 
 ///|
+/// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。点绘制仍不读这张表。
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
+pub fn PointsMaterial::dispatch_event(self : PointsMaterial, kind : String) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let snapshot = listeners.copy()
+      for listener in snapshot {
+        listener()
+      }
+    }
+  }
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。点绘制仍不因这次标记重新编译。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn PointsMaterial::set_needs_update(

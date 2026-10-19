@@ -240,6 +240,7 @@ pub(all) struct PointsMaterial {
 pub fn PointsMaterial::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::clone(Self) -> Self
 pub fn PointsMaterial::copy(Self, Self) -> Self
+pub fn PointsMaterial::dispatch_event(Self, String) -> Unit
 pub fn PointsMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 pub fn PointsMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
