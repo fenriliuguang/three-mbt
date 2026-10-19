@@ -178,6 +178,7 @@ pub(all) struct Material {
   is_mesh_matcap_material : Bool
   is_mesh_normal_material : Bool
   is_mesh_depth_material : Bool
+  mut depth_packing : @constants.DepthPacking
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

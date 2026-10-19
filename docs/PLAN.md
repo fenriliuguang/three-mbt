@@ -2083,6 +2083,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.isMeshDepthMaterial` has landed. Basic, Lambert, Standard, Physical, Toon, Matcap, and Normal stay false. `Material::depth` with hex `0x0000FF` stores true, type `MeshDepthMaterial`, kind `Depth`, and shading `Basic`. The red channel is `0` and the blue channel is `1`. Its defines stay empty. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`, and stores red `0` with blue `1`. Copying a green Normal material onto a Depth material keeps the destination true, stores red `0` and green `1`, and keeps a `FOO` define set to `1`. Cloning keeps the flag, the type, the kind, and blue `1`, with a new id. The renderer still shades it as Basic. `depthPacking` stays later.
 
+`Material.depthPacking` has landed. A new Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, and Depth material each store `Basic`, integer `3200`. Setting a Lambert material to `RGBA` stores `3201` and leaves another Lambert material at `3200`. Copying onto a Basic material stores `3201`. Setting the destination back to `Basic` leaves the source at `3201`. `RGB` is `3202` and `RG` is `3203`. The renderer still does not pack depth. `MeshDistanceMaterial` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3065,6 +3067,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.isMeshMatcapMaterial` | `materials` |
 | planned | 7 | `Material.isMeshNormalMaterial` | `materials` |
 | planned | 7 | `Material.isMeshDepthMaterial` | `materials` |
+| planned | 7 | `Material.depthPacking` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

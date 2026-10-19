@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788 ; `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283 ; `MultiplyOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L399
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788 ; `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283 ; `MultiplyOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L399 ; `BasicDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1251 ; `RGBADepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1259 ; `RGBDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1267 ; `RGDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1275
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -846,5 +846,41 @@ pub fn Combine::to_int(self : Combine) -> Int {
     Multiply => MULTIPLY_OPERATION
     Mix => MIX_OPERATION
     Add => ADD_OPERATION
+  }
+}
+
+///|
+/// 基础深度打包。对齐 `BasicDepthPacking`（3200）。
+pub const BASIC_DEPTH_PACKING : Int = 3200
+
+///|
+/// RGBA 深度打包。对齐 `RGBADepthPacking`（3201）。
+pub const RGBA_DEPTH_PACKING : Int = 3201
+
+///|
+/// RGB 深度打包。对齐 `RGBDepthPacking`（3202）。
+pub const RGB_DEPTH_PACKING : Int = 3202
+
+///|
+/// RG 深度打包。对齐 `RGDepthPacking`（3203）。
+pub const RG_DEPTH_PACKING : Int = 3203
+
+///|
+/// 深度写入颜色时的打包方式。数值与 r186 `src/constants.js` 一致。默认是基础打包。
+/// r186: `BasicDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1251 ; `RGBADepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1259 ; `RGBDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1267 ; `RGDepthPacking` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1275
+pub(all) enum DepthPacking {
+  Basic
+  RGBA
+  RGB
+  RG
+}
+
+///|
+pub fn DepthPacking::to_int(self : DepthPacking) -> Int {
+  match self {
+    Basic => BASIC_DEPTH_PACKING
+    RGBA => RGBA_DEPTH_PACKING
+    RGB => RGB_DEPTH_PACKING
+    RG => RG_DEPTH_PACKING
   }
 }

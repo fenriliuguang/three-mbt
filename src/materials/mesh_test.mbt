@@ -2779,3 +2779,36 @@ test "Material depth sets isMeshDepthMaterial and keeps defines on copy" {
   assert_eq(cloned.color.b, 1.0)
   assert_eq(cloned.id == depth.id, false)
 }
+
+///|
+test "Material depthPacking defaults to basic and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.depth_packing.to_int(), 3200)
+  assert_eq(basic.depth_packing is @constants.DepthPacking::Basic, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.depth_packing.to_int(), @constants.BASIC_DEPTH_PACKING)
+  lambert.depth_packing = @constants.DepthPacking::RGBA
+  assert_eq(lambert.depth_packing.to_int(), 3201)
+  let other = @materials.Material::lambert()
+  assert_eq(other.depth_packing.to_int(), 3200)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.depth_packing.to_int(), @constants.RGBA_DEPTH_PACKING)
+  assert_eq(destination.depth_packing is @constants.DepthPacking::RGBA, true)
+  destination.depth_packing = @constants.DepthPacking::Basic
+  assert_eq(lambert.depth_packing.to_int(), 3201)
+  assert_eq(@constants.DepthPacking::RGB.to_int(), @constants.RGB_DEPTH_PACKING)
+  assert_eq(@constants.DepthPacking::RG.to_int(), 3203)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.depth_packing.to_int(), 3200)
+  let physical = @materials.Material::physical()
+  assert_eq(physical.depth_packing.to_int(), 3200)
+  let toon = @materials.Material::toon()
+  assert_eq(toon.depth_packing.to_int(), 3200)
+  let matcap = @materials.Material::matcap()
+  assert_eq(matcap.depth_packing.to_int(), 3200)
+  let normal = @materials.Material::normal()
+  assert_eq(normal.depth_packing.to_int(), 3200)
+  let depth = @materials.Material::depth()
+  assert_eq(depth.depth_packing.to_int(), 3200)
+}

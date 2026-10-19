@@ -18,6 +18,8 @@ pub const ALWAYS_STENCIL_FUNC : Int = 519
 
 pub const BACK_SIDE : Int = 1
 
+pub const BASIC_DEPTH_PACKING : Int = 3200
+
 pub const CINEON_TONE_MAPPING : Int = 3
 
 pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
@@ -158,6 +160,12 @@ pub const REPLACE_STENCIL_OP : Int = 7681
 
 pub const REVERSE_SUBTRACT_EQUATION : Int = 102
 
+pub const RGBA_DEPTH_PACKING : Int = 3201
+
+pub const RGB_DEPTH_PACKING : Int = 3202
+
+pub const RG_DEPTH_PACKING : Int = 3203
+
 pub const SRC_ALPHA_FACTOR : Int = 204
 
 pub const SRC_ALPHA_SATURATE_FACTOR : Int = 210
@@ -267,6 +275,14 @@ pub(all) enum DepthFunc {
 }
 pub fn DepthFunc::reversed(Self) -> Self
 pub fn DepthFunc::to_int(Self) -> Int
+
+pub(all) enum DepthPacking {
+  Basic
+  RGBA
+  RGB
+  RG
+}
+pub fn DepthPacking::to_int(Self) -> Int
 
 pub(all) enum Interpolation {
   Discrete
