@@ -1584,6 +1584,42 @@ test "Skeleton.pose restores the bind positions" {
 }
 
 ///|
+test "Skeleton.update writes bind matrices into the buffer" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  arm.update()
+  assert_eq(arm.bone_matrices.length(), 48)
+  assert_eq(arm.bone_matrices[0], 1.0)
+  assert_eq(arm.bone_matrices[13], 0.0)
+  assert_eq(arm.bone_matrices[15], 1.0)
+  assert_eq(arm.bone_matrices[16], 1.0)
+  assert_eq(arm.bone_matrices[29], 0.0)
+  assert_eq(arm.bone_matrices[32], 1.0)
+  assert_eq(arm.bone_matrices[45], 0.0)
+  assert_eq(arm.bone_matrices[47], 1.0)
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  arm.update()
+  assert_eq(arm.bone_matrices[0], 1.0)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  assert_eq(arm.bone_matrices[29], 3.0)
+  assert_eq(arm.bone_matrices[45], 3.0)
+  assert_eq(arm.bone_matrices[47], 1.0)
+  assert_eq(shoulder.node.position.y, -2.0)
+  let empty = @objects.Skeleton::new()
+  empty.update()
+  assert_eq(empty.bone_matrices.length(), 0)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

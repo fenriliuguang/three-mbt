@@ -183,6 +183,7 @@ pub fn Skeleton::calculate_inverses(Self) -> Unit
 pub fn Skeleton::init(Self) -> Unit
 pub fn Skeleton::new(bones? : Array[Bone], bone_inverses? : Array[@math.Matrix4]) -> Self
 pub fn Skeleton::pose(Self) -> Unit
+pub fn Skeleton::update(Self) -> Unit
 
 pub(all) struct Sprite {
   node : @core.Object3D

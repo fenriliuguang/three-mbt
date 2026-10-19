@@ -197,6 +197,27 @@ pub fn Skeleton::pose(self : Skeleton) -> Unit {
 }
 
 ///|
+/// 把当前世界矩阵乘上逆绑定矩阵，按列主序写入骨骼矩阵缓冲。
+/// 骨骼纹理留到后面，所以这里不标记贴图更新。
+/// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L199
+pub fn Skeleton::update(self : Skeleton) -> Unit {
+  let offset = @math.Matrix4::new()
+  let count = self.bones.length()
+  let mut index = 0
+  while index < count {
+    ignore(
+      offset
+      .multiply_matrices(
+        self.bones[index].node.matrix_world,
+        self.bone_inverses[index],
+      )
+      .to_array(array=self.bone_matrices, offset=index * 16),
+    )
+    index = index + 1
+  }
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0
