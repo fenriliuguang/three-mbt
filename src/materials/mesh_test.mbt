@@ -6423,6 +6423,46 @@ test "Material shader writes USE_LIGHT_PROBES" {
 }
 
 ///|
+test "Material shader writes USE_LOGARITHMIC_DEPTH_BUFFER" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(logarithmic_depth_buffer=true).length(), 1645)
+  assert_eq(shader.prefixed_fragment_shader(logarithmic_depth_buffer=true).length(), 1259)
+  assert_eq(1645 - 1608, 37)
+  assert_eq(
+    shader.prefixed_vertex_shader(logarithmic_depth_buffer=true)[683:719].to_owned(),
+    "#define USE_LOGARITHMIC_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(logarithmic_depth_buffer=true)[1079:1115].to_owned(),
+    "#define USE_LOGARITHMIC_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(num_light_probes=1, logarithmic_depth_buffer=true).length(),
+    1670,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(num_light_probes=1, logarithmic_depth_buffer=true)[708:744].to_owned(),
+    "#define USE_LOGARITHMIC_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1, logarithmic_depth_buffer=true).length(),
+    1284,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1, logarithmic_depth_buffer=true)[1104:1140].to_owned(),
+    "#define USE_LOGARITHMIC_DEPTH_BUFFER",
+  )
+  assert_eq(shader.prefixed_vertex_shader(logarithmic_depth_buffer=false).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(logarithmic_depth_buffer=false).length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(logarithmic_depth_buffer=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(logarithmic_depth_buffer=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
