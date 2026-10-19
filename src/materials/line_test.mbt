@@ -1212,6 +1212,20 @@ test "LineBasicMaterial addEventListener keeps one copy of a listener" {
 }
 
 ///|
+test "LineBasicMaterial hasEventListener reports a registered listener" {
+  let material = @materials.LineBasicMaterial::new()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), true)
+  assert_eq(material.has_event_listener("dispose", other_listener), false)
+  assert_eq(material.has_event_listener("change", listener), false)
+  let other = @materials.LineBasicMaterial::new()
+  assert_eq(other.has_event_listener("dispose", listener), false)
+}
+
+///|
 test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
   let defaults = @materials.LineDashedMaterial::new()
   let defaults_clone = defaults.clone()

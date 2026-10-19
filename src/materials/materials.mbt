@@ -1152,6 +1152,28 @@ pub fn LineBasicMaterial::add_event_listener(
 }
 
 ///|
+/// 同一种事件里是否已经有这个监听。线段绘制仍不读这张表。
+/// r186: `hasEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L58
+pub fn LineBasicMaterial::has_event_listener(
+  self : LineBasicMaterial,
+  kind : String,
+  listener : () -> Unit,
+) -> Bool {
+  match self.listeners.get(kind) {
+    None => false
+    Some(listeners) => {
+      let mut found = false
+      for existing in listeners {
+        if physical_equal(existing, listener) {
+          found = true
+        }
+      }
+      found
+    }
+  }
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。线段绘制仍不因这次标记重新编译。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn LineBasicMaterial::set_needs_update(
