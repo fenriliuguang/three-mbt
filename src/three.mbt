@@ -93,6 +93,7 @@ pub using @cameras {
   type ArrayCamera,
   type OrthographicCamera,
   type PerspectiveCamera,
+  set_from_array_camera,
 }
 
 ///|

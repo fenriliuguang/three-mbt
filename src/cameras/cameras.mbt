@@ -1,4 +1,4 @@
-// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17 ; `ArrayCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/ArrayCamera.js#L14
+// r186: `PerspectiveCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/PerspectiveCamera.js#L23 ; `OrthographicCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/OrthographicCamera.js#L17 ; `ArrayCamera` https://github.com/mrdoob/three.js/blob/r186/src/cameras/ArrayCamera.js#L14 ; `setFromArrayCamera` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L55
 
 ///|
 using @core {type Object3D, type CameraState}
@@ -464,3 +464,36 @@ pub impl @core.AsNode for ArrayCamera with fn to_node(self) {
 
 ///|
 pub extend ArrayCamera with @core.AsNode::{to_node}
+
+///|
+/// 为每台子相机缓存一个视锥。投影矩阵乘上世界矩阵的逆。已有的多余视锥留着，只把 `count` 改成子相机数量。没有相机会中止。
+/// r186: `setFromArrayCamera` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L55
+pub fn set_from_array_camera(
+  frustums : @math.FrustumArray,
+  array_camera : ArrayCamera,
+) -> @math.FrustumArray {
+  let cameras = array_camera.cameras
+  for i in 0..<cameras.length() {
+    match cameras[i].node.camera {
+      None => abort("FrustumArray.set_from_array_camera requires a camera")
+      Some(state) => {
+        let projected = @math.Matrix4::new().multiply_matrices(
+          state.projection,
+          state.matrix_world_inverse,
+        )
+        if i >= frustums.frustums.length() {
+          frustums.frustums.push(@math.Frustum::new())
+        }
+        ignore(
+          frustums.frustums[i].set_from_projection_matrix(
+            projected,
+            coordinate_system=state.coordinate_system,
+            reversed_depth=state.reversed_depth,
+          ),
+        )
+      }
+    }
+  }
+  frustums.count = cameras.length()
+  frustums
+}

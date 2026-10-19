@@ -17,7 +17,7 @@ pub fn FrustumArray::new() -> FrustumArray {
 
 ///|
 /// 球是否碰到任一已用视锥。`count` 为 0 时为 false。
-/// `setFromArrayCamera` 需要 `ArrayCamera`，留在后面。物体测试在 `Object3D.intersects_frustum_array`，精灵测试在 `Sprite.intersects_frustum_array`。
+/// `setFromArrayCamera` 在 `cameras` 里，因为这里不能引用数组相机。物体测试在 `Object3D.intersects_frustum_array`，精灵测试在 `Sprite.intersects_frustum_array`。
 /// r186: `intersectsSphere` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L130
 pub fn FrustumArray::intersects_sphere(
   self : FrustumArray,

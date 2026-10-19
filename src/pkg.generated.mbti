@@ -119,6 +119,8 @@ pub fn parse(String, bin? : Bytes) -> @gltf.Gltf raise @gltf.GltfError
 
 pub fn rad_to_deg(Double) -> Double
 
+pub fn set_from_array_camera(@math.FrustumArray, @cameras.ArrayCamera) -> @math.FrustumArray
+
 pub fn srgb_to_linear(Double) -> Double
 
 pub fn tone_map(Double, Double, Double, @constants.ToneMapping, Double, srgb? : Bool) -> @math.Color
