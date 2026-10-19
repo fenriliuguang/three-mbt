@@ -3367,3 +3367,45 @@ test "Material shader copies numeric uniforms" {
   cloned.uniforms.set("time", 8.0)
   assert_eq(shader.uniforms.get("time"), Some(1.0))
 }
+
+///|
+test "Material shader copies uniforms groups" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.uniforms_groups.length(), 0)
+  assert_eq(basic.uniforms_groups.length(), 0)
+  assert_eq(phong.uniforms_groups.length(), 0)
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  assert_eq(frame.name, "Frame")
+  assert_eq(frame.usage, 35044)
+  shader.uniforms_groups.push(frame)
+  let other = @materials.UniformsGroup::new(name="Other")
+  other.usage = 35048
+  shader.uniforms_groups.push(other)
+  ignore(basic.copy(shader))
+  assert_eq(basic.uniforms_groups.length(), 0)
+  assert_eq(shader.uniforms_groups[0].name, "Frame")
+  let onto = @materials.Material::shader()
+  onto.uniforms_groups.push(@materials.UniformsGroup::new(name="Drop"))
+  ignore(onto.copy(shader))
+  assert_eq(onto.uniforms_groups.length(), 2)
+  assert_eq(onto.uniforms_groups[0].name, "Frame")
+  assert_eq(onto.uniforms_groups[0].usage, 35044)
+  assert_eq(onto.uniforms_groups[0].id == shader.uniforms_groups[0].id, false)
+  assert_eq(onto.uniforms_groups[1].name, "Other")
+  assert_eq(onto.uniforms_groups[1].usage, 35048)
+  onto.uniforms_groups[0].name = "Renamed"
+  assert_eq(onto.uniforms_groups[0].name, "Renamed")
+  assert_eq(shader.uniforms_groups[0].name, "Frame")
+  ignore(onto.copy(phong))
+  assert_eq(onto.uniforms_groups.length(), 0)
+  let cloned = shader.clone()
+  assert_eq(cloned.uniforms_groups.length(), 2)
+  assert_eq(cloned.uniforms_groups[0].name, "Frame")
+  assert_eq(cloned.uniforms_groups[1].usage, 35048)
+  assert_eq(cloned.uniforms_groups[0].id == shader.uniforms_groups[0].id, false)
+  cloned.uniforms_groups[0].name = "Clone"
+  assert_eq(cloned.uniforms_groups[0].name, "Clone")
+  assert_eq(shader.uniforms_groups[0].name, "Frame")
+}

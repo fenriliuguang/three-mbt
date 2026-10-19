@@ -2111,6 +2111,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.uniforms` has landed for numeric values. A new Shader, Basic, and Phong material each store an empty table. Setting the Shader material's `time` to `1` and `scale` to `2`, then copying it onto a Basic material, leaves the Basic table empty and the source `time` at `1`. Copying that Shader material onto another Shader material that had `time` `9` and `extra` `3` stores `time` `1` and `scale` `2`, and drops `extra`. Setting the destination `time` to `7` leaves the source at `1`. Copying an empty Phong material onto that destination drops `time`. Cloning the source keeps `time` `1` and `scale` `2`, and setting the clone's `time` to `8` leaves the source at `1`. The renderer still does not pass these numbers to a shader. Colors, vectors, arrays, textures, and `uniformsGroups` stay later.
 
+`ShaderMaterial.uniformsGroups` has landed for the group name and usage. A new Shader, Basic, and Phong material each store an empty array. A group named `Frame` starts with usage `35044`. A second group named `Other` with usage `35048` is copied onto another Shader material that held a group named `Drop`. The destination then has length `2`, names `Frame` and `Other`, and usages `35044` and `35048`. Each copied group has a new id. Renaming the destination's first group to `Renamed` leaves the source named `Frame`. Copying onto a Basic material leaves that array empty. Copying an empty Phong material onto the destination makes its length `0`. Cloning keeps length `2`, name `Frame`, and usage `35048`, with a new id. Renaming the clone's first group to `Clone` leaves the source named `Frame`. The uniforms stored inside a group stay later. `linewidth` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3107,6 +3109,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.vertexShader` | `materials` |
 | planned | 7 | `ShaderMaterial.fragmentShader` | `materials` |
 | planned | 7 | `ShaderMaterial.uniforms` | `materials` |
+| planned | 7 | `ShaderMaterial.uniformsGroups` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

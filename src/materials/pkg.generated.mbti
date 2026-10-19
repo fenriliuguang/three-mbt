@@ -106,6 +106,7 @@ pub(all) struct Material {
   mut vertex_shader : String
   mut fragment_shader : String
   mut uniforms : Map[String, Double]
+  mut uniforms_groups : Array[UniformsGroup]
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool
@@ -424,6 +425,13 @@ pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : 
 pub fn SpriteMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit
+
+pub(all) struct UniformsGroup {
+  id : Int
+  mut name : String
+  mut usage : Int
+}
+pub fn UniformsGroup::new(name? : String) -> Self
 
 pub(all) enum WireframeCap {
   Round
