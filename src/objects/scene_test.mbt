@@ -1228,6 +1228,63 @@ test "InstancedMesh.getMorphAt reads weights and skips the base" {
 }
 
 ///|
+test "InstancedMesh.copy clones the morph buffer" {
+  let geometry = @core.BufferGeometry::new()
+  let source = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
+  let weights = @objects.Mesh::new(geometry, @materials.Material::basic())
+  weights.morph_target_influences = Some([0.25, 0.5])
+  ignore(source.set_morph_at(1, weights))
+  let destination = @objects.InstancedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+    1,
+  )
+  ignore(destination.copy(source))
+  match destination.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data.length(), 6)
+      assert_eq(data[0], 0.0)
+      assert_eq(data[3], 0.25)
+      assert_eq(data[4], 0.25)
+      assert_eq(data[5], 0.5)
+      data[3] = 1.0
+    }
+  }
+  match source.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => assert_eq(data[3], 0.25)
+  }
+  let empty = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
+  ignore(destination.copy(empty))
+  match destination.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => assert_eq(data[3], 1.0)
+  }
+  let cloned = source.clone()
+  match cloned.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data[3], 0.25)
+      assert_eq(data[5], 0.5)
+      data[3] = 0.0
+    }
+  }
+  match source.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => assert_eq(data[3], 0.25)
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

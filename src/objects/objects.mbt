@@ -1250,7 +1250,8 @@ pub fn InstancedMesh::get_morph_at(
 }
 
 ///|
-/// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。没有形变纹理。
+/// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。
+/// 源对象有形变缓冲时复制一份。源对象没有时，目标上已有的缓冲留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L182
 pub fn InstancedMesh::copy(
   self : InstancedMesh,
@@ -1280,6 +1281,16 @@ pub fn InstancedMesh::copy(
   self.bounding_box = match source.bounding_box {
     None => None
     Some(box) => Some(box.clone())
+  }
+  match source.morph_texture {
+    None => ()
+    Some(data) => {
+      let copied : Array[Double] = []
+      for value in data {
+        copied.push(value)
+      }
+      self.morph_texture = Some(copied)
+    }
   }
   self.refresh()
   self
