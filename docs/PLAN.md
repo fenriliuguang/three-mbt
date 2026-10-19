@@ -1535,6 +1535,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.copy` has landed. A mesh at `y=3` with render order `4`, a detached bind translation of `y=4`, and an inverse of `y=-4` copies onto a mesh that started at `x=1`. The destination ends at `y=3` and `x=0`, shares the geometry, material, and skeleton, and keeps a cloned box from `y=5` to `y=9` plus a cloned sphere of radius `1`. Writing `7` into the clone's minimum leaves the source at `5`. `recursive=false` drops the child named `marker`. A source without bounds leaves the destination's box at `y=9` and its sphere radius at `8`, and clears a skeleton the destination already held. `clone` stays later.
 
+`SkinnedMesh.clone` has landed. The same mesh, with a child named `marker`, a detached bind translation of `y=4`, and a box from `y=5` to `y=9`, clones to a new mesh at `y=3` and `x=0`. The numeric id is new. The geometry, material, and skeleton are shared. Writing `7` into the cloned box minimum leaves the source at `5`. The cloned sphere stays centered at `y=5` with radius `1`. `recursive=false` drops the child, and the source child stays. `raycast` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2243,6 +2245,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.computeBoundingBox` | `objects` |
 | planned | 7 | `SkinnedMesh.computeBoundingSphere` | `objects` |
 | planned | 7 | `SkinnedMesh.copy` | `objects` |
+| planned | 7 | `SkinnedMesh.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

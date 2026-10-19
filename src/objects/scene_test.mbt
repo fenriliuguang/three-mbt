@@ -2506,6 +2506,87 @@ test "SkinnedMesh.copy shares the skeleton and clones the bounds" {
 }
 
 ///|
+test "SkinnedMesh.clone shares the skeleton and drops children when asked" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let source = @objects.SkinnedMesh::new(geometry, material)
+  ignore(source.mesh.node.position.set(0.0, 3.0, 0.0))
+  source.mesh.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.mesh.node.add(child))
+  source.bind_mode = @constants.Detached
+  ignore(
+    source.bind_matrix.set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    ),
+  )
+  ignore(
+    source.bind_matrix_inverse.set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
+    ),
+  )
+  let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
+  source.skeleton = Some(arm)
+  let source_box = @math.Box3::new(
+    @math.Vector3::new(x=0.0, y=5.0, z=0.0),
+    @math.Vector3::new(x=1.0, y=9.0, z=0.0),
+  )
+  source.bounding_box = Some(source_box)
+  source.bounding_sphere = Some(
+    @math.Sphere::new(center=@math.Vector3::new(x=0.0, y=5.0, z=0.0), radius=1.0),
+  )
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.mesh.node.id == source.mesh.node.id, false)
+  assert_eq(physical_equal(cloned.mesh.geometry, geometry), true)
+  assert_eq(physical_equal(cloned.mesh.material, material), true)
+  assert_eq(cloned.mesh.node.position.y, 3.0)
+  assert_eq(cloned.mesh.node.position.x, 0.0)
+  assert_eq(cloned.mesh.node.render_order, 4)
+  assert_eq(cloned.mesh.node.children.length(), 1)
+  assert_eq(cloned.mesh.node.children[0].name, "marker")
+  assert_eq(physical_equal(cloned.mesh.node.children[0], child), false)
+  assert_eq(cloned.bind_mode is @constants.BindMode::Detached, true)
+  assert_eq(cloned.bind_matrix.elements[13], 4.0)
+  assert_eq(cloned.bind_matrix_inverse.elements[13], -4.0)
+  match cloned.skeleton {
+    None => assert_eq(false, true)
+    Some(copied_arm) => assert_eq(physical_equal(copied_arm, arm), true)
+  }
+  match cloned.bounding_box {
+    None => assert_eq(false, true)
+    Some(box) => {
+      assert_eq(physical_equal(box, source_box), false)
+      assert_eq(box.min.y, 5.0)
+      assert_eq(box.max.y, 9.0)
+      box.min.y = 7.0
+    }
+  }
+  assert_eq(source_box.min.y, 5.0)
+  match cloned.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.y, 5.0)
+      assert_eq(sphere.radius, 1.0)
+    }
+  }
+  let bare = source.clone(recursive=false)
+  assert_eq(bare.mesh.node.children.length(), 0)
+  assert_eq(bare.mesh.node.position.y, 3.0)
+  assert_eq(bare.bind_matrix.elements[13], 4.0)
+  assert_eq(source.mesh.node.children.length(), 1)
+  assert_eq(source.mesh.node.position.y, 3.0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

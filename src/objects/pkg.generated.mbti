@@ -212,6 +212,7 @@ pub(all) struct SkinnedMesh {
 pub fn SkinnedMesh::apply_bone_transform(Self, Int, @math.Vector3) -> @math.Vector3
 pub fn SkinnedMesh::apply_bone_transform_vector4(Self, Int, @math.Vector4) -> @math.Vector4
 pub fn SkinnedMesh::bind(Self, Skeleton, bind_matrix? : @math.Matrix4) -> Unit
+pub fn SkinnedMesh::clone(Self, recursive? : Bool) -> Self
 pub fn SkinnedMesh::compute_bounding_box(Self) -> @math.Box3
 pub fn SkinnedMesh::compute_bounding_sphere(Self) -> @math.Sphere
 pub fn SkinnedMesh::copy(Self, Self, recursive? : Bool) -> Self
