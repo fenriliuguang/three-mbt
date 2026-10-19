@@ -401,3 +401,29 @@ test "LineBasicMaterial stores and copies blendColor" {
   other.line.blend_color.r = 0.5
   assert_eq(dashed.line.blend_color.r, 1.0)
 }
+
+///|
+test "LineBasicMaterial stores and copies blending" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blending is @constants.Blending::Normal, true)
+  assert_eq(defaults.blending.to_int(), 1)
+  let source = @materials.LineBasicMaterial::new()
+  source.blending = @constants.Blending::Additive
+  assert_eq(defaults.blending is @constants.Blending::Normal, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blending is @constants.Blending::Additive, true)
+  assert_eq(destination.blending.to_int(), 2)
+  destination.blending = @constants.Blending::Multiply
+  assert_eq(source.blending is @constants.Blending::Additive, true)
+  assert_eq(destination.blending.to_int(), 4)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blending = @constants.Blending::Additive
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.blending is @constants.Blending::Additive, true)
+  assert_eq(other.line.blending.to_int(), 2)
+  other.line.blending = @constants.Blending::Subtractive
+  assert_eq(dashed.line.blending is @constants.Blending::Additive, true)
+  assert_eq(other.line.blending.to_int(), 3)
+}
