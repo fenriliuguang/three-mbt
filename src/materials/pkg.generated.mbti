@@ -200,6 +200,7 @@ pub(all) struct PointsMaterial {
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
+  mut user_data : Map[String, String]
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

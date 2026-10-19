@@ -621,3 +621,33 @@ test "PointsMaterial stores and copies precision" {
     Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
   }
 }
+
+///|
+test "PointsMaterial stores and copies userData" {
+  let defaults = @materials.PointsMaterial::new()
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("default user data")
+  }
+  let source = @materials.PointsMaterial::new()
+  source.user_data.set("label", "point")
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("other user data")
+  }
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  match destination.user_data.get("label") {
+    None => abort("copied user data")
+    Some(label) => assert_eq(label, "point")
+  }
+  destination.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "point")
+  }
+  match destination.user_data.get("label") {
+    None => abort("destination user data")
+    Some(label) => assert_eq(label, "copy")
+  }
+}
