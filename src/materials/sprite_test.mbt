@@ -76,7 +76,19 @@ test "SpriteMaterial.copy writes color and shares maps" {
   )
   source.map = Some(color_map)
   source.alpha_map = Some(alpha_map)
+  source.depth_write = false
+  source.depth_test = false
+  source.depth_func = @constants.DepthFunc::Greater
+  source.color_write = false
+  source.premultiplied_alpha = true
+  source.visible = false
   let destination = @materials.SpriteMaterial::new()
+  assert_eq(destination.depth_write, true)
+  assert_eq(destination.depth_test, true)
+  assert_eq(destination.depth_func.to_int(), 3)
+  assert_eq(destination.color_write, true)
+  assert_eq(destination.premultiplied_alpha, false)
+  assert_eq(destination.visible, true)
   let color = destination.color
   let copied = destination.copy(source)
   assert_eq(physical_equal(copied, destination), true)
@@ -89,6 +101,12 @@ test "SpriteMaterial.copy writes color and shares maps" {
   assert_eq(destination.fog, false)
   assert_eq(destination.rotation, 0.5)
   assert_eq(destination.size_attenuation, false)
+  assert_eq(destination.depth_write, false)
+  assert_eq(destination.depth_test, false)
+  assert_eq(destination.depth_func.to_int(), 6)
+  assert_eq(destination.color_write, false)
+  assert_eq(destination.premultiplied_alpha, true)
+  assert_eq(destination.visible, false)
   match destination.map {
     None => assert_eq(false, true)
     Some(stored) => assert_eq(physical_equal(stored, color_map), true)

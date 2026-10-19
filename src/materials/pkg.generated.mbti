@@ -110,6 +110,12 @@ pub(all) struct SpriteMaterial {
   mut fog : Bool
   mut rotation : Double
   mut size_attenuation : Bool
+  mut depth_write : Bool
+  mut depth_test : Bool
+  mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
+  mut premultiplied_alpha : Bool
+  mut visible : Bool
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self

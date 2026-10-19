@@ -342,6 +342,8 @@ pub fn LineBasicMaterial::copy(
 ///|
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
+/// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
+/// 渲染器仍不画精灵。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
@@ -351,6 +353,12 @@ pub fn LineBasicMaterial::copy(
 /// r186: `transparent` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L107
 /// r186: `fog` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L115
 /// r186: `opacity` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L111
+/// r186: `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211
+/// r186: `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220
+/// r186: `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231
+/// r186: `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353
+/// r186: `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417
+/// r186: `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447
 pub(all) struct SpriteMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -360,6 +368,12 @@ pub(all) struct SpriteMaterial {
   mut fog : Bool
   mut rotation : Double
   mut size_attenuation : Bool
+  mut depth_write : Bool
+  mut depth_test : Bool
+  mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
+  mut premultiplied_alpha : Bool
+  mut visible : Bool
 }
 
 ///|
@@ -380,12 +394,18 @@ pub fn SpriteMaterial::new(
     fog,
     rotation,
     size_attenuation,
+    depth_write: true,
+    depth_test: true,
+    depth_func: @constants.LessEqual,
+    color_write: true,
+    premultiplied_alpha: false,
+    visible: true,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、透明开关、雾、旋转和尺寸衰减一并复制。
+/// 不透明度、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘和可见性一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -400,5 +420,11 @@ pub fn SpriteMaterial::copy(
   self.fog = source.fog
   self.rotation = source.rotation
   self.size_attenuation = source.size_attenuation
+  self.depth_write = source.depth_write
+  self.depth_test = source.depth_test
+  self.depth_func = source.depth_func
+  self.color_write = source.color_write
+  self.premultiplied_alpha = source.premultiplied_alpha
+  self.visible = source.visible
   self
 }
