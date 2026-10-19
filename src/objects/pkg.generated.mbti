@@ -83,9 +83,10 @@ pub impl @core.AsNode for Line
 
 pub(all) struct LineLoop {
   node : @core.Object3D
-  geometry : @core.BufferGeometry
-  material : @materials.LineBasicMaterial
+  mut geometry : @core.BufferGeometry
+  mut material : @materials.LineBasicMaterial
 }
+pub fn LineLoop::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineLoop::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineLoop::refresh(Self) -> Unit
 pub fn LineLoop::to_node(Self) -> @core.Object3D
