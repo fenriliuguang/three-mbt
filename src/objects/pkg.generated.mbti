@@ -220,6 +220,7 @@ pub fn SkinnedMesh::get_vertex_position(Self, Int, @math.Vector3) -> @math.Vecto
 pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn SkinnedMesh::normalize_skin_weights(Self) -> Unit
 pub fn SkinnedMesh::pose(Self) -> Unit
+pub fn SkinnedMesh::raycast(Self, @core.Raycaster, Array[@core.Intersection]) -> Unit
 pub fn SkinnedMesh::to_node(Self) -> @core.Object3D
 pub fn SkinnedMesh::update_matrix_world(Self, force? : Bool) -> Unit
 pub impl @core.AsNode for SkinnedMesh

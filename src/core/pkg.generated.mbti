@@ -470,6 +470,7 @@ pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit
 pub fn Object3D::new(kind? : NodeKind) -> Self
 pub fn Object3D::project_point(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::raycast(Self, Raycaster, Array[Intersection]) -> Bool?
+pub fn Object3D::raycast_triangles_with(Self, Raycaster, Array[Intersection], @math.Ray, @constants.Side, (Int, @math.Vector3) -> @math.Vector3, instance_id? : Int?) -> Unit
 pub fn Object3D::remove(Self, Self) -> Self
 pub fn Object3D::remove_event_listener(Self, String, (ObjectEvent) -> Unit) -> Unit
 pub fn Object3D::remove_from_parent(Self) -> Self

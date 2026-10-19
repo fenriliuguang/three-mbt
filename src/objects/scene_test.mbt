@@ -2587,6 +2587,107 @@ test "SkinnedMesh.clone shares the skeleton and drops children when asked" {
 }
 
 ///|
+test "SkinnedMesh.raycast hits the deformed triangle" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        ],
+        4,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new(
+        [
+          1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+        ],
+        4,
+      ),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  skin.mesh.node.update_matrix_world()
+  let hits = []
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  skin.raycast(raycaster, hits)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 0.25)
+  assert_eq(hits[0].point.z, 0.0)
+  assert_eq(physical_equal(hits[0].object, skin.mesh.node), true)
+  match hits[0].face {
+    None => assert_eq(false, true)
+    Some(face) => {
+      assert_eq(face.a, 0)
+      assert_eq(face.b, 1)
+      assert_eq(face.c, 2)
+      assert_eq(face.normal.z, 1.0)
+    }
+  }
+  match hits[0].barycoord {
+    None => assert_eq(false, true)
+    Some(bary) => {
+      assert_eq(bary.x, 0.5)
+      assert_eq(bary.y, 0.25)
+      assert_eq(bary.z, 0.25)
+    }
+  }
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  skin.bounding_sphere = None
+  hits.clear()
+  let lifted = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=5.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  skin.raycast(lifted, hits)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 5.25)
+  assert_eq(hits[0].point.z, 0.0)
+  skin.bounding_box = Some(
+    @math.Box3::new(
+      @math.Vector3::new(x=10.0, y=10.0, z=10.0),
+      @math.Vector3::new(x=11.0, y=11.0, z=11.0),
+    ),
+  )
+  hits.clear()
+  skin.raycast(lifted, hits)
+  assert_eq(hits.length(), 0)
+  skin.bounding_box = None
+  let missed = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.0, y=100.0, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  skin.raycast(missed, hits)
+  assert_eq(hits.length(), 0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

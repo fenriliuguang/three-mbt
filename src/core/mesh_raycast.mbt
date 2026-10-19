@@ -61,6 +61,29 @@ fn Object3D::raycast_triangles(
   side : @constants.Side,
   instance_id? : Int? = None,
 ) -> Unit {
+  self.raycast_triangles_with(
+    raycaster,
+    intersects,
+    ray,
+    side,
+    fn(index, target) { self.get_vertex_position(index, target) },
+    instance_id~,
+  )
+}
+
+///|
+/// 用调用方给出的顶点位置做三角形相交。蒙皮网格由此套入骨骼变换。
+/// 材质数组和分组留在后面。
+/// r186: `_computeIntersections` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L284
+pub fn Object3D::raycast_triangles_with(
+  self : Object3D,
+  raycaster : Raycaster,
+  intersects : Array[Intersection],
+  ray : @math.Ray,
+  side : @constants.Side,
+  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
+  instance_id? : Int? = None,
+) -> Unit {
   let geometry = match self.mesh {
     None => return
     Some(mesh) => mesh.geometry
@@ -83,6 +106,7 @@ fn Object3D::raycast_triangles(
           index.get_x(i + 1).to_int(),
           index.get_x(i + 2).to_int(),
           i / 3,
+          read_vertex,
           instance_id~,
         )
         i = i + 3
@@ -108,6 +132,7 @@ fn Object3D::raycast_triangles(
               i + 1,
               i + 2,
               i / 3,
+              read_vertex,
               instance_id~,
             )
             i = i + 3
@@ -128,15 +153,16 @@ fn Object3D::push_triangle(
   b : Int,
   c : Int,
   face_index : Int,
+  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
   instance_id? : Int? = None,
 ) -> Unit {
   let point = @math.Vector3::new()
   let corner_a = @math.Vector3::new()
   let corner_b = @math.Vector3::new()
   let corner_c = @math.Vector3::new()
-  ignore(self.get_vertex_position(a, corner_a))
-  ignore(self.get_vertex_position(b, corner_b))
-  ignore(self.get_vertex_position(c, corner_c))
+  ignore(read_vertex(a, corner_a))
+  ignore(read_vertex(b, corner_b))
+  ignore(read_vertex(c, corner_c))
   let hit = match side {
     Front => ray.intersect_triangle(corner_a, corner_b, corner_c, true, point)
     Back => ray.intersect_triangle(corner_c, corner_b, corner_a, true, point)

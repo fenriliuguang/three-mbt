@@ -689,6 +689,46 @@ pub fn SkinnedMesh::clone(
 }
 
 ///|
+/// 用蒙皮后的包围球、包围盒和顶点做射线相交。没有包围球时先算。
+/// 包围盒在局部空间里挡掉射线时不写交点。
+/// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L178
+pub fn SkinnedMesh::raycast(
+  self : SkinnedMesh,
+  raycaster : @core.Raycaster,
+  intersects : Array[@core.Intersection],
+) -> Unit {
+  let sphere = match self.bounding_sphere {
+    Some(sphere) => sphere
+    None => self.compute_bounding_sphere()
+  }
+  let world_sphere = @math.Sphere::new()
+  ignore(
+    world_sphere.copy(sphere).apply_matrix4(self.mesh.node.matrix_world),
+  )
+  if !raycaster.ray.intersects_sphere(world_sphere) {
+    return
+  }
+  let inverse = @math.Matrix4::new()
+  ignore(inverse.copy(self.mesh.node.matrix_world).invert())
+  let ray = @math.Ray::new()
+  ignore(ray.copy(raycaster.ray).apply_matrix4(inverse))
+  match self.bounding_box {
+    None => ()
+    Some(box) =>
+      if !ray.intersects_box(box) {
+        return
+      }
+  }
+  self.mesh.node.raycast_triangles_with(
+    raycaster,
+    intersects,
+    ray,
+    self.mesh.material.side,
+    fn(index, target) { self.get_vertex_position(index, target) },
+  )
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39

@@ -1537,6 +1537,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.clone` has landed. The same mesh, with a child named `marker`, a detached bind translation of `y=4`, and a box from `y=5` to `y=9`, clones to a new mesh at `y=3` and `x=0`. The numeric id is new. The geometry, material, and skeleton are shared. Writing `7` into the cloned box minimum leaves the source at `5`. The cloned sphere stays centered at `y=5` with radius `1`. `recursive=false` drops the child, and the source child stays. `raycast` stays later.
 
+`SkinnedMesh.raycast` has landed. A triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` with weight `1` is hit by a ray from `(0.25, 0.25, 1)` toward `-z` at `(0.25, 0.25, 0)`, distance `1`. The barycentric weights are `0.5`, `0.25`, and `0.25`. Moving the bone to `y=5` moves the hit to `(0.25, 5.25, 0)`. A local box from `(10, 10, 10)` to `(11, 11, 11)` rejects that ray. A ray from `(0, 100, 1)` misses the skinned sphere. `Object3D.raycast` still uses the unskinned mesh path.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2246,6 +2248,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.computeBoundingSphere` | `objects` |
 | planned | 7 | `SkinnedMesh.copy` | `objects` |
 | planned | 7 | `SkinnedMesh.clone` | `objects` |
+| planned | 7 | `SkinnedMesh.raycast` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
