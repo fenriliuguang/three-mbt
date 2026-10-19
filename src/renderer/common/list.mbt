@@ -1,11 +1,12 @@
-// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242 ; `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
 
 ///|
 using @core {type BufferGeometry, type Object3D}
 
 ///|
 /// 网格绘制项。线框不进不透明队列，也不进透明队列。
-/// `group_count` 小于 0 时画整份几何。否则从 `group_start` 起画 `group_count` 个顶点或索引。
+/// `group_count` 小于 0 时画整份几何。否则从 `group_start` 起画 `group_count` 个索引。
+/// 线框项的范围已经乘 2，并且已经和 `drawRange` 求过交。
 /// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65
 pub(all) struct RenderItem {
   node : Object3D
@@ -147,8 +148,97 @@ fn push_group_item(
 }
 
 ///|
+fn draw_limit(geometry : BufferGeometry, wire : Bool) -> Int? {
+  let source = match geometry.index {
+    Some(index) => Some(index.count)
+    None =>
+      match geometry.get_attribute("position") {
+        Some(position) => Some(position.count)
+        None => None
+      }
+  }
+  match source {
+    None => None
+    Some(count) => if wire { Some((count / 3) * 6) } else { Some(count) }
+  }
+}
+
+///|
+fn scaled_bound(value : Double, factor : Int) -> Double {
+  if value.is_nan() || value <= 0.0 {
+    0.0
+  } else if value.is_inf() {
+    1.0 / 0.0
+  } else {
+    let scaled = value * factor.to_double()
+    if scaled.is_nan() || scaled <= 0.0 { 0.0 } else { scaled }
+  }
+}
+
+///|
+/// 分组和 `drawRange` 的交集。`wire` 为真时范围乘 2，上限是线框索引个数。
+/// 没有分组且交集覆盖整份几何时，数量是 -1。交集为空时没有绘制。
+/// r186: `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
+pub fn resolve_draw(
+  geometry : BufferGeometry,
+  group_start : Int,
+  group_count : Int,
+  wire : Bool,
+) -> (Int, Int)? {
+  match draw_limit(geometry, wire) {
+    None => None
+    Some(limit) => {
+      let factor = if wire { 2 } else { 1 }
+      let mut start = scaled_bound(geometry.draw_range.start, factor)
+      let mut end = scaled_bound(
+        geometry.draw_range.start + geometry.draw_range.count,
+        factor,
+      )
+      if group_count >= 0 {
+        let group_from = (group_start * factor).to_double()
+        let group_to = ((group_start + group_count) * factor).to_double()
+        if group_from > start {
+          start = group_from
+        }
+        if group_to < end {
+          end = group_to
+        }
+      }
+      if start < 0.0 || start.is_nan() {
+        start = 0.0
+      }
+      let limit_end = limit.to_double()
+      if end.is_inf() || end > limit_end {
+        end = limit_end
+      }
+      if end < start {
+        None
+      } else {
+        let start_index = start.floor().to_int()
+        let end_index = end.floor().to_int()
+        if group_count < 0 && start_index == 0 && end_index == limit {
+          Some((0, -1))
+        } else {
+          Some((start_index, end_index - start_index))
+        }
+      }
+    }
+  }
+}
+
+///|
+fn resolved_span(
+  geometry : BufferGeometry,
+  group_start : Int,
+  group_count : Int,
+  queue : MeshQueue,
+) -> (Int, Int)? {
+  resolve_draw(geometry, group_start, group_count, queue is MeshQueue::Wire)
+}
+
+///|
 /// 材质数组按几何分组各出一项。空分组不画。材质下标越界的组跳过。
-/// 没有材质数组时仍是一项，`group_count` 为 -1。
+/// 没有材质数组且绘制范围覆盖整份几何时仍是一项，`group_count` 为 -1。
 /// r186: `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242
 fn append_mesh(
   items : Array[RenderItem],
@@ -164,7 +254,10 @@ fn append_mesh(
         binding.wireframe,
         queue,
       ) {
-        push_binding_item(items, node, binding, 0, -1)
+        match resolved_span(binding.geometry, 0, -1, queue) {
+          None => ()
+          Some((start, count)) => push_binding_item(items, node, binding, start, count)
+        }
       }
     Some(draws) =>
       for group in binding.geometry.groups {
@@ -176,7 +269,11 @@ fn append_mesh(
             draw.wireframe,
             queue,
           ) {
-            push_group_item(items, node, binding, draw, group.start, group.count)
+            match resolved_span(binding.geometry, group.start, group.count, queue) {
+              None => ()
+              Some((start, count)) =>
+                push_group_item(items, node, binding, draw, start, count)
+            }
           }
         }
       }

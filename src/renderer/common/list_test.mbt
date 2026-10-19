@@ -2225,7 +2225,7 @@ test "wireframe groups stay on the wire list" {
   assert_eq(wires[0].color.r, 1.0)
   assert_eq(wires[0].color.g, 0.0)
   assert_eq(wires[0].group_start, 0)
-  assert_eq(wires[0].group_count, 3)
+  assert_eq(wires[0].group_count, 6)
   let drawn = @common.collect_opaque(scene.node)
   assert_eq(drawn.length(), 1)
   assert_eq(drawn[0].color.g, 1.0)
@@ -2246,8 +2246,8 @@ test "wireframe groups stay on the wire list" {
   let both = @common.collect_wireframe(scene.node)
   assert_eq(both.length(), 2)
   assert_eq(both[1].color.g, 1.0)
-  assert_eq(both[1].group_start, 3)
-  assert_eq(both[1].group_count, 3)
+  assert_eq(both[1].group_start, 6)
+  assert_eq(both[1].group_count, 6)
   assert_eq(@common.collect_opaque(scene.node).length(), 0)
   assert_eq(@common.collect_transparent(scene.node, camera.node).length(), 0)
   assert_eq(@common.collect_shadow(scene.node).length(), 1)
@@ -2263,4 +2263,94 @@ test "wireframe groups stay on the wire list" {
   assert_eq(one.length(), 1)
   assert_eq(one[0].group_start, 0)
   assert_eq(one[0].group_count, -1)
+}
+
+///|
+test "draw range clips mesh groups" {
+  let scene = @scenes.Scene::new()
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
+          0.0, 5.0, 1.0, 0.0,
+        ],
+        3,
+      ),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  ignore(scene.add(mesh))
+  let whole = @common.collect_opaque(scene.node)
+  assert_eq(whole.length(), 1)
+  assert_eq(whole[0].group_start, 0)
+  assert_eq(whole[0].group_count, -1)
+  geometry.set_draw_range(1.0, 4.0)
+  let clipped = @common.collect_opaque(scene.node)
+  assert_eq(clipped.length(), 1)
+  assert_eq(clipped[0].group_start, 1)
+  assert_eq(clipped[0].group_count, 4)
+  geometry.set_draw_range(0.0, 6.0)
+  assert_eq(@common.collect_opaque(scene.node)[0].group_count, -1)
+  geometry.set_draw_range(2.0, 0.0)
+  assert_eq(@common.collect_opaque(scene.node)[0].group_start, 2)
+  assert_eq(@common.collect_opaque(scene.node)[0].group_count, 0)
+  geometry.set_draw_range(10.0, 2.0)
+  assert_eq(@common.collect_opaque(scene.node).length(), 0)
+  ignore(geometry.set_index_array([0, 1, 2]))
+  geometry.set_draw_range(1.0, 4.0)
+  let indexed = @common.collect_opaque(scene.node)
+  assert_eq(indexed.length(), 1)
+  assert_eq(indexed[0].group_start, 1)
+  assert_eq(indexed[0].group_count, 2)
+  let grouped = @core.BufferGeometry::new()
+  ignore(
+    grouped.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
+          0.0, 5.0, 1.0, 0.0,
+        ],
+        3,
+      ),
+    ),
+  )
+  grouped.add_group(0, 3, material_index=0)
+  grouped.add_group(3, 3, material_index=1)
+  grouped.set_draw_range(2.0, 3.0)
+  let red = @materials.Material::basic(hex=0xFF0000)
+  let green = @materials.Material::basic(hex=0x00FF00)
+  let pair = @objects.Mesh::new(grouped, red)
+  pair.set_materials([red, green])
+  ignore(scene.add(pair))
+  geometry.set_draw_range(10.0, 2.0)
+  let parts = @common.collect_opaque(scene.node)
+  assert_eq(parts.length(), 2)
+  assert_eq(parts[0].group_start, 2)
+  assert_eq(parts[0].group_count, 1)
+  assert_eq(parts[1].group_start, 3)
+  assert_eq(parts[1].group_count, 2)
+  let shadowed = @common.collect_shadow(scene.node)
+  assert_eq(shadowed.length(), 2)
+  assert_eq(shadowed[0].group_count, 1)
+  assert_eq(shadowed[1].group_count, 2)
+  red.wireframe = true
+  green.wireframe = true
+  pair.refresh()
+  let wires = @common.collect_wireframe(scene.node)
+  assert_eq(wires.length(), 2)
+  assert_eq(wires[0].group_start, 4)
+  assert_eq(wires[0].group_count, 2)
+  assert_eq(wires[1].group_start, 6)
+  assert_eq(wires[1].group_count, 4)
+  assert_eq(@common.collect_opaque(scene.node).length(), 0)
+  let empty = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(scene.add(empty))
+  assert_eq(@common.collect_opaque(scene.node).length(), 0)
 }

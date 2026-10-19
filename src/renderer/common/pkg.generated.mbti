@@ -57,6 +57,8 @@ pub fn point_quad_bytes() -> FixedArray[Byte]
 
 pub let position_stride : Int
 
+pub fn resolve_draw(@core.BufferGeometry, Int, Int, Bool) -> (Int, Int)?
+
 pub fn shadow_cast_side(@constants.Side, @constants.Side?) -> @constants.Side
 
 pub fn shadow_matrix(@math.Matrix4, @math.Matrix4) -> @math.Matrix4

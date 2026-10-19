@@ -3187,16 +3187,6 @@ fn mesh_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) 
 }
 
 ///|
-/// 线框索引比三角形索引多一倍。每个三角形的 3 个索引变成 6 个线索引，所以范围乘 2。
-fn wire_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) {
-  if group_count < 0 {
-    mesh_draw(-1, 0, full)
-  } else {
-    mesh_draw(group_count * 2, group_start * 2, full)
-  }
-}
-
-///|
 fn WebGPURenderer::draw_shadow(
   self : WebGPURenderer,
   scene : @scenes.Scene,
@@ -4465,7 +4455,7 @@ fn WebGPURenderer::draw_meshes(
                   None,
                   None,
                 )
-                let (count, first) = wire_draw(
+                let (count, first) = mesh_draw(
                   item.group_count,
                   item.group_start,
                   wire.index_count,

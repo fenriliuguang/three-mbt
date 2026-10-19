@@ -1551,6 +1551,8 @@ Renderer material groups have landed. Two triangles with groups `(0, 3)` and `(3
 
 Wireframe material groups have landed. The same two groups, with the first material wireframe and the second solid, put one red item on the wire list at range `0` for `3` and one green item on the opaque list at range `3` for `3`. An empty group list produces no wire item. Making the second material wireframe and transparent puts both items on the wire list and leaves the transparent list empty. The shadow list then keeps only the first group. A mesh without a material array and `wireframe` true still has `group_count` `-1`. The wire index draw multiplies that range by `2`. `drawRange` intersection stays later.
 
+Draw range intersection has landed. Six vertices with `setDrawRange(1, 4)` draw from `1` for `4`. The same range on an index of length `3` draws from `1` for `2`. Groups `(0, 3)` and `(3, 3)` with range `(2, 3)` draw `(2, 1)` and `(3, 2)` in both the opaque list and the shadow list. A range of `(10, 2)` produces no item. Those groups as wireframe draw wire indices `(4, 2)` and `(6, 4)`. A mesh with no position stays out of the list. A mesh whose range covers the whole geometry still has `group_count` `-1`. Points and lines stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2267,6 +2269,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | skinned mesh raycast material arrays | `objects` |
 | planned | 7 | renderer material groups | `renderer` |
 | planned | 7 | wireframe material groups | `renderer` |
+| planned | 7 | draw range intersection | `renderer` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
