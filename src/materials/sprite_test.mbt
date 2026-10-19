@@ -228,3 +228,17 @@ test "SpriteMaterial stores and copies polygonOffset" {
   assert_eq(source.polygon_offset_factor, 1.0)
   assert_eq(source.polygon_offset_units, -2.0)
 }
+
+///|
+test "SpriteMaterial stores and copies clipShadows" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.clip_shadows, false)
+  let source = @materials.SpriteMaterial::new()
+  source.clip_shadows = true
+  assert_eq(defaults.clip_shadows, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.clip_shadows, true)
+  destination.clip_shadows = false
+  assert_eq(source.clip_shadows, true)
+}
