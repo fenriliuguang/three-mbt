@@ -7647,6 +7647,43 @@ test "Material shader vertexShader keeps builtin source out" {
 }
 
 ///|
+test "Material shader fragmentShader keeps builtin source out" {
+  let shader = @materials.Material::shader()
+  let raw = @materials.Material::raw()
+  match shader.program_fragment_shader() {
+    Some(code) => assert_eq(code, shader.fragment_shader)
+    None => abort("shader fragment source missing")
+  }
+  match raw.program_fragment_shader() {
+    Some(code) => assert_eq(code, shader.fragment_shader)
+    None => abort("raw fragment source missing")
+  }
+  match shader.program_vertex_shader() {
+    Some(code) => assert_eq(code == shader.fragment_shader, false)
+    None => abort("shader vertex source missing")
+  }
+  match @materials.Material::basic().program_fragment_shader() {
+    None => ()
+    Some(_) => abort("basic returned fragment source")
+  }
+  match @materials.Material::lambert().program_fragment_shader() {
+    None => ()
+    Some(_) => abort("lambert returned fragment source")
+  }
+  match @materials.Material::physical().program_fragment_shader() {
+    None => ()
+    Some(_) => abort("physical returned fragment source")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.fragment_shader = "custom"
+  match shader.program_fragment_shader() {
+    Some(code) => assert_eq(code, "custom")
+    None => abort("replaced fragment source missing")
+  }
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
