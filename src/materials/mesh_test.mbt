@@ -6006,10 +6006,10 @@ test "Material shader writes MORPHTARGETS_TEXTURE_STRIDE" {
   )
   assert_eq(
     shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(),
-    1646,
+    1675,
   )
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(1646 - 1608, 38)
+  assert_eq(1675 - 1608, 67)
   assert_eq(
     shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1)[683:720].to_owned(),
     "#define MORPHTARGETS_TEXTURE_STRIDE 1",
@@ -6028,7 +6028,7 @@ test "Material shader writes MORPHTARGETS_TEXTURE_STRIDE" {
       morph_targets_count=1,
       morph_texture_stride=1,
     ).length(),
-    1670,
+    1699,
   )
   assert_eq(
     shader.prefixed_vertex_shader(
@@ -6043,6 +6043,56 @@ test "Material shader writes MORPHTARGETS_TEXTURE_STRIDE" {
   assert_eq(raw.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(), 92)
   let basic = @materials.Material::basic()
   assert_eq(basic.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1), "")
+}
+
+///|
+test "Material shader writes MORPHTARGETS_COUNT" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader(morph_targets_count=0).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1).length(),
+    1675,
+  )
+  assert_eq(1675 - 1646, 29)
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=1, morph_texture_stride=1)[721:749].to_owned(),
+    "#define MORPHTARGETS_COUNT 1",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=2, morph_texture_stride=1)[721:749].to_owned(),
+    "#define MORPHTARGETS_COUNT 2",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=10, morph_texture_stride=1).length(),
+    1676,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(morph_targets_count=10, morph_texture_stride=1)[721:750].to_owned(),
+    "#define MORPHTARGETS_COUNT 10",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(
+      has_morph_colors=true,
+      morph_targets_count=1,
+      morph_texture_stride=1,
+    ).length(),
+    1699,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(
+      has_morph_colors=true,
+      morph_targets_count=1,
+      morph_texture_stride=1,
+    )[745:773].to_owned(),
+    "#define MORPHTARGETS_COUNT 1",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(morph_targets_count=1).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(morph_targets_count=1), "")
 }
 
 ///|
