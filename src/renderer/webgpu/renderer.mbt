@@ -3176,13 +3176,23 @@ fn WebGPURenderer::ensure_shadow(
 }
 
 ///|
-/// 分组范围。`group_count` 小于 0 时画全部。线框索引不走这里。
+/// 分组范围。`group_count` 小于 0 时画全部。
 /// r186: `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
 fn mesh_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) {
   if group_count < 0 {
     (full.reinterpret_as_uint(), None)
   } else {
     (group_count.reinterpret_as_uint(), Some(group_start.reinterpret_as_uint()))
+  }
+}
+
+///|
+/// 线框索引比三角形索引多一倍。每个三角形的 3 个索引变成 6 个线索引，所以范围乘 2。
+fn wire_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) {
+  if group_count < 0 {
+    mesh_draw(-1, 0, full)
+  } else {
+    mesh_draw(group_count * 2, group_start * 2, full)
   }
 }
 
@@ -4455,10 +4465,15 @@ fn WebGPURenderer::draw_meshes(
                   None,
                   None,
                 )
+                let (count, first) = wire_draw(
+                  item.group_count,
+                  item.group_start,
+                  wire.index_count,
+                )
                 pass.draw_indexed(
-                  wire.index_count.reinterpret_as_uint(),
+                  count,
                   Some(instance_count.reinterpret_as_uint()),
-                  None,
+                  first,
                   None,
                   None,
                 )

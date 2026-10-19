@@ -43,6 +43,7 @@ priv enum MeshQueue {
   Opaque
   Transparent
   Shadow
+  Wire
 }
 
 ///|
@@ -59,6 +60,7 @@ fn kept_for_queue(
       MeshQueue::Opaque => !transparent && !wireframe
       MeshQueue::Transparent => transparent && !wireframe
       MeshQueue::Shadow => !transparent
+      MeshQueue::Wire => wireframe
     }
   }
 }
@@ -271,6 +273,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
 ///|
 /// 线框网格。透明与不透明、普通与实例化都收集。
 /// 彼此按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
+/// 材质数组里只有 `wireframe` 的组进入此列，范围仍是几何分组。
 /// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 pub fn collect_wireframe(
   root : Object3D,
@@ -284,11 +287,9 @@ pub fn collect_wireframe(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.visible &&
-              binding.wireframe &&
-              on_camera_layer(node, camera) &&
+            if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              push_binding_item(items, node, binding, 0, -1)
+              append_mesh(items, node, binding, MeshQueue::Wire)
             }
         }
       _ => ()
