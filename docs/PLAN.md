@@ -2305,6 +2305,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_MORPHNORMALS` has landed. A Shader material with `has_morph_normals` false adds nothing. Passing `has_morph_normals` as true writes `#define USE_MORPHNORMALS` and a newline, `25` characters, on the vertex prefix only. The vertex string grows from `1608` to `1633`. The fragment string stays `1222`. `flat_shading` true with `wireframe` false drops the line and writes `FLAT_SHADED` instead, so the vertex string is `1628` and the fragment string is `1242`. Turning `wireframe` on writes `USE_MORPHNORMALS` again and the vertex string returns to `1633`. `has_morph_targets` true puts that line after `USE_MORPHTARGETS`, so the vertex string is `1658` and the fragment string stays `1222`. Passing `has_morph_normals` as false drops the line. A raw material stays at `92`. A Basic material stays `""`. `USE_MORPHCOLORS` stays later.
 
+`USE_MORPHCOLORS` has landed. A Shader material with `has_morph_colors` false adds nothing. Passing `has_morph_colors` as true writes `#define USE_MORPHCOLORS` and a newline, `24` characters, on the vertex prefix only. The vertex string grows from `1608` to `1632`. The fragment string stays `1222`. `has_morph_normals` true puts that line after `USE_MORPHNORMALS`, so the vertex string is `1657` and the fragment string stays `1222`. Passing `has_morph_colors` as false drops the line. A raw material stays at `92`. A Basic material stays `""`. `MORPHTARGETS_TEXTURE_STRIDE` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3398,6 +3400,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_SKINNING` | `materials` |
 | planned | 7 | `USE_MORPHTARGETS` | `materials` |
 | planned | 7 | `USE_MORPHNORMALS` | `materials` |
+| planned | 7 | `USE_MORPHCOLORS` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
