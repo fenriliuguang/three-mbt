@@ -436,3 +436,38 @@ test "LOD.raycast hits the level selected by distance" {
   assert_eq(hits[0].point.z, 0.0)
   assert_eq(physical_equal(hits[0].object, mesh.node), true)
 }
+
+///|
+test "LOD.update shows the level for the camera distance" {
+  let camera = @core.Object3D::new(kind=@core.NodeKind::PerspectiveCamera)
+  let state = @core.CameraState::perspective(50.0, 1.0, 0.1, 2000.0)
+  camera.camera = Some(state)
+  ignore(camera.position.set(0.0, 0.0, 10.0))
+  camera.update_matrix_world()
+  let alone = @core.Object3D::new()
+  let single = @objects.LOD::new()
+  ignore(single.add_level(alone, distance=0.0))
+  single.node.update_matrix_world()
+  single.update(camera)
+  assert_eq(alone.visible, true)
+  assert_eq(single.current_level, 0)
+  let lod = @objects.LOD::new()
+  let near = @core.Object3D::new()
+  let mid = @core.Object3D::new()
+  let far = @core.Object3D::new()
+  ignore(lod.add_level(near, distance=0.0))
+  ignore(lod.add_level(mid, distance=10.0))
+  ignore(lod.add_level(far, distance=20.0))
+  lod.node.update_matrix_world()
+  lod.update(camera)
+  assert_eq(lod.current_level, 1)
+  assert_eq(near.visible, false)
+  assert_eq(mid.visible, true)
+  assert_eq(far.visible, false)
+  state.zoom = 2.0
+  lod.update(camera)
+  assert_eq(lod.current_level, 0)
+  assert_eq(near.visible, true)
+  assert_eq(mid.visible, false)
+  assert_eq(far.visible, false)
+}

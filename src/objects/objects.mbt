@@ -703,6 +703,7 @@ pub(all) struct LOD {
   node : Object3D
   mut levels : Array[@core.LodLevel]
   mut auto_update : Bool
+  mut current_level : Int
 }
 
 ///|
@@ -716,7 +717,7 @@ pub fn LOD::new() -> LOD {
   let levels : Array[@core.LodLevel] = []
   let node = Object3D::new(kind=@core.NodeKind::LOD)
   node.lod_levels = Some(levels)
-  { node, levels, auto_update: true, }
+  { node, levels, auto_update: true, current_level: 0, }
 }
 
 ///|
@@ -802,4 +803,44 @@ pub fn LOD::get_object_for_distance(
   distance : Double,
 ) -> Object3D? {
   @core.lod_object_for_distance(self.levels, distance)
+}
+
+///|
+/// 按相机到 LOD 的世界距离除以 `zoom` 切换可见级别。只有一级时什么都不改。没有相机会中止。
+/// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L250
+pub fn LOD::update(self : LOD, camera : Object3D) -> Unit {
+  let count = self.levels.length()
+  if count <= 1 {
+    return
+  }
+  let state = match camera.camera {
+    None => abort("LOD.update requires a camera")
+    Some(state) => state
+  }
+  let camera_position = @math.Vector3::new()
+    .set_from_matrix_position(camera.matrix_world)
+  let lod_position = @math.Vector3::new()
+    .set_from_matrix_position(self.node.matrix_world)
+  let distance = camera_position.distance_to(lod_position) / state.zoom
+  self.levels[0].object.visible = true
+  let mut i = 1
+  while i < count {
+    let level = self.levels[i]
+    let mut level_distance = level.distance
+    if level.object.visible {
+      level_distance = level_distance - level_distance * level.hysteresis
+    }
+    if distance >= level_distance {
+      self.levels[i - 1].object.visible = false
+      level.object.visible = true
+    } else {
+      break
+    }
+    i = i + 1
+  }
+  self.current_level = i - 1
+  while i < count {
+    self.levels[i].object.visible = false
+    i = i + 1
+  }
 }
