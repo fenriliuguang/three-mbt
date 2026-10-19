@@ -183,6 +183,7 @@ pub(all) struct Material {
   mut depth_packing : @constants.DepthPacking
   is_mesh_distance_material : Bool
   is_mesh_phong_material : Bool
+  is_shadow_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -247,6 +248,7 @@ pub fn Material::set_retroreflectivity(Self, Double) -> Unit
 pub fn Material::set_sheen(Self, Double) -> Unit
 pub fn Material::set_transmission(Self, Double) -> Unit
 pub fn Material::shading(Self) -> @constants.Shading
+pub fn Material::shadow(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::toon(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 
@@ -261,6 +263,7 @@ pub(all) enum MaterialKind {
   Depth
   Distance
   Phong
+  Shadow
 }
 
 pub(all) struct MeshBasicMaterial {
