@@ -116,6 +116,7 @@ pub(all) struct Material {
   mut premultiplied_alpha : Bool
   mut visible : Bool
   mut force_single_pass : Bool
+  mut extensions : ShaderExtensions
   emissive : @math.Color
   mut emissive_intensity : Double
   mut emissive_map : @textures.Texture?
@@ -358,6 +359,11 @@ pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool)
 pub fn PointsMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn PointsMaterial::set_needs_update(Self, Bool) -> Unit
+
+pub(all) struct ShaderExtensions {
+  mut clip_cull_distance : Bool
+  mut multi_draw : Bool
+}
 
 pub(all) struct SpriteMaterial {
   color : @math.Color

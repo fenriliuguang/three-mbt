@@ -2117,6 +2117,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.forceSinglePass` has landed. A new Shader material stores true. A new Basic material and a new Phong material stay false. Copying the Shader material onto the Basic material stores true and leaves the source true. Setting the Basic material back to false leaves the source true. Copying the Phong material onto a Shader material stores false. Cloning the Shader material keeps true, with a new id. A transparent double-sided mesh still draws in one pass when this flag is on. `extensions` stays later.
 
+`ShaderMaterial.extensions` has landed. A new Shader, Basic, and Phong material each store `clip_cull_distance` false and `multi_draw` false. Setting both switches on a Shader material and copying it onto a Basic material leaves the Basic switches false and the source true. Copying that Shader material onto another Shader material stores both true. Setting the destination `clip_cull_distance` back to false leaves the source true. Copying a Phong material onto that destination stores both false. Cloning the source keeps both true, with a new id, and setting the clone's `multi_draw` to false leaves the source true. The renderer still does not enable these WebGL extensions. `defaultAttributeValues` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3116,6 +3118,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.uniformsGroups` | `materials` |
 | planned | 7 | `ShaderMaterial.linewidth` | `materials` |
 | planned | 7 | `ShaderMaterial.forceSinglePass` | `materials` |
+| planned | 7 | `ShaderMaterial.extensions` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

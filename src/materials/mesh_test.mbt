@@ -3457,3 +3457,38 @@ test "Material shader defaults forceSinglePass on" {
   assert_eq(cloned.force_single_pass, true)
   assert_eq(cloned.id == shader.id, false)
 }
+
+///|
+test "Material shader copies extensions only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.extensions.clip_cull_distance, false)
+  assert_eq(shader.extensions.multi_draw, false)
+  assert_eq(basic.extensions.clip_cull_distance, false)
+  assert_eq(basic.extensions.multi_draw, false)
+  assert_eq(phong.extensions.clip_cull_distance, false)
+  assert_eq(phong.extensions.multi_draw, false)
+  shader.extensions.clip_cull_distance = true
+  shader.extensions.multi_draw = true
+  ignore(basic.copy(shader))
+  assert_eq(basic.extensions.clip_cull_distance, false)
+  assert_eq(basic.extensions.multi_draw, false)
+  assert_eq(shader.extensions.clip_cull_distance, true)
+  assert_eq(shader.extensions.multi_draw, true)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.extensions.clip_cull_distance, true)
+  assert_eq(onto.extensions.multi_draw, true)
+  onto.extensions.clip_cull_distance = false
+  assert_eq(shader.extensions.clip_cull_distance, true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.extensions.clip_cull_distance, false)
+  assert_eq(onto.extensions.multi_draw, false)
+  let cloned = shader.clone()
+  assert_eq(cloned.extensions.clip_cull_distance, true)
+  assert_eq(cloned.extensions.multi_draw, true)
+  assert_eq(cloned.id == shader.id, false)
+  cloned.extensions.multi_draw = false
+  assert_eq(shader.extensions.multi_draw, true)
+}
