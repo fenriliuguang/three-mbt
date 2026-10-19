@@ -1523,6 +1523,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.updateMatrixWorld` has landed. A mesh at `y=3` in attached mode stores world translation `y=3` and an inverse bind translation of `y=-3`. The bind matrix stays identity. Switching to detached mode with a bind translation of `y=4` and moving the mesh to `y=9` keeps the world translation at `y=9` and writes the inverse bind translation `y=-4`.
 
+`SkinnedMesh.applyBoneTransform` has landed for a `Vector3`. A point `(1, 0, 0)` with weight `1` on a bone that moved to `y=5` becomes `(1, 5, 0)`. The unused index `99` has weight `0` and is skipped. A zero point with weights `0.25` and `0.75` on bones at `y=5` and `x=4` becomes `(3, 1.25, 0)`. The bind matrix is identity. Calling it without a skeleton aborts. The `Vector4` target stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2225,6 +2227,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.pose` | `objects` |
 | planned | 7 | `SkinnedMesh.normalizeSkinWeights` | `objects` |
 | planned | 7 | `SkinnedMesh.updateMatrixWorld` | `objects` |
+| planned | 7 | `SkinnedMesh.applyBoneTransform` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

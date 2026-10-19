@@ -209,6 +209,7 @@ pub(all) struct SkinnedMesh {
   mut bounding_sphere : @math.Sphere?
   mut skeleton : Skeleton?
 }
+pub fn SkinnedMesh::apply_bone_transform(Self, Int, @math.Vector3) -> @math.Vector3
 pub fn SkinnedMesh::bind(Self, Skeleton, bind_matrix? : @math.Matrix4) -> Unit
 pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn SkinnedMesh::normalize_skin_weights(Self) -> Unit

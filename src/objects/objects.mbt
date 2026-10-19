@@ -461,6 +461,73 @@ pub fn SkinnedMesh::update_matrix_world(
 }
 
 ///|
+/// 用骨骼矩阵变换一个点。`w` 按 1 处理。权重为 0 的影响跳过。
+/// 没有骨架、`skinIndex` 或 `skinWeight` 时中止。`Vector4` 目标留到后面。
+/// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
+pub fn SkinnedMesh::apply_bone_transform(
+  self : SkinnedMesh,
+  index : Int,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  let skeleton = match self.skeleton {
+    None => abort("SkinnedMesh.applyBoneTransform requires a skeleton")
+    Some(skeleton) => skeleton
+  }
+  let geometry = self.mesh.geometry
+  let skin_index = match geometry.get_attribute("skinIndex") {
+    None => abort("SkinnedMesh.applyBoneTransform requires a skinIndex attribute")
+    Some(attribute) => attribute
+  }
+  let skin_weight = match geometry.get_attribute("skinWeight") {
+    None => abort("SkinnedMesh.applyBoneTransform requires a skinWeight attribute")
+    Some(attribute) => attribute
+  }
+  let base = @math.Vector4::new(x=target.x, y=target.y, z=target.z, w=1.0)
+  target.x = 0.0
+  target.y = 0.0
+  target.z = 0.0
+  ignore(base.apply_matrix4(self.bind_matrix))
+  let indices = @math.Vector4::new()
+  let weights = @math.Vector4::new()
+  ignore(skin_index.copy_to_vector4(index, indices))
+  ignore(skin_weight.copy_to_vector4(index, weights))
+  let mut slot = 0
+  while slot < 4 {
+    let weight = weights.get_component(slot)
+    if weight != 0.0 {
+      let bone_index = indices.get_component(slot).to_int()
+      if bone_index < 0 ||
+        bone_index >= skeleton.bones.length() ||
+        bone_index >= skeleton.bone_inverses.length() {
+        abort("SkinnedMesh.applyBoneTransform bone index is out of range")
+      }
+      let bone_matrix = @math.Matrix4::new()
+      ignore(
+        bone_matrix.multiply_matrices(
+          skeleton.bones[bone_index].node.matrix_world,
+          skeleton.bone_inverses[bone_index],
+        ),
+      )
+      let transformed = @math.Vector4::new()
+      ignore(transformed.copy(base).apply_matrix4(bone_matrix))
+      ignore(
+        target.add_scaled_vector(
+          @math.Vector3::new(
+            x=transformed.x,
+            y=transformed.y,
+            z=transformed.z,
+          ),
+          weight,
+        ),
+      )
+    }
+    slot = slot + 1
+  }
+  ignore(target.apply_matrix4(self.bind_matrix_inverse))
+  target
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39

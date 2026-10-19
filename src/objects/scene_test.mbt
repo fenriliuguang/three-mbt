@@ -2047,6 +2047,54 @@ test "SkinnedMesh.updateMatrixWorld refreshes the inverse bind matrix" {
 }
 
 ///|
+test "SkinnedMesh.applyBoneTransform blends bone translations" {
+  let bone0 = @objects.Bone::new()
+  let bone1 = @objects.Bone::new()
+  bone0.node.update_matrix_world(force=true)
+  bone1.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone0, bone1])
+  ignore(bone0.node.position.set(0.0, 5.0, 0.0))
+  ignore(bone1.node.position.set(4.0, 0.0, 0.0))
+  bone0.node.update_matrix_world(force=true)
+  bone1.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 99.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0], 4),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  let point = @math.Vector3::new(x=1.0, y=0.0, z=0.0)
+  let transformed = skin.apply_bone_transform(0, point)
+  assert_eq(physical_equal(transformed, point), true)
+  assert_eq(point.x, 1.0)
+  assert_eq(point.y, 5.0)
+  assert_eq(point.z, 0.0)
+  let blended = @math.Vector3::new()
+  ignore(skin.apply_bone_transform(1, blended))
+  assert_eq(blended.x, 3.0)
+  assert_eq(blended.y, 1.25)
+  assert_eq(blended.z, 0.0)
+}
+
+///|
+test "panic SkinnedMesh.applyBoneTransform requires a skeleton" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.apply_bone_transform(0, @math.Vector3::new()))
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []
