@@ -2024,3 +2024,31 @@ test "Material attenuationDistance defaults to positive infinity and copies" {
   assert_eq(standard.attenuation_distance.is_inf(), true)
   assert_eq(standard.attenuation_distance > 0.0, true)
 }
+
+///|
+test "Material attenuationColor starts white and copies into the destination" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.attenuation_color.r, 1.0)
+  assert_eq(basic.attenuation_color.g, 1.0)
+  assert_eq(basic.attenuation_color.b, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.attenuation_color.r, 1.0)
+  ignore(lambert.attenuation_color.set_rgb(0.25, 0.5, 0.75))
+  let other = @materials.Material::lambert()
+  assert_eq(other.attenuation_color.r, 1.0)
+  assert_eq(other.attenuation_color.g, 1.0)
+  assert_eq(other.attenuation_color.b, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.attenuation_color.r, 0.25)
+  assert_eq(destination.attenuation_color.g, 0.5)
+  assert_eq(destination.attenuation_color.b, 0.75)
+  ignore(destination.attenuation_color.set_rgb(1.0, 0.0, 0.0))
+  assert_eq(lambert.attenuation_color.r, 0.25)
+  assert_eq(lambert.attenuation_color.g, 0.5)
+  assert_eq(lambert.attenuation_color.b, 0.75)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.attenuation_color.r, 1.0)
+  assert_eq(standard.attenuation_color.g, 1.0)
+  assert_eq(standard.attenuation_color.b, 1.0)
+}

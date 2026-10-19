@@ -159,6 +159,7 @@ pub(all) struct Material {
   mut thickness : Double
   mut thickness_map : @textures.Texture?
   mut attenuation_distance : Double
+  attenuation_color : @math.Color
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
