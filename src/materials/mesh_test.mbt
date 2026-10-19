@@ -3731,9 +3731,9 @@ test "Material shader writes USE_EMISSIVEMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let emissive_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.emissive_map = Some(emissive_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1632)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
   assert_eq(shader.prefixed_fragment_shader().length(), 1246)
-  assert_eq(1632 - 1608, 24)
+  assert_eq(1658 - 1608, 50)
   assert_eq(
     shader.prefixed_vertex_shader()[683:706].to_owned(),
     "#define USE_EMISSIVEMAP",
@@ -3743,7 +3743,7 @@ test "Material shader writes USE_EMISSIVEMAP" {
     "#define USE_EMISSIVEMAP",
   )
   shader.displacement_map = Some(emissive_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1660)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
   assert_eq(
     shader.prefixed_vertex_shader()[711:734].to_owned(),
     "#define USE_EMISSIVEMAP",
@@ -3779,7 +3779,7 @@ test "Material shader writes USE_ANISOTROPY" {
   shader.anisotropy = 1.0
   let pixels = FixedArray::make(4, b'\xFF')
   shader.emissive_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
-  assert_eq(shader.prefixed_vertex_shader().length(), 1655)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1681)
   assert_eq(
     shader.prefixed_vertex_shader()[707:729].to_owned(),
     "#define USE_ANISOTROPY",
@@ -4605,6 +4605,46 @@ test "Material shader writes AOMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.ao_map = Some(ao_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes EMISSIVEMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let emissive_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(emissive_map.channel, 0)
+  shader.emissive_map = Some(emissive_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
+  assert_eq(1658 - 1608, 50)
+  assert_eq(
+    shader.prefixed_vertex_shader()[707:732].to_owned(),
+    "#define EMISSIVEMAP_UV uv",
+  )
+  emissive_map.channel = 1
+  shader.emissive_map = Some(emissive_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
+  assert_eq(1659 - 1608, 51)
+  assert_eq(
+    shader.prefixed_vertex_shader()[707:733].to_owned(),
+    "#define EMISSIVEMAP_UV uv1",
+  )
+  emissive_map.channel = 0
+  shader.emissive_map = Some(emissive_map)
+  let ao_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.ao_map = Some(ao_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1696)
+  assert_eq(
+    shader.prefixed_vertex_shader()[745:770].to_owned(),
+    "#define EMISSIVEMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.emissive_map = Some(emissive_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.emissive_map = Some(emissive_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
