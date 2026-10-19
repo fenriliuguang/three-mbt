@@ -461,28 +461,41 @@ pub(all) struct PrimitiveItem {
 
 ///|
 /// 点和线的绘制范围。没有位置时不收集。范围盖住全部顶点或索引时 `draw_count` 为 -1。
-fn push_primitive(
+fn emit_primitive(
   items : Array[PrimitiveItem],
   node : Object3D,
-  binding : @core.PrimitiveBinding,
+  geometry : BufferGeometry,
+  color : @math.Color,
+  kind : @core.PrimitiveKind,
+  size : Double,
+  size_attenuation : Bool,
+  opacity : Double,
+  fog : Bool,
+  depth_write : Bool,
+  depth_test : Bool,
+  depth_func : @constants.DepthFunc,
+  color_write : Bool,
+  premultiplied_alpha : Bool,
+  group_start : Int,
+  group_count : Int,
 ) -> Unit {
-  match resolve_draw(binding.geometry, 0, -1, false) {
+  match resolve_draw(geometry, group_start, group_count, false) {
     None => ()
     Some((start, count)) =>
       items.push({
         node,
-        geometry: binding.geometry,
-        color: binding.color,
-        kind: binding.kind,
-        size: binding.size,
-        size_attenuation: binding.size_attenuation,
-        opacity: binding.opacity,
-        fog: binding.fog,
-        depth_write: binding.depth_write,
-        depth_test: binding.depth_test,
-        depth_func: binding.depth_func,
-        color_write: binding.color_write,
-        premultiplied_alpha: binding.premultiplied_alpha,
+        geometry,
+        color,
+        kind,
+        size,
+        size_attenuation,
+        opacity,
+        fog,
+        depth_write,
+        depth_test,
+        depth_func,
+        color_write,
+        premultiplied_alpha,
         draw_start: start,
         draw_count: count,
       })
@@ -490,7 +503,68 @@ fn push_primitive(
 }
 
 ///|
+/// 材质数组按几何分组各出一项。空分组不画。材质下标越界的组跳过。
+/// r186: `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242
+fn push_primitive(
+  items : Array[PrimitiveItem],
+  node : Object3D,
+  binding : @core.PrimitiveBinding,
+  want_transparent : Bool,
+) -> Unit {
+  match binding.group_draws {
+    None =>
+      if binding.visible && binding.transparent == want_transparent {
+        emit_primitive(
+          items,
+          node,
+          binding.geometry,
+          binding.color,
+          binding.kind,
+          binding.size,
+          binding.size_attenuation,
+          binding.opacity,
+          binding.fog,
+          binding.depth_write,
+          binding.depth_test,
+          binding.depth_func,
+          binding.color_write,
+          binding.premultiplied_alpha,
+          0,
+          -1,
+        )
+      }
+    Some(draws) =>
+      for group in binding.geometry.groups {
+        if group.material_index >= 0 && group.material_index < draws.length() {
+          let draw = draws[group.material_index]
+          if draw.visible && draw.transparent == want_transparent {
+            emit_primitive(
+              items,
+              node,
+              binding.geometry,
+              draw.color,
+              binding.kind,
+              draw.size,
+              draw.size_attenuation,
+              draw.opacity,
+              draw.fog,
+              draw.depth_write,
+              draw.depth_test,
+              draw.depth_func,
+              draw.color_write,
+              draw.premultiplied_alpha,
+              group.start,
+              group.count,
+            )
+          }
+        }
+      }
+  }
+}
+
+///|
 /// 收集当前可见的不透明点和线。传入视锥时按包围球裁剪。
+/// 材质数组按几何分组展开。
 /// 只按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
 /// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20
 pub fn collect_primitives(
@@ -503,11 +577,9 @@ pub fn collect_primitives(
     match node.primitive {
       None => ()
       Some(binding) =>
-        if binding.visible &&
-          !binding.transparent &&
-          on_camera_layer(node, camera) &&
+        if on_camera_layer(node, camera) &&
           kept_by_frustum(node, binding.geometry, frustum) {
-          push_primitive(items, node, binding)
+          push_primitive(items, node, binding, false)
         }
     }
   })
@@ -527,11 +599,9 @@ pub fn collect_transparent_primitives(
     match node.primitive {
       None => ()
       Some(binding) =>
-        if binding.visible &&
-          binding.transparent &&
-          on_camera_layer(node, Some(camera)) &&
+        if on_camera_layer(node, Some(camera)) &&
           kept_by_frustum(node, binding.geometry, frustum) {
-          push_primitive(items, node, binding)
+          push_primitive(items, node, binding, true)
         }
     }
   })

@@ -1045,6 +1045,7 @@ fn primitive_binding(
   color_write : Bool,
   premultiplied_alpha : Bool,
   visible : Bool,
+  group_draws : Array[@core.PrimitiveDraw]?,
 ) -> @core.PrimitiveBinding {
   {
     geometry,
@@ -1061,6 +1062,97 @@ fn primitive_binding(
     color_write,
     premultiplied_alpha,
     visible,
+    group_draws,
+  }
+}
+
+///|
+fn point_draws(
+  materials : Array[@materials.PointsMaterial]?,
+) -> Array[@core.PrimitiveDraw]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let draws : Array[@core.PrimitiveDraw] = []
+      for material in materials {
+        draws.push({
+          color: material.color,
+          size: material.size,
+          size_attenuation: material.size_attenuation,
+          opacity: material.opacity,
+          transparent: material.transparent,
+          fog: material.fog,
+          depth_write: material.depth_write,
+          depth_test: material.depth_test,
+          depth_func: material.depth_func,
+          color_write: material.color_write,
+          premultiplied_alpha: material.premultiplied_alpha,
+          visible: material.visible,
+        })
+      }
+      Some(draws)
+    }
+  }
+}
+
+///|
+fn line_draws(
+  materials : Array[@materials.LineBasicMaterial]?,
+) -> Array[@core.PrimitiveDraw]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let draws : Array[@core.PrimitiveDraw] = []
+      for material in materials {
+        draws.push({
+          color: material.color,
+          size: 1.0,
+          size_attenuation: false,
+          opacity: material.opacity,
+          transparent: material.transparent,
+          fog: material.fog,
+          depth_write: material.depth_write,
+          depth_test: material.depth_test,
+          depth_func: material.depth_func,
+          color_write: material.color_write,
+          premultiplied_alpha: material.premultiplied_alpha,
+          visible: material.visible,
+        })
+      }
+      Some(draws)
+    }
+  }
+}
+
+///|
+fn copy_point_materials(
+  materials : Array[@materials.PointsMaterial]?,
+) -> Array[@materials.PointsMaterial]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let copied : Array[@materials.PointsMaterial] = []
+      for material in materials {
+        copied.push(material)
+      }
+      Some(copied)
+    }
+  }
+}
+
+///|
+fn copy_line_materials(
+  materials : Array[@materials.LineBasicMaterial]?,
+) -> Array[@materials.LineBasicMaterial]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let copied : Array[@materials.LineBasicMaterial] = []
+      for material in materials {
+        copied.push(material)
+      }
+      Some(copied)
+    }
   }
 }
 
@@ -1073,6 +1165,7 @@ pub(all) struct Points {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.PointsMaterial
+  mut materials : Array[@materials.PointsMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -1087,6 +1180,7 @@ pub fn Points::new(
     node,
     geometry,
     material,
+    materials: None,
     morph_target_influences: None,
     morph_target_dictionary: None,
   }
@@ -1114,6 +1208,7 @@ pub fn Points::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = copy_point_materials(source.materials)
   self.refresh()
   self
 }
@@ -1178,8 +1273,25 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.color_write,
       self.material.premultiplied_alpha,
       self.material.visible,
+      point_draws(self.materials),
     ),
   )
+}
+
+///|
+/// 换成材质数组后，每个几何分组用自己的颜色、大小和透明度。
+/// 直接改数组里的值不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L55
+pub fn Points::set_materials(
+  self : Points,
+  materials : Array[@materials.PointsMaterial],
+) -> Unit {
+  let copied : Array[@materials.PointsMaterial] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
 }
 
 ///|
@@ -1211,6 +1323,7 @@ pub(all) struct Line {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -1225,6 +1338,7 @@ pub fn Line::new(
     node,
     geometry,
     material,
+    materials: None,
     morph_target_influences: None,
     morph_target_dictionary: None,
   }
@@ -1252,6 +1366,7 @@ pub fn Line::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = copy_line_materials(source.materials)
   self.refresh()
   self
 }
@@ -1354,8 +1469,25 @@ pub fn Line::refresh(self : Line) -> Unit {
       self.material.color_write,
       self.material.premultiplied_alpha,
       self.material.visible,
+      line_draws(self.materials),
     ),
   )
+}
+
+///|
+/// 换成材质数组后，每个几何分组用自己的颜色和透明度。
+/// 直接改数组里的值不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L77
+pub fn Line::set_materials(
+  self : Line,
+  materials : Array[@materials.LineBasicMaterial],
+) -> Unit {
+  let copied : Array[@materials.LineBasicMaterial] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
 }
 
 ///|
@@ -1388,6 +1520,7 @@ pub(all) struct LineSegments {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -1402,6 +1535,7 @@ pub fn LineSegments::new(
     node,
     geometry,
     material,
+    materials: None,
     morph_target_influences: None,
     morph_target_dictionary: None,
   }
@@ -1430,6 +1564,7 @@ pub fn LineSegments::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = copy_line_materials(source.materials)
   self.refresh()
   self
 }
@@ -1543,8 +1678,25 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.color_write,
       self.material.premultiplied_alpha,
       self.material.visible,
+      line_draws(self.materials),
     ),
   )
+}
+
+///|
+/// 换成材质数组后，每个几何分组用自己的颜色和透明度。
+/// 直接改数组里的值不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L77
+pub fn LineSegments::set_materials(
+  self : LineSegments,
+  materials : Array[@materials.LineBasicMaterial],
+) -> Unit {
+  let copied : Array[@materials.LineBasicMaterial] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
 }
 
 ///|
@@ -1577,6 +1729,7 @@ pub(all) struct LineLoop {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -1591,6 +1744,7 @@ pub fn LineLoop::new(
     node,
     geometry,
     material,
+    materials: None,
     morph_target_influences: None,
     morph_target_dictionary: None,
   }
@@ -1619,6 +1773,7 @@ pub fn LineLoop::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = copy_line_materials(source.materials)
   self.refresh()
   self
 }
@@ -1723,8 +1878,25 @@ pub fn LineLoop::refresh(self : LineLoop) -> Unit {
       self.material.color_write,
       self.material.premultiplied_alpha,
       self.material.visible,
+      line_draws(self.materials),
     ),
   )
+}
+
+///|
+/// 换成材质数组后，每个几何分组用自己的颜色和透明度。
+/// 直接改数组里的值不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L77
+pub fn LineLoop::set_materials(
+  self : LineLoop,
+  materials : Array[@materials.LineBasicMaterial],
+) -> Unit {
+  let copied : Array[@materials.LineBasicMaterial] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
 }
 
 ///|

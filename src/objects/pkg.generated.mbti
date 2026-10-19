@@ -90,6 +90,7 @@ pub(all) struct Line {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -99,6 +100,7 @@ pub fn Line::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn Line::refresh(Self) -> Unit
 pub fn Line::set_fog(Self, Bool) -> Unit
+pub fn Line::set_materials(Self, Array[@materials.LineBasicMaterial]) -> Unit
 pub fn Line::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Line::to_node(Self) -> @core.Object3D
 pub fn Line::update_morph_targets(Self) -> Unit
@@ -108,6 +110,7 @@ pub(all) struct LineLoop {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -116,6 +119,7 @@ pub fn LineLoop::compute_line_distances(Self) -> Self
 pub fn LineLoop::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineLoop::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineLoop::refresh(Self) -> Unit
+pub fn LineLoop::set_materials(Self, Array[@materials.LineBasicMaterial]) -> Unit
 pub fn LineLoop::to_node(Self) -> @core.Object3D
 pub fn LineLoop::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for LineLoop
@@ -124,6 +128,7 @@ pub(all) struct LineSegments {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -133,6 +138,7 @@ pub fn LineSegments::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineSegments::refresh(Self) -> Unit
 pub fn LineSegments::set_fog(Self, Bool) -> Unit
+pub fn LineSegments::set_materials(Self, Array[@materials.LineBasicMaterial]) -> Unit
 pub fn LineSegments::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn LineSegments::to_node(Self) -> @core.Object3D
 pub fn LineSegments::update_morph_targets(Self) -> Unit
@@ -164,6 +170,7 @@ pub(all) struct Points {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.PointsMaterial
+  mut materials : Array[@materials.PointsMaterial]?
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
 }
@@ -172,6 +179,7 @@ pub fn Points::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Points::new(@core.BufferGeometry, @materials.PointsMaterial) -> Self
 pub fn Points::refresh(Self) -> Unit
 pub fn Points::set_fog(Self, Bool) -> Unit
+pub fn Points::set_materials(Self, Array[@materials.PointsMaterial]) -> Unit
 pub fn Points::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Points::to_node(Self) -> @core.Object3D
 pub fn Points::update_morph_targets(Self) -> Unit

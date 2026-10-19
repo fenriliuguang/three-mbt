@@ -1,4 +1,4 @@
-// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65 ; `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
+// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65 ; `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75 ; `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L55
 
 ///|
 /// 挂在网格节点上的绘制数据。颜色与材质共享同一个 `Color`。
@@ -144,6 +144,25 @@ pub(all) struct PrimitiveBinding {
   geometry : BufferGeometry
   color : @math.Color
   kind : PrimitiveKind
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
+  transparent : Bool
+  fog : Bool
+  depth_write : Bool
+  depth_test : Bool
+  depth_func : @constants.DepthFunc
+  color_write : Bool
+  premultiplied_alpha : Bool
+  visible : Bool
+  group_draws : Array[PrimitiveDraw]?
+}
+
+///|
+/// 点和线的材质数组里的一份绘制参数。没有同名上游类型。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L55
+pub(all) struct PrimitiveDraw {
+  color : @math.Color
   size : Double
   size_attenuation : Bool
   opacity : Double

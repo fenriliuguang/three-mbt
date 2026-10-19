@@ -2427,3 +2427,127 @@ test "draw range clips points and lines" {
   ignore(scene.add(empty))
   assert_eq(@common.collect_primitives(scene.node).length(), 2)
 }
+
+///|
+test "point and line material groups draw separately" {
+  let scene = @scenes.Scene::new()
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let red = @materials.PointsMaterial::new(hex=0xFF0000, size=4.0)
+  let green = @materials.PointsMaterial::new(
+    hex=0x00FF00,
+    size=8.0,
+    size_attenuation=false,
+  )
+  let points = @objects.Points::new(geometry, red)
+  points.set_materials([red, green])
+  ignore(scene.add(points))
+  assert_eq(@common.collect_primitives(scene.node).length(), 0)
+  geometry.add_group(0, 2, material_index=0)
+  geometry.add_group(2, 2, material_index=1)
+  let drawn = @common.collect_primitives(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].color.r, 1.0)
+  assert_eq(drawn[0].color.g, 0.0)
+  assert_eq(drawn[0].size, 4.0)
+  assert_eq(drawn[0].size_attenuation, true)
+  assert_eq(drawn[0].draw_start, 0)
+  assert_eq(drawn[0].draw_count, 2)
+  assert_eq(drawn[1].color.r, 0.0)
+  assert_eq(drawn[1].color.g, 1.0)
+  assert_eq(drawn[1].size, 8.0)
+  assert_eq(drawn[1].size_attenuation, false)
+  assert_eq(drawn[1].draw_start, 2)
+  assert_eq(drawn[1].draw_count, 2)
+  geometry.set_draw_range(1.0, 2.0)
+  let clipped = @common.collect_primitives(scene.node)
+  assert_eq(clipped.length(), 2)
+  assert_eq(clipped[0].draw_start, 1)
+  assert_eq(clipped[0].draw_count, 1)
+  assert_eq(clipped[1].draw_start, 2)
+  assert_eq(clipped[1].draw_count, 1)
+  green.transparent = true
+  points.refresh()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  @common.update_frame(scene.node, camera.node)
+  let kept = @common.collect_primitives(scene.node)
+  assert_eq(kept.length(), 1)
+  assert_eq(kept[0].color.r, 1.0)
+  assert_eq(kept[0].draw_count, 1)
+  let glass = @common.collect_transparent_primitives(scene.node, camera.node)
+  assert_eq(glass.length(), 1)
+  assert_eq(glass[0].color.g, 1.0)
+  assert_eq(glass[0].draw_start, 2)
+  assert_eq(glass[0].draw_count, 1)
+  assert_eq(glass[0].opacity, 1.0)
+  geometry.add_group(4, 2, material_index=9)
+  assert_eq(@common.collect_primitives(scene.node).length(), 1)
+  match points.materials {
+    None => assert_eq(false, true)
+    Some(list) => assert_eq(list.length(), 2)
+  }
+  let cloned = points.clone()
+  match cloned.materials {
+    None => assert_eq(false, true)
+    Some(list) => {
+      assert_eq(list.length(), 2)
+      list.push(@materials.PointsMaterial::new())
+      assert_eq(list.length(), 3)
+    }
+  }
+  match points.materials {
+    None => assert_eq(false, true)
+    Some(list) => assert_eq(list.length(), 2)
+  }
+  let line_geometry = @core.BufferGeometry::new()
+  ignore(
+    line_geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  line_geometry.add_group(0, 2, material_index=0)
+  line_geometry.add_group(2, 2, material_index=1)
+  let line_red = @materials.LineBasicMaterial::new(hex=0xFF0000)
+  let line_green = @materials.LineBasicMaterial::new(hex=0x00FF00)
+  let line = @objects.Line::new(line_geometry, line_red)
+  line.set_materials([line_red, line_green])
+  let line_scene = @scenes.Scene::new()
+  ignore(line_scene.add(line))
+  let wires = @common.collect_primitives(line_scene.node)
+  assert_eq(wires.length(), 2)
+  assert_eq(wires[0].kind is @core.PrimitiveKind::Line, true)
+  assert_eq(wires[0].color.r, 1.0)
+  assert_eq(wires[0].draw_start, 0)
+  assert_eq(wires[0].draw_count, 2)
+  assert_eq(wires[1].color.g, 1.0)
+  assert_eq(wires[1].draw_start, 2)
+  assert_eq(wires[1].draw_count, 2)
+  let segments = @objects.LineSegments::new(
+    line_geometry,
+    @materials.LineBasicMaterial::new(),
+  )
+  segments.set_materials([line_red, line_green])
+  ignore(line_scene.add(segments))
+  let paired = @common.collect_primitives(line_scene.node)
+  assert_eq(paired.length(), 4)
+  assert_eq(paired[2].kind is @core.PrimitiveKind::LineSegments, true)
+  assert_eq(paired[2].draw_count, 2)
+  assert_eq(paired[3].draw_start, 2)
+}

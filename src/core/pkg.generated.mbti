@@ -552,6 +552,22 @@ pub(all) struct PrimitiveBinding {
   color_write : Bool
   premultiplied_alpha : Bool
   visible : Bool
+  group_draws : Array[PrimitiveDraw]?
+}
+
+pub(all) struct PrimitiveDraw {
+  color : @math.Color
+  size : Double
+  size_attenuation : Bool
+  opacity : Double
+  transparent : Bool
+  fog : Bool
+  depth_write : Bool
+  depth_test : Bool
+  depth_func : @constants.DepthFunc
+  color_write : Bool
+  premultiplied_alpha : Bool
+  visible : Bool
 }
 
 pub(all) enum PrimitiveKind {
