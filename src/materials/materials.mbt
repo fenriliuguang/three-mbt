@@ -39,7 +39,7 @@ pub(all) enum MaterialKind {
 /// `clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。渲染器仍不按这些平面裁剪。
 /// `precision` 默认空。空着时沿用渲染器默认精度。管线仍不读这个字段。
 /// `user_data` 默认空表。自定义字符串键值。渲染器仍不读这张表。
-/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。渲染器仍不读这个计数。
+/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。渲染器仍不读这个计数。
 /// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
 /// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
 /// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
@@ -362,6 +362,15 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
     Basic => @constants.Basic
     Lambert => @constants.Lambert
     Standard => @constants.Standard
+  }
+}
+
+///|
+/// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。渲染器仍不因这次标记重新编译。
+/// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
+pub fn Material::set_needs_update(self : Material, value : Bool) -> Unit {
+  if value {
+    self.version = self.version + 1
   }
 }
 

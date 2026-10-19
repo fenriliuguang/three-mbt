@@ -650,3 +650,23 @@ test "Material version starts at zero" {
   assert_eq(basic.material.version, 1)
   assert_eq(standard.material.version, 2)
 }
+
+///|
+test "Material needsUpdate increments version" {
+  let basic = @materials.MeshBasicMaterial::new()
+  basic.material.set_needs_update(false)
+  assert_eq(basic.material.version, 0)
+  basic.material.set_needs_update(true)
+  assert_eq(basic.material.version, 1)
+  basic.material.set_needs_update(true)
+  assert_eq(basic.material.version, 2)
+  let other = @materials.Material::basic()
+  assert_eq(other.version, 0)
+  let lambert = @materials.MeshLambertMaterial::new()
+  let standard = @materials.MeshStandardMaterial::new()
+  standard.material.set_needs_update(true)
+  assert_eq(standard.material.version, 1)
+  assert_eq(lambert.material.version, 0)
+  lambert.material.set_needs_update(false)
+  assert_eq(lambert.material.version, 0)
+}

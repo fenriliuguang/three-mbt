@@ -133,6 +133,7 @@ pub(all) struct Material {
 }
 pub fn Material::basic(hex? : Int) -> Self
 pub fn Material::lambert(hex? : Int) -> Self
+pub fn Material::set_needs_update(Self, Bool) -> Unit
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 
