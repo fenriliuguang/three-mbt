@@ -2604,6 +2604,32 @@ test "Object3D.raycast reports no hit" {
 }
 
 ///|
+test "intersectObject sorts hits by distance" {
+  let root = @core.Object3D::new()
+  let child = @core.Object3D::new()
+  ignore(root.add(child))
+  let raycaster = @core.Raycaster::new()
+  let hits : Array[@core.Intersection] = [
+    @core.Intersection::{
+      distance: 2.0,
+      point: @math.Vector3::new(),
+      object: root,
+    },
+    @core.Intersection::{
+      distance: 1.0,
+      point: @math.Vector3::new(x=4.0),
+      object: root,
+    },
+  ]
+  let written = raycaster.intersect_object(root, intersects=hits)
+  assert_eq(physical_equal(written, hits), true)
+  assert_eq(hits.length(), 2)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 4.0)
+  assert_eq(hits[1].distance, 2.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

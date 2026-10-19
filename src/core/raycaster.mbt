@@ -123,3 +123,46 @@ pub fn Raycaster::set_from_camera(
     _ => abort("Raycaster.set_from_camera unsupported camera type")
   }
 }
+
+///|
+/// 收集对象和子节点上的交点，并按距离从近到远排序。基类 `raycast` 不写入交点。
+/// 返回的是传入的数组；没传时用一个新数组。
+/// r186: `intersectObject` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L198
+pub fn Raycaster::intersect_object(
+  self : Raycaster,
+  object : Object3D,
+  recursive? : Bool = true,
+  intersects? : Array[Intersection],
+) -> Array[Intersection] {
+  let intersects = match intersects {
+    None => []
+    Some(intersects) => intersects
+  }
+  self.intersect(object, intersects, recursive)
+  intersects.sort_by_key(fn(hit) { hit.distance })
+  intersects
+}
+
+///|
+fn Raycaster::intersect(
+  self : Raycaster,
+  object : Object3D,
+  intersects : Array[Intersection],
+  recursive : Bool,
+) -> Unit {
+  let mut propagate = true
+  if object.layers.intersects(self.layers) {
+    match object.raycast(self, intersects) {
+      Some(false) => propagate = false
+      _ => ()
+    }
+  }
+  if propagate && recursive {
+    let count = object.children.length()
+    let mut index = 0
+    while index < count {
+      self.intersect(object.children[index], intersects, true)
+      index = index + 1
+    }
+  }
+}

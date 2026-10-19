@@ -502,6 +502,7 @@ pub(all) struct Raycaster {
   layers : Layers
   params : RaycasterParams
 }
+pub fn Raycaster::intersect_object(Self, Object3D, recursive? : Bool, intersects? : Array[Intersection]) -> Array[Intersection]
 pub fn Raycaster::new(origin? : @math.Vector3, direction? : @math.Vector3, near? : Double, far? : Double) -> Self
 pub fn Raycaster::set(Self, @math.Vector3, @math.Vector3) -> Unit
 pub fn Raycaster::set_from_camera(Self, @math.Vector2, Object3D) -> Unit

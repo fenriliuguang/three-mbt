@@ -1355,6 +1355,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Object3D.raycast` has landed as the empty base method. It leaves the hit list empty and returns `None`, so a later traversal still visits children. `Some(false)` is the only result that stops them.
 
+`Raycaster.intersectObject` has landed. It visits the object and its children when layers overlap, then sorts the hit list by distance. A list seeded with distances `2` and `1` comes back as `1` then `2`. The nearer point stays at `x=4`. The returned array is the one passed in. The empty base `raycast` adds nothing.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1973,6 +1975,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Raycaster.layers` | `core` |
 | planned | 7 | `Raycaster.params` | `core` |
 | planned | 7 | `Object3D.raycast` | `core` |
+| planned | 7 | `Raycaster.intersectObject` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
