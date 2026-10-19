@@ -2203,6 +2203,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_CLEARCOATMAP` has landed. A Shader material with `clearcoat` set to `1` and a 1×1 clearcoat map writes `#define USE_CLEARCOATMAP` and a newline, `25` characters, on both prefixed shaders. The vertex string grows from `1608` to `1633`. The fragment string also writes `USE_CLEARCOAT` first, so it grows from `1244` to `1269`. The map with `clearcoat` at `0` adds nothing, so both strings stay `1608` and `1222`. A raw material stays at `92`. A Basic material stays `""`. `USE_CLEARCOAT_ROUGHNESSMAP` stays later.
 
+`USE_CLEARCOAT_ROUGHNESSMAP` has landed. A Shader material with `clearcoat` set to `1` and a 1×1 clearcoat roughness map writes `#define USE_CLEARCOAT_ROUGHNESSMAP` and a newline, `35` characters, on both prefixed shaders. The vertex string grows from `1608` to `1643`. The fragment string also writes `USE_CLEARCOAT`, so it grows from `1244` to `1279`. A clearcoat map as well puts the roughness line after `USE_CLEARCOATMAP`, so the vertex string is `1668`. The roughness map with `clearcoat` at `0` adds nothing. A raw material stays at `92`. A Basic material stays `""`. `USE_CLEARCOAT_NORMALMAP` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3245,6 +3247,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_ANISOTROPYMAP` | `materials` |
 | planned | 7 | `USE_CLEARCOAT` | `materials` |
 | planned | 7 | `USE_CLEARCOATMAP` | `materials` |
+| planned | 7 | `USE_CLEARCOAT_ROUGHNESSMAP` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
