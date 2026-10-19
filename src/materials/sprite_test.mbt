@@ -907,6 +907,20 @@ test "SpriteMaterial dispatchEvent runs listeners of one kind" {
 }
 
 ///|
+test "SpriteMaterial side defaults to front and copies" {
+  let material = @materials.SpriteMaterial::new()
+  assert_eq(material.side is @constants.Front, true)
+  material.side = @constants.Back
+  let other = @materials.SpriteMaterial::new()
+  assert_eq(other.side is @constants.Front, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.side is @constants.Back, true)
+  destination.side = @constants.Double
+  assert_eq(material.side is @constants.Back, true)
+}
+
+///|
 test "SpriteMaterial dispose runs only dispose listeners" {
   let material = @materials.SpriteMaterial::new()
   let hits = Ref::Ref(0)
