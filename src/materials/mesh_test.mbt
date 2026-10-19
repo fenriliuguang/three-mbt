@@ -7327,6 +7327,67 @@ test "Material shader releaseProgram drops a zero count" {
 }
 
 ///|
+test "Material shader releaseShaderCache drops unused stages" {
+  let cache = @materials.ShaderCache::new()
+  let shader = @materials.Material::shader()
+  let raw = @materials.Material::raw()
+  cache.update(shader.id, "vert", "frag")
+  let vert = match cache.shader_cache.get("vert") {
+    Some(stage) => stage
+    None => abort("vertex stage missing")
+  }
+  let frag = match cache.shader_cache.get("frag") {
+    Some(stage) => stage
+    None => abort("fragment stage missing")
+  }
+  assert_eq(vert.used_times.val, 1)
+  assert_eq(frag.used_times.val, 1)
+  assert_eq(frag.id, vert.id + 1)
+  cache.update(shader.id, "vert", "frag")
+  assert_eq(vert.used_times.val, 1)
+  cache.update(raw.id, "vert", "other")
+  assert_eq(vert.used_times.val, 2)
+  let other = match cache.shader_cache.get("other") {
+    Some(stage) => stage
+    None => abort("other stage missing")
+  }
+  assert_eq(other.used_times.val, 1)
+  assert_eq(other.id == vert.id, false)
+  cache.release_shader_cache(shader.id)
+  assert_eq(vert.used_times.val, 1)
+  match cache.shader_cache.get("frag") {
+    None => ()
+    Some(_) => abort("unused fragment stage stayed")
+  }
+  match cache.material_cache.get(shader.id) {
+    None => ()
+    Some(_) => abort("released material stayed")
+  }
+  cache.release_shader_cache(raw.id)
+  match cache.shader_cache.get("vert") {
+    None => ()
+    Some(_) => abort("shared vertex stage stayed")
+  }
+  match cache.shader_cache.get("other") {
+    None => ()
+    Some(_) => abort("other stage stayed")
+  }
+  cache.update(shader.id, "same", "same")
+  let same = match cache.shader_cache.get("same") {
+    Some(stage) => stage
+    None => abort("same stage missing")
+  }
+  assert_eq(same.used_times.val, 1)
+  cache.release_shader_cache(shader.id)
+  match cache.shader_cache.get("same") {
+    None => ()
+    Some(_) => abort("identical stage stayed")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

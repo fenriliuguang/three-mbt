@@ -400,9 +400,23 @@ pub fn ProgramCache::acquire(Self, String) -> CachedProgram
 pub fn ProgramCache::new() -> Self
 pub fn ProgramCache::release(Self, CachedProgram) -> Unit
 
+pub struct ShaderCache {
+  shader_cache : Map[String, ShaderStage]
+  material_cache : Map[Int, Array[ShaderStage]]
+}
+pub fn ShaderCache::new() -> Self
+pub fn ShaderCache::release_shader_cache(Self, Int) -> Unit
+pub fn ShaderCache::update(Self, Int, String, String) -> Unit
+
 pub(all) struct ShaderExtensions {
   mut clip_cull_distance : Bool
   mut multi_draw : Bool
+}
+
+pub struct ShaderStage {
+  id : Int
+  code : String
+  used_times : @ref.Ref[Int]
 }
 
 pub(all) struct SpriteMaterial {
