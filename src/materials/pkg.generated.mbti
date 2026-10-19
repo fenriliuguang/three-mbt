@@ -27,6 +27,7 @@ pub(all) struct LineBasicMaterial {
   mut visible : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
+  mut alpha_hash : Bool
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

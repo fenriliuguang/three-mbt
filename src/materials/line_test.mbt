@@ -188,3 +188,24 @@ test "LineBasicMaterial stores and copies toneMapped" {
   other.line.tone_mapped = true
   assert_eq(dashed.line.tone_mapped, false)
 }
+
+///|
+test "LineBasicMaterial stores and copies alphaHash" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.alpha_hash, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.alpha_hash = true
+  assert_eq(defaults.alpha_hash, false)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_hash, true)
+  destination.alpha_hash = false
+  assert_eq(source.alpha_hash, true)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.alpha_hash = true
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.alpha_hash, true)
+  other.line.alpha_hash = false
+  assert_eq(dashed.line.alpha_hash, true)
+}
