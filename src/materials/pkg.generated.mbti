@@ -177,6 +177,7 @@ pub(all) struct Material {
   is_mesh_toon_material : Bool
   is_mesh_matcap_material : Bool
   is_mesh_normal_material : Bool
+  is_mesh_depth_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -220,6 +221,7 @@ pub fn Material::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::basic(hex? : Int) -> Self
 pub fn Material::clone(Self) -> Self
 pub fn Material::copy(Self, Self) -> Self
+pub fn Material::depth(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::dispatch_event(Self, String) -> Unit
 pub fn Material::dispose(Self) -> Unit
 pub fn Material::has_event_listener(Self, String, () -> Unit) -> Bool
@@ -249,6 +251,7 @@ pub(all) enum MaterialKind {
   Toon
   Matcap
   Normal
+  Depth
 }
 
 pub(all) struct MeshBasicMaterial {
