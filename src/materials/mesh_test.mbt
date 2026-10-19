@@ -7070,6 +7070,45 @@ test "Material shader resolveIncludes expands chunks" {
 }
 
 ///|
+test "Material shader replaceLightNums writes light counts" {
+  let source = "NUM_DIR_LIGHTS NUM_DIR_LIGHTS NUM_SPOT_LIGHT_MAPS NUM_SPOT_LIGHTS NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS NUM_SPOT_LIGHT_SHADOWS NUM_SPOT_LIGHT_COORDS NUM_POINT_LIGHTS NUM_HEMI_LIGHTS NUM_SUN_LIGHTS NUM_SUN_LIGHT_SHADOWS NUM_DIR_LIGHT_SHADOWS NUM_RECT_AREA_LIGHTS NUM_POINT_LIGHT_SHADOWS"
+  assert_eq(
+    @materials.replace_light_nums(source),
+    "0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+  )
+  assert_eq(
+    @materials.replace_light_nums(
+      source,
+      num_dir_lights=2,
+      num_spot_lights=5,
+      num_spot_light_maps=4,
+      num_spot_light_shadows=3,
+      num_spot_light_shadows_with_maps=1,
+      num_point_lights=6,
+      num_hemi_lights=1,
+      num_sun_lights=7,
+      num_sun_light_shadows=8,
+      num_dir_light_shadows=9,
+      num_rect_area_lights=10,
+      num_point_light_shadows=11,
+    ),
+    "2 2 4 5 1 3 6 6 1 7 8 9 10 11",
+  )
+  assert_eq(
+    @materials.replace_light_nums(
+      "NUM_SPOT_LIGHT_COORDS",
+      num_spot_light_shadows=0,
+      num_spot_light_maps=0,
+      num_spot_light_shadows_with_maps=2,
+    ),
+    "-2",
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

@@ -2363,6 +2363,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `resolveIncludes` has landed. It rewrites a shader string. A line that begins with optional spaces or tabs, then `#include <name>`, is replaced by that chunk. The chunk is expanded the same way. `#include <common>` with chunk `float x;` and a newline becomes that text. Two leading spaces are part of the match. Text after `>` on the same line stays. `#include` followed by a tab stays unchanged. A name can contain letters, digits, `_`, `.`, and `/`. A missing name aborts. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `replaceLightNums` stays later.
 
+`replaceLightNums` has landed. It rewrites light-count tokens in a shader string. Unset counts become `0`. `NUM_DIR_LIGHTS` `2` is written twice when the token appears twice. `NUM_SPOT_LIGHT_COORDS` is spot-light shadows plus spot-light maps minus spot-light shadows that have maps, so `3`, `4`, and `1` write `6`. `NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS` is replaced before `NUM_SPOT_LIGHT_SHADOWS`. A negative coordinate count writes `-2`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `replaceClippingPlaneNums` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3485,6 +3487,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `DECODE_VIDEO_TEXTURE` | `materials` |
 | planned | 7 | `DECODE_VIDEO_TEXTURE_EMISSIVE` | `materials` |
 | planned | 7 | `resolveIncludes` | `materials` |
+| planned | 7 | `replaceLightNums` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

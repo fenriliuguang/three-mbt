@@ -8,6 +8,8 @@ import {
 }
 
 // Values
+pub fn replace_light_nums(String, num_sun_lights? : Int, num_dir_lights? : Int, num_spot_lights? : Int, num_spot_light_maps? : Int, num_rect_area_lights? : Int, num_point_lights? : Int, num_hemi_lights? : Int, num_sun_light_shadows? : Int, num_dir_light_shadows? : Int, num_spot_light_shadows_with_maps? : Int, num_spot_light_shadows? : Int, num_point_light_shadows? : Int) -> String
+
 pub fn resolve_includes(String, Map[String, String]) -> String
 
 // Errors
