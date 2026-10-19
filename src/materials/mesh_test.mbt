@@ -6966,6 +6966,34 @@ test "Material shader writes USE_LIGHT_PROBES_GRID" {
 }
 
 ///|
+test "Material shader writes DECODE_VIDEO_TEXTURE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_fragment_shader(decode_video_texture=false).length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(decode_video_texture=true).length(), 2070)
+  assert_eq(2070 - 2041, 29)
+  assert_eq(
+    shader.prefixed_fragment_shader(decode_video_texture=true)[1079:1107].to_owned(),
+    "#define DECODE_VIDEO_TEXTURE",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probe_grids=1, decode_video_texture=true).length(),
+    2100,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probe_grids=1, decode_video_texture=true)[1109:1137].to_owned(),
+    "#define DECODE_VIDEO_TEXTURE",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(decode_video_texture=true).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(decode_video_texture=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
