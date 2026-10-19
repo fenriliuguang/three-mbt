@@ -4229,6 +4229,41 @@ test "Material shader writes USE_ALPHAMAP" {
 }
 
 ///|
+test "Material shader writes USE_ALPHAHASH" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.alpha_hash = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1630)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1244)
+  assert_eq(1630 - 1608, 22)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:704].to_owned(),
+    "#define USE_ALPHAHASH",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_ALPHAHASH",
+  )
+  shader.alpha_hash = false
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.alpha_hash = true
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.alpha_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.prefixed_vertex_shader().length(), 1651)
+  assert_eq(
+    shader.prefixed_vertex_shader()[704:725].to_owned(),
+    "#define USE_ALPHAHASH",
+  )
+  let raw = @materials.Material::raw()
+  raw.alpha_hash = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.alpha_hash = true
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
