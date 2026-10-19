@@ -6463,6 +6463,46 @@ test "Material shader writes USE_LOGARITHMIC_DEPTH_BUFFER" {
 }
 
 ///|
+test "Material shader writes USE_REVERSED_DEPTH_BUFFER" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader(reversed_depth_buffer=true).length(), 1256)
+  assert_eq(1642 - 1608, 34)
+  assert_eq(
+    shader.prefixed_vertex_shader(reversed_depth_buffer=true)[683:716].to_owned(),
+    "#define USE_REVERSED_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true)[1079:1112].to_owned(),
+    "#define USE_REVERSED_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(logarithmic_depth_buffer=true, reversed_depth_buffer=true).length(),
+    1679,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(logarithmic_depth_buffer=true, reversed_depth_buffer=true)[720:753].to_owned(),
+    "#define USE_REVERSED_DEPTH_BUFFER",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(logarithmic_depth_buffer=true, reversed_depth_buffer=true).length(),
+    1293,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(logarithmic_depth_buffer=true, reversed_depth_buffer=true)[1116:1149].to_owned(),
+    "#define USE_REVERSED_DEPTH_BUFFER",
+  )
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=false).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(reversed_depth_buffer=false).length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(reversed_depth_buffer=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

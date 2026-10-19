@@ -2329,6 +2329,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_LOGARITHMIC_DEPTH_BUFFER` has landed. A Shader material with `logarithmic_depth_buffer` false adds nothing. Passing it as true writes `#define USE_LOGARITHMIC_DEPTH_BUFFER` and a newline, `37` characters, on both prefixes. The vertex string grows from `1608` to `1645`. The fragment string grows from `1222` to `1259`. `num_light_probes` at `1` puts that line after `USE_LIGHT_PROBES`, so the vertex string is `1670` and the fragment string is `1284`. Passing it as false drops both lines. A raw material stays at `92`. A Basic material stays `""`. `USE_REVERSED_DEPTH_BUFFER` stays later.
 
+`USE_REVERSED_DEPTH_BUFFER` has landed. A Shader material with `reversed_depth_buffer` false adds nothing. Passing it as true writes `#define USE_REVERSED_DEPTH_BUFFER` and a newline, `34` characters, on both prefixes. The vertex string grows from `1608` to `1642`. The fragment string grows from `1222` to `1256`. `logarithmic_depth_buffer` true puts that line after `USE_LOGARITHMIC_DEPTH_BUFFER`, so the vertex string is `1679` and the fragment string is `1293`. Passing it as false drops both lines. A raw material stays at `92`. A Basic material stays `""`. `TONE_MAPPING` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3434,6 +3436,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_SIZEATTENUATION` | `materials` |
 | planned | 7 | `USE_LIGHT_PROBES` | `materials` |
 | planned | 7 | `USE_LOGARITHMIC_DEPTH_BUFFER` | `materials` |
+| planned | 7 | `USE_REVERSED_DEPTH_BUFFER` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
