@@ -310,10 +310,12 @@ pub fn PointsMaterial::copy(
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
 /// `alpha_test` 默认 `0`。线段着色器在片元 alpha 小于它时丢弃。
 /// `vertex_colors` 默认关闭。线段着色器仍不读顶点色。
+/// `tone_mapped` 默认打开。色调映射仍对每份绘制过的线段生效。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
+/// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -328,6 +330,7 @@ pub(all) struct LineBasicMaterial {
   mut premultiplied_alpha : Bool
   mut visible : Bool
   mut vertex_colors : Bool
+  mut tone_mapped : Bool
 }
 
 ///|
@@ -346,12 +349,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     premultiplied_alpha: false,
     visible: true,
     vertex_colors: false,
+    tone_mapped: true,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性和顶点色一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色和色调映射一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -371,6 +375,7 @@ pub fn LineBasicMaterial::copy(
   self.premultiplied_alpha = source.premultiplied_alpha
   self.visible = source.visible
   self.vertex_colors = source.vertex_colors
+  self.tone_mapped = source.tone_mapped
   self
 }
 

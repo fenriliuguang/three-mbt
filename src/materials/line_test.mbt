@@ -167,3 +167,24 @@ test "LineBasicMaterial stores and copies vertex colors" {
   other.line.vertex_colors = false
   assert_eq(dashed.line.vertex_colors, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies toneMapped" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.tone_mapped, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.tone_mapped = false
+  assert_eq(defaults.tone_mapped, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.tone_mapped, false)
+  destination.tone_mapped = true
+  assert_eq(source.tone_mapped, false)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.tone_mapped = false
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.tone_mapped, false)
+  other.line.tone_mapped = true
+  assert_eq(dashed.line.tone_mapped, false)
+}
