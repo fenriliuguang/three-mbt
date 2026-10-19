@@ -4366,6 +4366,51 @@ test "Material shader writes USE_THICKNESSMAP" {
 }
 
 ///|
+test "Material shader writes USE_SHEEN_COLORMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let sheen_color_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.sheen_color_map = Some(sheen_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.sheen = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1635)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
+  assert_eq(1635 - 1608, 27)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:709].to_owned(),
+    "#define USE_SHEEN_COLORMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1105].to_owned(),
+    "#define USE_SHEEN_COLORMAP",
+  )
+  shader.sheen = -1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.sheen = 1.0
+  shader.transmission = 1.0
+  shader.thickness_map = Some(sheen_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
+  assert_eq(
+    shader.prefixed_vertex_shader()[733:759].to_owned(),
+    "#define USE_SHEEN_COLORMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1299)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1105].to_owned(),
+    "#define USE_SHEEN_COLORMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.sheen = 1.0
+  raw.sheen_color_map = Some(sheen_color_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.sheen = 1.0
+  basic.sheen_color_map = Some(sheen_color_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
