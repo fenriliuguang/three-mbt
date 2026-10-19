@@ -2129,6 +2129,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `UniformsGroup.uniforms` has landed for numeric values. A new group stores an empty array. Pushing `1` and `2` onto a group named `Frame`, then copying that Shader material onto another Shader material, stores `[1, 2]` on the destination. The copied group has a new id. Setting the destination's first number to `9` leaves the source at `1`. Cloning keeps `[1, 2]`, and setting the clone's first number to `8` leaves the source at `1`. Colors, vectors, arrays, and textures inside a group stay later. `UniformsGroup.add` stays later.
 
+`UniformsGroup.add` has landed for a number. Adding `1` and then `2` stores `[1, 2]`. The chained result is the same group, with the same id. Copying that group onto another Shader material and then adding `4` on the source stores `[1, 2, 4]` on the source and leaves the destination at `[1, 2]`. Colors, vectors, arrays, and textures still cannot be added. `UniformsGroup.remove` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3134,6 +3136,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.index0AttributeName` | `materials` |
 | planned | 7 | `ShaderMaterial.uniformsNeedUpdate` | `materials` |
 | planned | 7 | `UniformsGroup.uniforms` | `materials` |
+| planned | 7 | `UniformsGroup.add` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

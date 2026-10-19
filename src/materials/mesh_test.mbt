@@ -3432,6 +3432,22 @@ test "UniformsGroup copies numeric uniforms" {
 }
 
 ///|
+test "UniformsGroup add appends a number" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  let chained = frame.add(1.0).add(2.0)
+  assert_eq(frame.uniforms, [1.0, 2.0])
+  assert_eq(chained.uniforms, [1.0, 2.0])
+  assert_eq(chained.id, frame.id)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  ignore(shader.uniforms_groups[0].add(4.0))
+  assert_eq(shader.uniforms_groups[0].uniforms, [1.0, 2.0, 4.0])
+  assert_eq(onto.uniforms_groups[0].uniforms, [1.0, 2.0])
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()

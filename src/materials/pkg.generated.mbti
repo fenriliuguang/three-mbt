@@ -449,6 +449,7 @@ pub(all) struct UniformsGroup {
   mut usage : Int
   mut uniforms : Array[Double]
 }
+pub fn UniformsGroup::add(Self, Double) -> Self
 pub fn UniformsGroup::new(name? : String) -> Self
 
 pub(all) enum WireframeCap {
