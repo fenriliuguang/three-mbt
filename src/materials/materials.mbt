@@ -1111,6 +1111,13 @@ pub fn LineDashedMaterial::copy(
 }
 
 ///|
+/// 没有单独的 `LineDashedMaterial.clone`。按 `Material.clone` 新建一份虚线材质，再 `copy`。新材质的 `type_name` 仍是 `LineDashedMaterial`，内嵌线段是新的 `LineBasicMaterial`，有自己的 `id` 和 `uuid`。`alpha_test` 穿过 `0` 时内嵌线段的 `version` 从 `0` 加一。线段绘制仍不读这份克隆。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
+pub fn LineDashedMaterial::clone(self : LineDashedMaterial) -> LineDashedMaterial {
+  LineDashedMaterial::new().copy(self)
+}
+
+///|
 /// 没有同名上游方法。距离先乘 `scale`，再按 GLSL `mod` 对 `dash_size + gap_size` 取余。
 /// 余数大于 `dash_size` 时落在间隔里，返回 false。周期为 0 时中止。
 /// 着色器仍画实线。

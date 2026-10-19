@@ -75,6 +75,7 @@ pub(all) struct LineDashedMaterial {
   mut gap_size : Double
   type_name : String
 }
+pub fn LineDashedMaterial::clone(Self) -> Self
 pub fn LineDashedMaterial::copy(Self, Self) -> Self
 pub fn LineDashedMaterial::keeps_distance(Self, Double) -> Bool
 pub fn LineDashedMaterial::new(hex? : Int, scale? : Double, dash_size? : Double, gap_size? : Double) -> Self
