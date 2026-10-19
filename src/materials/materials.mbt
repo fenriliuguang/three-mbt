@@ -562,7 +562,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。渲染器仍不画精灵。
+/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。渲染器仍不画精灵。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
@@ -573,6 +573,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// r186: `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383
 /// r186: `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391
 /// r186: `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329
+/// r186: `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L82
@@ -613,6 +614,7 @@ pub(all) struct SpriteMaterial {
   mut polygon_offset_factor : Double
   mut polygon_offset_units : Double
   mut clip_shadows : Bool
+  mut clip_intersection : Bool
 }
 
 ///|
@@ -649,12 +651,13 @@ pub fn SpriteMaterial::new(
     polygon_offset_factor: 0.0,
     polygon_offset_units: 0.0,
     clip_shadows: false,
+    clip_intersection: false,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移和 `clip_shadows` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows` 和 `clip_intersection` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -685,5 +688,6 @@ pub fn SpriteMaterial::copy(
   self.polygon_offset_factor = source.polygon_offset_factor
   self.polygon_offset_units = source.polygon_offset_units
   self.clip_shadows = source.clip_shadows
+  self.clip_intersection = source.clip_intersection
   self
 }

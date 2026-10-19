@@ -242,3 +242,17 @@ test "SpriteMaterial stores and copies clipShadows" {
   destination.clip_shadows = false
   assert_eq(source.clip_shadows, true)
 }
+
+///|
+test "SpriteMaterial stores and copies clipIntersection" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.clip_intersection, false)
+  let source = @materials.SpriteMaterial::new()
+  source.clip_intersection = true
+  assert_eq(defaults.clip_intersection, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.clip_intersection, true)
+  destination.clip_intersection = false
+  assert_eq(source.clip_intersection, true)
+}
