@@ -2089,6 +2089,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.isMeshPhongMaterial` has landed. Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, Depth, and Distance stay false. `Material::phong` with hex `0x00FF00` stores true, type `MeshPhongMaterial`, kind `Phong`, and shading `Lambert`. The red channel is `0` and the green channel is `1`. Its defines stay empty. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`, and stores red `0` with green `1`. Copying a red Distance material onto a Phong material keeps the destination true, stores red `1` and green `0`, and keeps a `FOO` define set to `1`. Cloning keeps the flag, the type, the kind, and green `1`, with a new id. The renderer still shades it as Lambert. `specular` stays later.
 
+`Material.specular` has landed. A new Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, Depth, Distance, and Phong material each store hex `0x111111`. A Phong material's `specular_color` stays hex `0xFFFFFF`. Setting the Phong specular to `(0.25, 0.5, 0.75)` leaves another Phong material at `0x111111`. Copying onto a Basic material stores those components in the destination color. Setting the destination to red leaves the source at `(0.25, 0.5, 0.75)`. The renderer still does not use this color for Phong highlights. `shininess` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3074,6 +3076,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.depthPacking` | `materials` |
 | planned | 7 | `Material.isMeshDistanceMaterial` | `materials` |
 | planned | 7 | `Material.isMeshPhongMaterial` | `materials` |
+| planned | 7 | `Material.specular` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
