@@ -3063,7 +3063,7 @@ test "Material shadow sets isShadowMaterial and keeps defines on copy" {
 }
 
 ///|
-test "Material shader sets isShaderMaterial and keeps defines on copy" {
+test "Material shader sets isShaderMaterial" {
   let basic = @materials.Material::basic()
   let lambert = @materials.Material::lambert()
   let standard = @materials.Material::standard()
@@ -3114,8 +3114,8 @@ test "Material shader sets isShaderMaterial and keeps defines on copy" {
   assert_eq(onto.color.r, 0.0)
   assert_eq(onto.color.g, 1.0)
   match onto.defines.get("FOO") {
-    None => abort("shader copy dropped define")
-    Some(value) => assert_eq(value, "1")
+    None => ()
+    Some(_) => abort("shader copy kept define missing from source")
   }
   let cloned = shader.clone()
   assert_eq(cloned.is_shader_material, true)
@@ -3123,4 +3123,64 @@ test "Material shader sets isShaderMaterial and keeps defines on copy" {
   assert_eq(cloned.kind is @materials.MaterialKind::Shader, true)
   assert_eq(cloned.color.get_hex(), 0xFFFFFF)
   assert_eq(cloned.id == shader.id, false)
+}
+
+///|
+test "Material shader copies defines" {
+  let source = @materials.Material::shader()
+  source.defines.set("FOO", "1")
+  source.defines.set("BAR", "2")
+  let onto = @materials.Material::shader()
+  onto.defines.set("FOO", "9")
+  onto.defines.set("BAZ", "3")
+  ignore(onto.copy(source))
+  match onto.defines.get("FOO") {
+    None => abort("shader copy dropped FOO")
+    Some(value) => assert_eq(value, "1")
+  }
+  match onto.defines.get("BAR") {
+    None => abort("shader copy dropped BAR")
+    Some(value) => assert_eq(value, "2")
+  }
+  match onto.defines.get("BAZ") {
+    None => ()
+    Some(_) => abort("shader copy kept destination define")
+  }
+  onto.defines.set("FOO", "7")
+  match source.defines.get("FOO") {
+    None => abort("source lost FOO")
+    Some(value) => assert_eq(value, "1")
+  }
+  let basic = @materials.Material::basic()
+  basic.defines.set("KEEP", "4")
+  ignore(basic.copy(source))
+  match basic.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("basic copy gained shader define")
+  }
+  match basic.defines.get("KEEP") {
+    None => abort("basic copy dropped define")
+    Some(value) => assert_eq(value, "4")
+  }
+  let cleared = @materials.Material::shader()
+  cleared.defines.set("FOO", "1")
+  ignore(cleared.copy(@materials.Material::phong()))
+  match cleared.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("shader copy kept define missing from source")
+  }
+  let cloned = source.clone()
+  match cloned.defines.get("FOO") {
+    None => abort("clone dropped FOO")
+    Some(value) => assert_eq(value, "1")
+  }
+  match cloned.defines.get("BAR") {
+    None => abort("clone dropped BAR")
+    Some(value) => assert_eq(value, "2")
+  }
+  cloned.defines.set("FOO", "8")
+  match source.defines.get("FOO") {
+    None => abort("clone wrote source")
+    Some(value) => assert_eq(value, "1")
+  }
 }

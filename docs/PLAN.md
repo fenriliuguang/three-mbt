@@ -2097,6 +2097,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.isShaderMaterial` has landed. Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, Depth, Distance, Phong, and Shadow stay false. `Material::shader` stores true, type `ShaderMaterial`, kind `Shader`, and shading `Basic`. The color is white `0xFFFFFF`, transparency is off, fog stays on, and `defines` starts empty. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`. Copying a green Phong material onto a Shader material keeps the destination true, stores red `0` and green `1`, and keeps a `FOO` define set to `1`. Cloning keeps the flag, the type, the kind, and white, with a new id. The renderer still shades it as Basic. Copying `defines` from the source, the `fog` default of false, `lights`, `clipping`, and the shader strings stay later.
 
+`ShaderMaterial` copies `defines` from the source. A Shader material with `FOO` set to `9` and `BAZ` set to `3`, copied from a Shader material with `FOO` `1` and `BAR` `2`, stores `FOO` `1` and `BAR` `2` and drops `BAZ`. Setting the destination `FOO` to `7` leaves the source at `1`. Copying that source onto a Basic material leaves the Basic `KEEP` define at `4` and does not add `FOO`. Copying an empty Phong material onto a Shader material drops `FOO`. Cloning copies `FOO` `1` and `BAR` `2` onto a new table, and setting the clone's `FOO` to `8` leaves the source at `1`. The renderer still does not read the table. The `fog` default of false stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3086,6 +3088,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.shininess` | `materials` |
 | planned | 7 | `Material.isShadowMaterial` | `materials` |
 | planned | 7 | `Material.isShaderMaterial` | `materials` |
+| planned | 7 | `ShaderMaterial` defines copy | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
