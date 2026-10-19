@@ -167,6 +167,7 @@ pub(all) struct Material {
   mut anisotropy : Double
   mut clearcoat : Double
   mut iridescence : Double
+  mut dispersion : Double
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -218,6 +219,7 @@ pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
 pub fn Material::set_anisotropy(Self, Double) -> Unit
 pub fn Material::set_clearcoat(Self, Double) -> Unit
+pub fn Material::set_dispersion(Self, Double) -> Unit
 pub fn Material::set_iridescence(Self, Double) -> Unit
 pub fn Material::set_needs_update(Self, Bool) -> Unit
 pub fn Material::shading(Self) -> @constants.Shading
