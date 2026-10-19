@@ -103,6 +103,7 @@ pub(all) struct Material {
   mut blend_equation : @constants.BlendEquation
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
+  mut blend_equation_alpha : @constants.BlendEquation?
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

@@ -362,3 +362,32 @@ test "Material blendDstAlpha defaults to empty" {
   }
   assert_eq(lambert.material.blend_dst_alpha is None, true)
 }
+
+///|
+test "Material blendEquationAlpha defaults to empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_equation_alpha is None, true)
+  basic.material.blend_equation_alpha = Some(@constants.BlendEquation::Subtract)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_equation_alpha is None, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_equation_alpha is None, true)
+  standard.material.blend_equation_alpha = Some(@constants.BlendEquation::Max)
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_equation_alpha is None, true)
+  match basic.material.blend_equation_alpha {
+    Some(equation) => {
+      assert_eq(equation is @constants.BlendEquation::Subtract, true)
+      assert_eq(equation.to_int(), 101)
+    }
+    None => abort("basic blendEquationAlpha is empty")
+  }
+  match standard.material.blend_equation_alpha {
+    Some(equation) => {
+      assert_eq(equation is @constants.BlendEquation::Max, true)
+      assert_eq(equation.to_int(), 104)
+    }
+    None => abort("standard blendEquationAlpha is empty")
+  }
+  assert_eq(lambert.material.blend_equation_alpha is None, true)
+}
