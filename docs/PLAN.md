@@ -1755,6 +1755,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.stencilFunc` has landed. A new material stores `Always`, whose integer is `519`. Setting it to `Never` (`512`) leaves another new material at `Always`. Copying onto a default material stores `Never`. Setting the destination to `Equal` (`514`) leaves the source at `Never`. A dashed material copies the function through its inner line material. Setting the destination to `Greater` (`516`) leaves the source at `Never`. Line draws still do not read this field.
 
+`SpriteMaterial.stencilFunc` has landed. A new material stores `Always`, whose integer is `519`. Setting it to `Never` (`512`) leaves another new material at `Always`. Copying onto a default material stores `Never`. Setting the destination to `Equal` (`514`) leaves the source at `Never`. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2573,6 +2575,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.stencilFunc` | `materials` |
 | planned | 7 | `PointsMaterial.stencilFunc` | `materials` |
 | planned | 7 | `LineBasicMaterial.stencilFunc` | `materials` |
+| planned | 7 | `SpriteMaterial.stencilFunc` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
