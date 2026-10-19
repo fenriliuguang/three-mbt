@@ -1847,6 +1847,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.setAlphaTest` has landed. Writing `0` onto a new basic material keeps `alpha_test` at `0` and `version` at `0`. Writing `0.2` stores that threshold and raises `version` to `1`. Writing `0.4` stores `0.4` and leaves `version` at `1`. Writing `0` stores `0` and raises `version` to `2`. Writing `-1` stores `-1` and leaves `version` at `2`. Another basic material stays at `0`. Writing `0.5` on a Standard material stores `0.5` and `version` `1`, and leaves the Lambert material at `0`. The renderer still discards fragments below the stored threshold.
 
+`PointsMaterial.setAlphaTest` has landed. Writing `0` keeps `alpha_test` at `0` and `version` at `0`. Writing `0.2` stores `0.2` and raises `version` to `1`. Writing `0.4` leaves `version` at `1`. Writing `0` raises `version` to `2`. Writing `-1` stores `-1` and leaves `version` at `2`. Another new material stays at `0`. Copying that `-1` onto a material at `version` `3` stores `-1` and leaves the counter at `3`. Writing `0.2` on the source raises it to `3`. Copying again stores `0.2` on the destination and raises its counter to `4`, leaving the source at `3`. Point draws still discard fragments below the stored threshold.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2711,6 +2713,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.needsUpdate` | `materials` |
 | planned | 7 | `SpriteMaterial.needsUpdate` | `materials` |
 | planned | 7 | `Material.setAlphaTest` | `materials` |
+| planned | 7 | `PointsMaterial.setAlphaTest` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

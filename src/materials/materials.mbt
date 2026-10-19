@@ -388,7 +388,7 @@ pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
 ///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
-/// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。
+/// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
 /// `vertex_colors` 默认关闭。点着色器仍不读顶点色。
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的点生效。
 /// `alpha_hash` 默认关闭。点着色器仍不做哈希透明。
@@ -564,7 +564,7 @@ pub fn PointsMaterial::new(
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。
+/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -601,7 +601,7 @@ pub fn PointsMaterial::copy(
   self.size = source.size
   self.size_attenuation = source.size_attenuation
   self.opacity = source.opacity
-  self.alpha_test = source.alpha_test
+  self.set_alpha_test(source.alpha_test)
   self.transparent = source.transparent
   self.fog = source.fog
   self.depth_write = source.depth_write
@@ -635,6 +635,16 @@ pub fn PointsMaterial::set_needs_update(
   if value {
     self.version = self.version + 1
   }
+}
+
+///|
+/// 写入 `alpha_test`。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L495
+pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> Unit {
+  if (self.alpha_test > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.alpha_test = value
 }
 
 ///|

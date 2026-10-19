@@ -686,3 +686,36 @@ test "PointsMaterial needsUpdate increments version" {
   assert_eq(destination.version, 3)
   assert_eq(source.version, 2)
 }
+
+///|
+test "PointsMaterial set_alpha_test bumps version across zero" {
+  let source = @materials.PointsMaterial::new()
+  source.set_alpha_test(0.0)
+  assert_eq(source.alpha_test, 0.0)
+  assert_eq(source.version, 0)
+  source.set_alpha_test(0.2)
+  assert_eq(source.alpha_test, 0.2)
+  assert_eq(source.version, 1)
+  source.set_alpha_test(0.4)
+  assert_eq(source.alpha_test, 0.4)
+  assert_eq(source.version, 1)
+  source.set_alpha_test(0.0)
+  assert_eq(source.version, 2)
+  source.set_alpha_test(-1.0)
+  assert_eq(source.alpha_test, -1.0)
+  assert_eq(source.version, 2)
+  let other = @materials.PointsMaterial::new()
+  assert_eq(other.version, 0)
+  let destination = @materials.PointsMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_test, -1.0)
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 2)
+  source.set_alpha_test(0.2)
+  assert_eq(source.version, 3)
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_test, 0.2)
+  assert_eq(destination.version, 4)
+  assert_eq(source.version, 3)
+}
