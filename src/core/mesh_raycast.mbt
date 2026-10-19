@@ -80,6 +80,7 @@ fn Object3D::raycast_triangles(
           index.get_x(i).to_int(),
           index.get_x(i + 1).to_int(),
           index.get_x(i + 2).to_int(),
+          i / 3,
         )
         i = i + 3
       }
@@ -95,7 +96,16 @@ fn Object3D::raycast_triangles(
           )
           let mut i = start
           while i < end {
-            self.push_triangle(raycaster, intersects, ray, side, i, i + 1, i + 2)
+            self.push_triangle(
+              raycaster,
+              intersects,
+              ray,
+              side,
+              i,
+              i + 1,
+              i + 2,
+              i / 3,
+            )
             i = i + 3
           }
         }
@@ -113,6 +123,7 @@ fn Object3D::push_triangle(
   a : Int,
   b : Int,
   c : Int,
+  face_index : Int,
 ) -> Unit {
   let point = @math.Vector3::new()
   let corner_a = @math.Vector3::new()
@@ -132,7 +143,23 @@ fn Object3D::push_triangle(
       let world = @math.Vector3::new().copy(point).apply_matrix4(self.matrix_world)
       let distance = raycaster.ray.origin.distance_to(world)
       if distance >= raycaster.near && distance <= raycaster.far {
-        intersects.push({ distance, point: world, object: self })
+        let normal = @math.Vector3::new()
+        ignore(@math.Triangle::get_normal(corner_a, corner_b, corner_c, normal))
+        let barycoord = @math.Triangle::get_barycoord(
+          point,
+          corner_a,
+          corner_b,
+          corner_c,
+          @math.Vector3::new(),
+        )
+        intersects.push({
+          distance,
+          point: world,
+          object: self,
+          face: Some({ a, b, c, normal, material_index: 0 }),
+          face_index: Some(face_index),
+          barycoord,
+        })
       }
     }
   }

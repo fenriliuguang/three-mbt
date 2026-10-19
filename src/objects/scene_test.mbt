@@ -88,4 +88,28 @@ test "mesh raycast hits a front-facing triangle" {
   assert_eq(hits[0].point.y, 0.25)
   assert_eq(hits[0].point.z, 0.0)
   assert_eq(physical_equal(hits[0].object, mesh.node), true)
+  match hits[0].face {
+    None => assert_eq(false, true)
+    Some(face) => {
+      assert_eq(face.a, 0)
+      assert_eq(face.b, 1)
+      assert_eq(face.c, 2)
+      assert_eq(face.material_index, 0)
+      assert_eq(face.normal.x, 0.0)
+      assert_eq(face.normal.y, 0.0)
+      assert_eq(face.normal.z, 1.0)
+    }
+  }
+  match hits[0].face_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  match hits[0].barycoord {
+    None => assert_eq(false, true)
+    Some(bary) => {
+      assert_eq(bary.x, 0.5)
+      assert_eq(bary.y, 0.25)
+      assert_eq(bary.z, 0.25)
+    }
+  }
 }

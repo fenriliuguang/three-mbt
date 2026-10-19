@@ -20,11 +20,29 @@ pub(all) struct Raycaster {
 
 ///|
 /// 一次射线相交。上游没有单独的类，记录来自 `Raycaster~Intersection`。
+/// `face` 来自网格相交时写下的三角形。
 /// r186: `Raycaster~Intersection` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L160
+/// r186: `face` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L489
+/// r186: `faceIndex` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L406
+/// r186: `barycoord` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L500
 pub(all) struct Intersection {
   distance : Double
   point : @math.Vector3
   object : Object3D
+  face : Face?
+  face_index : Int?
+  barycoord : @math.Vector3?
+}
+
+///|
+/// 上游没有单独的类。网格相交时写下的三角形，`materialIndex` 默认 `0`。
+/// r186: `face` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L489
+pub(all) struct Face {
+  a : Int
+  b : Int
+  c : Int
+  normal : @math.Vector3
+  material_index : Int
 }
 
 ///|

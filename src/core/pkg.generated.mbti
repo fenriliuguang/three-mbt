@@ -180,6 +180,14 @@ pub(all) struct DrawRange {
   mut count : Double
 }
 
+pub(all) struct Face {
+  a : Int
+  b : Int
+  c : Int
+  normal : @math.Vector3
+  material_index : Int
+}
+
 pub(all) struct GeometryGroup {
   start : Int
   count : Int
@@ -277,6 +285,9 @@ pub(all) struct Intersection {
   distance : Double
   point : @math.Vector3
   object : Object3D
+  face : Face?
+  face_index : Int?
+  barycoord : @math.Vector3?
 }
 
 pub(all) struct Layers {
