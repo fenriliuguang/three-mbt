@@ -179,6 +179,7 @@ pub(all) struct PointsMaterial {
   mut stencil_write_mask : Int
   mut stencil_func : @constants.StencilFunc
   mut stencil_ref : Int
+  mut stencil_func_mask : Int
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

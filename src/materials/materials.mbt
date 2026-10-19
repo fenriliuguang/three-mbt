@@ -350,6 +350,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// `stencil_write_mask` 默认 `0xFF`。管线仍不读这个字段。
 /// `stencil_func` 默认 `Always`。管线仍不读这个字段。
 /// `stencil_ref` 默认 `0`。管线仍不读这个字段。
+/// `stencil_func_mask` 默认 `0xFF`。管线仍不读这个字段。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -377,6 +378,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// r186: `stencilWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L239
 /// r186: `stencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L247
 /// r186: `stencilRef` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L255
+/// r186: `stencilFuncMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L263
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -416,6 +418,7 @@ pub(all) struct PointsMaterial {
   mut stencil_write_mask : Int
   mut stencil_func : @constants.StencilFunc
   mut stencil_ref : Int
+  mut stencil_func_mask : Int
 }
 
 ///|
@@ -463,12 +466,13 @@ pub fn PointsMaterial::new(
     stencil_write_mask: 0xFF,
     stencil_func: @constants.StencilFunc::Always,
     stencil_ref: 0,
+    stencil_func_mask: 0xFF,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func` 和 `stencil_ref` 一并复制。
+/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref` 和 `stencil_func_mask` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -487,6 +491,7 @@ pub fn PointsMaterial::copy(
   self.stencil_write_mask = source.stencil_write_mask
   self.stencil_func = source.stencil_func
   self.stencil_ref = source.stencil_ref
+  self.stencil_func_mask = source.stencil_func_mask
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.size = source.size
