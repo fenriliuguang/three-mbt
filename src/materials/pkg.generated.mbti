@@ -337,6 +337,7 @@ pub fn Material::program_packed_normal_map(Self, Int) -> Bool
 pub fn Material::program_precision(Self, String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
 pub fn Material::program_retroreflection(Self) -> Bool
 pub fn Material::program_roughness_map(Self) -> Bool
+pub fn Material::program_roughness_map_uv(Self) -> String
 pub fn Material::program_sheen(Self) -> Bool
 pub fn Material::program_sheen_color_map(Self) -> Bool
 pub fn Material::program_sheen_roughness_map(Self) -> Bool
