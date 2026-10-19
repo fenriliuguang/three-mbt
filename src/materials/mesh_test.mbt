@@ -468,3 +468,29 @@ test "Material stencilFuncMask defaults to 255" {
   assert_eq(standard.material.stencil_func_mask, 1)
   assert_eq(lambert.material.stencil_func_mask, 255)
 }
+
+///|
+test "Material stencilFail defaults to Keep" {
+  assert_eq(@constants.StencilOp::Zero.to_int(), 0)
+  assert_eq(@constants.StencilOp::Keep.to_int(), 7680)
+  assert_eq(@constants.StencilOp::Replace.to_int(), 7681)
+  assert_eq(@constants.StencilOp::Increment.to_int(), 7682)
+  assert_eq(@constants.StencilOp::Decrement.to_int(), 7683)
+  assert_eq(@constants.StencilOp::IncrementWrap.to_int(), 34055)
+  assert_eq(@constants.StencilOp::DecrementWrap.to_int(), 34056)
+  assert_eq(@constants.StencilOp::Invert.to_int(), 5386)
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_fail is @constants.StencilOp::Keep, true)
+  assert_eq(basic.material.stencil_fail.to_int(), 7680)
+  basic.material.stencil_fail = @constants.StencilOp::Zero
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_fail is @constants.StencilOp::Keep, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_fail is @constants.StencilOp::Keep, true)
+  standard.material.stencil_fail = @constants.StencilOp::Replace
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_fail is @constants.StencilOp::Keep, true)
+  assert_eq(basic.material.stencil_fail.to_int(), 0)
+  assert_eq(standard.material.stencil_fail.to_int(), 7681)
+  assert_eq(lambert.material.stencil_fail.to_int(), 7680)
+}

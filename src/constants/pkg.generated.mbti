@@ -28,6 +28,10 @@ pub const CUSTOM_BLENDING : Int = 5
 
 pub const CUSTOM_TONE_MAPPING : Int = 5
 
+pub const DECREMENT_STENCIL_OP : Int = 7683
+
+pub const DECREMENT_WRAP_STENCIL_OP : Int = 34056
+
 pub const DOUBLE_SIDE : Int = 2
 
 pub const DST_ALPHA_FACTOR : Int = 206
@@ -56,6 +60,10 @@ pub const GREATER_EQUAL_STENCIL_FUNC : Int = 518
 
 pub const GREATER_STENCIL_FUNC : Int = 516
 
+pub const INCREMENT_STENCIL_OP : Int = 7682
+
+pub const INCREMENT_WRAP_STENCIL_OP : Int = 34055
+
 pub const INTERPOLATE_DISCRETE : Int = 2300
 
 pub const INTERPOLATE_LINEAR : Int = 2301
@@ -63,6 +71,10 @@ pub const INTERPOLATE_LINEAR : Int = 2301
 pub const INTERPOLATE_SMOOTH : Int = 2302
 
 pub const INT_TYPE : Int = 1013
+
+pub const INVERT_STENCIL_OP : Int = 5386
+
+pub const KEEP_STENCIL_OP : Int = 7680
 
 pub const LESS_DEPTH : Int = 2
 
@@ -134,6 +146,8 @@ pub const REINHARD_TONE_MAPPING : Int = 2
 
 pub const REPEAT_WRAPPING : Int = 1000
 
+pub const REPLACE_STENCIL_OP : Int = 7681
+
 pub const REVERSE_SUBTRACT_EQUATION : Int = 102
 
 pub const SRC_ALPHA_FACTOR : Int = 204
@@ -169,6 +183,8 @@ pub const ZERO_CURVATURE_ENDING : Int = 2400
 pub const ZERO_FACTOR : Int = 200
 
 pub const ZERO_SLOPE_ENDING : Int = 2401
+
+pub const ZERO_STENCIL_OP : Int = 0
 
 // Errors
 
@@ -287,6 +303,18 @@ pub(all) enum StencilFunc {
   Always
 }
 pub fn StencilFunc::to_int(Self) -> Int
+
+pub(all) enum StencilOp {
+  Zero
+  Keep
+  Replace
+  Increment
+  Decrement
+  IncrementWrap
+  DecrementWrap
+  Invert
+}
+pub fn StencilOp::to_int(Self) -> Int
 
 pub(all) enum TextureFilter {
   Nearest

@@ -383,6 +383,66 @@ pub fn StencilFunc::to_int(self : StencilFunc) -> Int {
 }
 
 ///|
+/// 把模板值写成 0。对齐 `ZeroStencilOp`（0）。
+pub const ZERO_STENCIL_OP : Int = 0
+
+///|
+/// 保持模板值。对齐 `KeepStencilOp`（7680）。
+pub const KEEP_STENCIL_OP : Int = 7680
+
+///|
+/// 把模板值写成参考值。对齐 `ReplaceStencilOp`（7681）。
+pub const REPLACE_STENCIL_OP : Int = 7681
+
+///|
+/// 模板值加 1，到上限后夹住。对齐 `IncrementStencilOp`（7682）。
+pub const INCREMENT_STENCIL_OP : Int = 7682
+
+///|
+/// 模板值减 1，到 0 后夹住。对齐 `DecrementStencilOp`（7683）。
+pub const DECREMENT_STENCIL_OP : Int = 7683
+
+///|
+/// 模板值加 1，溢出后回到 0。对齐 `IncrementWrapStencilOp`（34055）。
+pub const INCREMENT_WRAP_STENCIL_OP : Int = 34055
+
+///|
+/// 模板值减 1，低于 0 后回到上限。对齐 `DecrementWrapStencilOp`（34056）。
+pub const DECREMENT_WRAP_STENCIL_OP : Int = 34056
+
+///|
+/// 按位取反模板值。对齐 `InvertStencilOp`（5386）。
+pub const INVERT_STENCIL_OP : Int = 5386
+
+///|
+/// 模板操作。数值与 r186 `src/constants.js` 一致。默认是 `Keep`。
+/// r186: `ZeroStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1365 ; `KeepStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1373 ; `ReplaceStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1381 ; `IncrementStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1389 ; `DecrementStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1397 ; `IncrementWrapStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1406 ; `DecrementWrapStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1415 ; `InvertStencilOp` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1423
+pub(all) enum StencilOp {
+  Zero
+  Keep
+  Replace
+  Increment
+  Decrement
+  IncrementWrap
+  DecrementWrap
+  Invert
+}
+
+///|
+pub fn StencilOp::to_int(self : StencilOp) -> Int {
+  match self {
+    Zero => ZERO_STENCIL_OP
+    Keep => KEEP_STENCIL_OP
+    Replace => REPLACE_STENCIL_OP
+    Increment => INCREMENT_STENCIL_OP
+    Decrement => DECREMENT_STENCIL_OP
+    IncrementWrap => INCREMENT_WRAP_STENCIL_OP
+    DecrementWrap => DECREMENT_WRAP_STENCIL_OP
+    Invert => INVERT_STENCIL_OP
+  }
+}
+
+///|
 /// 网格怎么着色。`Basic` 忽略灯光，`Lambert` 使用环境光和一盏平行光，`Standard` 走直接光 GGX。
 /// r186: 没有同名枚举。`Basic` `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14 ; `Lambert` `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24 ; `Standard` `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) enum Shading {
