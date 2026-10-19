@@ -441,6 +441,7 @@ pub(all) struct Object3D {
   mut light : LightState?
   mut morph : MorphState?
   mut skin : SkinState?
+  mut skinned_raycast : ((Raycaster, Array[Intersection]) -> Unit)?
   mut sprite : SpriteState?
   mut lod_levels : Array[LodLevel]?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]

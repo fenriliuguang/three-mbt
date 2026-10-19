@@ -370,7 +370,7 @@ pub fn SkinnedMesh::new(
   geometry : BufferGeometry,
   material : @materials.Material,
 ) -> SkinnedMesh {
-  {
+  let skin : SkinnedMesh = {
     mesh: Mesh::new(geometry, material),
     bind_mode: @constants.Attached,
     bind_matrix: @math.Matrix4::new(),
@@ -379,6 +379,15 @@ pub fn SkinnedMesh::new(
     bounding_sphere: None,
     skeleton: None,
   }
+  skin.attach_raycast()
+  skin
+}
+
+///|
+fn SkinnedMesh::attach_raycast(self : SkinnedMesh) -> Unit {
+  self.mesh.node.skinned_raycast = Some(fn(raycaster, intersects) {
+    self.raycast(raycaster, intersects)
+  })
 }
 
 ///|

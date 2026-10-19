@@ -46,8 +46,10 @@ fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
 /// 场景图节点。欧拉角和四元数通过回调保持同步；直接写 `rotation.x` 不会更新四元数，
 /// 请用 `rotation.set` 或 `set_x` / `set_y` / `set_z`。
 /// `uuid` 在新建时生成，`copy` 不改写目标自己的编号。
+/// `skinned_raycast` 没有同名上游字段。蒙皮网格把它设成自己的 `raycast`，节点种类仍是 `Mesh`。
 /// r186: `Object3D` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L64
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L97
+/// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L178
 pub(all) struct Object3D {
   id : Int
   mut uuid : String
@@ -80,6 +82,7 @@ pub(all) struct Object3D {
   mut light : LightState?
   mut morph : MorphState?
   mut skin : SkinState?
+  mut skinned_raycast : ((Raycaster, Array[Intersection]) -> Unit)?
   mut sprite : SpriteState?
   mut lod_levels : Array[LodLevel]?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
@@ -122,6 +125,7 @@ pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
     light: None,
     morph: None,
     skin: None,
+    skinned_raycast: None,
     sprite: None,
     lod_levels: None,
     listeners: Map([]),
@@ -752,6 +756,7 @@ pub fn Object3D::clone(self : Object3D, recursive? : Bool = true) -> Object3D {
 
 ///|
 /// 复制变换、层和标志。网格、相机、灯光、形变和蒙皮留在源对象上。
+/// `skinned_raycast` 留在目标自己的节点上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1605
 pub fn Object3D::copy(
   self : Object3D,
@@ -798,7 +803,7 @@ pub fn Object3D::dispose(self : Object3D) -> Unit {
 }
 
 ///|
-/// 网格会把三角形交点写入列表。带实例数据时先用实例包围球，再按每个实例矩阵测试，并写下 `instance_id`。折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点，精灵会写入朝向相机的四边形交点，LOD 会把选中那一级的交点写入列表。其他种类不产生交点。
+/// 网格会把三角形交点写入列表。带 `skinned_raycast` 时改走蒙皮射线。带实例数据时先用实例包围球，再按每个实例矩阵测试，并写下 `instance_id`。折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点，精灵会写入朝向相机的四边形交点，LOD 会把选中那一级的交点写入列表。其他种类不产生交点。
 /// 返回 `None` 表示继续访问子节点；只有 `Some(false)` 会停住。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1061
 pub fn Object3D::raycast(
@@ -808,12 +813,16 @@ pub fn Object3D::raycast(
 ) -> Bool? {
   match self.kind {
     Mesh =>
-      match self.mesh {
-        None => ()
-        Some(mesh) =>
-          match mesh.instances {
-            None => self.raycast_mesh(raycaster, intersects)
-            Some(_) => self.raycast_instances(raycaster, intersects)
+      match self.skinned_raycast {
+        Some(raycast) => raycast(raycaster, intersects)
+        None =>
+          match self.mesh {
+            None => ()
+            Some(mesh) =>
+              match mesh.instances {
+                None => self.raycast_mesh(raycaster, intersects)
+                Some(_) => self.raycast_instances(raycaster, intersects)
+              }
           }
       }
     Line | LineSegments | LineLoop =>

@@ -1539,6 +1539,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.raycast` has landed. A triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` with weight `1` is hit by a ray from `(0.25, 0.25, 1)` toward `-z` at `(0.25, 0.25, 0)`, distance `1`. The barycentric weights are `0.5`, `0.25`, and `0.25`. Moving the bone to `y=5` moves the hit to `(0.25, 5.25, 0)`. A local box from `(10, 10, 10)` to `(11, 11, 11)` rejects that ray. A ray from `(0, 100, 1)` misses the skinned sphere. `Object3D.raycast` still uses the unskinned mesh path.
 
+`Object3D.raycast` calls `SkinnedMesh.raycast` when the mesh node carries that hook. The same triangle, after the bone moves to `y=5`, is hit through `intersect_object` at `(0.25, 5.25, 0)`, distance `1`. A clone keeps its own hook and reports the hit on the clone. A plain mesh has no hook, and the same ray misses its unskinned triangle. Material arrays in the triangle walk stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2249,6 +2251,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.copy` | `objects` |
 | planned | 7 | `SkinnedMesh.clone` | `objects` |
 | planned | 7 | `SkinnedMesh.raycast` | `objects` |
+| planned | 7 | `Object3D.raycast` skinned hook | `core`, `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

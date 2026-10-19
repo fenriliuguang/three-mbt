@@ -2688,6 +2688,75 @@ test "SkinnedMesh.raycast hits the deformed triangle" {
 }
 
 ///|
+test "Object3D.raycast uses the skinned hook" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        ],
+        4,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new(
+        [
+          1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+        ],
+        4,
+      ),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let skin = @objects.SkinnedMesh::new(geometry, material)
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  skin.mesh.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=5.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let hits = raycaster.intersect_object(skin.mesh.node)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 5.25)
+  assert_eq(hits[0].point.z, 0.0)
+  assert_eq(physical_equal(hits[0].object, skin.mesh.node), true)
+  let cloned = skin.clone()
+  cloned.mesh.node.update_matrix_world()
+  let cloned_hits = raycaster.intersect_object(cloned.mesh.node)
+  assert_eq(cloned_hits.length(), 1)
+  assert_eq(cloned_hits[0].point.y, 5.25)
+  assert_eq(physical_equal(cloned_hits[0].object, cloned.mesh.node), true)
+  let again = raycaster.intersect_object(skin.mesh.node)
+  assert_eq(again.length(), 1)
+  assert_eq(again[0].point.y, 5.25)
+  let plain = @objects.Mesh::new(geometry, material)
+  plain.node.update_matrix_world()
+  assert_eq(plain.node.skinned_raycast is None, true)
+  assert_eq(raycaster.intersect_object(plain.node).length(), 0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []
