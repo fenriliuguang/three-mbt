@@ -3094,7 +3094,7 @@ test "Material shader sets isShaderMaterial" {
   assert_eq(shader.shading() is @constants.Basic, true)
   assert_eq(shader.color.get_hex(), 0xFFFFFF)
   assert_eq(shader.transparent, false)
-  assert_eq(shader.fog, true)
+  assert_eq(shader.fog, false)
   match shader.defines.get("FOO") {
     None => ()
     Some(_) => abort("shader defines should start empty")
@@ -3183,4 +3183,25 @@ test "Material shader copies defines" {
     None => abort("clone wrote source")
     Some(value) => assert_eq(value, "1")
   }
+}
+
+///|
+test "Material shader defaults fog off" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  assert_eq(shader.fog, false)
+  assert_eq(basic.fog, true)
+  ignore(basic.copy(shader))
+  assert_eq(basic.fog, false)
+  assert_eq(shader.fog, false)
+  let onto = @materials.Material::shader()
+  let phong = @materials.Material::phong()
+  assert_eq(phong.fog, true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.fog, true)
+  onto.fog = false
+  assert_eq(phong.fog, true)
+  let cloned = shader.clone()
+  assert_eq(cloned.fog, false)
+  assert_eq(cloned.id == shader.id, false)
 }
