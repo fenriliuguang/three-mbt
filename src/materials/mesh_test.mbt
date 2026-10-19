@@ -3448,6 +3448,25 @@ test "UniformsGroup add appends a number" {
 }
 
 ///|
+test "UniformsGroup remove drops the first matching number" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  ignore(frame.add(1.0).add(2.0).add(1.0))
+  let chained = frame.remove(1.0)
+  assert_eq(frame.uniforms, [2.0, 1.0])
+  assert_eq(chained.uniforms, [2.0, 1.0])
+  assert_eq(chained.id, frame.id)
+  ignore(frame.remove(9.0))
+  assert_eq(frame.uniforms, [2.0, 1.0])
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  ignore(shader.uniforms_groups[0].remove(2.0))
+  assert_eq(shader.uniforms_groups[0].uniforms, [1.0])
+  assert_eq(onto.uniforms_groups[0].uniforms, [2.0, 1.0])
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
