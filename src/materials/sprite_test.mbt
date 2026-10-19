@@ -941,6 +941,20 @@ test "SpriteMaterial shadowSide defaults to empty and copies" {
 }
 
 ///|
+test "SpriteMaterial forceSinglePass defaults to false and copies" {
+  let material = @materials.SpriteMaterial::new()
+  assert_eq(material.force_single_pass, false)
+  material.force_single_pass = true
+  let other = @materials.SpriteMaterial::new()
+  assert_eq(other.force_single_pass, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.force_single_pass, true)
+  destination.force_single_pass = false
+  assert_eq(material.force_single_pass, true)
+}
+
+///|
 test "SpriteMaterial dispose runs only dispose listeners" {
   let material = @materials.SpriteMaterial::new()
   let hits = Ref::Ref(0)
