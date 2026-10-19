@@ -370,3 +370,34 @@ test "LineBasicMaterial stores and copies blendAlpha" {
   other.line.blend_alpha = 0.75
   assert_eq(dashed.line.blend_alpha, 0.25)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendColor" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_color.r, 0.0)
+  assert_eq(defaults.blend_color.g, 0.0)
+  assert_eq(defaults.blend_color.b, 0.0)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_color.r = 1.0
+  assert_eq(defaults.blend_color.r, 0.0)
+  let destination = @materials.LineBasicMaterial::new()
+  let color = destination.blend_color
+  ignore(destination.copy(source))
+  assert_eq(physical_equal(destination.blend_color, color), true)
+  assert_eq(destination.blend_color.r, 1.0)
+  assert_eq(destination.blend_color.g, 0.0)
+  assert_eq(destination.blend_color.b, 0.0)
+  destination.blend_color.r = 0.5
+  assert_eq(source.blend_color.r, 1.0)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_color.r = 1.0
+  let other = @materials.LineDashedMaterial::new()
+  let dashed_color = other.line.blend_color
+  ignore(other.copy(dashed))
+  assert_eq(physical_equal(other.line.blend_color, dashed_color), true)
+  assert_eq(other.line.blend_color.r, 1.0)
+  assert_eq(other.line.blend_color.g, 0.0)
+  assert_eq(other.line.blend_color.b, 0.0)
+  other.line.blend_color.r = 0.5
+  assert_eq(dashed.line.blend_color.r, 1.0)
+}

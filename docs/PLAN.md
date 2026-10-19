@@ -1681,6 +1681,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `PointsMaterial.blendColor` has landed. A new material stores black `(0, 0, 0)`. Setting its red channel to `1` leaves another new material at black. Copying onto a default material writes `(1, 0, 0)` into the destination's own color object. Setting that red channel to `0.5` leaves the source at `1`. Point blending still does not use the constant color.
 
+`LineBasicMaterial.blendColor` has landed. A new material stores black `(0, 0, 0)`. Setting its red channel to `1` leaves another new material at black. Copying onto a default material writes `(1, 0, 0)` into the destination's own color object. Setting that red channel to `0.5` leaves the source at `1`. A dashed material copies the color through its inner line material. Setting the destination red channel to `0.5` leaves the source at `1`. Line blending still does not use the constant color.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2462,6 +2464,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SpriteMaterial.blendAlpha` | `materials` |
 | planned | 7 | `Material.blendColor` | `materials` |
 | planned | 7 | `PointsMaterial.blendColor` | `materials` |
+| planned | 7 | `LineBasicMaterial.blendColor` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -37,6 +37,7 @@ pub(all) struct LineBasicMaterial {
   mut clip_intersection : Bool
   mut allow_override : Bool
   mut blend_alpha : Double
+  blend_color : @math.Color
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
