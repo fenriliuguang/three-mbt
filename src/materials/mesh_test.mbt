@@ -124,3 +124,19 @@ test "Material clipShadows defaults off" {
   assert_eq(basic.material.clip_shadows, true)
   assert_eq(standard.material.clip_shadows, true)
 }
+
+///|
+test "Material clipIntersection defaults off" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.clip_intersection, false)
+  basic.material.clip_intersection = true
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.clip_intersection, false)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.clip_intersection, false)
+  standard.material.clip_intersection = true
+  let other = @materials.Material::basic()
+  assert_eq(other.clip_intersection, false)
+  assert_eq(basic.material.clip_intersection, true)
+  assert_eq(standard.material.clip_intersection, true)
+}
