@@ -4306,9 +4306,9 @@ test "Material shader writes USE_TRANSMISSIONMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.transmission = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1691)
   assert_eq(shader.prefixed_fragment_shader().length(), 1275)
-  assert_eq(1661 - 1633, 28)
+  assert_eq(1691 - 1633, 58)
   assert_eq(
     shader.prefixed_vertex_shader()[708:735].to_owned(),
     "#define USE_TRANSMISSIONMAP",
@@ -4350,7 +4350,7 @@ test "Material shader writes USE_THICKNESSMAP" {
     "#define USE_THICKNESSMAP",
   )
   shader.transmission_map = Some(thickness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1716)
   assert_eq(
     shader.prefixed_vertex_shader()[736:760].to_owned(),
     "#define USE_THICKNESSMAP",
@@ -5356,6 +5356,54 @@ test "Material shader writes SPECULAR_INTENSITYMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.specular_intensity_map = Some(specular_intensity_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes TRANSMISSIONMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let transmission_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(transmission_map.channel, 0)
+  shader.transmission_map = Some(transmission_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.transmission = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1691)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1275)
+  assert_eq(1691 - 1608, 83)
+  assert_eq(
+    shader.prefixed_vertex_shader()[736:765].to_owned(),
+    "#define TRANSMISSIONMAP_UV uv",
+  )
+  transmission_map.channel = 1
+  shader.transmission_map = Some(transmission_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1692)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1275)
+  assert_eq(1692 - 1608, 84)
+  assert_eq(
+    shader.prefixed_vertex_shader()[736:766].to_owned(),
+    "#define TRANSMISSIONMAP_UV uv1",
+  )
+  shader.transmission = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.transmission = 1.0
+  transmission_map.channel = 0
+  shader.transmission_map = Some(transmission_map)
+  let specular_intensity_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.specular_intensity_map = Some(specular_intensity_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1761)
+  assert_eq(
+    shader.prefixed_vertex_shader()[806:835].to_owned(),
+    "#define TRANSMISSIONMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.transmission = 1.0
+  raw.transmission_map = Some(transmission_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.transmission = 1.0
+  basic.transmission_map = Some(transmission_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 

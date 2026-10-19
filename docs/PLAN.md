@@ -2277,6 +2277,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `SPECULAR_INTENSITYMAP_UV` has landed. A Shader material with a 1×1 specular intensity map writes `#define SPECULAR_INTENSITYMAP_UV uv` and a newline, `36` characters, on the vertex prefix only. The vertex string grows from `1608` to `1678`. The fragment string grows only by `USE_SPECULAR_INTENSITYMAP`, from `1222` to `1256`. Setting the texture `channel` to `1` writes `#define SPECULAR_INTENSITYMAP_UV uv1`, `37` characters, and the vertex string is `1679`. A specular color map as well puts that line after `SPECULAR_COLORMAP_UV`, so channel `0` makes the vertex string `1740`. A raw material stays at `92`. A Basic material stays `""`. `TRANSMISSIONMAP_UV` stays later.
 
+`TRANSMISSIONMAP_UV` has landed. A Shader material with `transmission` at `0` and a 1×1 transmission map adds nothing. Setting `transmission` to `1` writes `#define TRANSMISSIONMAP_UV uv` and a newline, `30` characters, on the vertex prefix only. The vertex string grows from `1608` to `1691`. The fragment string grows only by `USE_TRANSMISSION` and `USE_TRANSMISSIONMAP`, from `1222` to `1275`. Setting the texture `channel` to `1` writes `#define TRANSMISSIONMAP_UV uv1`, `31` characters, and the vertex string is `1692`. Putting `transmission` back to `0` drops the line. A specular intensity map as well puts that line after `SPECULAR_INTENSITYMAP_UV`, so channel `0` makes the vertex string `1761`. A raw material stays at `92`. A Basic material stays `""`. `THICKNESSMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3356,6 +3358,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SPECULARMAP_UV` | `materials` |
 | planned | 7 | `SPECULAR_COLORMAP_UV` | `materials` |
 | planned | 7 | `SPECULAR_INTENSITYMAP_UV` | `materials` |
+| planned | 7 | `TRANSMISSIONMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
