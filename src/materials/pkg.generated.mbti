@@ -135,6 +135,7 @@ pub(all) struct Material {
   mut ao_map_intensity : Double
   mut bump_map : @textures.Texture?
   mut gradient_map : @textures.Texture?
+  mut matcap : @textures.Texture?
   mut bump_scale : Double
   mut wireframe_linewidth : Double
   mut wireframe_linecap : WireframeCap

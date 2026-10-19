@@ -2571,3 +2571,34 @@ test "Material gradientMap starts empty and copies by reference" {
   let physical = @materials.Material::physical()
   assert_eq(physical.gradient_map is None, true)
 }
+
+///|
+test "Material matcap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.matcap is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.matcap is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.matcap = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.matcap is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.matcap {
+    None => abort("copied matcap")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.matcap = None
+  match lambert.matcap {
+    None => abort("source matcap")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.matcap is None, true)
+  let physical = @materials.Material::physical()
+  assert_eq(physical.matcap is None, true)
+  let toon = @materials.Material::toon()
+  assert_eq(toon.matcap is None, true)
+}
