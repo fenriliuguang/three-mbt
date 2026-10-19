@@ -1385,3 +1385,30 @@ test "Material aoMapIntensity defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.ao_map_intensity, 1.0)
 }
+
+///|
+test "Material bumpMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.bump_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.bump_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.bump_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.bump_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.bump_map {
+    None => abort("copied bump map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.bump_map = None
+  match lambert.bump_map {
+    None => abort("source bump map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.bump_map is None, true)
+}
