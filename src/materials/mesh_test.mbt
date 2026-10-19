@@ -3307,6 +3307,32 @@ test "Material shader writes SHADER_NAME" {
 }
 
 ///|
+test "Material shader writes custom defines" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.defines.set("FOO", "1")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1622)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1236)
+  assert_eq(1622 - 1608, 14)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:696].to_owned(),
+    "#define FOO 1",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1092].to_owned(),
+    "#define FOO 1",
+  )
+  let raw = @materials.Material::raw()
+  raw.defines.set("FOO", "1")
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.defines.set("FOO", "1")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

@@ -2167,6 +2167,8 @@ Shader precision prefix has landed. An empty `precision` writes 17 `precision hi
 
 `SHADER_NAME` has landed. An empty name writes `#define SHADER_NAME ` and a newline, `21` characters, on both prefixed shaders. The default vertex string is `1608` and the default fragment string is `1222`. Naming the material `Cube` adds `4`, so those lengths become `1612` and `1226`. A raw material named `Cube` stays at `92` and `61`. Custom defines stay later.
 
+Custom defines have landed. An empty `defines` table adds nothing, so the default vertex string stays `1608` and the default fragment string stays `1222`. Setting `FOO` to `1` adds `#define FOO 1` and a newline, `14` characters, so those lengths become `1622` and `1236`. A raw material with `FOO` stays at `92` and `61`. A Basic material stays `""`. Feature defines such as `USE_MAP` stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3191,6 +3193,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | Shader precision prefix | `materials` |
 | planned | 7 | `SHADER_TYPE` | `materials` |
 | planned | 7 | `SHADER_NAME` | `materials` |
+| planned | 7 | Shader custom defines | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
