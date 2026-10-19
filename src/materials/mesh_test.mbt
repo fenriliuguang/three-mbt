@@ -1904,3 +1904,30 @@ test "Material sheenRoughness defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.sheen_roughness, 1.0)
 }
+
+///|
+test "Material sheenRoughnessMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.sheen_roughness_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.sheen_roughness_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.sheen_roughness_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.sheen_roughness_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.sheen_roughness_map {
+    None => abort("copied sheen roughness map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.sheen_roughness_map = None
+  match lambert.sheen_roughness_map {
+    None => abort("source sheen roughness map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.sheen_roughness_map is None, true)
+}
