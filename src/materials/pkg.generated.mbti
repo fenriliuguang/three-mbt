@@ -87,6 +87,7 @@ pub(all) struct Material {
   mut clip_shadows : Bool
   mut clip_intersection : Bool
   mut allow_override : Bool
+  mut blend_alpha : Double
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
