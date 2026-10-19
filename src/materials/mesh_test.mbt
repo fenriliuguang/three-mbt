@@ -3856,6 +3856,44 @@ test "Material shader writes USE_CLEARCOAT" {
 }
 
 ///|
+test "Material shader writes USE_CLEARCOATMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let clearcoat_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.clearcoat_map = Some(clearcoat_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.clearcoat = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1269)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(1269 - 1244, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:707].to_owned(),
+    "#define USE_CLEARCOATMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_CLEARCOAT",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1101:1125].to_owned(),
+    "#define USE_CLEARCOATMAP",
+  )
+  shader.clearcoat = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  let raw = @materials.Material::raw()
+  raw.clearcoat = 1.0
+  raw.clearcoat_map = Some(clearcoat_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.clearcoat = 1.0
+  basic.clearcoat_map = Some(clearcoat_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
