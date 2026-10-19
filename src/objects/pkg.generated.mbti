@@ -134,6 +134,8 @@ pub(all) struct Points {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.PointsMaterial
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 pub fn Points::clone(Self, recursive? : Bool) -> Self
 pub fn Points::copy(Self, Self, recursive? : Bool) -> Self
@@ -142,6 +144,7 @@ pub fn Points::refresh(Self) -> Unit
 pub fn Points::set_fog(Self, Bool) -> Unit
 pub fn Points::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Points::to_node(Self) -> @core.Object3D
+pub fn Points::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for Points
 
 pub(all) struct Sprite {
