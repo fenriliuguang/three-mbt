@@ -7109,6 +7109,35 @@ test "Material shader replaceLightNums writes light counts" {
 }
 
 ///|
+test "Material shader replaceClippingPlaneNums writes plane counts" {
+  assert_eq(
+    @materials.replace_clipping_plane_nums(
+      "NUM_CLIPPING_PLANES UNION_CLIPPING_PLANES NUM_CLIPPING_PLANES",
+    ),
+    "0 0 0",
+  )
+  assert_eq(
+    @materials.replace_clipping_plane_nums(
+      "NUM_CLIPPING_PLANES UNION_CLIPPING_PLANES",
+      num_clipping_planes=5,
+      num_clip_intersection=2,
+    ),
+    "5 3",
+  )
+  assert_eq(
+    @materials.replace_clipping_plane_nums(
+      "UNION_CLIPPING_PLANES",
+      num_clipping_planes=1,
+      num_clip_intersection=7,
+    ),
+    "-6",
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
