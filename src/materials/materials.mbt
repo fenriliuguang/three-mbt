@@ -731,6 +731,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// `id` 与网格材质共用从 `0` 起的计数。每新建一份线材质取下一个编号。`copy` 不改目标上的这个编号。线段绘制仍不读它。
 /// `uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。线段绘制仍不读它。
 /// `name` 默认空字符串。`copy` 把名字写进目标。线段绘制仍不读它。
+/// `type_name` 对应上游 `type`，固定是 `LineBasicMaterial`。`copy` 不改目标上的这个名字。线段绘制仍不读它。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -769,6 +770,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// r186: `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52
 /// r186: `name` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L59
+/// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L39
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -817,6 +819,7 @@ pub(all) struct LineBasicMaterial {
   id : Int
   mut uuid : String
   mut name : String
+  type_name : String
 }
 
 ///|
@@ -869,6 +872,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     id: fresh_material_id(),
     uuid: @math.generate_uuid(),
     name: "",
+    type_name: "LineBasicMaterial",
   }
 }
 
