@@ -505,3 +505,40 @@ test "LineBasicMaterial stores and copies blendEquation" {
   assert_eq(dashed.line.blend_equation is @constants.BlendEquation::Subtract, true)
   assert_eq(other.line.blend_equation.to_int(), 103)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendSrcAlpha" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_src_alpha is None, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_src_alpha = Some(@constants.BlendFactor::One)
+  assert_eq(defaults.blend_src_alpha is None, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.blend_src_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::One, true)
+      assert_eq(factor.to_int(), 201)
+    }
+    None => abort("destination blendSrcAlpha is empty")
+  }
+  destination.blend_src_alpha = Some(@constants.BlendFactor::Zero)
+  match source.blend_src_alpha {
+    Some(factor) => assert_eq(factor.to_int(), 201)
+    None => abort("source blendSrcAlpha is empty")
+  }
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_src_alpha = Some(@constants.BlendFactor::One)
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  match other.line.blend_src_alpha {
+    Some(factor) => assert_eq(factor.to_int(), 201)
+    None => abort("dashed destination blendSrcAlpha is empty")
+  }
+  other.line.blend_src_alpha = None
+  match dashed.line.blend_src_alpha {
+    Some(factor) => assert_eq(factor.to_int(), 201)
+    None => abort("dashed source blendSrcAlpha is empty")
+  }
+  assert_eq(other.line.blend_src_alpha is None, true)
+}
