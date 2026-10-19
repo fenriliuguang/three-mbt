@@ -2157,6 +2157,72 @@ test "panic SkinnedMesh.applyBoneTransform Vector4 requires a skeleton" {
 }
 
 ///|
+test "SkinnedMesh.getVertexPosition applies morphs then bones" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  let target = @math.Vector3::new()
+  let written = skin.get_vertex_position(0, target)
+  assert_eq(physical_equal(written, target), true)
+  assert_eq(target.x, 1.0)
+  assert_eq(target.y, 7.0)
+  assert_eq(target.z, 3.0)
+  geometry.morph_targets_relative = true
+  geometry.morph_attributes.set(
+    "position",
+    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
+  )
+  skin.mesh.node.morph = Some(@core.MorphState::{
+    base_position: [1.0, 2.0, 3.0],
+    base_normal: None,
+    base_color: None,
+    targets: [],
+    weights: [0.5],
+    shared: false,
+  })
+  ignore(skin.get_vertex_position(0, target))
+  assert_eq(target.x, 2.0)
+  assert_eq(target.y, 7.0)
+  assert_eq(target.z, 3.0)
+}
+
+///|
+test "panic SkinnedMesh.getVertexPosition requires a skeleton" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  ignore(skin.get_vertex_position(0, @math.Vector3::new()))
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

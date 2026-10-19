@@ -586,6 +586,18 @@ pub fn SkinnedMesh::apply_bone_transform_vector4(
 }
 
 ///|
+/// 先按网格读局部顶点（含形变），再套骨骼变换。
+/// r186: `getVertexPosition` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L213
+pub fn SkinnedMesh::get_vertex_position(
+  self : SkinnedMesh,
+  index : Int,
+  target : @math.Vector3,
+) -> @math.Vector3 {
+  ignore(self.mesh.node.get_vertex_position(index, target))
+  self.apply_bone_transform(index, target)
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
