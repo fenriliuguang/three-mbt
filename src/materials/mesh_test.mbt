@@ -1412,3 +1412,21 @@ test "Material bumpMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.bump_map is None, true)
 }
+
+///|
+test "Material bumpScale defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.bump_scale, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.bump_scale, 1.0)
+  lambert.bump_scale = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.bump_scale, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.bump_scale, 2.0)
+  destination.bump_scale = 0.0
+  assert_eq(lambert.bump_scale, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.bump_scale, 1.0)
+}
