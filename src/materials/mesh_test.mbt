@@ -9160,6 +9160,27 @@ test "Material shader alphaMapUv names the alpha texture channel" {
 }
 
 ///|
+test "Material shader vertexTangents needs a tangent and a normal source" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_vertex_tangents(), false)
+  assert_eq(@materials.Material::raw().program_vertex_tangents(), false)
+  assert_eq(@materials.Material::physical().program_vertex_tangents(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_vertex_tangents(has_tangent=true), false)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.normal_map = Some(map)
+  assert_eq(shader.program_vertex_tangents(), false)
+  assert_eq(shader.program_vertex_tangents(has_tangent=true), true)
+  shader.normal_map = None
+  shader.anisotropy = 0.25
+  assert_eq(shader.program_vertex_tangents(has_tangent=true), true)
+  shader.anisotropy = 0.0
+  assert_eq(shader.program_vertex_tangents(has_tangent=true), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
