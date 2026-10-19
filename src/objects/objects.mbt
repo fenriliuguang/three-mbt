@@ -396,6 +396,13 @@ pub fn Line::copy(
 }
 
 ///|
+/// 新建一条折线再复制。three.js 没有单独的 `Line.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Line::clone(self : Line, recursive? : Bool = true) -> Line {
+  Line::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
 pub fn Line::refresh(self : Line) -> Unit {
   self.node.primitive = Some(
     primitive_binding(

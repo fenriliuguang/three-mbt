@@ -72,6 +72,7 @@ pub(all) struct Line {
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
 }
+pub fn Line::clone(Self, recursive? : Bool) -> Self
 pub fn Line::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn Line::refresh(Self) -> Unit
