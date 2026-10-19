@@ -7816,6 +7816,23 @@ test "Material shader instancing follows the instanced mesh flag" {
 }
 
 ///|
+test "Material shader instancingColor needs instance color" {
+  assert_eq(@materials.program_instancing_color(), false)
+  assert_eq(@materials.program_instancing_color(is_instanced_mesh=true), false)
+  assert_eq(@materials.program_instancing_color(has_instance_color=true), false)
+  assert_eq(
+    @materials.program_instancing_color(
+      is_instanced_mesh=true,
+      has_instance_color=true,
+    ),
+    true,
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
