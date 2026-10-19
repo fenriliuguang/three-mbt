@@ -1311,6 +1311,14 @@ pub fn InstancedMesh::clone(
 }
 
 ///|
+/// 空操作。实例网格的形变写在 `morph_texture` 里，不在这里建立权重表。
+/// 已经写过的缓冲保持不变。
+/// r186: `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L388
+pub fn InstancedMesh::update_morph_targets(_self : InstancedMesh) -> Unit {
+
+}
+
+///|
 /// 发出 `dispose`，并清掉形变缓冲。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L396
 pub fn InstancedMesh::dispose(self : InstancedMesh) -> Unit {

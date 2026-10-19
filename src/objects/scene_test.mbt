@@ -1319,6 +1319,38 @@ test "InstancedMesh.dispose clears the morph buffer" {
 }
 
 ///|
+test "InstancedMesh.updateMorphTargets leaves the morph buffer alone" {
+  let geometry = @core.BufferGeometry::new()
+  let wide = @core.BufferAttribute::new([2.0, 0.0, 0.0], 3)
+  wide.name = "wide"
+  let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
+  tall.name = "tall"
+  geometry.morph_attributes.set("position", [wide, tall])
+  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  mesh.update_morph_targets()
+  assert_eq(mesh.morph_texture is None, true)
+  assert_eq(mesh.instances.count, 2)
+  let plain = @objects.Mesh::new(geometry, @materials.Material::basic())
+  match plain.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let weights = @objects.Mesh::new(geometry, @materials.Material::basic())
+  weights.morph_target_influences = Some([0.25, 0.5])
+  ignore(mesh.set_morph_at(1, weights))
+  mesh.update_morph_targets()
+  match mesh.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data.length(), 6)
+      assert_eq(data[3], 0.25)
+      assert_eq(data[4], 0.25)
+      assert_eq(data[5], 0.5)
+    }
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

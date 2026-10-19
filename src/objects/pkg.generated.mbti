@@ -52,6 +52,7 @@ pub fn InstancedMesh::set_morph_at(Self, Int, Mesh) -> Self
 pub fn InstancedMesh::set_side(Self, @constants.Side) -> Unit
 pub fn InstancedMesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn InstancedMesh::to_node(Self) -> @core.Object3D
+pub fn InstancedMesh::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for InstancedMesh
 
 pub(all) struct LOD {

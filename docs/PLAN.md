@@ -1481,6 +1481,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `InstancedMesh.dispose` has landed. Instance `1` with weights `[0.25, 0.5]` stores `0.25` at the fourth buffer value. Dispose emits one `dispose` event and clears that buffer. A clone made first still has `0.25` and `0.5` at the fourth and sixth values. A mesh with no morph data stays empty after dispose.
 
+`InstancedMesh.updateMorphTargets` has landed. It does nothing. A count `2` mesh whose geometry has position targets named `wide` and `tall` keeps an empty morph buffer, while a plain mesh maps `wide` to `0`. After writing weights `[0.25, 0.5]` to instance `1`, the call leaves the six values in place, including `0.25`, `0.25`, and `0.5` at the end.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2162,6 +2164,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.getMorphAt` | `objects` |
 | planned | 7 | `InstancedMesh.copy` copies the morph buffer | `objects` |
 | planned | 7 | `InstancedMesh.dispose` | `objects` |
+| planned | 7 | `InstancedMesh.updateMorphTargets` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
