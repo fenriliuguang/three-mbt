@@ -840,15 +840,17 @@ fn sprite_geometry() -> BufferGeometry {
 }
 
 ///|
-/// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。几何体是所有精灵共用的那一份。
+/// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。几何体是所有精灵共用的那一份。`count` 默认是 `1`。
 /// r186: `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
 /// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L110
 /// r186: `geometry` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L93
+/// r186: `count` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L119
 pub(all) struct Sprite {
   node : Object3D
   material : @materials.SpriteMaterial
   center : @math.Vector2
   geometry : BufferGeometry
+  mut count : Int
 }
 
 ///|
@@ -860,7 +862,7 @@ pub fn Sprite::new(material : @materials.SpriteMaterial) -> Sprite {
     rotation: material.rotation,
     size_attenuation: material.size_attenuation,
   })
-  { node, material, center, geometry: sprite_geometry(), }
+  { node, material, center, geometry: sprite_geometry(), count: 1, }
 }
 
 ///|

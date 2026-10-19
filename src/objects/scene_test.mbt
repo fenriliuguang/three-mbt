@@ -884,6 +884,17 @@ test "Sprite.geometry is one shared quad" {
 }
 
 ///|
+test "Sprite.count defaults to one instance" {
+  let sprite = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  assert_eq(sprite.count, 1)
+  sprite.count = 4
+  assert_eq(sprite.count, 4)
+  let other = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  assert_eq(other.count, 1)
+  assert_eq(sprite.count, 4)
+}
+
+///|
 test "Sprite.intersectsFrustum uses a sphere around the sprite" {
   let frustum = @math.Frustum::new()
   ignore(
