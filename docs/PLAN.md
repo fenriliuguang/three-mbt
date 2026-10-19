@@ -2319,6 +2319,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `SHADOWMAP_TYPE_BASIC` has landed. A Shader material with `shadow_map_enabled` false adds nothing. Passing it as true writes `#define SHADOWMAP_TYPE_BASIC` and a newline, `29` characters, on both prefixes, after `USE_SHADOWMAP`. The vertex string is `1659`. The fragment string is `1273`. `side` back puts that line after `USE_SHADOWMAP`, so the vertex string is `1678` and the fragment string is `1292`. Passing it as false leaves the back-side lengths at `1627` and `1241`. A raw material stays at `92`. A Basic material stays `""`. `SHADOWMAP_TYPE_PCF` stays later.
 
+`SHADOWMAP_TYPE_PCF` has landed. A Shader material with `shadow_map_enabled` false writes nothing even when `shadow_map_pcf` is true. Enabling the shadow map and PCF writes `#define SHADOWMAP_TYPE_PCF` and a newline, `27` characters, on both prefixes, instead of `SHADOWMAP_TYPE_BASIC`. The vertex string is `1657`. The fragment string is `1271`. `side` back puts that line after `USE_SHADOWMAP`, so the vertex string is `1676` and the fragment string is `1290`. Putting `shadow_map_pcf` back to false restores `SHADOWMAP_TYPE_BASIC` and the back-side lengths `1678` and `1292`. A raw material stays at `92`. A Basic material stays `""`. `SHADOWMAP_TYPE_VSM` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3419,6 +3421,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `FLIP_SIDED` | `materials` |
 | planned | 7 | `USE_SHADOWMAP` | `materials` |
 | planned | 7 | `SHADOWMAP_TYPE_BASIC` | `materials` |
+| planned | 7 | `SHADOWMAP_TYPE_PCF` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
