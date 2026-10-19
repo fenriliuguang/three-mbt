@@ -762,6 +762,21 @@ pub fn Sprite::intersects_frustum(
 }
 
 ///|
+/// 任一已用视锥碰到这张精灵则为真。`count` 为 0 时为假。
+/// r186: `intersectsSprite` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L108
+pub fn Sprite::intersects_frustum_array(
+  self : Sprite,
+  frustums : @math.FrustumArray,
+) -> Bool {
+  for i in 0..<frustums.count {
+    if self.intersects_frustum(frustums.frustums[i]) {
+      return true
+    }
+  }
+  false
+}
+
+///|
 /// 按距离切换显示的对象。级别从近到远排列，`auto_update` 默认真。节点上的级别数组与 `levels` 是同一份。
 /// r186: `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 pub(all) struct LOD {
