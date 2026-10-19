@@ -7265,6 +7265,29 @@ test "Material shader getUniforms clones builtin tables" {
 }
 
 ///|
+test "Material shader acquireProgram reuses a cache key" {
+  let cache = @materials.ProgramCache::new()
+  assert_eq(cache.programs.length(), 0)
+  let first = cache.acquire("a")
+  assert_eq(first.cache_key, "a")
+  assert_eq(first.used_times.val, 1)
+  let again = cache.acquire("a")
+  assert_eq(again.used_times.val, 2)
+  assert_eq(first.used_times.val, 2)
+  assert_eq(cache.programs.length(), 1)
+  let second = cache.acquire("b")
+  assert_eq(second.cache_key, "b")
+  assert_eq(second.used_times.val, 1)
+  assert_eq(cache.programs.length(), 2)
+  assert_eq(cache.programs[0].cache_key, "a")
+  assert_eq(cache.programs[1].cache_key, "b")
+  assert_eq(first.used_times.val, 2)
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
