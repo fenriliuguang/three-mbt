@@ -169,6 +169,7 @@ pub(all) struct Material {
   mut iridescence : Double
   mut dispersion : Double
   mut retroreflectivity : Double
+  mut sheen : Double
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -224,6 +225,7 @@ pub fn Material::set_dispersion(Self, Double) -> Unit
 pub fn Material::set_iridescence(Self, Double) -> Unit
 pub fn Material::set_needs_update(Self, Bool) -> Unit
 pub fn Material::set_retroreflectivity(Self, Double) -> Unit
+pub fn Material::set_sheen(Self, Double) -> Unit
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 
