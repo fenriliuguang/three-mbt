@@ -131,6 +131,7 @@ pub(all) struct Sprite {
   node : @core.Object3D
   material : @materials.SpriteMaterial
   center : @math.Vector2
+  geometry : @core.BufferGeometry
 }
 pub fn Sprite::intersects_frustum(Self, @math.Frustum) -> Bool
 pub fn Sprite::intersects_frustum_array(Self, @math.FrustumArray) -> Bool

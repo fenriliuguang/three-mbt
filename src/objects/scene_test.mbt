@@ -838,6 +838,52 @@ test "LOD.update shows the level for the camera distance" {
 }
 
 ///|
+test "Sprite.geometry is one shared quad" {
+  let first = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  let second = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  assert_eq(physical_equal(first.geometry, second.geometry), true)
+  match first.geometry.get_attribute("position") {
+    None => assert_eq(false, true)
+    Some(position) => {
+      assert_eq(position.count, 4)
+      assert_eq(position.get_x(0), -0.5)
+      assert_eq(position.get_y(0), -0.5)
+      assert_eq(position.get_z(0), 0.0)
+      assert_eq(position.get_x(1), 0.5)
+      assert_eq(position.get_y(1), -0.5)
+      assert_eq(position.get_x(2), 0.5)
+      assert_eq(position.get_y(2), 0.5)
+      assert_eq(position.get_x(3), -0.5)
+      assert_eq(position.get_y(3), 0.5)
+      assert_eq(position.get_z(3), 0.0)
+    }
+  }
+  match first.geometry.get_attribute("uv") {
+    None => assert_eq(false, true)
+    Some(uv) => {
+      assert_eq(uv.get_x(0), 0.0)
+      assert_eq(uv.get_y(0), 0.0)
+      assert_eq(uv.get_x(2), 1.0)
+      assert_eq(uv.get_y(2), 1.0)
+      assert_eq(uv.get_x(3), 0.0)
+      assert_eq(uv.get_y(3), 1.0)
+    }
+  }
+  match first.geometry.get_index() {
+    None => assert_eq(false, true)
+    Some(index) => {
+      assert_eq(index.count, 6)
+      assert_eq(index.get_x(0), 0.0)
+      assert_eq(index.get_x(1), 1.0)
+      assert_eq(index.get_x(2), 2.0)
+      assert_eq(index.get_x(3), 0.0)
+      assert_eq(index.get_x(4), 2.0)
+      assert_eq(index.get_x(5), 3.0)
+    }
+  }
+}
+
+///|
 test "Sprite.intersectsFrustum uses a sphere around the sprite" {
   let frustum = @math.Frustum::new()
   ignore(

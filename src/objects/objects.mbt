@@ -802,13 +802,53 @@ pub fn InstancedMesh::intersects_frustum_array(
 }
 
 ///|
-/// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。
+/// 所有精灵共用的单位四边形。r186 把位置和 uv 打进步长为 5 的交错缓冲。这里几何体属性是 `BufferAttribute`，所以位置和 uv 分开存放，数值与索引相同。
+/// r186: `geometry` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L93
+let shared_sprite_geometry : Ref[BufferGeometry?] = Ref::Ref(None)
+
+///|
+fn sprite_geometry() -> BufferGeometry {
+  match shared_sprite_geometry.val {
+    Some(geometry) => geometry
+    None => {
+      let geometry = BufferGeometry::new()
+      ignore(
+        geometry.set_attribute(
+          "position",
+          BufferAttribute::new(
+            [
+              -0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0,
+            ],
+            3,
+          ),
+        ),
+      )
+      ignore(
+        geometry.set_attribute(
+          "uv",
+          BufferAttribute::new(
+            [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0],
+            2,
+          ),
+        ),
+      )
+      ignore(geometry.set_index_array([0, 1, 2, 0, 2, 3]))
+      shared_sprite_geometry.val = Some(geometry)
+      geometry
+    }
+  }
+}
+
+///|
+/// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。几何体是所有精灵共用的那一份。
 /// r186: `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
 /// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L110
+/// r186: `geometry` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L93
 pub(all) struct Sprite {
   node : Object3D
   material : @materials.SpriteMaterial
   center : @math.Vector2
+  geometry : BufferGeometry
 }
 
 ///|
@@ -820,7 +860,7 @@ pub fn Sprite::new(material : @materials.SpriteMaterial) -> Sprite {
     rotation: material.rotation,
     size_attenuation: material.size_attenuation,
   })
-  { node, material, center, }
+  { node, material, center, geometry: sprite_geometry(), }
 }
 
 ///|
