@@ -3825,6 +3825,37 @@ test "Material shader writes USE_ANISOTROPYMAP" {
 }
 
 ///|
+test "Material shader writes USE_CLEARCOAT" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.clearcoat = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1244)
+  assert_eq(1244 - 1222, 22)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_CLEARCOAT",
+  )
+  shader.clearcoat = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.clearcoat = 1.0
+  shader.anisotropy = 1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 1267)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1102:1123].to_owned(),
+    "#define USE_CLEARCOAT",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1631)
+  let raw = @materials.Material::raw()
+  raw.clearcoat = 1.0
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.clearcoat = 1.0
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
