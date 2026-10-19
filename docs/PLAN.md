@@ -2569,6 +2569,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `flatShading` has landed. Shader, Raw, Basic, and Toon start at `false`. Lambert, Phong, Standard, and Physical start at `true` when the geometry has no normal and the normal map is empty. Giving Lambert a normal attribute returns `false`. A normal map does the same. Shader with `flat_shading` on returns `true`, and a wireframe returns `false`. Lambert with `flat_shading` on and a normal attribute stays `false` while wireframe is on, then returns `true` when the wireframe is off. The vertex prefix stays `1608` and the fragment prefix stays `2041` while Shader `flat_shading` and `wireframe` are still off. `sizeAttenuation` stays later.
 
+`sizeAttenuation` has landed. Shader, Raw, and Basic stay `false` because mesh materials have no such field. Points and Sprite start at `true`. Turning the points flag off returns `false`, and turning it back on returns `true`. Turning the sprite flag off returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `logarithmicDepthBuffer` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3794,6 +3796,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `useFog` | `materials` |
 | planned | 7 | `fogExp2` | `materials` |
 | planned | 7 | `flatShading` | `materials` |
+| planned | 7 | `sizeAttenuation` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

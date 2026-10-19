@@ -9326,6 +9326,26 @@ test "Material shader flatShading skips wireframes and derived lit meshes" {
 }
 
 ///|
+test "Material shader sizeAttenuation is only on points and sprites" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_size_attenuation(), false)
+  assert_eq(@materials.Material::raw().program_size_attenuation(), false)
+  assert_eq(@materials.Material::basic().program_size_attenuation(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let points = @materials.PointsMaterial::new()
+  assert_eq(points.program_size_attenuation(), true)
+  points.size_attenuation = false
+  assert_eq(points.program_size_attenuation(), false)
+  points.size_attenuation = true
+  assert_eq(points.program_size_attenuation(), true)
+  let sprite = @materials.SpriteMaterial::new()
+  assert_eq(sprite.program_size_attenuation(), true)
+  sprite.size_attenuation = false
+  assert_eq(sprite.program_size_attenuation(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

@@ -354,6 +354,7 @@ pub fn Material::program_sheen_color_map(Self) -> Bool
 pub fn Material::program_sheen_color_map_uv(Self) -> String
 pub fn Material::program_sheen_roughness_map(Self) -> Bool
 pub fn Material::program_sheen_roughness_map_uv(Self) -> String
+pub fn Material::program_size_attenuation(Self) -> Bool
 pub fn Material::program_specular_color_map(Self) -> Bool
 pub fn Material::program_specular_color_map_uv(Self) -> String
 pub fn Material::program_specular_intensity_map(Self) -> Bool
@@ -485,6 +486,7 @@ pub fn PointsMaterial::dispatch_event(Self, String) -> Unit
 pub fn PointsMaterial::dispose(Self) -> Unit
 pub fn PointsMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
+pub fn PointsMaterial::program_size_attenuation(Self) -> Bool
 pub fn PointsMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn PointsMaterial::set_needs_update(Self, Bool) -> Unit
@@ -585,6 +587,7 @@ pub fn SpriteMaterial::dispatch_event(Self, String) -> Unit
 pub fn SpriteMaterial::dispose(Self) -> Unit
 pub fn SpriteMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
+pub fn SpriteMaterial::program_size_attenuation(Self) -> Bool
 pub fn SpriteMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit
