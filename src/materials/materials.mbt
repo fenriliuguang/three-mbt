@@ -524,6 +524,7 @@ pub fn PointsMaterial::copy(
 /// `blend_dst_alpha` 默认空。空着时 alpha 通道沿用 `blend_dst`。管线仍不读这个字段。
 /// `blend_equation_alpha` 默认空。空着时 alpha 通道沿用 `blend_equation`。管线仍不读这个字段。
 /// `stencil_write_mask` 默认 `0xFF`。管线仍不读这个字段。
+/// `stencil_func` 默认 `Always`。管线仍不读这个字段。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -548,6 +549,7 @@ pub fn PointsMaterial::copy(
 /// r186: `blendDstAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L175
 /// r186: `blendEquationAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L183
 /// r186: `stencilWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L239
+/// r186: `stencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L247
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -582,6 +584,7 @@ pub(all) struct LineBasicMaterial {
   mut blend_dst_alpha : @constants.BlendFactor?
   mut blend_equation_alpha : @constants.BlendEquation?
   mut stencil_write_mask : Int
+  mut stencil_func : @constants.StencilFunc
 }
 
 ///|
@@ -620,12 +623,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     blend_dst_alpha: None,
     blend_equation_alpha: None,
     stencil_write_mask: 0xFF,
+    stencil_func: @constants.StencilFunc::Always,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha` 和 `stencil_write_mask` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask` 和 `stencil_func` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -642,6 +646,7 @@ pub fn LineBasicMaterial::copy(
   self.blend_dst_alpha = source.blend_dst_alpha
   self.blend_equation_alpha = source.blend_equation_alpha
   self.stencil_write_mask = source.stencil_write_mask
+  self.stencil_func = source.stencil_func
   self.map = source.map
   self.opacity = source.opacity
   self.alpha_test = source.alpha_test

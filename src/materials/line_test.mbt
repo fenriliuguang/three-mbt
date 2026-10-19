@@ -647,3 +647,28 @@ test "LineBasicMaterial stores and copies stencilWriteMask" {
   assert_eq(dashed.line.stencil_write_mask, 0)
   assert_eq(other.line.stencil_write_mask, 9)
 }
+
+///|
+test "LineBasicMaterial stores and copies stencilFunc" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(defaults.stencil_func.to_int(), 519)
+  let source = @materials.LineBasicMaterial::new()
+  source.stencil_func = @constants.StencilFunc::Never
+  assert_eq(defaults.stencil_func is @constants.StencilFunc::Always, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_func is @constants.StencilFunc::Never, true)
+  assert_eq(destination.stencil_func.to_int(), 512)
+  destination.stencil_func = @constants.StencilFunc::Equal
+  assert_eq(source.stencil_func.to_int(), 512)
+  assert_eq(destination.stencil_func.to_int(), 514)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.stencil_func = @constants.StencilFunc::Never
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.stencil_func.to_int(), 512)
+  other.line.stencil_func = @constants.StencilFunc::Greater
+  assert_eq(dashed.line.stencil_func.to_int(), 512)
+  assert_eq(other.line.stencil_func.to_int(), 516)
+}
