@@ -777,3 +777,13 @@ test "SpriteMaterial stores and copies name" {
   assert_eq(source.name, "sprite")
   assert_eq(destination.name, "copy")
 }
+
+///|
+test "SpriteMaterial type_name stays SpriteMaterial" {
+  let source = @materials.SpriteMaterial::new()
+  assert_eq(source.type_name, "SpriteMaterial")
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.type_name, "SpriteMaterial")
+  assert_eq(source.type_name, "SpriteMaterial")
+}

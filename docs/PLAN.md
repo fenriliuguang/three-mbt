@@ -1883,6 +1883,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.type` has landed as `type_name`. A new material stores `LineBasicMaterial`. Copying onto another new material leaves that class name in place. A dashed material stores the same name on its inner line, and copying leaves both names in place. Line draws still do not read this name.
 
+`SpriteMaterial.type` has landed as `type_name`. A new material stores `SpriteMaterial`. Copying onto another new material leaves that class name in place. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2765,6 +2767,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.type` | `materials` |
 | planned | 7 | `PointsMaterial.type` | `materials` |
 | planned | 7 | `LineBasicMaterial.type` | `materials` |
+| planned | 7 | `SpriteMaterial.type` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
