@@ -7727,6 +7727,26 @@ test "Material shader isRawShaderMaterial is only set on raw" {
 }
 
 ///|
+test "Material shader glslVersion starts empty" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_glsl_version() is None, true)
+  assert_eq(@materials.Material::raw().program_glsl_version() is None, true)
+  assert_eq(@materials.Material::basic().program_glsl_version() is None, true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.glsl_version = Some(@materials.GlslVersion::GLSL3)
+  assert_eq(
+    shader.program_glsl_version() is Some(@materials.GlslVersion::GLSL3),
+    true,
+  )
+  shader.glsl_version = Some(@materials.GlslVersion::GLSL1)
+  assert_eq(
+    shader.program_glsl_version() is Some(@materials.GlslVersion::GLSL1),
+    true,
+  )
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
