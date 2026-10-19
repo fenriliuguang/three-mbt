@@ -147,6 +147,7 @@ pub(all) struct PrimitiveBinding {
   size : Double
   size_attenuation : Bool
   opacity : Double
+  alpha_test : Double
   transparent : Bool
   fog : Bool
   depth_write : Bool
@@ -166,6 +167,7 @@ pub(all) struct PrimitiveDraw {
   size : Double
   size_attenuation : Bool
   opacity : Double
+  alpha_test : Double
   transparent : Bool
   fog : Bool
   depth_write : Bool

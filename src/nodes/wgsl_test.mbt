@@ -332,5 +332,7 @@ test "lines return the uniform color and points scale like r186" {
   assert_eq(includes(points, "@location(0) corner : vec2<f32>"), true)
   assert_eq(includes(points, "@location(1) position : vec3<f32>"), true)
   assert_eq(includes(points, "uniforms.view"), true)
-  assert_eq(includes(points, "apply_fog(color, input.v_fog_depth)"), true)
+  assert_eq(includes(points, "apply_fog(shaded, input.v_fog_depth)"), true)
+  assert_eq(includes(points, "color.a < (uniforms.surface).z"), true)
+  assert_eq(includes(points, "discard"), true)
 }

@@ -449,6 +449,7 @@ pub(all) struct PrimitiveItem {
   size : Double
   size_attenuation : Bool
   opacity : Double
+  alpha_test : Double
   fog : Bool
   depth_write : Bool
   depth_test : Bool
@@ -470,6 +471,7 @@ fn emit_primitive(
   size : Double,
   size_attenuation : Bool,
   opacity : Double,
+  alpha_test : Double,
   fog : Bool,
   depth_write : Bool,
   depth_test : Bool,
@@ -490,6 +492,7 @@ fn emit_primitive(
         size,
         size_attenuation,
         opacity,
+        alpha_test,
         fog,
         depth_write,
         depth_test,
@@ -523,6 +526,7 @@ fn push_primitive(
           binding.size,
           binding.size_attenuation,
           binding.opacity,
+          binding.alpha_test,
           binding.fog,
           binding.depth_write,
           binding.depth_test,
@@ -547,6 +551,7 @@ fn push_primitive(
               draw.size,
               draw.size_attenuation,
               draw.opacity,
+              draw.alpha_test,
               draw.fog,
               draw.depth_write,
               draw.depth_test,

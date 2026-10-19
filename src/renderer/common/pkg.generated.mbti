@@ -108,6 +108,7 @@ pub(all) struct PrimitiveItem {
   size : Double
   size_attenuation : Bool
   opacity : Double
+  alpha_test : Double
   fog : Bool
   depth_write : Bool
   depth_test : Bool

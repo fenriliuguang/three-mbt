@@ -1230,6 +1230,28 @@ test "premultiplied alpha defaults off and reaches blended lists" {
 }
 
 ///|
+test "point and line alphaTest reaches the draw list" {
+  let scene = @scenes.Scene::new()
+  let spot = point_at(0.0)
+  let points_material = @materials.PointsMaterial::new()
+  points_material.alpha_test = 0.4
+  points_material.opacity = 1.0
+  let points = @objects.Points::new(spot, points_material)
+  ignore(scene.add(points))
+  let line_material = @materials.LineBasicMaterial::new()
+  line_material.alpha_test = 0.4
+  line_material.opacity = 1.0
+  let line = @objects.Line::new(spot, line_material)
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes.length(), 2)
+  assert_eq(strokes[0].alpha_test, 0.4)
+  assert_eq(strokes[0].opacity, 1.0)
+  assert_eq(strokes[1].alpha_test, 0.4)
+  assert_eq(strokes[1].opacity, 1.0)
+}
+
+///|
 test "shadow side flips the material side unless set" {
   assert_eq(
     @common.shadow_cast_side(@constants.Front, None).to_int(),

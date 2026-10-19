@@ -4563,6 +4563,7 @@ fn WebGPURenderer::draw_strokes(
           haze.far,
           haze.density,
           haze.mode,
+          alpha_test=item.alpha_test,
         )
         ignore(
           self.device

@@ -210,7 +210,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 ///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
-/// `alpha_test` 默认 `0`。点着色器仍不按它丢弃片元。
+/// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -288,7 +288,7 @@ pub fn PointsMaterial::copy(
 ///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
-/// `alpha_test` 默认 `0`。线段着色器仍不按它丢弃片元。
+/// `alpha_test` 默认 `0`。线段着色器在片元 alpha 小于它时丢弃。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
