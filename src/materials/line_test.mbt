@@ -1331,6 +1331,26 @@ test "LineBasicMaterial side defaults to front and copies" {
 }
 
 ///|
+test "LineBasicMaterial shadowSide defaults to empty and copies" {
+  let material = @materials.LineBasicMaterial::new()
+  assert_eq(material.shadow_side is None, true)
+  material.shadow_side = Some(@constants.Back)
+  let other = @materials.LineBasicMaterial::new()
+  assert_eq(other.shadow_side is None, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(material))
+  match destination.shadow_side {
+    None => abort("shadow side")
+    Some(side) => assert_eq(side is @constants.Back, true)
+  }
+  destination.shadow_side = Some(@constants.Double)
+  match material.shadow_side {
+    None => abort("source shadow side")
+    Some(side) => assert_eq(side is @constants.Back, true)
+  }
+}
+
+///|
 test "LineDashedMaterial dispose runs only the inner dispose listeners" {
   let material = @materials.LineDashedMaterial::new()
   let hits = Ref::Ref(0)

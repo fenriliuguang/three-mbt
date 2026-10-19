@@ -15,6 +15,7 @@ import {
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut side : @constants.Side
+  mut shadow_side : @constants.Side?
   mut map : @textures.Texture?
   mut opacity : Double
   mut alpha_test : Double
