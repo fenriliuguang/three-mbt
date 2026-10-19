@@ -2337,6 +2337,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `getToneMappingFunction` has landed. A Shader material with `tone_mapping` at `No` adds nothing. `Linear` writes `vec3 toneMapping( vec3 color ) { return LinearToneMapping( color ); }` after `tonemapping_pars_fragment`, `69` characters, with a newline on each side, `71` in total. The fragment string grows from `1222` to `6546`. The vertex string stays `1608`. `Reinhard` is `71` characters and the fragment string is `6548`. `Cineon` is `69` and stays `6546`. `ACES` writes `ACESFilmic`, `73` characters, and the fragment string is `6550`. `AgX` is `66` and the fragment string is `6543`. `Neutral` is `70` and the fragment string is `6547`. `reversed_depth_buffer` true puts the `Linear` line after the chunk, so the fragment string is `6580` and the vertex string is `1642`. A raw material stays at `61`. A Basic material stays `""`. `DITHERING` stays later.
 
+`DITHERING` has landed. A Shader material with `dithering` false adds nothing. Setting it to true writes `#define DITHERING` on the fragment prefix. With `tone_mapping` at `No`, a leading newline is included, so the line is `19` characters and the fragment string grows from `1222` to `1241`. The vertex string stays `1608`. `Linear` already ends the tone-mapping function with a newline, so the define adds `18` characters and the fragment string is `6564`. `reversed_depth_buffer` true with `Linear` puts that line after the tone-mapping function, so the fragment string is `6598` and the vertex string is `1642`. Setting `dithering` back to false drops the line. A raw material stays at `61`. A Basic material stays `""`. `OPAQUE` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3446,6 +3448,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `TONE_MAPPING` | `materials` |
 | planned | 7 | `tonemapping_pars_fragment` | `materials` |
 | planned | 7 | `getToneMappingFunction` | `materials` |
+| planned | 7 | `DITHERING` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -6608,6 +6608,40 @@ test "Material shader writes getToneMappingFunction" {
 }
 
 ///|
+test "Material shader writes DITHERING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.dithering = true
+  assert_eq(shader.prefixed_fragment_shader().length(), 1241)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(1241 - 1222, 19)
+  assert_eq(shader.prefixed_fragment_shader()[1162:1179].to_owned(), "#define DITHERING")
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 6564)
+  assert_eq(
+    shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[6485:6502].to_owned(),
+    "#define DITHERING",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear).length(),
+    6598,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear)[6519:6536].to_owned(),
+    "#define DITHERING",
+  )
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
+  shader.dithering = false
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 6546)
+  let raw = @materials.Material::raw()
+  raw.dithering = true
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.dithering = true
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
