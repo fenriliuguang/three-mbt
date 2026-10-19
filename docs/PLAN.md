@@ -2537,6 +2537,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `sheenColorMapUv` has landed. Shader, Raw, and Physical start at `false`. A 1×1 sheen color map with sheen `0` stays `false`. Sheen `0.25` on channel `0` returns `uv`. Returning sheen to `0` returns `false` while the map stays. Sheen `0.25` on channel `1` returns `uv1`. Clearing the map returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while both are still unset. `sheenRoughnessMapUv` stays later.
 
+`sheenRoughnessMapUv` has landed. Shader, Raw, and Physical start at `false`. A 1×1 sheen roughness map with sheen `0` stays `false`. Sheen `0.25` on channel `0` returns `uv`. Returning sheen to `0` returns `false` while the map stays. Sheen `0.25` on channel `1` returns `uv1`. Clearing the map returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while both are still unset. `specularMapUv` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3746,6 +3748,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `iridescenceMapUv` | `materials` |
 | planned | 7 | `iridescenceThicknessMapUv` | `materials` |
 | planned | 7 | `sheenColorMapUv` | `materials` |
+| planned | 7 | `sheenRoughnessMapUv` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
