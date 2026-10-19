@@ -3205,3 +3205,30 @@ test "Material shader defaults fog off" {
   assert_eq(cloned.fog, false)
   assert_eq(cloned.id == shader.id, false)
 }
+
+///|
+test "Material shader defaults lights off and copies only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.lights, false)
+  assert_eq(basic.lights, false)
+  assert_eq(phong.lights, false)
+  shader.lights = true
+  ignore(basic.copy(shader))
+  assert_eq(basic.lights, false)
+  assert_eq(shader.lights, true)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.lights, true)
+  onto.lights = false
+  assert_eq(shader.lights, true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.lights, false)
+  assert_eq(phong.lights, false)
+  let cloned = shader.clone()
+  assert_eq(cloned.lights, true)
+  assert_eq(cloned.id == shader.id, false)
+  cloned.lights = false
+  assert_eq(shader.lights, true)
+}

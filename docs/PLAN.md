@@ -2101,6 +2101,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.fog` has landed. A new Shader material stores false. A new Basic material stays true. Copying the Shader material onto that Basic material stores false on the destination and leaves the source false. Copying a Phong material onto a Shader material stores true. Setting the destination back to false leaves the Phong source true. Cloning keeps false, with a new id. The renderer mixes scene fog only when this flag is on. `lights` stays later.
 
+`ShaderMaterial.lights` has landed. A new Shader, Basic, and Phong material each store false. Setting the Shader material to true and copying it onto a Basic material leaves the Basic material false and the source true. Copying that Shader material onto another Shader material stores true. Setting the destination back to false leaves the source true. Copying a Phong material onto that destination stores false. Cloning the source keeps true, and setting the clone to false leaves the source true. The renderer still does not pass lighting uniforms from this flag. `clipping` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3092,6 +3094,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.isShaderMaterial` | `materials` |
 | planned | 7 | `ShaderMaterial` defines copy | `materials` |
 | planned | 7 | `ShaderMaterial.fog` | `materials` |
+| planned | 7 | `ShaderMaterial.lights` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
