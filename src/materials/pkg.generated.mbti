@@ -209,6 +209,7 @@ pub(all) struct PointsMaterial {
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
+pub fn PointsMaterial::set_needs_update(Self, Bool) -> Unit
 
 pub(all) struct SpriteMaterial {
   color : @math.Color

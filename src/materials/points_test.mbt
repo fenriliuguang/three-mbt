@@ -668,3 +668,21 @@ test "PointsMaterial stores version" {
   assert_eq(source.version, 1)
   assert_eq(destination.version, 2)
 }
+
+///|
+test "PointsMaterial needsUpdate increments version" {
+  let source = @materials.PointsMaterial::new()
+  source.set_needs_update(false)
+  assert_eq(source.version, 0)
+  source.set_needs_update(true)
+  assert_eq(source.version, 1)
+  source.set_needs_update(true)
+  assert_eq(source.version, 2)
+  let other = @materials.PointsMaterial::new()
+  assert_eq(other.version, 0)
+  let destination = @materials.PointsMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 2)
+}
