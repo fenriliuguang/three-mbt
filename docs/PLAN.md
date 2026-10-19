@@ -1567,6 +1567,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 `SpriteMaterial` color, map, and transparency have landed. A new material is white `(1, 1, 1)`, opacity `1`, transparent, rotation `0`, and size attenuation on. The map is empty. `hex=0xFF0000`, opacity `0.25`, and transparent off store red `(1, 0, 0)`. A 1×1 map stays that texture object. Setting the red channel to `0.5` leaves another new material at `1`. `alphaMap` and fog stay later. The renderer still does not draw sprites.
 
+`SpriteMaterial` alpha map and fog have landed. A new material has fog on and an empty alpha map. `fog=false` stores false. A 1×1 alpha map whose second byte is `0x80` stays that texture object. Another new material stays fog on with an empty alpha map. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2291,6 +2293,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.morphTexture` | `textures`, `objects` |
 | planned | 7 | `Points.copy` leaves morph weights in place | `objects` |
 | planned | 7 | `SpriteMaterial` color, map, and transparency | `materials` |
+| planned | 7 | `SpriteMaterial` alpha map and fog | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
