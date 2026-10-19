@@ -109,6 +109,7 @@ pub(all) struct Material {
   mut blend_equation_alpha : @constants.BlendEquation?
   mut stencil_write_mask : Int
   mut stencil_func : @constants.StencilFunc
+  mut stencil_ref : Int
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

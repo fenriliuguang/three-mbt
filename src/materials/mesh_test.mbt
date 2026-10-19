@@ -434,3 +434,20 @@ test "Material stencilFunc defaults to Always" {
   assert_eq(standard.material.stencil_func.to_int(), 514)
   assert_eq(lambert.material.stencil_func.to_int(), 519)
 }
+
+///|
+test "Material stencilRef defaults to 0" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_ref, 0)
+  basic.material.stencil_ref = 1
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_ref, 0)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_ref, 0)
+  standard.material.stencil_ref = 7
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_ref, 0)
+  assert_eq(basic.material.stencil_ref, 1)
+  assert_eq(standard.material.stencil_ref, 7)
+  assert_eq(lambert.material.stencil_ref, 0)
+}
