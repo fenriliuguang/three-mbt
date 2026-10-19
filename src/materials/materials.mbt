@@ -463,10 +463,11 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。渲染器仍不画精灵。
+/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。渲染器仍不画精灵。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
+/// r186: `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L82
@@ -500,6 +501,7 @@ pub(all) struct SpriteMaterial {
   mut visible : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
+  mut alpha_hash : Bool
 }
 
 ///|
@@ -529,12 +531,13 @@ pub fn SpriteMaterial::new(
     visible: true,
     vertex_colors: false,
     tone_mapped: true,
+    alpha_hash: false,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色和色调映射一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射和 `alpha_hash` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -558,5 +561,6 @@ pub fn SpriteMaterial::copy(
   self.visible = source.visible
   self.vertex_colors = source.vertex_colors
   self.tone_mapped = source.tone_mapped
+  self.alpha_hash = source.alpha_hash
   self
 }

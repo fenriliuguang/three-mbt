@@ -162,3 +162,17 @@ test "SpriteMaterial stores and copies toneMapped" {
   destination.tone_mapped = true
   assert_eq(source.tone_mapped, false)
 }
+
+///|
+test "SpriteMaterial stores and copies alphaHash" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.alpha_hash, false)
+  let source = @materials.SpriteMaterial::new()
+  source.alpha_hash = true
+  assert_eq(defaults.alpha_hash, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_hash, true)
+  destination.alpha_hash = false
+  assert_eq(source.alpha_hash, true)
+}
