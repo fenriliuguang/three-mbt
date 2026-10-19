@@ -1469,6 +1469,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Line.updateMorphTargets` has landed. A new line with no morph attributes keeps influences and the dictionary empty. A position group with targets named `wide` and `tall` stores influences `[0, 0]` and maps those names to `0` and `1`. Setting the first weight to `0.5` leaves another new line at `0`. Assigning the geometry after construction leaves the dictionary empty until the call. Replacing that group with an unnamed target maps `"0"` to `0`. Clearing the morph attributes and calling again keeps `"0"` at `0`. `LineSegments` and `LineLoop` stay later.
 
+`LineSegments.updateMorphTargets` has landed. `LineSegments` has no method of its own; it follows `Line`. A new line segments object with no morph attributes keeps influences and the dictionary empty. A position group with targets named `wide` and `tall` stores influences `[0, 0]` and maps those names to `0` and `1`. Setting the first weight to `0.5` leaves another new line segments object at `0`. Assigning the geometry after construction leaves the dictionary empty until the call. Replacing that group with an unnamed target maps `"0"` to `0`. Clearing the morph attributes and calling again keeps `"0"` at `0`. `LineLoop` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2144,6 +2146,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineLoop.computeLineDistances` | `objects` |
 | planned | 7 | `Points.updateMorphTargets` | `objects` |
 | planned | 7 | `Line.updateMorphTargets` | `objects` |
+| planned | 7 | `LineSegments.updateMorphTargets` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
