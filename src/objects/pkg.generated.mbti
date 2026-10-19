@@ -89,6 +89,8 @@ pub(all) struct LineLoop {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 pub fn LineLoop::clone(Self, recursive? : Bool) -> Self
 pub fn LineLoop::compute_line_distances(Self) -> Self
@@ -96,6 +98,7 @@ pub fn LineLoop::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineLoop::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineLoop::refresh(Self) -> Unit
 pub fn LineLoop::to_node(Self) -> @core.Object3D
+pub fn LineLoop::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for LineLoop
 
 pub(all) struct LineSegments {

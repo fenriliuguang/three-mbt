@@ -765,11 +765,16 @@ pub fn LineSegments::set_transparent(
 
 ///|
 /// 闭合折线。最后一点连回第一点，射线会测这段；绘制仍按折线提交。
+/// 没有形变属性时，权重和名字表保持空。这两个字段来自 `Line`，`LineLoop` 没有单独声明。
 /// r186: `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10
+/// r186: `morphTargetDictionary` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L87
+/// r186: `morphTargetInfluences` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L97
 pub(all) struct LineLoop {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 
 ///|
@@ -778,8 +783,15 @@ pub fn LineLoop::new(
   material : @materials.LineBasicMaterial,
 ) -> LineLoop {
   let node = Object3D::new(kind=@core.NodeKind::LineLoop)
-  let line : LineLoop = { node, geometry, material, }
+  let line : LineLoop = {
+    node,
+    geometry,
+    material,
+    morph_target_influences: None,
+    morph_target_dictionary: None,
+  }
   line.refresh()
+  line.update_morph_targets()
   line
 }
 
@@ -812,6 +824,42 @@ pub fn LineLoop::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn LineLoop::clone(self : LineLoop, recursive? : Bool = true) -> LineLoop {
   LineLoop::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
+/// 按几何体里先迭代到的那一组形变属性填写权重和名字表。权重全是 `0`。
+/// 属性名为空时用下标字符串。没有形变属性时保持原值。
+/// `LineLoop` 没有自己的 `updateMorphTargets`，行为来自 `Line`。
+/// r186: `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L275
+pub fn LineLoop::update_morph_targets(self : LineLoop) -> Unit {
+  let mut chosen : Array[BufferAttribute]? = None
+  for pair in self.geometry.morph_attributes.iter() {
+    if chosen is None {
+      let (_, attributes) = pair
+      chosen = Some(attributes)
+    }
+  }
+  match chosen {
+    None => ()
+    Some(attributes) => {
+      let influences : Array[Double] = []
+      let dictionary : Map[String, Int] = Map([])
+      let mut index = 0
+      while index < attributes.length() {
+        let attribute = attributes[index]
+        let name = if attribute.name == "" {
+          index.to_string()
+        } else {
+          attribute.name
+        }
+        influences.push(0.0)
+        dictionary.set(name, index)
+        index = index + 1
+      }
+      self.morph_target_influences = Some(influences)
+      self.morph_target_dictionary = Some(dictionary)
+    }
+  }
 }
 
 ///|
