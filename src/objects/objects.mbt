@@ -47,6 +47,13 @@ pub fn Group::copy(
 }
 
 ///|
+/// 新建一个组再复制。three.js 没有单独的 `Group.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Group::clone(self : Group, recursive? : Bool = true) -> Group {
+  Group::new().copy(self, recursive~)
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39

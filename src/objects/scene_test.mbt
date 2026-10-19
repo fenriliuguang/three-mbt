@@ -1377,6 +1377,30 @@ test "Group.copy clones the child and keeps the transform" {
 }
 
 ///|
+test "Group.clone keeps the transform and drops children when asked" {
+  let source = @objects.Group::new()
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.add(child))
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(cloned.node.position.y, 3.0)
+  assert_eq(cloned.node.position.x, 0.0)
+  assert_eq(cloned.node.render_order, 4)
+  assert_eq(cloned.node.children.length(), 1)
+  assert_eq(cloned.node.children[0].name, "marker")
+  assert_eq(physical_equal(cloned.node.children[0], child), false)
+  let bare = source.clone(recursive=false)
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.node.position.y, 3.0)
+  assert_eq(bare.node.render_order, 4)
+  assert_eq(source.node.children.length(), 1)
+  assert_eq(source.node.position.y, 3.0)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

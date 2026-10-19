@@ -1485,6 +1485,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Group.copy` has landed. `Group` has no `copy` of its own; it follows `Object3D.copy`. A group at `y=3` with render order `4` and a child named `marker` copies onto a group that was at `x=1`. The destination moves to `y=3` with `x` `0`, and the child is a new node. `recursive` false keeps the transform and drops the child. The source child stays in place.
 
+`Group.clone` has landed. The same group produces a new group at `y=3` with render order `4` and `x` `0`. The child named `marker` is a new node. `recursive` false drops the child and leaves the source child in place.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2168,6 +2170,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.dispose` | `objects` |
 | planned | 7 | `InstancedMesh.updateMorphTargets` | `objects` |
 | planned | 7 | `Group.copy` | `objects` |
+| planned | 7 | `Group.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
