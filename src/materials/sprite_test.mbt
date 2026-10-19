@@ -730,3 +730,17 @@ test "SpriteMaterial set_alpha_test bumps version across zero" {
   assert_eq(destination.version, 4)
   assert_eq(source.version, 3)
 }
+
+///|
+test "SpriteMaterial id increments" {
+  let before = @materials.Material::basic()
+  let source = @materials.SpriteMaterial::new()
+  assert_eq(source.id, before.id + 1)
+  let destination = @materials.SpriteMaterial::new()
+  assert_eq(destination.id, source.id + 1)
+  ignore(destination.copy(source))
+  assert_eq(destination.id, source.id + 1)
+  assert_eq(source.id, before.id + 1)
+  let after = @materials.PointsMaterial::new()
+  assert_eq(after.id, destination.id + 1)
+}
