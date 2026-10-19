@@ -1317,6 +1317,20 @@ test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
 }
 
 ///|
+test "LineBasicMaterial side defaults to front and copies" {
+  let material = @materials.LineBasicMaterial::new()
+  assert_eq(material.side is @constants.Front, true)
+  material.side = @constants.Back
+  let other = @materials.LineBasicMaterial::new()
+  assert_eq(other.side is @constants.Front, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.side is @constants.Back, true)
+  destination.side = @constants.Double
+  assert_eq(material.side is @constants.Back, true)
+}
+
+///|
 test "LineDashedMaterial dispose runs only the inner dispose listeners" {
   let material = @materials.LineDashedMaterial::new()
   let hits = Ref::Ref(0)

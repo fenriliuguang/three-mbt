@@ -1149,6 +1149,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 ///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
+/// `side` 默认正面。背面和双面一并存储。`copy` 沿用源值。线段绘制仍不按这个面剔除。
 /// `alpha_test` 默认 `0`。线段着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
 /// `vertex_colors` 默认关闭。线段着色器仍不读顶点色。
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的线段生效。
@@ -1186,6 +1187,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// `type_name` 对应上游 `type`，固定是 `LineBasicMaterial`。`copy` 不改目标上的这个名字。线段绘制仍不读它。
 /// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。线段绘制仍不读它。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
+/// r186: `side` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L88
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
@@ -1226,6 +1228,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L39
 pub(all) struct LineBasicMaterial {
   color : @math.Color
+  mut side : @constants.Side
   mut map : @textures.Texture?
   mut opacity : Double
   mut alpha_test : Double
@@ -1280,6 +1283,7 @@ pub(all) struct LineBasicMaterial {
 pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
   {
     color: @math.Color::new().set_hex(hex),
+    side: @constants.Front,
     map: None,
     opacity: 1.0,
     alpha_test: 0.0,
@@ -1333,7 +1337,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// `name`、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
+/// `name`、`side`、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -1341,6 +1345,7 @@ pub fn LineBasicMaterial::copy(
   source : LineBasicMaterial,
 ) -> LineBasicMaterial {
   self.name = source.name
+  self.side = source.side
   ignore(self.color.copy(source.color))
   ignore(self.blend_color.copy(source.blend_color))
   self.blending = source.blending
