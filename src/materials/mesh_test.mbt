@@ -5767,6 +5767,61 @@ test "Material shader writes USE_UV3" {
 }
 
 ///|
+test "Material shader writes USE_POINTS_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1260)
+  assert_eq(1664 - 1642, 22)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_points_uv=true)[717:738].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_points_uv=true)[1095:1116].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  shader.map = None
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1222)
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1674)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_points_uv=true)[727:748].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1265)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_points_uv=true)[1100:1121].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  shader.alpha_map = None
+  map.channel = 3
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(has_points_uv=true).length(), 1681)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_points_uv=true)[734:755].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_points_uv=true).length(), 1276)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_points_uv=true)[1111:1132].to_owned(),
+    "#define USE_POINTS_UV",
+  )
+  let raw = @materials.Material::raw()
+  raw.map = Some(map)
+  assert_eq(raw.prefixed_vertex_shader(has_points_uv=true).length(), 92)
+  let basic = @materials.Material::basic()
+  basic.map = Some(map)
+  assert_eq(basic.prefixed_vertex_shader(has_points_uv=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
