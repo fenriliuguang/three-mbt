@@ -6364,6 +6364,34 @@ test "Material shader writes SHADOWMAP_TYPE_VSM" {
 }
 
 ///|
+test "Material shader writes USE_SIZEATTENUATION" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(size_attenuation=true).length(), 1636)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1636 - 1608, 28)
+  assert_eq(
+    shader.prefixed_vertex_shader(size_attenuation=true)[683:710].to_owned(),
+    "#define USE_SIZEATTENUATION",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, size_attenuation=true).length(),
+    1687,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true, size_attenuation=true)[734:761].to_owned(),
+    "#define USE_SIZEATTENUATION",
+  )
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1273)
+  assert_eq(shader.prefixed_vertex_shader(size_attenuation=false).length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(size_attenuation=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(size_attenuation=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
