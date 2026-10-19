@@ -3501,6 +3501,28 @@ test "UniformsGroup setUsage replaces the usage" {
 }
 
 ///|
+test "UniformsGroup dispose runs dispose listeners" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  let hits = Ref::Ref(0)
+  let listener = fn() { hits.val = hits.val + 1 }
+  frame.add_event_listener("dispose", listener)
+  frame.add_event_listener("dispose", listener)
+  frame.add_event_listener("change", fn() { hits.val = hits.val + 10 })
+  frame.dispose()
+  assert_eq(hits.val, 1)
+  frame.dispose()
+  assert_eq(hits.val, 2)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  onto.uniforms_groups[0].dispose()
+  assert_eq(hits.val, 2)
+  shader.uniforms_groups[0].dispose()
+  assert_eq(hits.val, 3)
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()

@@ -448,8 +448,11 @@ pub(all) struct UniformsGroup {
   mut name : String
   mut usage : Int
   mut uniforms : Array[Double]
+  listeners : Map[String, Array[() -> Unit]]
 }
 pub fn UniformsGroup::add(Self, Double) -> Self
+pub fn UniformsGroup::add_event_listener(Self, String, () -> Unit) -> Unit
+pub fn UniformsGroup::dispose(Self) -> Unit
 pub fn UniformsGroup::new(name? : String) -> Self
 pub fn UniformsGroup::remove(Self, Double) -> Self
 pub fn UniformsGroup::set_name(Self, String) -> Self

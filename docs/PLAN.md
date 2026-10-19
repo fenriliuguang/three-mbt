@@ -2137,6 +2137,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `UniformsGroup.setUsage` has landed. A new group stores usage `35044`. Setting it to `35048` stores `35048`. The chained result is the same group, with the same id. Copying that group onto another Shader material and then setting the source usage back to `35044` leaves the destination at `35048`. `UniformsGroup.dispose` stays later.
 
+`UniformsGroup.dispose` has landed. A listener registered twice for `dispose` runs once, so the hit count is `1`. A `change` listener does not run. Calling `dispose` again makes the count `2`. Copying the group onto another Shader material gives that group an empty listener table. Disposing the destination leaves the count at `2`. Disposing the source makes the count `3`. The renderer still does not free a GPU buffer from this call. `UniformsGroup.hasEventListener` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3146,6 +3148,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `UniformsGroup.remove` | `materials` |
 | planned | 7 | `UniformsGroup.setName` | `materials` |
 | planned | 7 | `UniformsGroup.setUsage` | `materials` |
+| planned | 7 | `UniformsGroup.dispose` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
