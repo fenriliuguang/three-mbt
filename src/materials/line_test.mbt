@@ -951,3 +951,29 @@ test "LineBasicMaterial stores and copies userData" {
     Some(label) => assert_eq(label, "other")
   }
 }
+
+///|
+test "LineBasicMaterial stores version" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.version, 0)
+  let source = @materials.LineBasicMaterial::new()
+  source.version = 1
+  assert_eq(defaults.version, 0)
+  let destination = @materials.LineBasicMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 1)
+  destination.version = 2
+  assert_eq(source.version, 1)
+  assert_eq(destination.version, 2)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.version = 4
+  let other = @materials.LineDashedMaterial::new()
+  other.line.version = 5
+  ignore(other.copy(dashed))
+  assert_eq(other.line.version, 5)
+  assert_eq(dashed.line.version, 4)
+  other.line.version = 6
+  assert_eq(dashed.line.version, 4)
+}

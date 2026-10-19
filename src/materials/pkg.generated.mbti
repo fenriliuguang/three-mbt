@@ -56,6 +56,7 @@ pub(all) struct LineBasicMaterial {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
+  mut version : Int
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
