@@ -248,6 +248,7 @@ pub(all) struct SpriteMaterial {
   mut stencil_z_pass : @constants.StencilOp
   mut stencil_write : Bool
   mut clipping_planes : Array[@math.Plane]?
+  mut precision : @constants.Precision?
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self

@@ -608,3 +608,27 @@ test "SpriteMaterial stores and copies clippingPlanes" {
     Some(planes) => assert_eq(planes[0].constant, 2.0)
   }
 }
+
+///|
+test "SpriteMaterial stores and copies precision" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.precision is None, true)
+  let source = @materials.SpriteMaterial::new()
+  source.precision = Some(@constants.Precision::Highp)
+  assert_eq(defaults.precision is None, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  match destination.precision {
+    None => abort("copied precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  destination.precision = Some(@constants.Precision::Mediump)
+  match source.precision {
+    None => abort("source precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Highp, true)
+  }
+  match destination.precision {
+    None => abort("destination precision")
+    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+  }
+}
