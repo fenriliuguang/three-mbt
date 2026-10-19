@@ -173,6 +173,16 @@ pub fn Points::to_node(Self) -> @core.Object3D
 pub fn Points::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for Points
 
+pub(all) struct Skeleton {
+  uuid : String
+  bones : Array[Bone]
+  mut bone_inverses : Array[@math.Matrix4]
+  mut bone_matrices : Array[Double]
+}
+pub fn Skeleton::calculate_inverses(Self) -> Unit
+pub fn Skeleton::init(Self) -> Unit
+pub fn Skeleton::new(bones? : Array[Bone], bone_inverses? : Array[@math.Matrix4]) -> Self
+
 pub(all) struct Sprite {
   node : @core.Object3D
   mut material : @materials.SpriteMaterial

@@ -1470,6 +1470,81 @@ test "Bone.clone keeps the transform and drops children when asked" {
 }
 
 ///|
+test "Skeleton inverts the current world matrices" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let listed = [shoulder, elbow, hand]
+  let inverses = []
+  let arm = @objects.Skeleton::new(bones=listed, bone_inverses=inverses)
+  listed.push(@objects.Bone::new())
+  assert_eq(arm.bones.length(), 3)
+  assert_eq(physical_equal(arm.bones[0], shoulder), true)
+  assert_eq(physical_equal(arm.bones[2], hand), true)
+  assert_eq(arm.bones[0].node.position.y, -5.0)
+  assert_eq(arm.bones[1].node.position.y, 0.0)
+  assert_eq(arm.bones[2].node.position.y, 5.0)
+  assert_eq(physical_equal(arm.bone_inverses, inverses), true)
+  assert_eq(inverses.length(), 3)
+  assert_eq(inverses[0].elements[13], 5.0)
+  assert_eq(inverses[1].elements[13], 5.0)
+  assert_eq(inverses[2].elements[0], 1.0)
+  assert_eq(inverses[2].elements[13], 0.0)
+  assert_eq(arm.bone_matrices.length(), 48)
+  assert_eq(arm.bone_matrices[0], 0.0)
+  assert_eq(arm.bone_matrices[47], 0.0)
+  assert_eq(arm.uuid.length(), 36)
+  let empty = @objects.Skeleton::new()
+  assert_eq(empty.bones.length(), 0)
+  assert_eq(empty.bone_inverses.length(), 0)
+  assert_eq(empty.bone_matrices.length(), 0)
+  assert_eq(empty.uuid.length(), 36)
+  arm.bone_matrices[0] = 4.0
+  arm.init()
+  assert_eq(arm.bone_matrices[0], 0.0)
+  assert_eq(arm.bone_matrices.length(), 48)
+  assert_eq(arm.bone_inverses[0].elements[13], 5.0)
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  arm.calculate_inverses()
+  assert_eq(arm.bone_inverses[0].elements[13], 2.0)
+  assert_eq(arm.bone_inverses[1].elements[13], 2.0)
+  assert_eq(arm.bone_inverses[2].elements[13], -3.0)
+}
+
+///|
+test "Skeleton.init replaces a mismatched inverse list" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  let one = @math.Matrix4::new()
+  ignore(
+    one.set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 9.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    ),
+  )
+  let mismatched = [one]
+  let replaced = @objects.Skeleton::new(
+    bones=[shoulder, elbow, hand],
+    bone_inverses=mismatched,
+  )
+  assert_eq(physical_equal(replaced.bone_inverses, mismatched), false)
+  assert_eq(replaced.bone_inverses.length(), 3)
+  assert_eq(replaced.bone_inverses[0].elements[0], 1.0)
+  assert_eq(replaced.bone_inverses[0].elements[13], 0.0)
+  assert_eq(replaced.bone_inverses[2].elements[13], 0.0)
+  assert_eq(mismatched.length(), 1)
+  assert_eq(mismatched[0].elements[13], 9.0)
+  assert_eq(replaced.bone_matrices.length(), 48)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

@@ -266,6 +266,8 @@ pub using @constants {type Shading}
 
 pub using @constants {type Side}
 
+pub using @objects {type Skeleton}
+
 pub using @math {type Sphere}
 
 pub using @lights {type SpotLight}

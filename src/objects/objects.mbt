@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17 ; `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 
 ///|
 using @core {
@@ -96,6 +96,85 @@ pub fn Bone::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn Bone::clone(self : Bone, recursive? : Bool = true) -> Bone {
   Bone::new().copy(self, recursive~)
+}
+
+///|
+/// 由骨骼层级组成的骨架。构造时复制骨骼列表。逆绑定矩阵缺省时由当前 `matrixWorld` 求逆。
+/// 骨骼纹理留到后面。
+/// r186: `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37
+pub(all) struct Skeleton {
+  uuid : String
+  bones : Array[Bone]
+  mut bone_inverses : Array[@math.Matrix4]
+  mut bone_matrices : Array[Double]
+}
+
+///|
+pub fn Skeleton::new(
+  bones? : Array[Bone],
+  bone_inverses? : Array[@math.Matrix4],
+) -> Skeleton {
+  let bones = match bones {
+    None => []
+    Some(bones) => bones.copy()
+  }
+  let bone_inverses = match bone_inverses {
+    None => []
+    Some(bone_inverses) => bone_inverses
+  }
+  let skeleton : Skeleton = {
+    uuid: @math.generate_uuid(),
+    bones,
+    bone_inverses,
+    bone_matrices: [],
+  }
+  skeleton.init()
+  skeleton
+}
+
+///|
+/// 按骨骼数量分配全零的矩阵缓冲。逆绑定矩阵为空时重新计算；数量对不上时改成同样多的单位矩阵。
+/// r186: `init` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L91
+pub fn Skeleton::init(self : Skeleton) -> Unit {
+  self.bone_matrices = zero_doubles(self.bones.length() * 16)
+  if self.bone_inverses.length() == 0 {
+    self.calculate_inverses()
+  } else if self.bones.length() != self.bone_inverses.length() {
+    let inverses = []
+    let count = self.bones.length()
+    let mut index = 0
+    while index < count {
+      inverses.push(@math.Matrix4::new())
+      index = index + 1
+    }
+    self.bone_inverses = inverses
+  }
+}
+
+///|
+/// 清空逆绑定矩阵，再写入每根骨骼 `matrixWorld` 的逆。
+/// r186: `calculateInverses` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L130
+pub fn Skeleton::calculate_inverses(self : Skeleton) -> Unit {
+  self.bone_inverses.clear()
+  let count = self.bones.length()
+  let mut index = 0
+  while index < count {
+    let inverse = @math.Matrix4::new()
+    ignore(inverse.copy(self.bones[index].node.matrix_world).invert())
+    self.bone_inverses.push(inverse)
+    index = index + 1
+  }
+}
+
+///|
+fn zero_doubles(count : Int) -> Array[Double] {
+  let values = []
+  let mut index = 0
+  while index < count {
+    values.push(0.0)
+    index = index + 1
+  }
+  values
 }
 
 ///|

@@ -146,6 +146,7 @@ pub using @objects {
   type LOD,
   type Mesh,
   type Points,
+  type Skeleton,
   type Sprite,
 }
 
