@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 
 ///|
 using @core {
@@ -374,6 +374,56 @@ pub fn LineSegments::set_transparent(
   self.material.transparent = enabled
   self.material.opacity = opacity
   self.refresh()
+}
+
+///|
+/// 闭合折线。最后一点连回第一点，射线会测这段；绘制仍按折线提交。
+/// r186: `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10
+pub(all) struct LineLoop {
+  node : Object3D
+  geometry : BufferGeometry
+  material : @materials.LineBasicMaterial
+}
+
+///|
+pub fn LineLoop::new(
+  geometry : BufferGeometry,
+  material : @materials.LineBasicMaterial,
+) -> LineLoop {
+  let node = Object3D::new(kind=@core.NodeKind::LineLoop)
+  let line : LineLoop = { node, geometry, material, }
+  line.refresh()
+  line
+}
+
+///|
+pub impl @core.AsNode for LineLoop with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend LineLoop with @core.AsNode::{to_node}
+
+///|
+pub fn LineLoop::refresh(self : LineLoop) -> Unit {
+  self.node.primitive = Some(
+    primitive_binding(
+      self.geometry,
+      self.material.color,
+      @core.PrimitiveKind::Line,
+      1.0,
+      false,
+      self.material.opacity,
+      self.material.transparent,
+      self.material.fog,
+      self.material.depth_write,
+      self.material.depth_test,
+      self.material.depth_func,
+      self.material.color_write,
+      self.material.premultiplied_alpha,
+      self.material.visible,
+    ),
+  )
 }
 
 ///|

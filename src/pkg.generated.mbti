@@ -206,6 +206,8 @@ pub using @objects {type Line}
 
 pub using @materials {type LineBasicMaterial}
 
+pub using @objects {type LineLoop}
+
 pub using @objects {type LineSegments}
 
 pub using @core {type LodLevel}

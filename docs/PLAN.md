@@ -1389,6 +1389,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `LOD.update` has landed. A camera at `(0, 0, 10)` with zoom `1` is distance `10` from an LOD at the origin. Levels at `0`, `10`, and `20` show the middle object, hide the other two, and store current level `1`. Zoom `2` makes the distance `5`, so only the near object stays visible and the current level is `0`. One level is left unchanged.
 
+`LineLoop` raycast has landed. With the line threshold at `0`, a ray from `(0.5, 0.5, 1)` along `(0, 0, -1)` misses the open segments of `(0, 0, 0)`, `(1, 0, 0)`, `(1, 1, 0)`. The closing segment hits `(0.5, 0.5, 0)` at distance `1`, index `2`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2024,6 +2026,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LOD.getObjectForDistance` | `objects` |
 | planned | 7 | `LOD.raycast` | `core` |
 | planned | 7 | `LOD.update` | `objects` |
+| planned | 7 | `LineLoop` raycast | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

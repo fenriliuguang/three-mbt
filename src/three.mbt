@@ -135,6 +135,7 @@ pub using @objects {
   type Group,
   type InstancedMesh,
   type Line,
+  type LineLoop,
   type LineSegments,
   type LOD,
   type Mesh,

@@ -1,8 +1,9 @@
-// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L172
+// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L172 ; `isLineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L223
 
 ///|
-/// 折线按相邻顶点成段，线段按成对顶点成段。距离平方大于阈值就跳过。
+/// 折线按相邻顶点成段，线段按成对顶点成段，闭合折线再补上最后一点到第一点。距离平方大于阈值就跳过。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L172
+/// r186: `isLineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L223
 fn Object3D::raycast_line(
   self : Object3D,
   raycaster : Raycaster,
@@ -62,6 +63,18 @@ fn Object3D::raycast_line(
         )
         i = i + step
       }
+      if self.kind is LineLoop && end > start {
+        self.push_line_segment(
+          raycaster,
+          intersects,
+          ray,
+          position,
+          local_threshold_sq,
+          index.get_x(end - 1).to_int(),
+          index.get_x(start).to_int(),
+          end - 1,
+        )
+      }
     }
     None => {
       let (start, end) = triangle_bounds(
@@ -82,6 +95,18 @@ fn Object3D::raycast_line(
           i,
         )
         i = i + step
+      }
+      if self.kind is LineLoop && end > start {
+        self.push_line_segment(
+          raycaster,
+          intersects,
+          ray,
+          position,
+          local_threshold_sq,
+          end - 1,
+          start,
+          end - 1,
+        )
       }
     }
   }

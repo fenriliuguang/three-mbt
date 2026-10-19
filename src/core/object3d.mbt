@@ -808,7 +808,7 @@ pub fn Object3D::raycast(
         None => ()
         Some(_) => self.raycast_mesh(raycaster, intersects)
       }
-    Line | LineSegments =>
+    Line | LineSegments | LineLoop =>
       match self.primitive {
         None => ()
         Some(_) => self.raycast_line(raycaster, intersects)

@@ -438,6 +438,40 @@ test "LOD.raycast hits the level selected by distance" {
 }
 
 ///|
+test "LineLoop raycast closes the last vertex to the first" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let open = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  open.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.5, y=0.5, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  raycaster.params.line.threshold = 0.0
+  assert_eq(raycaster.intersect_object(open.node).length(), 0)
+  let closed = @objects.LineLoop::new(geometry, @materials.LineBasicMaterial::new())
+  closed.node.update_matrix_world()
+  let hits = raycaster.intersect_object(closed.node)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.5)
+  assert_eq(hits[0].point.y, 0.5)
+  assert_eq(hits[0].point.z, 0.0)
+  match hits[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 2)
+  }
+}
+
+///|
 test "LOD.update shows the level for the camera distance" {
   let camera = @core.Object3D::new(kind=@core.NodeKind::PerspectiveCamera)
   let state = @core.CameraState::perspective(50.0, 1.0, 0.1, 2000.0)

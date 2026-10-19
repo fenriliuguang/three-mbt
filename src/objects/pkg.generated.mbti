@@ -70,6 +70,16 @@ pub fn Line::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Line::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Line
 
+pub(all) struct LineLoop {
+  node : @core.Object3D
+  geometry : @core.BufferGeometry
+  material : @materials.LineBasicMaterial
+}
+pub fn LineLoop::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
+pub fn LineLoop::refresh(Self) -> Unit
+pub fn LineLoop::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for LineLoop
+
 pub(all) struct LineSegments {
   node : @core.Object3D
   geometry : @core.BufferGeometry
