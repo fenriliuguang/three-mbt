@@ -2371,6 +2371,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `getProgramCacheKey` has landed. The key is comma-separated. With no shader id the first two fields are the custom vertex and fragment ids, both empty by default. A shader id replaces those two fields with one id. Defines are appended as name then value, in the given order. A raw material skips the parameter list, both boolean masks, and the renderer output color space. The default non-raw key starts `,,highp,` and ends `,0,0,,`. `instancing` and `retroreflection` set mask bits `0` and `24`, so the first mask is `16777217`. `opaque` and light-probe grids set bits `17` and `22`, so the second mask is `4325376`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `getUniforms` stays later.
 
+`getUniforms` has landed. A builtin material type is turned into a shader id, then that id selects a table from the given library and the table is copied. `MeshStandardMaterial` and `MeshPhysicalMaterial` both use `physical`. `LineBasicMaterial` uses `basic`. Changing the copy leaves the library table unchanged, and the material's own numeric map is not returned. `ShaderMaterial` and `RawShaderMaterial` return the map that was passed in, so writing a value there changes that map. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `acquireProgram` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3497,6 +3499,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `replaceClippingPlaneNums` | `materials` |
 | planned | 7 | `unrollLoops` | `materials` |
 | planned | 7 | `getProgramCacheKey` | `materials` |
+| planned | 7 | `getUniforms` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

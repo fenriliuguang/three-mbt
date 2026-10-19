@@ -7208,6 +7208,63 @@ test "Material shader getProgramCacheKey joins parameters" {
 }
 
 ///|
+test "Material shader getUniforms clones builtin tables" {
+  let library : Map[String, Map[String, Double]] = Map([])
+  let names = [
+    ("MeshDepthMaterial", "depth"),
+    ("MeshDistanceMaterial", "distance"),
+    ("MeshNormalMaterial", "normal"),
+    ("MeshBasicMaterial", "basic"),
+    ("MeshLambertMaterial", "lambert"),
+    ("MeshPhongMaterial", "phong"),
+    ("MeshToonMaterial", "toon"),
+    ("MeshStandardMaterial", "physical"),
+    ("MeshPhysicalMaterial", "physical"),
+    ("MeshMatcapMaterial", "matcap"),
+    ("LineBasicMaterial", "basic"),
+    ("LineDashedMaterial", "dashed"),
+    ("PointsMaterial", "points"),
+    ("ShadowMaterial", "shadow"),
+    ("SpriteMaterial", "sprite"),
+  ]
+  let mut index = 0
+  while index < names.length() {
+    let (type_name, shader_id) = names[index]
+    let table : Map[String, Double] = Map([])
+    table.set("marker", 1.0)
+    library.set(shader_id, table)
+    let own : Map[String, Double] = Map([])
+    own.set("time", 9.0)
+    let got = @materials.program_uniforms(type_name, own, library)
+    assert_eq(got.get("marker"), Some(1.0))
+    match got.get("time") {
+      None => ()
+      Some(_) => abort("builtin uniforms kept the material map")
+    }
+    got.set("marker", 5.0)
+    assert_eq(table.get("marker"), Some(1.0))
+    index = index + 1
+  }
+  let shader = @materials.Material::shader()
+  shader.uniforms.set("time", 1.0)
+  let got = @materials.program_uniforms(shader.type_name, shader.uniforms, library)
+  assert_eq(got.get("time"), Some(1.0))
+  match got.get("marker") {
+    None => ()
+    Some(_) => abort("shader uniforms came from the library")
+  }
+  got.set("time", 4.0)
+  assert_eq(shader.uniforms.get("time"), Some(4.0))
+  let raw = @materials.Material::raw()
+  raw.uniforms.set("scale", 2.0)
+  let raw_got = @materials.program_uniforms(raw.type_name, raw.uniforms, library)
+  raw_got.set("scale", 6.0)
+  assert_eq(raw.uniforms.get("scale"), Some(6.0))
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
