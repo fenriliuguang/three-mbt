@@ -531,3 +531,41 @@ test "Sprite.intersectsFrustum uses a sphere around the sprite" {
   assert_eq(inside.center.y, 0.5)
   assert_eq(frustum.planes[0].constant, 0.0)
 }
+
+///|
+test "Object3D.intersectsFrustum uses the geometry sphere" {
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  assert_eq(@core.Object3D::new().intersects_frustum(frustum), false)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.5, 0.5], 3),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.node.update_matrix_world()
+  assert_eq(mesh.node.intersects_frustum(frustum), true)
+  ignore(mesh.node.position.set(-2.5, 0.0, 0.0))
+  mesh.node.update_matrix_world()
+  assert_eq(mesh.node.intersects_frustum(frustum), false)
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 0.5)
+      assert_eq(sphere.center.y, 0.5)
+      assert_eq(sphere.center.z, 0.5)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+}

@@ -879,3 +879,31 @@ pub fn Object3D::get_vertex_position(
       }
   }
 }
+
+///|
+/// 用几何体的包围球对视锥做保守测试。没有网格或点线几何、或没有位置时返回假。实例化后的包围球留在后面。
+/// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
+pub fn Object3D::intersects_frustum(
+  self : Object3D,
+  frustum : @math.Frustum,
+) -> Bool {
+  let geometry = match self.mesh {
+    Some(mesh) => mesh.geometry
+    None =>
+      match self.primitive {
+        Some(primitive) => primitive.geometry
+        None => return false
+      }
+  }
+  if geometry.bounding_sphere is None {
+    geometry.compute_bounding_sphere()
+  }
+  match geometry.bounding_sphere {
+    None => false
+    Some(sphere) => {
+      let copy = @math.Sphere::new()
+      ignore(copy.copy(sphere).apply_matrix4(self.matrix_world))
+      frustum.intersects_sphere(copy)
+    }
+  }
+}
