@@ -5928,6 +5928,46 @@ test "Material shader writes USE_MORPHTARGETS" {
 }
 
 ///|
+test "Material shader writes USE_MORPHNORMALS" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(has_morph_normals=true).length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_morph_normals=true)[683:707].to_owned(),
+    "#define USE_MORPHNORMALS",
+  )
+  shader.flat_shading = true
+  assert_eq(shader.prefixed_vertex_shader(has_morph_normals=true).length(), 1628)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
+  shader.wireframe = true
+  assert_eq(shader.prefixed_vertex_shader(has_morph_normals=true).length(), 1633)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_morph_normals=true)[683:707].to_owned(),
+    "#define USE_MORPHNORMALS",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.wireframe = false
+  shader.flat_shading = false
+  assert_eq(
+    shader.prefixed_vertex_shader(has_morph_targets=true, has_morph_normals=true).length(),
+    1658,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_morph_targets=true, has_morph_normals=true)[708:732].to_owned(),
+    "#define USE_MORPHNORMALS",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(has_morph_normals=false).length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(has_morph_normals=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(has_morph_normals=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
