@@ -303,6 +303,7 @@ pub fn Material::program_is_raw_shader_material(Self) -> Bool
 pub fn Material::program_light_map(Self) -> Bool
 pub fn Material::program_map(Self) -> Bool
 pub fn Material::program_matcap(Self) -> Bool
+pub fn Material::program_normal_map(Self) -> Bool
 pub fn Material::program_precision(Self, String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
 pub fn Material::program_vertex_shader(Self) -> String?
 pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
