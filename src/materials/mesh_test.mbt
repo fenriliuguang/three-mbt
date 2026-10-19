@@ -1430,3 +1430,21 @@ test "Material bumpScale defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.bump_scale, 1.0)
 }
+
+///|
+test "Material wireframeLinewidth defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.wireframe_linewidth, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.wireframe_linewidth, 1.0)
+  lambert.wireframe_linewidth = 4.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.wireframe_linewidth, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.wireframe_linewidth, 4.0)
+  destination.wireframe_linewidth = 2.0
+  assert_eq(lambert.wireframe_linewidth, 4.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.wireframe_linewidth, 1.0)
+}
