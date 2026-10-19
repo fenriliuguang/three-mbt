@@ -980,7 +980,9 @@ fn read_matrix(
 ///|
 /// 同一几何体画多次。实例矩阵在物体矩阵之前相乘，和 r186 `InstancedMesh` 一样。
 /// 没有 `instanceColor` 时渲染器使用白色。默认不做视锥裁剪。
+/// `morph_texture` 是形变纹理的浮点数据，默认没有。
 /// r186: `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
+/// r186: `morphTexture` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L77
 pub(all) struct InstancedMesh {
   node : Object3D
   mut geometry : BufferGeometry
@@ -988,6 +990,7 @@ pub(all) struct InstancedMesh {
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
+  mut morph_texture : Array[Double]?
 }
 
 ///|
@@ -1012,6 +1015,7 @@ pub fn InstancedMesh::new(
     instances,
     bounding_box: None,
     bounding_sphere: None,
+    morph_texture: None,
   }
   mesh.refresh()
   mesh
@@ -1171,6 +1175,53 @@ pub fn InstancedMesh::get_color_at(
         colors.get_z(index),
       )
   }
+}
+
+///|
+/// 把一只网格的形变权重写进第 `index` 个实例。
+/// 缓冲第一个数是底权重：相对形变时是 `1`，否则是 `1` 减各项权重之和。后面接各项权重。
+/// 第一次调用按 `(权重个数 + 1) * count` 分配，其余位置是 `0`。
+/// 这里存的是 `DataTexture` 的浮点数据，纹理对象留在后面。
+/// r186: `setMorphAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L355
+pub fn InstancedMesh::set_morph_at(
+  self : InstancedMesh,
+  index : Int,
+  object : Mesh,
+) -> InstancedMesh {
+  let influences = match object.morph_target_influences {
+    None => abort("InstancedMesh.setMorphAt requires morphTargetInfluences")
+    Some(influences) => influences
+  }
+  let len = influences.length() + 1
+  if self.morph_texture is None {
+    let created : Array[Double] = []
+    let total = len * self.instances.count
+    let mut fill = 0
+    while fill < total {
+      created.push(0.0)
+      fill = fill + 1
+    }
+    self.morph_texture = Some(created)
+  }
+  let data = match self.morph_texture {
+    None => abort("InstancedMesh.setMorphAt requires morphTexture")
+    Some(data) => data
+  }
+  let mut sum = 0.0
+  let mut cursor = 0
+  while cursor < influences.length() {
+    sum = sum + influences[cursor]
+    cursor = cursor + 1
+  }
+  let base = if self.geometry.morph_targets_relative { 1.0 } else { 1.0 - sum }
+  let data_index = len * index
+  data[data_index] = base
+  cursor = 0
+  while cursor < influences.length() {
+    data[data_index + 1 + cursor] = influences[cursor]
+    cursor = cursor + 1
+  }
+  self
 }
 
 ///|

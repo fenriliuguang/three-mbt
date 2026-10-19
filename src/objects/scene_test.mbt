@@ -1151,6 +1151,43 @@ test "LineLoop.updateMorphTargets indexes named targets" {
 }
 
 ///|
+test "InstancedMesh.setMorphAt stores base influence and weights" {
+  let geometry = @core.BufferGeometry::new()
+  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  assert_eq(mesh.morph_texture is None, true)
+  let source = @objects.Mesh::new(geometry, @materials.Material::basic())
+  source.morph_target_influences = Some([0.25, 0.5])
+  let written = mesh.set_morph_at(1, source)
+  assert_eq(physical_equal(written, mesh), true)
+  match mesh.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data.length(), 6)
+      assert_eq(data[0], 0.0)
+      assert_eq(data[1], 0.0)
+      assert_eq(data[2], 0.0)
+      assert_eq(data[3], 0.25)
+      assert_eq(data[4], 0.25)
+      assert_eq(data[5], 0.5)
+    }
+  }
+  geometry.morph_targets_relative = true
+  ignore(mesh.set_morph_at(0, source))
+  match mesh.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data.length(), 6)
+      assert_eq(data[0], 1.0)
+      assert_eq(data[1], 0.25)
+      assert_eq(data[2], 0.5)
+      assert_eq(data[3], 0.25)
+      assert_eq(data[4], 0.25)
+      assert_eq(data[5], 0.5)
+    }
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

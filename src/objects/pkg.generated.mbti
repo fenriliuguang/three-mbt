@@ -29,6 +29,7 @@ pub(all) struct InstancedMesh {
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
+  mut morph_texture : Array[Double]?
 }
 pub fn InstancedMesh::clone(Self, recursive? : Bool) -> Self
 pub fn InstancedMesh::compute_bounding_box(Self) -> @math.Box3
@@ -45,6 +46,7 @@ pub fn InstancedMesh::set_count(Self, Int) -> Unit
 pub fn InstancedMesh::set_fog(Self, Bool) -> Unit
 pub fn InstancedMesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn InstancedMesh::set_matrix_at(Self, Int, @math.Matrix4) -> Unit
+pub fn InstancedMesh::set_morph_at(Self, Int, Mesh) -> Self
 pub fn InstancedMesh::set_side(Self, @constants.Side) -> Unit
 pub fn InstancedMesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn InstancedMesh::to_node(Self) -> @core.Object3D
