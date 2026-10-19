@@ -284,3 +284,23 @@ test "SpriteMaterial stores and copies blendAlpha" {
   destination.blend_alpha = 0.5
   assert_eq(source.blend_alpha, 0.25)
 }
+
+///|
+test "SpriteMaterial stores and copies blendColor" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.blend_color.r, 0.0)
+  assert_eq(defaults.blend_color.g, 0.0)
+  assert_eq(defaults.blend_color.b, 0.0)
+  let source = @materials.SpriteMaterial::new()
+  source.blend_color.r = 1.0
+  assert_eq(defaults.blend_color.r, 0.0)
+  let destination = @materials.SpriteMaterial::new()
+  let color = destination.blend_color
+  ignore(destination.copy(source))
+  assert_eq(physical_equal(destination.blend_color, color), true)
+  assert_eq(destination.blend_color.r, 1.0)
+  assert_eq(destination.blend_color.g, 0.0)
+  assert_eq(destination.blend_color.b, 0.0)
+  destination.blend_color.r = 0.5
+  assert_eq(source.blend_color.r, 1.0)
+}
