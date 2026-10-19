@@ -55,6 +55,7 @@ pub(all) enum MaterialKind {
 /// `uuid` 在新建时生成，长度 36，版本位是 4。渲染器仍不读这个字符串。
 /// `name` 默认空字符串。渲染器仍不读这个名字。
 /// `type_name` 对应上游 `type`。基础材质是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`。渲染器仍不读这个名字。
+/// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。渲染器仍不读它。
 /// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
 /// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
 /// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
@@ -135,6 +136,7 @@ pub(all) struct Material {
   mut name : String
   type_name : String
   kind : MaterialKind
+  listeners : Map[String, Array[() -> Unit]]
 }
 
 ///|
@@ -202,6 +204,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     name: "",
     type_name: "MeshBasicMaterial",
     kind: Basic,
+    listeners: Map([]),
   }
 }
 
@@ -282,6 +285,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     name: "",
     type_name: "MeshLambertMaterial",
     kind: Lambert,
+    listeners: Map([]),
   }
 }
 
@@ -368,6 +372,7 @@ pub fn Material::standard(
     name: "",
     type_name: "MeshStandardMaterial",
     kind: Standard,
+    listeners: Map([]),
   }
 }
 
@@ -417,7 +422,7 @@ pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
 
 ///|
 /// 把颜色、常量混合色和自发光写进目标自己的颜色对象。颜色贴图、透明贴图、自发光贴图、粗糙度贴图和金属度贴图沿用源对象。
-/// `name`、`side`、`shadow_side`、不透明度、透明开关、线框、粗糙度、金属度、雾、`flat_shading`、`emissive_intensity`、`alpha_test`、深度、颜色写入、预乘、可见性、`force_single_pass`、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`clipping_planes` 沿用源数组。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`id`、`uuid`、`type_name`、`kind` 和其余的 `version` 留在目标上。
+/// `name`、`side`、`shadow_side`、不透明度、透明开关、线框、粗糙度、金属度、雾、`flat_shading`、`emissive_intensity`、`alpha_test`、深度、颜色写入、预乘、可见性、`force_single_pass`、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`clipping_planes` 沿用源数组。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`id`、`uuid`、`type_name`、`kind`、`listeners` 和其余的 `version` 留在目标上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L237
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L386
@@ -498,6 +503,26 @@ pub fn Material::clone(self : Material) -> Material {
     Standard => Material::standard()
   }
   created.copy(self)
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn Material::add_event_listener(
+  self : Material,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
 }
 
 ///|

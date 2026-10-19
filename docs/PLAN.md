@@ -1899,6 +1899,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineDashedMaterial.clone` has landed. A new material clones to `LineDashedMaterial` with scale `1`, dash size `3`, gap size `1`, and an inner `LineBasicMaterial` at version `0` with a new id. A material with scale `2`, dash size `4`, gap size `5`, inner name `dash`, color `(0, 1, 0)`, alpha test `0.2`, version `5`, uuid `dash`, and user data `dash` clones to `LineDashedMaterial`. The inner line stays `LineBasicMaterial`. Its version is `1`. Its uuid is 36 characters with version nibble `4`, and its id differs from the source. The source stays at version `5` and uuid `dash`. Setting the clone's scale to `9` and green channel to `0.5` leaves the source at `2` and `1`. Line draws still do not read this clone.
 
+`Material.addEventListener` has landed. Registering the same `dispose` listener twice on a basic material leaves one entry. Copying a Lambert material that has that listener onto a new basic material leaves the destination list empty and the source list at length `1`. A new Standard material has no `dispose` listeners. The renderer still does not read this list.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2789,6 +2791,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.clone` | `materials` |
 | planned | 7 | `SpriteMaterial.clone` | `materials` |
 | planned | 7 | `LineDashedMaterial.clone` | `materials` |
+| planned | 7 | `Material.addEventListener` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -897,3 +897,32 @@ test "Material clone keeps kind and takes a new id" {
   assert_eq(standard_clone.kind is @materials.MaterialKind::Standard, true)
   assert_eq(standard.roughness, 0.2)
 }
+
+///|
+test "Material addEventListener keeps one copy of a listener" {
+  let material = @materials.Material::basic()
+  let listener = fn() {}
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("dispose", listener)
+  match material.listeners.get("dispose") {
+    None => abort("dispose listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+  let source = @materials.Material::lambert()
+  source.add_event_listener("dispose", listener)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(source))
+  match destination.listeners.get("dispose") {
+    None => ()
+    Some(_) => abort("copy brought listeners")
+  }
+  match source.listeners.get("dispose") {
+    None => abort("source listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+  let standard = @materials.Material::standard()
+  match standard.listeners.get("dispose") {
+    None => ()
+    Some(_) => abort("standard listeners")
+  }
+}

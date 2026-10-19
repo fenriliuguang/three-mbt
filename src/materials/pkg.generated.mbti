@@ -143,7 +143,9 @@ pub(all) struct Material {
   mut name : String
   type_name : String
   kind : MaterialKind
+  listeners : Map[String, Array[() -> Unit]]
 }
+pub fn Material::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::basic(hex? : Int) -> Self
 pub fn Material::clone(Self) -> Self
 pub fn Material::copy(Self, Self) -> Self
