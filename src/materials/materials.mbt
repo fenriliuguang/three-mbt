@@ -588,6 +588,13 @@ pub fn Material::dispatch_event(self : Material, kind : String) -> Unit {
 }
 
 ///|
+/// 通知 `dispose` 监听。其它事件不动。渲染器仍不因这次调用释放资源。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1207
+pub fn Material::dispose(self : Material) -> Unit {
+  self.dispatch_event("dispose")
+}
+
+///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
