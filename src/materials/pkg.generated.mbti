@@ -137,6 +137,7 @@ pub(all) struct PointsMaterial {
   mut polygon_offset_factor : Double
   mut polygon_offset_units : Double
   mut clip_shadows : Bool
+  mut clip_intersection : Bool
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
