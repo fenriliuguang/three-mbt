@@ -1983,6 +1983,45 @@ test "panic SkinnedMesh.pose requires a skeleton" {
 }
 
 ///|
+test "SkinnedMesh.normalizeSkinWeights scales by the Manhattan length" {
+  let geometry = @core.BufferGeometry::new()
+  let weights = @core.BufferAttribute::new(
+    [2.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, -2.0, 2.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+    4,
+  )
+  ignore(geometry.set_attribute("skinWeight", weights))
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.normalize_skin_weights()
+  let stored = skin.mesh.geometry.get_attribute("skinWeight").unwrap()
+  assert_eq(physical_equal(stored, weights), true)
+  assert_eq(stored.array[0], 0.5)
+  assert_eq(stored.array[1], 0.0)
+  assert_eq(stored.array[2], 0.0)
+  assert_eq(stored.array[3], 0.5)
+  assert_eq(stored.array[4], 1.0)
+  assert_eq(stored.array[5], 0.0)
+  assert_eq(stored.array[6], 0.0)
+  assert_eq(stored.array[7], 0.0)
+  assert_eq(stored.array[8], -0.5)
+  assert_eq(stored.array[9], 0.5)
+  assert_eq(stored.array[10], 0.0)
+  assert_eq(stored.array[11], 0.0)
+  assert_eq(stored.array[12], 0.25)
+  assert_eq(stored.array[13], 0.25)
+  assert_eq(stored.array[14], 0.25)
+  assert_eq(stored.array[15], 0.25)
+}
+
+///|
+test "panic SkinnedMesh.normalizeSkinWeights requires skinWeight" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  skin.normalize_skin_weights()
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

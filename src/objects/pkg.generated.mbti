@@ -211,6 +211,7 @@ pub(all) struct SkinnedMesh {
 }
 pub fn SkinnedMesh::bind(Self, Skeleton, bind_matrix? : @math.Matrix4) -> Unit
 pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
+pub fn SkinnedMesh::normalize_skin_weights(Self) -> Unit
 pub fn SkinnedMesh::pose(Self) -> Unit
 pub fn SkinnedMesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for SkinnedMesh

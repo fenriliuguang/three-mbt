@@ -421,6 +421,30 @@ pub fn SkinnedMesh::pose(self : SkinnedMesh) -> Unit {
 }
 
 ///|
+/// 把 `skinWeight` 按曼哈顿长度归一。长度是 0 的顶点写成 `(1, 0, 0, 0)`。没有这个属性时中止。
+/// r186: `normalizeSkinWeights` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L262
+pub fn SkinnedMesh::normalize_skin_weights(self : SkinnedMesh) -> Unit {
+  let skin_weight = match self.mesh.geometry.get_attribute("skinWeight") {
+    None =>
+      abort("SkinnedMesh.normalizeSkinWeights requires a skinWeight attribute")
+    Some(attribute) => attribute
+  }
+  let vector = @math.Vector4::new()
+  let mut index = 0
+  while index < skin_weight.count {
+    ignore(skin_weight.copy_to_vector4(index, vector))
+    let length = vector.manhattan_length()
+    if length == 0.0 {
+      ignore(vector.set(1.0, 0.0, 0.0, 0.0))
+    } else {
+      ignore(vector.multiply_scalar(1.0 / length))
+    }
+    ignore(skin_weight.set_xyzw(index, vector.x, vector.y, vector.z, vector.w))
+    index = index + 1
+  }
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
