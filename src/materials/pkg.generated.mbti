@@ -85,6 +85,7 @@ pub(all) struct Material {
   mut polygon_offset_units : Double
   mut clip_shadows : Bool
   mut clip_intersection : Bool
+  mut allow_override : Bool
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

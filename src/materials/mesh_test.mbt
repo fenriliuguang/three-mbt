@@ -140,3 +140,19 @@ test "Material clipIntersection defaults off" {
   assert_eq(basic.material.clip_intersection, true)
   assert_eq(standard.material.clip_intersection, true)
 }
+
+///|
+test "Material allowOverride defaults on" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.allow_override, true)
+  basic.material.allow_override = false
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.allow_override, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.allow_override, true)
+  standard.material.allow_override = false
+  let other = @materials.Material::basic()
+  assert_eq(other.allow_override, true)
+  assert_eq(basic.material.allow_override, false)
+  assert_eq(standard.material.allow_override, false)
+}
