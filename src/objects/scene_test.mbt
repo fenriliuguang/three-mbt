@@ -429,6 +429,27 @@ test "LOD.clone starts at level zero with new objects" {
 }
 
 ///|
+test "LOD.getCurrentLevel reads the level chosen for the camera" {
+  let fresh = @objects.LOD::new()
+  assert_eq(fresh.get_current_level(), 0)
+  let camera = @core.Object3D::new(kind=@core.NodeKind::PerspectiveCamera)
+  let state = @core.CameraState::perspective(50.0, 1.0, 0.1, 2000.0)
+  camera.camera = Some(state)
+  ignore(camera.position.set(0.0, 0.0, 10.0))
+  camera.update_matrix_world()
+  let lod = @objects.LOD::new()
+  ignore(lod.add_level(@core.Object3D::new(), distance=0.0))
+  ignore(lod.add_level(@core.Object3D::new(), distance=10.0))
+  ignore(lod.add_level(@core.Object3D::new(), distance=20.0))
+  lod.node.update_matrix_world()
+  lod.update(camera)
+  assert_eq(lod.get_current_level(), 1)
+  state.zoom = 2.0
+  lod.update(camera)
+  assert_eq(lod.get_current_level(), 0)
+}
+
+///|
 test "mesh raycast interpolates uv" {
   let geometry = @core.BufferGeometry::new()
   ignore(

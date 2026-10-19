@@ -973,6 +973,13 @@ pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
 }
 
 ///|
+/// 返回当前级别下标。新建时是 `0`。`update` 在多于一级时改写它。
+/// r186: `getCurrentLevel` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L175
+pub fn LOD::get_current_level(self : LOD) -> Int {
+  self.current_level
+}
+
+///|
 /// 返回第一个距离阈值大于给定距离的前一级对象。对象可见时，阈值会减去 `distance * hysteresis`。没有级别时返回空。
 /// r186: `getObjectForDistance` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L188
 pub fn LOD::get_object_for_distance(
