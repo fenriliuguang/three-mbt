@@ -1311,6 +1311,13 @@ pub fn LineBasicMaterial::dispatch_event(
 }
 
 ///|
+/// 通知 `dispose` 监听。其它事件不动。线段绘制仍不因这次调用释放资源。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1207
+pub fn LineBasicMaterial::dispose(self : LineBasicMaterial) -> Unit {
+  self.dispatch_event("dispose")
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。线段绘制仍不因这次标记重新编译。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn LineBasicMaterial::set_needs_update(
