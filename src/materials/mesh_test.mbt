@@ -1184,3 +1184,39 @@ test "Material envMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.env_map is None, true)
 }
+
+///|
+test "Material envMapRotation starts at zero and copies into the destination" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.env_map_rotation.x, 0.0)
+  assert_eq(basic.env_map_rotation.y, 0.0)
+  assert_eq(basic.env_map_rotation.z, 0.0)
+  match basic.env_map_rotation.order {
+    @math.EulerOrder::XYZ => ()
+    _ => abort("basic env map rotation order")
+  }
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.env_map_rotation.x, 0.0)
+  ignore(lambert.env_map_rotation.set(0.25, 0.5, -0.1))
+  let other = @materials.Material::lambert()
+  assert_eq(other.env_map_rotation.x, 0.0)
+  assert_eq(other.env_map_rotation.y, 0.0)
+  assert_eq(other.env_map_rotation.z, 0.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.env_map_rotation.x, 0.25)
+  assert_eq(destination.env_map_rotation.y, 0.5)
+  assert_eq(destination.env_map_rotation.z, -0.1)
+  match destination.env_map_rotation.order {
+    @math.EulerOrder::XYZ => ()
+    _ => abort("copied env map rotation order")
+  }
+  ignore(destination.env_map_rotation.set_x(0.0))
+  assert_eq(lambert.env_map_rotation.x, 0.25)
+  assert_eq(lambert.env_map_rotation.y, 0.5)
+  assert_eq(lambert.env_map_rotation.z, -0.1)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.env_map_rotation.x, 0.0)
+  assert_eq(standard.env_map_rotation.y, 0.0)
+  assert_eq(standard.env_map_rotation.z, 0.0)
+}
