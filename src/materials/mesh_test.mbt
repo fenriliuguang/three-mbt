@@ -8465,6 +8465,21 @@ test "Material shader sheenRoughnessMap needs strength and a texture" {
 }
 
 ///|
+test "Material shader specularMap follows the specular texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_specular_map(), false)
+  assert_eq(@materials.Material::raw().program_specular_map(), false)
+  assert_eq(@materials.Material::phong().program_specular_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.specular_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_specular_map(), true)
+  shader.specular_map = None
+  assert_eq(shader.program_specular_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
