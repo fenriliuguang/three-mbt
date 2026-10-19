@@ -71,6 +71,8 @@ pub(all) struct Line {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 pub fn Line::clone(Self, recursive? : Bool) -> Self
 pub fn Line::compute_line_distances(Self) -> Self
@@ -80,6 +82,7 @@ pub fn Line::refresh(Self) -> Unit
 pub fn Line::set_fog(Self, Bool) -> Unit
 pub fn Line::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Line::to_node(Self) -> @core.Object3D
+pub fn Line::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for Line
 
 pub(all) struct LineLoop {

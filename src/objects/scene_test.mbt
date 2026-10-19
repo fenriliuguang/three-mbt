@@ -938,6 +938,76 @@ test "Points.updateMorphTargets indexes named targets" {
 }
 
 ///|
+test "Line.updateMorphTargets indexes named targets" {
+  let empty = @core.BufferGeometry::new()
+  let bare = @objects.Line::new(empty, @materials.LineBasicMaterial::new())
+  assert_eq(bare.morph_target_influences is None, true)
+  assert_eq(bare.morph_target_dictionary is None, true)
+  let geometry = @core.BufferGeometry::new()
+  let wide = @core.BufferAttribute::new([2.0, 0.0, 0.0], 3)
+  wide.name = "wide"
+  let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
+  tall.name = "tall"
+  geometry.morph_attributes.set("position", [wide, tall])
+  let line = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  match line.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights.length(), 2)
+      assert_eq(weights[0], 0.0)
+      assert_eq(weights[1], 0.0)
+      weights[0] = 0.5
+    }
+  }
+  match line.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => {
+      assert_eq(dictionary.get("wide"), Some(0))
+      assert_eq(dictionary.get("tall"), Some(1))
+    }
+  }
+  let other = @objects.Line::new(
+    geometry,
+    @materials.LineBasicMaterial::new(hex=0x0000FF),
+  )
+  match other.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.0)
+  }
+  match line.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+  let late = @objects.Line::new(
+    @core.BufferGeometry::new(),
+    @materials.LineBasicMaterial::new(),
+  )
+  late.geometry = geometry
+  assert_eq(late.morph_target_influences is None, true)
+  late.update_morph_targets()
+  match late.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let unnamed = @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)
+  geometry.morph_attributes.set("position", [unnamed])
+  line.update_morph_targets()
+  match line.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => {
+      assert_eq(dictionary.get("0"), Some(0))
+      assert_eq(dictionary.get("wide"), None)
+    }
+  }
+  geometry.morph_attributes.clear()
+  line.update_morph_targets()
+  match line.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("0"), Some(0))
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
