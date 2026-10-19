@@ -158,6 +158,9 @@ pub(all) struct SpriteMaterial {
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
   mut dithering : Bool
+  mut polygon_offset : Bool
+  mut polygon_offset_factor : Double
+  mut polygon_offset_units : Double
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
