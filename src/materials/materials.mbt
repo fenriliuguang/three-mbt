@@ -1,4 +1,4 @@
-// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18 ; `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L67 ; `side` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L88 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L75 ; `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L88 ; `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L100 ; `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L108 ; `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L120 ; `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L129 ; `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L140 ; `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L148 ; `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L184 ; `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L193 ; `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L202 ; `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L217 ; `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L225 ; `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L238 ; `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L246 ; `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L258 ; `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L270 ; `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L280 ; `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L292 ; `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L302 ; `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L311 ; `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L320 ; `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L332 ; `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L340 ; `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L353 ; `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L373 ; `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L399 ; `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L423 ; `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L449 ; `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L476 ; `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L500 ; `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L530 ; `isMeshPhysicalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L56 ; `isMeshToonMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L34 ; `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L73 ; `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L66 ; `isMeshMatcapMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L40 ; `isMeshNormalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L33 ; `isMeshDepthMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L33 ; `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L43 ; `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36 ; `isMeshPhongMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L44 ; `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L63 ; `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L71 ; `isShadowMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L44
+// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18 ; `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L67 ; `side` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L88 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L75 ; `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L88 ; `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L100 ; `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L108 ; `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L120 ; `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L129 ; `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L140 ; `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L148 ; `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L184 ; `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L193 ; `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L202 ; `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L217 ; `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L225 ; `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L238 ; `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L246 ; `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L258 ; `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L270 ; `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L280 ; `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L292 ; `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L302 ; `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L311 ; `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L320 ; `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L332 ; `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L340 ; `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L353 ; `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L373 ; `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L399 ; `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L423 ; `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L449 ; `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L476 ; `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L500 ; `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L530 ; `isMeshPhysicalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L56 ; `isMeshToonMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L34 ; `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L73 ; `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L66 ; `isMeshMatcapMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L40 ; `isMeshNormalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L33 ; `isMeshDepthMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L33 ; `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L43 ; `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36 ; `isMeshPhongMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L44 ; `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L63 ; `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L71 ; `isShadowMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L44 ; `isShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L67
 
 ///|
 let next_material_id : Ref[Int] = Ref::Ref(0)
@@ -11,7 +11,7 @@ fn fresh_material_id() -> Int {
 }
 
 ///|
-/// 不受光照的基础材质、Lambert、直接光的 Standard、带物理扩展的 Physical、卡通着色的 Toon、不受光的 Matcap、把法线画成颜色的 Normal、按深度画成颜色的 Depth、点光源阴影用的 Distance、Blinn-Phong 的 Phong，以及只接收阴影的 Shadow。
+/// 不受光照的基础材质、Lambert、直接光的 Standard、带物理扩展的 Physical、卡通着色的 Toon、不受光的 Matcap、把法线画成颜色的 Normal、按深度画成颜色的 Depth、点光源阴影用的 Distance、Blinn-Phong 的 Phong，以及只接收阴影的 Shadow，还有自定义着色器的 Shader。
 pub(all) enum MaterialKind {
   Basic
   Lambert
@@ -24,6 +24,7 @@ pub(all) enum MaterialKind {
   Distance
   Phong
   Shadow
+  Shader
 }
 
 ///|
@@ -77,10 +78,10 @@ pub(all) enum WireframeJoin {
 /// `precision` 默认空。空着时沿用渲染器默认精度。管线仍不读这个字段。
 /// `user_data` 默认空表。自定义字符串键值。渲染器仍不读这张表。
 /// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。渲染器仍不读这个计数。
-/// `id` 从 `0` 起递增。每新建一份基础、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong 或 Shadow 材质取下一个编号。渲染器仍不读这个编号。
+/// `id` 从 `0` 起递增。每新建一份基础、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow 或 Shader 材质取下一个编号。渲染器仍不读这个编号。
 /// `uuid` 在新建时生成，长度 36，版本位是 4。渲染器仍不读这个字符串。
 /// `name` 默认空字符串。渲染器仍不读这个名字。
-/// `type_name` 对应上游 `type`。基础材质是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`。渲染器仍不读这个名字。
+/// `type_name` 对应上游 `type`。基础材质是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`，Shader 是 `ShaderMaterial`。渲染器仍不读这个名字。
 /// `is_mesh_physical_material` 对应上游只读标记。Basic、Lambert、Standard 是 `false`。`Material::physical` 是 `true`。`copy` 不改这个标记，也不改 `kind`。渲染器仍按 Standard 着色。
 /// `is_mesh_toon_material` 对应上游只读标记。Basic、Lambert、Standard、Physical 是 `false`。`Material::toon` 是 `true`，`defines` 只有 `TOON` 对空字符串。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Lambert 着色。
 /// `is_mesh_matcap_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon 是 `false`。`Material::matcap` 是 `true`，`defines` 只有 `MATCAP` 对空字符串。`copy` 不改这个标记，也不改 `kind`，但会把目标的 `defines` 重写成这张表。渲染器仍按 Basic 着色。
@@ -92,6 +93,7 @@ pub(all) enum WireframeJoin {
 /// `specular` 默认 `0x111111`。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong 都存这份 Phong 高光颜色，和物理材质的 `specular_color` 分开。`copy` 写进目标自己的颜色对象。渲染器仍不用它做高光。
 /// `shininess` 默认 `30`。数值越大，Phong 高光越集中。这些材质都存这个字段。`copy` 把值写进目标。渲染器仍不用它做高光。
 /// `is_shadow_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong 是 `false`。`Material::shadow` 是 `true`，颜色默认黑，`transparent` 默认打开，`fog` 默认打开，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
+/// `is_shader_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow 是 `false`。`Material::shader` 是 `true`，`type_name` 是 `ShaderMaterial`，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
 /// `gradient_map` 默认空。Toon 用它做色阶。Basic、Lambert、Standard、Physical 也存这个字段。`copy` 沿用源对象。渲染器仍不采样这张贴图。
 /// `matcap` 默认空。Basic、Lambert、Standard、Physical、Toon 都存这个字段。`copy` 沿用源对象。渲染器仍不采样这张贴图。
 /// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。渲染器仍不读它。
@@ -123,7 +125,7 @@ pub(all) enum WireframeJoin {
 /// `wireframe_linewidth` 默认 `1`。Basic、Lambert、Standard 存线框宽度。`copy` 沿用源数值。渲染器仍按 1 像素画线框。
 /// `wireframe_linecap` 默认圆角。斜角和尖角一并存储。Basic、Lambert、Standard 存线框端点。`copy` 沿用源值。渲染器仍按 1 像素画线框。
 /// `wireframe_linejoin` 默认圆角。斜角和尖角一并存储。Basic、Lambert、Standard 存线框拐角。`copy` 沿用源值。渲染器仍按 1 像素画线框。
-/// `defines` 默认空。Standard 新建以及 `copy` 到 Standard 时写成只有 `STANDARD` 对空字符串。Physical 新建以及 `copy` 到 Physical 时写成 `STANDARD` 和 `PHYSICAL` 都对空字符串。Matcap 新建以及 `copy` 到 Matcap 时写成只有 `MATCAP` 对空字符串。源上改过的键不跟着走。Toon 新建时写成只有 `TOON` 对空字符串，`copy` 留着目标上的这张表。Normal、Depth、Distance、Phong 与 Shadow 新建时表是空的，`copy` 也留着目标上的这张表。Basic 与 Lambert 的表也留在目标上。渲染器仍不读这张表。
+/// `defines` 默认空。Standard 新建以及 `copy` 到 Standard 时写成只有 `STANDARD` 对空字符串。Physical 新建以及 `copy` 到 Physical 时写成 `STANDARD` 和 `PHYSICAL` 都对空字符串。Matcap 新建以及 `copy` 到 Matcap 时写成只有 `MATCAP` 对空字符串。源上改过的键不跟着走。Toon 新建时写成只有 `TOON` 对空字符串，`copy` 留着目标上的这张表。Normal、Depth、Distance、Phong、Shadow 与 Shader 新建时表是空的，`copy` 也留着目标上的这张表。Basic 与 Lambert 的表也留在目标上。渲染器仍不读这张表。
 /// `anisotropy_rotation` 默认 `0`。上游注释写默认 `1`，赋值是 `0`。Basic、Lambert、Standard 一并存储。`copy` 沿用源数值。渲染器仍不旋转各向异性。
 /// `anisotropy_map` 默认空。Basic、Lambert、Standard 都存这张各向异性贴图。`copy` 沿用源对象。渲染器仍不采样它。
 /// `clearcoat_map` 默认空。Basic、Lambert、Standard 都存这张清漆贴图。`copy` 沿用源对象。渲染器仍不采样它。
@@ -166,7 +168,7 @@ pub(all) enum WireframeJoin {
 /// `visible` 默认打开。关掉后这个材质不进颜色列表，也不进阴影列表。节点的 `visible` 仍然单独决定整棵子树。
 /// `force_single_pass` 默认关闭。透明且双面时，先画背面再画正面。打开后这两次合成一次双面绘制。不透明双面本来就是一次。
 /// 改 `side`、`shadow_side`、`visible`、`force_single_pass`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`depth_func`、`color_write`、`premultiplied_alpha`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99 ; `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458 ; `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135 ; `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409 ; `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399 ; `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375 ; `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383 ; `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391 ; `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329 ; `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320 ; `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439 ; `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203 ; `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193 ; `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80 ; `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143 ; `blendDst` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L151 ; `blendEquation` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L159 ; `blendSrcAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L167 ; `blendDstAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L175 ; `blendEquationAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L183 ; `stencilWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L239 ; `stencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L247 ; `stencilRef` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L255 ; `stencilFuncMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L263 ; `stencilFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L271 ; `stencilZFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L280 ; `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289 ; `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299 ; `clippingPlanes` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L311 ; `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361 ; `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466 ; `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475 ; `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44 ; `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52 ; `name` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L59 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L38 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L48 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L65 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L182 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L222 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L190 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L230 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L198 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L238 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L216 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L256 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L226 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L266 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L236 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L276 ; `specularMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L248 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L146 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L279 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L332 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L154 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L287 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L340 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L165 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L298 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L174 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L307 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L315 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L348 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L185 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L326 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L73 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L83 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L123 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L81 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L91 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L131 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L93 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L103 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L143 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L103 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L113 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L153 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L158 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L198 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L166 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L206 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L203 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L344 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L366 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L354 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L376 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L364 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L386 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L67 ; `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L75 ; `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L88 ; `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L100 ; `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L108 ; `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L120 ; `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L129 ; `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L140 ; `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L148 ; `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L184 ; `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L193 ; `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L202 ; `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L217 ; `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L225 ; `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L238 ; `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L246 ; `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L258 ; `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L270 ; `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L280 ; `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L292 ; `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L302 ; `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L311 ; `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L320 ; `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L332 ; `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L340 ; `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L353 ; `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L373 ; `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L399 ; `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L423 ; `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L449 ; `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L476 ; `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L500 ; `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L530 ; `isMeshPhysicalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L56 ; `isMeshToonMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L34 ; `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L73 ; `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L66 ; `isMeshMatcapMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L40 ; `isMeshNormalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L33 ; `isMeshDepthMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L33 ; `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L43 ; `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36 ; `isMeshPhongMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L44 ; `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L63 ; `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L71 ; `isShadowMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L44 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99 ; `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458 ; `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135 ; `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409 ; `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399 ; `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375 ; `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383 ; `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391 ; `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329 ; `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320 ; `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439 ; `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203 ; `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193 ; `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80 ; `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143 ; `blendDst` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L151 ; `blendEquation` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L159 ; `blendSrcAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L167 ; `blendDstAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L175 ; `blendEquationAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L183 ; `stencilWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L239 ; `stencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L247 ; `stencilRef` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L255 ; `stencilFuncMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L263 ; `stencilFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L271 ; `stencilZFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L280 ; `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289 ; `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299 ; `clippingPlanes` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L311 ; `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361 ; `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466 ; `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475 ; `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44 ; `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52 ; `name` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L59 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L38 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L48 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L65 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L182 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L222 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L190 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L230 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L198 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L238 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L216 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L256 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L226 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L266 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L236 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L276 ; `specularMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L248 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L146 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L279 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L332 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L154 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L287 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L340 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L165 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L298 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L174 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L307 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L315 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L348 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L185 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L326 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L73 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L83 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L123 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L81 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L91 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L131 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L93 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L103 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L143 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L103 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L113 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L153 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L158 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L198 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L166 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L206 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L203 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L344 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L366 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L354 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L376 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L364 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L386 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L67 ; `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L75 ; `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L88 ; `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L100 ; `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L108 ; `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L120 ; `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L129 ; `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L140 ; `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L148 ; `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L184 ; `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L193 ; `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L202 ; `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L217 ; `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L225 ; `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L238 ; `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L246 ; `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L258 ; `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L270 ; `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L280 ; `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L292 ; `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L302 ; `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L311 ; `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L320 ; `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L332 ; `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L340 ; `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L353 ; `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L373 ; `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L399 ; `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L423 ; `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L449 ; `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L476 ; `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L500 ; `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L530 ; `isMeshPhysicalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L56 ; `isMeshToonMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L34 ; `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L73 ; `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L66 ; `isMeshMatcapMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L40 ; `isMeshNormalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L33 ; `isMeshDepthMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L33 ; `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L43 ; `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36 ; `isMeshPhongMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L44 ; `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L63 ; `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L71 ; `isShadowMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L44 ; `isShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L67 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -261,6 +263,7 @@ pub(all) struct Material {
   is_mesh_distance_material : Bool
   is_mesh_phong_material : Bool
   is_shadow_material : Bool
+  is_shader_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -397,6 +400,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -546,6 +550,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -701,6 +706,7 @@ pub fn Material::standard(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -846,6 +852,7 @@ pub fn Material::physical(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -991,6 +998,7 @@ pub fn Material::toon(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1136,6 +1144,7 @@ pub fn Material::matcap(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1280,6 +1289,7 @@ pub fn Material::normal(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1424,6 +1434,7 @@ pub fn Material::depth(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1568,6 +1579,7 @@ pub fn Material::distance(
     is_mesh_distance_material: true,
     is_mesh_phong_material: false,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1712,6 +1724,7 @@ pub fn Material::phong(
     is_mesh_distance_material: false,
     is_mesh_phong_material: true,
     is_shadow_material: false,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1858,6 +1871,7 @@ pub fn Material::shadow(
     is_mesh_distance_material: false,
     is_mesh_phong_material: false,
     is_shadow_material: true,
+    is_shader_material: false,
     vertex_colors: false,
     tone_mapped: true,
     alpha_hash: false,
@@ -1900,6 +1914,152 @@ pub fn Material::shadow(
 }
 
 ///|
+/// 自定义着色器。`is_shader_material` 为真，`type_name` 是 `ShaderMaterial`，`defines` 是空表。颜色仍是白，`transparent` 默认关闭，`fog` 仍打开。渲染器仍按 Basic 着色。
+/// r186: `isShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L67
+/// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L69
+/// r186: `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L89
+pub fn Material::shader(
+  hex? : Int = 0xFFFFFF,
+  roughness? : Double = 1.0,
+  metalness? : Double = 0.0,
+) -> Material {
+  {
+    color: @math.Color::new().set_hex(hex),
+    side: @constants.Front,
+    shadow_side: None,
+    opacity: 1.0,
+    transparent: false,
+    wireframe: false,
+    map: None,
+    roughness,
+    metalness,
+    fog: true,
+    alpha_test: 0.0,
+    flat_shading: false,
+    depth_write: true,
+    depth_test: true,
+    depth_func: @constants.LessEqual,
+    color_write: true,
+    premultiplied_alpha: false,
+    visible: true,
+    force_single_pass: false,
+    emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
+    emissive_intensity: 1.0,
+    emissive_map: None,
+    roughness_map: None,
+    metalness_map: None,
+    alpha_map: None,
+    normal_map: None,
+    normal_map_type: @constants.TangentSpace,
+    normal_scale: @math.Vector2::new(x=1.0, y=1.0),
+    displacement_map: None,
+    displacement_scale: 1.0,
+    displacement_bias: 0.0,
+    specular_map: None,
+    env_map: None,
+    env_map_rotation: @math.Euler::new(),
+    combine: @constants.Combine::Multiply,
+    reflectivity: 1.0,
+    env_map_intensity: 1.0,
+    refraction_ratio: 0.98,
+    light_map: None,
+    light_map_intensity: 1.0,
+    ao_map: None,
+    ao_map_intensity: 1.0,
+    bump_map: None,
+    gradient_map: None,
+    matcap: None,
+    bump_scale: 1.0,
+    wireframe_linewidth: 1.0,
+    wireframe_linecap: WireframeCap::Round,
+    wireframe_linejoin: WireframeJoin::Round,
+    defines: Map([]),
+    anisotropy_rotation: 0.0,
+    anisotropy_map: None,
+    clearcoat_map: None,
+    clearcoat_roughness: 0.0,
+    clearcoat_roughness_map: None,
+    clearcoat_normal_scale: @math.Vector2::new(x=1.0, y=1.0),
+    clearcoat_normal_map: None,
+    ior: 1.5,
+    iridescence_map: None,
+    iridescence_ior: 1.3,
+    iridescence_thickness_range: fresh_iridescence_thickness_range(),
+    iridescence_thickness_map: None,
+    sheen_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
+    specular: @math.Color::new().set_hex(0x111111),
+    shininess: 30.0,
+    sheen_color_map: None,
+    sheen_roughness: 1.0,
+    sheen_roughness_map: None,
+    transmission_map: None,
+    thickness: 0.0,
+    thickness_map: None,
+    attenuation_distance: 1.0 / 0.0,
+    attenuation_color: @math.Color::new(r=1.0, g=1.0, b=1.0),
+    specular_intensity: 1.0,
+    specular_intensity_map: None,
+    specular_color: @math.Color::new(r=1.0, g=1.0, b=1.0),
+    specular_color_map: None,
+    anisotropy: 0.0,
+    clearcoat: 0.0,
+    iridescence: 0.0,
+    dispersion: 0.0,
+    retroreflectivity: 0.0,
+    sheen: 0.0,
+    transmission: 0.0,
+    is_mesh_physical_material: false,
+    is_mesh_toon_material: false,
+    is_mesh_matcap_material: false,
+    is_mesh_normal_material: false,
+    is_mesh_depth_material: false,
+    depth_packing: @constants.DepthPacking::Basic,
+    is_mesh_distance_material: false,
+    is_mesh_phong_material: false,
+    is_shadow_material: false,
+    is_shader_material: true,
+    vertex_colors: false,
+    tone_mapped: true,
+    alpha_hash: false,
+    alpha_to_coverage: false,
+    dithering: false,
+    polygon_offset: false,
+    polygon_offset_factor: 0.0,
+    polygon_offset_units: 0.0,
+    clip_shadows: false,
+    clip_intersection: false,
+    allow_override: true,
+    blend_alpha: 0.0,
+    blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
+    blending: @constants.Normal,
+    blend_src: @constants.SrcAlpha,
+    blend_dst: @constants.OneMinusSrcAlpha,
+    blend_equation: @constants.Add,
+    blend_src_alpha: None,
+    blend_dst_alpha: None,
+    blend_equation_alpha: None,
+    stencil_write_mask: 0xFF,
+    stencil_func: @constants.StencilFunc::Always,
+    stencil_ref: 0,
+    stencil_func_mask: 0xFF,
+    stencil_fail: @constants.StencilOp::Keep,
+    stencil_z_fail: @constants.StencilOp::Keep,
+    stencil_z_pass: @constants.StencilOp::Keep,
+    stencil_write: false,
+    clipping_planes: None,
+    precision: None,
+    user_data: Map([]),
+    version: 0,
+    id: fresh_material_id(),
+    uuid: @math.generate_uuid(),
+    name: "",
+    type_name: "ShaderMaterial",
+    kind: Shader,
+    listeners: Map([]),
+  }
+}
+
+///|
 /// `MeshStandardMaterial`。`baseColor` 是 `color`，可再乘贴图。
 /// r186: `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub(all) struct MeshStandardMaterial {
@@ -1929,6 +2089,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
     Distance => @constants.Basic
     Phong => @constants.Lambert
     Shadow => @constants.Basic
+    Shader => @constants.Basic
   }
 }
 
@@ -2188,6 +2349,7 @@ pub fn Material::copy(self : Material, source : Material) -> Material {
     Distance => ()
     Phong => ()
     Shadow => ()
+    Shader => ()
   }
   self.set_anisotropy(source.anisotropy)
   self.anisotropy_rotation = source.anisotropy_rotation
@@ -2262,7 +2424,7 @@ pub fn Material::copy(self : Material, source : Material) -> Material {
 }
 
 ///|
-/// 按 `kind` 新建一份材质，再 `copy`。新材质有自己的 `id` 和 `uuid`。`type_name` 跟着 `kind`：基础是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`。`copy` 不改这三项，也不改 `is_mesh_physical_material`、`is_mesh_toon_material`、`is_mesh_matcap_material`、`is_mesh_normal_material`、`is_mesh_depth_material`、`is_mesh_distance_material`、`is_mesh_phong_material` 和 `is_shadow_material`。`alpha_test` 穿过 `0` 时新材质的 `version` 从 `0` 加一。
+/// 按 `kind` 新建一份材质，再 `copy`。新材质有自己的 `id` 和 `uuid`。`type_name` 跟着 `kind`：基础是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`，Shader 是 `ShaderMaterial`。`copy` 不改这三项，也不改 `is_mesh_physical_material`、`is_mesh_toon_material`、`is_mesh_matcap_material`、`is_mesh_normal_material`、`is_mesh_depth_material`、`is_mesh_distance_material`、`is_mesh_phong_material`、`is_shadow_material` 和 `is_shader_material`。`alpha_test` 穿过 `0` 时新材质的 `version` 从 `0` 加一。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
 pub fn Material::clone(self : Material) -> Material {
   let created = match self.kind {
@@ -2277,6 +2439,7 @@ pub fn Material::clone(self : Material) -> Material {
     Distance => Material::distance()
     Phong => Material::phong()
     Shadow => Material::shadow()
+    Shader => Material::shader()
   }
   created.copy(self)
 }

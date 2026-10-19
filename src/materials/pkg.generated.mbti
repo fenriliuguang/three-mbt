@@ -184,6 +184,7 @@ pub(all) struct Material {
   is_mesh_distance_material : Bool
   is_mesh_phong_material : Bool
   is_shadow_material : Bool
+  is_shader_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -247,6 +248,7 @@ pub fn Material::set_needs_update(Self, Bool) -> Unit
 pub fn Material::set_retroreflectivity(Self, Double) -> Unit
 pub fn Material::set_sheen(Self, Double) -> Unit
 pub fn Material::set_transmission(Self, Double) -> Unit
+pub fn Material::shader(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::shadow(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
@@ -264,6 +266,7 @@ pub(all) enum MaterialKind {
   Distance
   Phong
   Shadow
+  Shader
 }
 
 pub(all) struct MeshBasicMaterial {
