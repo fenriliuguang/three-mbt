@@ -172,3 +172,26 @@ test "Material blendAlpha defaults to zero" {
   assert_eq(basic.material.blend_alpha, 0.25)
   assert_eq(standard.material.blend_alpha, 0.5)
 }
+
+///|
+test "Material blendColor defaults to black" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_color.r, 0.0)
+  assert_eq(basic.material.blend_color.g, 0.0)
+  assert_eq(basic.material.blend_color.b, 0.0)
+  basic.material.blend_color.r = 1.0
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_color.r, 0.0)
+  assert_eq(lambert.material.blend_color.g, 0.0)
+  assert_eq(lambert.material.blend_color.b, 0.0)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_color.g, 0.0)
+  standard.material.blend_color.g = 0.5
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_color.r, 0.0)
+  assert_eq(other.blend_color.g, 0.0)
+  assert_eq(other.blend_color.b, 0.0)
+  assert_eq(basic.material.blend_color.r, 1.0)
+  assert_eq(standard.material.blend_color.g, 0.5)
+  assert_eq(lambert.material.blend_color.r, 0.0)
+}
