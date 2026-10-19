@@ -355,3 +355,20 @@ test "SpriteMaterial stores and copies blendDst" {
   assert_eq(source.blend_dst is @constants.BlendFactor::Zero, true)
   assert_eq(destination.blend_dst.to_int(), 201)
 }
+
+///|
+test "SpriteMaterial stores and copies blendEquation" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(defaults.blend_equation.to_int(), 100)
+  let source = @materials.SpriteMaterial::new()
+  source.blend_equation = @constants.BlendEquation::Subtract
+  assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(destination.blend_equation.to_int(), 101)
+  destination.blend_equation = @constants.BlendEquation::Max
+  assert_eq(source.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(destination.blend_equation.to_int(), 104)
+}

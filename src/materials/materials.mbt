@@ -667,7 +667,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src` 和 `blend_dst`。
+/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst` 和 `blend_equation`。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
@@ -685,6 +685,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// r186: `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80
 /// r186: `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143
 /// r186: `blendDst` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L151
+/// r186: `blendEquation` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L159
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L82
@@ -732,6 +733,7 @@ pub(all) struct SpriteMaterial {
   mut blending : @constants.Blending
   mut blend_src : @constants.BlendFactor
   mut blend_dst : @constants.BlendFactor
+  mut blend_equation : @constants.BlendEquation
 }
 
 ///|
@@ -775,12 +777,13 @@ pub fn SpriteMaterial::new(
     blending: @constants.Normal,
     blend_src: @constants.SrcAlpha,
     blend_dst: @constants.OneMinusSrcAlpha,
+    blend_equation: @constants.Add,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src` 和 `blend_dst` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst` 和 `blend_equation` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -792,6 +795,7 @@ pub fn SpriteMaterial::copy(
   self.blending = source.blending
   self.blend_src = source.blend_src
   self.blend_dst = source.blend_dst
+  self.blend_equation = source.blend_equation
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.opacity = source.opacity
