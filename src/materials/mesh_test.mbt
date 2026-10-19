@@ -3544,3 +3544,32 @@ test "Material shader copies default attribute values only onto shader" {
   cloned.default_attribute_values.get("color").unwrap()[0] = 6.0
   assert_eq(shader.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
 }
+
+///|
+test "Material shader copies glslVersion only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.glsl_version is None, true)
+  assert_eq(basic.glsl_version is None, true)
+  assert_eq(phong.glsl_version is None, true)
+  assert_eq(@materials.GlslVersion::GLSL1.code(), "100")
+  assert_eq(@materials.GlslVersion::GLSL3.code(), "300 es")
+  shader.glsl_version = Some(@materials.GlslVersion::GLSL3)
+  ignore(basic.copy(shader))
+  assert_eq(basic.glsl_version is None, true)
+  assert_eq(shader.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
+  let onto = @materials.Material::shader()
+  onto.glsl_version = Some(@materials.GlslVersion::GLSL1)
+  ignore(onto.copy(shader))
+  assert_eq(onto.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
+  onto.glsl_version = None
+  assert_eq(shader.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.glsl_version is None, true)
+  let cloned = shader.clone()
+  assert_eq(cloned.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
+  assert_eq(cloned.id == shader.id, false)
+  cloned.glsl_version = Some(@materials.GlslVersion::GLSL1)
+  assert_eq(shader.glsl_version is Some(@materials.GlslVersion::GLSL3), true)
+}

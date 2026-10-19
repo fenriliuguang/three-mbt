@@ -12,6 +12,12 @@ import {
 // Errors
 
 // Types and methods
+pub(all) enum GlslVersion {
+  GLSL1
+  GLSL3
+}
+pub fn GlslVersion::code(Self) -> String
+
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut side : @constants.Side
@@ -108,6 +114,7 @@ pub(all) struct Material {
   mut uniforms : Map[String, Double]
   mut uniforms_groups : Array[UniformsGroup]
   mut default_attribute_values : Map[String, Array[Double]]
+  mut glsl_version : GlslVersion?
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool

@@ -2121,6 +2121,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.defaultAttributeValues` has landed. A new Shader material stores `color` `[1, 1, 1]`, `uv` `[0, 0]`, and `uv1` `[0, 0]`. A new Basic material and a new Phong material store an empty table. Setting the Shader `color` to `[2, 3, 4]` and `tangent` to `[5]`, then copying onto a Basic material, leaves the Basic table empty and the source `color` at `[2, 3, 4]`. Copying onto another Shader material that had `color` `[9, 9, 9]` and `drop` `[1]` stores `color` `[2, 3, 4]`, `uv` `[0, 0]`, `uv1` `[0, 0]`, and `tangent` `[5]`, and drops `drop`. Setting the destination `color` first component to `8` leaves the source at `2`. Copying an empty Phong material onto that destination drops `color`. Cloning keeps `color` `[2, 3, 4]` and `uv` `[0, 0]`, with a new id. Setting the clone's `color` first component to `6` leaves the source at `2`. The renderer still does not fill missing vertex attributes from these numbers. `glslVersion` stays later.
 
+`ShaderMaterial.glslVersion` has landed. A new Shader, Basic, and Phong material each store nothing. `GLSL1` codes to `100` and `GLSL3` codes to `300 es`. Setting the Shader material to `GLSL3` and copying it onto a Basic material leaves the Basic material empty and the source at `GLSL3`. Copying that Shader material onto another Shader material that was `GLSL1` stores `GLSL3`. Setting the destination back to empty leaves the source at `GLSL3`. Copying a Phong material onto that destination stores nothing. Cloning the source keeps `GLSL3`, with a new id, and setting the clone to `GLSL1` leaves the source at `GLSL3`. The renderer still does not write a `#version` line from this field. `index0AttributeName` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3122,6 +3124,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.forceSinglePass` | `materials` |
 | planned | 7 | `ShaderMaterial.extensions` | `materials` |
 | planned | 7 | `ShaderMaterial.defaultAttributeValues` | `materials` |
+| planned | 7 | `ShaderMaterial.glslVersion` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
