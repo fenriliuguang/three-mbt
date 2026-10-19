@@ -547,3 +547,32 @@ test "Material stencilWrite defaults to false" {
   assert_eq(standard.material.stencil_write, true)
   assert_eq(lambert.material.stencil_write, false)
 }
+
+///|
+test "Material clippingPlanes defaults to empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.clipping_planes is None, true)
+  basic.material.clipping_planes = Some([@math.Plane::new(constant=1.0)])
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.clipping_planes is None, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.clipping_planes is None, true)
+  standard.material.clipping_planes = Some([@math.Plane::new(constant=2.0)])
+  let other = @materials.Material::basic()
+  assert_eq(other.clipping_planes is None, true)
+  match basic.material.clipping_planes {
+    None => abort("basic clipping planes")
+    Some(planes) => {
+      assert_eq(planes.length(), 1)
+      assert_eq(planes[0].constant, 1.0)
+    }
+  }
+  match standard.material.clipping_planes {
+    None => abort("standard clipping planes")
+    Some(planes) => {
+      assert_eq(planes.length(), 1)
+      assert_eq(planes[0].constant, 2.0)
+    }
+  }
+  assert_eq(lambert.material.clipping_planes is None, true)
+}
