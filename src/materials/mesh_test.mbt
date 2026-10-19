@@ -8548,6 +8548,26 @@ test "Material shader transmissionMap needs strength and a texture" {
 }
 
 ///|
+test "Material shader thicknessMap needs transmission and a texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_thickness_map(), false)
+  assert_eq(@materials.Material::raw().program_thickness_map(), false)
+  assert_eq(@materials.Material::physical().program_thickness_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.thickness_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_thickness_map(), false)
+  shader.transmission = 0.25
+  assert_eq(shader.program_thickness_map(), true)
+  shader.transmission = 0.0
+  assert_eq(shader.program_thickness_map(), false)
+  shader.transmission = 0.25
+  shader.thickness_map = None
+  assert_eq(shader.program_thickness_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
