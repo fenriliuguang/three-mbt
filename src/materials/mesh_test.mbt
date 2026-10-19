@@ -7038,6 +7038,38 @@ test "Material shader writes DECODE_VIDEO_TEXTURE_EMISSIVE" {
 }
 
 ///|
+test "Material shader resolveIncludes expands chunks" {
+  let chunks : Map[String, String] = Map([])
+  chunks.set("common", "float x;\n")
+  chunks.set("a", "#include <b>\n")
+  chunks.set("b", "vec3 y;\n")
+  chunks.set("lights/common.glsl", "int n;\n")
+  assert_eq(@materials.resolve_includes("float z;\n", chunks), "float z;\n")
+  assert_eq(@materials.resolve_includes("#include <common>", chunks), "float x;\n")
+  assert_eq(@materials.resolve_includes("  #include <common>", chunks), "float x;\n")
+  assert_eq(
+    @materials.resolve_includes("#include <common> // keep\n", chunks),
+    "float x;\n // keep\n",
+  )
+  assert_eq(
+    @materials.resolve_includes("#include\t<common>\n", chunks),
+    "#include\t<common>\n",
+  )
+  assert_eq(
+    @materials.resolve_includes("void main() {\n#include <common>\n}\n", chunks),
+    "void main() {\nfloat x;\n\n}\n",
+  )
+  assert_eq(@materials.resolve_includes("#include <a>", chunks), "vec3 y;\n\n")
+  assert_eq(
+    @materials.resolve_includes("#include <lights/common.glsl>", chunks),
+    "int n;\n",
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

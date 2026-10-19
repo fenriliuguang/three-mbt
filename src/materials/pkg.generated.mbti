@@ -8,6 +8,7 @@ import {
 }
 
 // Values
+pub fn resolve_includes(String, Map[String, String]) -> String
 
 // Errors
 

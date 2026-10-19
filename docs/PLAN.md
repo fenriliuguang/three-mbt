@@ -2361,6 +2361,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `DECODE_VIDEO_TEXTURE_EMISSIVE` has landed. A Shader material with `decode_video_texture_emissive` false adds nothing. The fragment string stays `2041` and the vertex string stays `1608`. Setting it to true writes `#define DECODE_VIDEO_TEXTURE_EMISSIVE` and a newline, `38` characters, so the fragment string is `2079`. The vertex string stays `1608`. `decode_video_texture` true writes the define after `DECODE_VIDEO_TEXTURE`, so the fragment string is `2108` and the vertex string stays `1608`. A raw material stays at `61`. A Basic material stays `""`. `resolveIncludes` stays later.
 
+`resolveIncludes` has landed. It rewrites a shader string. A line that begins with optional spaces or tabs, then `#include <name>`, is replaced by that chunk. The chunk is expanded the same way. `#include <common>` with chunk `float x;` and a newline becomes that text. Two leading spaces are part of the match. Text after `>` on the same line stays. `#include` followed by a tab stays unchanged. A name can contain letters, digits, `_`, `.`, and `/`. A missing name aborts. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `replaceLightNums` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3482,6 +3484,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_LIGHT_PROBES_GRID` | `materials` |
 | planned | 7 | `DECODE_VIDEO_TEXTURE` | `materials` |
 | planned | 7 | `DECODE_VIDEO_TEXTURE_EMISSIVE` | `materials` |
+| planned | 7 | `resolveIncludes` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
