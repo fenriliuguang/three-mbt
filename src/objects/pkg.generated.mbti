@@ -86,6 +86,7 @@ pub(all) struct LineLoop {
   mut geometry : @core.BufferGeometry
   mut material : @materials.LineBasicMaterial
 }
+pub fn LineLoop::clone(Self, recursive? : Bool) -> Self
 pub fn LineLoop::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineLoop::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineLoop::refresh(Self) -> Unit

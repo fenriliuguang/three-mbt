@@ -585,6 +585,13 @@ pub fn LineLoop::copy(
 }
 
 ///|
+/// 新建一条闭合折线再复制。three.js 没有单独的 `LineLoop.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn LineLoop::clone(self : LineLoop, recursive? : Bool = true) -> LineLoop {
+  LineLoop::new(self.geometry, self.material).copy(self, recursive~)
+}
+
+///|
 pub fn LineLoop::refresh(self : LineLoop) -> Unit {
   self.node.primitive = Some(
     primitive_binding(
