@@ -3569,9 +3569,9 @@ test "Material shader writes USE_BUMPMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let bump_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.bump_map = Some(bump_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1628)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1650)
   assert_eq(shader.prefixed_fragment_shader().length(), 1242)
-  assert_eq(1628 - 1608, 20)
+  assert_eq(1650 - 1608, 42)
   assert_eq(
     shader.prefixed_vertex_shader()[683:702].to_owned(),
     "#define USE_BUMPMAP",
@@ -3581,7 +3581,7 @@ test "Material shader writes USE_BUMPMAP" {
     "#define USE_BUMPMAP",
   )
   shader.ao_map = Some(bump_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1666)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1688)
   assert_eq(
     shader.prefixed_vertex_shader()[701:720].to_owned(),
     "#define USE_BUMPMAP",
@@ -3617,7 +3617,7 @@ test "Material shader writes USE_NORMALMAP" {
     "#define USE_NORMALMAP",
   )
   shader.bump_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1707)
   assert_eq(
     shader.prefixed_vertex_shader()[703:724].to_owned(),
     "#define USE_NORMALMAP",
@@ -4645,6 +4645,49 @@ test "Material shader writes EMISSIVEMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.emissive_map = Some(emissive_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes BUMPMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let bump_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(bump_map.channel, 0)
+  shader.bump_map = Some(bump_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1650)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
+  assert_eq(1650 - 1608, 42)
+  assert_eq(
+    shader.prefixed_vertex_shader()[703:724].to_owned(),
+    "#define BUMPMAP_UV uv",
+  )
+  bump_map.channel = 1
+  shader.bump_map = Some(bump_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1651)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
+  assert_eq(1651 - 1608, 43)
+  assert_eq(
+    shader.prefixed_vertex_shader()[703:725].to_owned(),
+    "#define BUMPMAP_UV uv1",
+  )
+  shader.wireframe = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1628)
+  shader.wireframe = false
+  bump_map.channel = 0
+  shader.bump_map = Some(bump_map)
+  let emissive_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.emissive_map = Some(emissive_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1700)
+  assert_eq(
+    shader.prefixed_vertex_shader()[753:774].to_owned(),
+    "#define BUMPMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.bump_map = Some(bump_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.bump_map = Some(bump_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
