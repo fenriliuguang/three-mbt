@@ -1457,6 +1457,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Sprite.copy` has landed. A sprite with center `(0.25, 0.75)`, material rotation `0.5`, size attenuation off, count `4`, node position `y=3`, and render order `4` copies onto a sprite whose center was `(0.5, 0.5)` and whose count was `1`. The material is the source object. The center values are copied into the destination vector, and setting that vector's x to `0.1` leaves the source at `0.25`. The node sprite state reads rotation `0.5` and the same center. Count stays `1`. Geometry stays the shared quad. A child named `marker` is cloned. `recursive` false keeps the transform and center and drops the child.
 
+`Sprite.clone` has landed. The same sprite produces a new sprite. The material is shared, and the center is `(0.25, 0.75)` on a new vector. Setting the clone's x to `0.1` leaves the source at `0.25`. The node sprite state reads rotation `0.5` and that center. Count stays `1` while the source stays at `4`. Geometry stays the shared quad. The child named `marker` is a new node. `recursive` false drops the child and leaves the source child in place.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2126,6 +2128,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineLoop.copy` | `objects` |
 | planned | 7 | `LineLoop.clone` | `objects` |
 | planned | 7 | `Sprite.copy` | `objects` |
+| planned | 7 | `Sprite.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

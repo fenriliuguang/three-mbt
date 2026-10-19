@@ -148,6 +148,7 @@ pub(all) struct Sprite {
   geometry : @core.BufferGeometry
   mut count : Int
 }
+pub fn Sprite::clone(Self, recursive? : Bool) -> Self
 pub fn Sprite::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Sprite::intersects_frustum(Self, @math.Frustum) -> Bool
 pub fn Sprite::intersects_frustum_array(Self, @math.FrustumArray) -> Bool

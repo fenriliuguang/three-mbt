@@ -696,6 +696,54 @@ test "Sprite.copy shares material and copies the center" {
 }
 
 ///|
+test "Sprite.clone copies the center and keeps count at one" {
+  let material = @materials.SpriteMaterial::new(
+    rotation=0.5,
+    size_attenuation=false,
+  )
+  let source = @objects.Sprite::new(material)
+  ignore(source.center.set(0.25, 0.75))
+  source.count = 4
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let cloned = source.clone()
+  assert_eq(physical_equal(cloned, source), false)
+  assert_eq(physical_equal(cloned.material, material), true)
+  assert_eq(cloned.material.rotation, 0.5)
+  assert_eq(cloned.material.size_attenuation, false)
+  assert_eq(cloned.center.x, 0.25)
+  assert_eq(cloned.center.y, 0.75)
+  assert_eq(cloned.count, 1)
+  assert_eq(source.count, 4)
+  assert_eq(physical_equal(cloned.geometry, source.geometry), true)
+  assert_eq(cloned.node.position.y, 3.0)
+  assert_eq(cloned.node.render_order, 4)
+  assert_eq(cloned.node.children.length(), 1)
+  assert_eq(cloned.node.children[0].name, "marker")
+  assert_eq(physical_equal(cloned.node.children[0], child), false)
+  match cloned.node.sprite {
+    None => assert_eq(false, true)
+    Some(state) => {
+      assert_eq(state.rotation, 0.5)
+      assert_eq(state.size_attenuation, false)
+      assert_eq(physical_equal(state.center, cloned.center), true)
+      assert_eq(state.center.x, 0.25)
+    }
+  }
+  ignore(cloned.center.set(0.1, 0.75))
+  assert_eq(source.center.x, 0.25)
+  let bare = source.clone(recursive=false)
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.center.x, 0.25)
+  assert_eq(bare.count, 1)
+  assert_eq(source.node.children.length(), 1)
+  assert_eq(source.count, 4)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

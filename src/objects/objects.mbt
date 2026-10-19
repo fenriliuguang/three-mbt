@@ -1076,6 +1076,13 @@ pub fn Sprite::copy(
 }
 
 ///|
+/// 新建一只精灵再复制。three.js 没有单独的 `Sprite.clone`，用的是 `Object3D.clone`。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
+pub fn Sprite::clone(self : Sprite, recursive? : Bool = true) -> Sprite {
+  Sprite::new(self.material).copy(self, recursive~)
+}
+
+///|
 /// 把材质上的旋转和尺寸衰减写回节点。直接改这两个字段不会更新射线用的状态。锚点是共享的。
 pub fn Sprite::refresh(self : Sprite) -> Unit {
   match self.node.sprite {
