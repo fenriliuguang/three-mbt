@@ -2259,6 +2259,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `CLEARCOATMAP_UV` has landed. A Shader material with `clearcoat` at `0` and a 1×1 clearcoat map adds nothing. Setting `clearcoat` to `1` writes `#define CLEARCOATMAP_UV uv` and a newline, `27` characters, on the vertex prefix only. The vertex string grows from `1608` to `1660`. The fragment string grows only by `USE_CLEARCOAT` and `USE_CLEARCOATMAP`, from `1222` to `1269`. Setting the texture `channel` to `1` writes `#define CLEARCOATMAP_UV uv1`, `28` characters, and the vertex string is `1661`. Putting `clearcoat` back to `0` drops the line. An anisotropy map with `anisotropy` at `1` puts that line after `ANISOTROPYMAP_UV`, so channel `0` makes the vertex string `1737`. A raw material stays at `92`. A Basic material stays `""`. `CLEARCOAT_NORMALMAP_UV` stays later.
 
+`CLEARCOAT_NORMALMAP_UV` has landed. A Shader material with `clearcoat` at `0` and a 1×1 clearcoat normal map adds nothing. Setting `clearcoat` to `1` writes `#define CLEARCOAT_NORMALMAP_UV uv` and a newline, `34` characters, on the vertex prefix only. The vertex string grows from `1608` to `1674`. The fragment string grows only by `USE_CLEARCOAT` and `USE_CLEARCOAT_NORMALMAP`, from `1222` to `1276`. Setting the texture `channel` to `1` writes `#define CLEARCOAT_NORMALMAP_UV uv1`, `35` characters, and the vertex string is `1675`. Putting `clearcoat` back to `0` drops the line. A clearcoat map as well puts that line after `CLEARCOATMAP_UV`, so channel `0` makes the vertex string `1726`. A raw material stays at `92`. A Basic material stays `""`. `CLEARCOAT_ROUGHNESSMAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3329,6 +3331,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ROUGHNESSMAP_UV` | `materials` |
 | planned | 7 | `ANISOTROPYMAP_UV` | `materials` |
 | planned | 7 | `CLEARCOATMAP_UV` | `materials` |
+| planned | 7 | `CLEARCOAT_NORMALMAP_UV` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

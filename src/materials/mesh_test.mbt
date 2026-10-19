@@ -3938,9 +3938,9 @@ test "Material shader writes USE_CLEARCOAT_NORMALMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.clearcoat = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1640)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
   assert_eq(shader.prefixed_fragment_shader().length(), 1276)
-  assert_eq(1640 - 1608, 32)
+  assert_eq(1674 - 1608, 66)
   assert_eq(
     shader.prefixed_vertex_shader()[683:714].to_owned(),
     "#define USE_CLEARCOAT_NORMALMAP",
@@ -3950,7 +3950,7 @@ test "Material shader writes USE_CLEARCOAT_NORMALMAP" {
     "#define USE_CLEARCOAT_NORMALMAP",
   )
   shader.clearcoat_roughness_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1675)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1709)
   assert_eq(
     shader.prefixed_vertex_shader()[718:749].to_owned(),
     "#define USE_CLEARCOAT_NORMALMAP",
@@ -3990,7 +3990,7 @@ test "Material shader writes USE_IRIDESCENCEMAP" {
   shader.iridescence = 1.0
   shader.clearcoat = 1.0
   shader.clearcoat_normal_map = Some(iridescence_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1667)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1701)
   assert_eq(
     shader.prefixed_vertex_shader()[715:741].to_owned(),
     "#define USE_IRIDESCENCEMAP",
@@ -4945,6 +4945,54 @@ test "Material shader writes CLEARCOATMAP_UV" {
   let basic = @materials.Material::basic()
   basic.clearcoat = 1.0
   basic.clearcoat_map = Some(clearcoat_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes CLEARCOAT_NORMALMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(normal_map.channel, 0)
+  shader.clearcoat_normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.clearcoat = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1276)
+  assert_eq(1674 - 1608, 66)
+  assert_eq(
+    shader.prefixed_vertex_shader()[715:748].to_owned(),
+    "#define CLEARCOAT_NORMALMAP_UV uv",
+  )
+  normal_map.channel = 1
+  shader.clearcoat_normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1675)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1276)
+  assert_eq(1675 - 1608, 67)
+  assert_eq(
+    shader.prefixed_vertex_shader()[715:749].to_owned(),
+    "#define CLEARCOAT_NORMALMAP_UV uv1",
+  )
+  shader.clearcoat = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.clearcoat = 1.0
+  normal_map.channel = 0
+  shader.clearcoat_normal_map = Some(normal_map)
+  let clearcoat_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.clearcoat_map = Some(clearcoat_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1726)
+  assert_eq(
+    shader.prefixed_vertex_shader()[767:800].to_owned(),
+    "#define CLEARCOAT_NORMALMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.clearcoat = 1.0
+  raw.clearcoat_normal_map = Some(normal_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.clearcoat = 1.0
+  basic.clearcoat_normal_map = Some(normal_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
