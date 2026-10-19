@@ -163,6 +163,7 @@ pub(all) struct Material {
   mut specular_intensity : Double
   mut specular_intensity_map : @textures.Texture?
   specular_color : @math.Color
+  mut specular_color_map : @textures.Texture?
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
