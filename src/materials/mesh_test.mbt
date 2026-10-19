@@ -7599,6 +7599,21 @@ test "Material shader shaderType reads the material type" {
 }
 
 ///|
+test "Material shader shaderName reads the material name" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.shader_name(), "")
+  assert_eq(shader.shader_type(), "ShaderMaterial")
+  assert_eq(@materials.Material::basic().shader_name(), "")
+  assert_eq(@materials.Material::lambert().shader_name(), "")
+  assert_eq(@materials.Material::raw().shader_name(), "")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.name = "renamed"
+  assert_eq(shader.shader_name(), "renamed")
+  assert_eq(shader.shader_type(), "ShaderMaterial")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
