@@ -4042,6 +4042,38 @@ test "Material shader writes USE_IRIDESCENCE_THICKNESSMAP" {
 }
 
 ///|
+test "Material shader writes USE_SPECULARMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let specular_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.specular_map = Some(specular_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1632)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
+  assert_eq(1632 - 1608, 24)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:706].to_owned(),
+    "#define USE_SPECULARMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1102].to_owned(),
+    "#define USE_SPECULARMAP",
+  )
+  shader.iridescence = 1.0
+  shader.iridescence_thickness_map = Some(specular_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1669)
+  assert_eq(
+    shader.prefixed_vertex_shader()[720:743].to_owned(),
+    "#define USE_SPECULARMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.specular_map = Some(specular_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.specular_map = Some(specular_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
