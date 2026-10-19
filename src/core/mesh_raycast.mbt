@@ -152,27 +152,8 @@ fn Object3D::push_triangle(
           corner_c,
           @math.Vector3::new(),
         )
-        let uv = match barycoord {
-          None => None
-          Some(bary) =>
-            match self.mesh {
-              None => None
-              Some(mesh) =>
-                match mesh.geometry.get_attribute("uv") {
-                  None => None
-                  Some(attribute) =>
-                    Some(
-                      attribute.interpolate_vector2(
-                        a,
-                        b,
-                        c,
-                        bary,
-                        @math.Vector2::new(),
-                      ),
-                    )
-                }
-            }
-        }
+        let uv = interpolated_uv(self.mesh, "uv", a, b, c, barycoord)
+        let uv1 = interpolated_uv(self.mesh, "uv1", a, b, c, barycoord)
         intersects.push({
           distance,
           point: world,
@@ -181,9 +162,36 @@ fn Object3D::push_triangle(
           face_index: Some(face_index),
           barycoord,
           uv,
+          uv1,
         })
       }
     }
+  }
+}
+
+///|
+fn interpolated_uv(
+  mesh : MeshBinding?,
+  name : String,
+  a : Int,
+  b : Int,
+  c : Int,
+  barycoord : @math.Vector3?,
+) -> @math.Vector2? {
+  match barycoord {
+    None => None
+    Some(bary) =>
+      match mesh {
+        None => None
+        Some(mesh) =>
+          match mesh.geometry.get_attribute(name) {
+            None => None
+            Some(attribute) =>
+              Some(
+                attribute.interpolate_vector2(a, b, c, bary, @math.Vector2::new()),
+              )
+          }
+      }
   }
 }
 

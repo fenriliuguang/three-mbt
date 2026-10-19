@@ -151,4 +151,43 @@ test "mesh raycast interpolates uv" {
       assert_eq(uv.y, 0.25)
     }
   }
+  match hits[0].uv1 {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
+test "mesh raycast interpolates uv1" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "uv1",
+      @core.BufferAttribute::new([0.0, 1.0, 1.0, 1.0, 0.0, 0.0], 2),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let hits = raycaster.intersect_object(mesh.node)
+  assert_eq(hits.length(), 1)
+  match hits[0].uv1 {
+    None => assert_eq(false, true)
+    Some(uv) => {
+      assert_eq(uv.x, 0.25)
+      assert_eq(uv.y, 0.75)
+    }
+  }
 }

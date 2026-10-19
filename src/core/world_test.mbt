@@ -2618,6 +2618,7 @@ test "intersectObject sorts hits by distance" {
       face_index: None,
       barycoord: None,
       uv: None,
+      uv1: None,
     },
     @core.Intersection::{
       distance: 1.0,
@@ -2627,6 +2628,7 @@ test "intersectObject sorts hits by distance" {
       face_index: None,
       barycoord: None,
       uv: None,
+      uv1: None,
     },
   ]
   let written = raycaster.intersect_object(root, intersects=hits)
@@ -2653,6 +2655,7 @@ test "intersectObjects sorts hits from several roots" {
       face_index: None,
       barycoord: None,
       uv: None,
+      uv1: None,
     },
     @core.Intersection::{
       distance: 1.0,
@@ -2662,6 +2665,7 @@ test "intersectObjects sorts hits from several roots" {
       face_index: None,
       barycoord: None,
       uv: None,
+      uv1: None,
     },
   ]
   let written = raycaster.intersect_objects([first, second], intersects=hits)

@@ -290,6 +290,7 @@ pub(all) struct Intersection {
   face_index : Int?
   barycoord : @math.Vector3?
   uv : @math.Vector2?
+  uv1 : @math.Vector2?
 }
 
 pub(all) struct Layers {
