@@ -1640,6 +1640,31 @@ pub fn SpriteMaterial::has_event_listener(
 }
 
 ///|
+/// 从一种事件里移除这个监听。没有登记时不动。渲染器仍不画精灵。
+/// r186: `removeEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L74
+pub fn SpriteMaterial::remove_event_listener(
+  self : SpriteMaterial,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let mut index = None
+      for i in 0..<listeners.length() {
+        if physical_equal(listeners[i], listener) {
+          index = Some(i)
+        }
+      }
+      match index {
+        None => ()
+        Some(index) => ignore(listeners.remove(index))
+      }
+    }
+  }
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。渲染器仍不画精灵。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn SpriteMaterial::set_needs_update(

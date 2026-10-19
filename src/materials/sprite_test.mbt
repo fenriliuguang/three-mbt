@@ -872,3 +872,21 @@ test "SpriteMaterial hasEventListener reports a registered listener" {
   let other = @materials.SpriteMaterial::new()
   assert_eq(other.has_event_listener("dispose", listener), false)
 }
+
+///|
+test "SpriteMaterial removeEventListener drops a registered listener" {
+  let material = @materials.SpriteMaterial::new()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("change", other_listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  assert_eq(material.has_event_listener("change", other_listener), true)
+  let other = @materials.SpriteMaterial::new()
+  other.add_event_listener("dispose", listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(other.has_event_listener("dispose", listener), true)
+}
