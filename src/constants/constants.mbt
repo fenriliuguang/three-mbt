@@ -103,6 +103,108 @@ pub fn Blending::to_int(self : Blending) -> Int {
 }
 
 ///|
+/// 混合因子乘 `0`。对齐 `ZeroFactor`（200）。
+pub const ZERO_FACTOR : Int = 200
+
+///|
+/// 混合因子乘 `1`。对齐 `OneFactor`（201）。
+pub const ONE_FACTOR : Int = 201
+
+///|
+/// 混合因子乘源颜色。对齐 `SrcColorFactor`（202）。
+pub const SRC_COLOR_FACTOR : Int = 202
+
+///|
+/// 混合因子乘 `1` 减源颜色。对齐 `OneMinusSrcColorFactor`（203）。
+pub const ONE_MINUS_SRC_COLOR_FACTOR : Int = 203
+
+///|
+/// 混合因子乘源 alpha。对齐 `SrcAlphaFactor`（204）。
+pub const SRC_ALPHA_FACTOR : Int = 204
+
+///|
+/// 混合因子乘 `1` 减源 alpha。对齐 `OneMinusSrcAlphaFactor`（205）。
+pub const ONE_MINUS_SRC_ALPHA_FACTOR : Int = 205
+
+///|
+/// 混合因子乘目标 alpha。对齐 `DstAlphaFactor`（206）。
+pub const DST_ALPHA_FACTOR : Int = 206
+
+///|
+/// 混合因子乘 `1` 减目标 alpha。对齐 `OneMinusDstAlphaFactor`（207）。
+pub const ONE_MINUS_DST_ALPHA_FACTOR : Int = 207
+
+///|
+/// 混合因子乘目标颜色。对齐 `DstColorFactor`（208）。
+pub const DST_COLOR_FACTOR : Int = 208
+
+///|
+/// 混合因子乘 `1` 减目标颜色。对齐 `OneMinusDstColorFactor`（209）。
+pub const ONE_MINUS_DST_COLOR_FACTOR : Int = 209
+
+///|
+/// RGB 乘源 alpha 与 `1` 减目标 alpha 的较小值，alpha 乘 `1`。对齐 `SrcAlphaSaturateFactor`（210）。
+pub const SRC_ALPHA_SATURATE_FACTOR : Int = 210
+
+///|
+/// 混合因子乘常量颜色。对齐 `ConstantColorFactor`（211）。
+pub const CONSTANT_COLOR_FACTOR : Int = 211
+
+///|
+/// 混合因子乘 `1` 减常量颜色。对齐 `OneMinusConstantColorFactor`（212）。
+pub const ONE_MINUS_CONSTANT_COLOR_FACTOR : Int = 212
+
+///|
+/// 混合因子乘常量 alpha。对齐 `ConstantAlphaFactor`（213）。
+pub const CONSTANT_ALPHA_FACTOR : Int = 213
+
+///|
+/// 混合因子乘 `1` 减常量 alpha。对齐 `OneMinusConstantAlphaFactor`（214）。
+pub const ONE_MINUS_CONSTANT_ALPHA_FACTOR : Int = 214
+
+///|
+/// 混合源因子和目标因子。数值与 r186 `src/constants.js` 一致。默认是 `SrcAlpha`。
+/// r186: `ZeroFactor` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L213 ; `SrcAlphaFactor` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L245 ; `OneMinusConstantAlphaFactor` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L327
+pub(all) enum BlendFactor {
+  Zero
+  One
+  SrcColor
+  OneMinusSrcColor
+  SrcAlpha
+  OneMinusSrcAlpha
+  DstAlpha
+  OneMinusDstAlpha
+  DstColor
+  OneMinusDstColor
+  SrcAlphaSaturate
+  ConstantColor
+  OneMinusConstantColor
+  ConstantAlpha
+  OneMinusConstantAlpha
+}
+
+///|
+pub fn BlendFactor::to_int(self : BlendFactor) -> Int {
+  match self {
+    Zero => ZERO_FACTOR
+    One => ONE_FACTOR
+    SrcColor => SRC_COLOR_FACTOR
+    OneMinusSrcColor => ONE_MINUS_SRC_COLOR_FACTOR
+    SrcAlpha => SRC_ALPHA_FACTOR
+    OneMinusSrcAlpha => ONE_MINUS_SRC_ALPHA_FACTOR
+    DstAlpha => DST_ALPHA_FACTOR
+    OneMinusDstAlpha => ONE_MINUS_DST_ALPHA_FACTOR
+    DstColor => DST_COLOR_FACTOR
+    OneMinusDstColor => ONE_MINUS_DST_COLOR_FACTOR
+    SrcAlphaSaturate => SRC_ALPHA_SATURATE_FACTOR
+    ConstantColor => CONSTANT_COLOR_FACTOR
+    OneMinusConstantColor => ONE_MINUS_CONSTANT_COLOR_FACTOR
+    ConstantAlpha => CONSTANT_ALPHA_FACTOR
+    OneMinusConstantAlpha => ONE_MINUS_CONSTANT_ALPHA_FACTOR
+  }
+}
+
+///|
 /// 深度测试通过的条件。数值与 r186 `src/constants.js` 一致。默认是 `LessEqual`。
 /// r186: `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `LessEqualDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L359
 pub(all) enum DepthFunc {

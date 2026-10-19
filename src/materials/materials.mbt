@@ -22,6 +22,7 @@ pub(all) enum MaterialKind {
 /// `blend_alpha` 默认 `0`。混合仍不用常量 alpha。
 /// `blend_color` 默认黑色 `(0, 0, 0)`。混合仍不用常量颜色。
 /// `blending` 默认 `Normal`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blend_src` 默认 `SrcAlpha`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
 /// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
 /// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
 /// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
@@ -38,7 +39,7 @@ pub(all) enum MaterialKind {
 /// `visible` 默认打开。关掉后这个材质不进颜色列表，也不进阴影列表。节点的 `visible` 仍然单独决定整棵子树。
 /// `force_single_pass` 默认关闭。透明且双面时，先画背面再画正面。打开后这两次合成一次双面绘制。不透明双面本来就是一次。
 /// 改 `side`、`shadow_side`、`visible`、`force_single_pass`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`depth_func`、`color_write`、`premultiplied_alpha`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
-/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99 ; `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458 ; `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135 ; `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409 ; `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399 ; `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375 ; `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383 ; `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391 ; `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329 ; `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320 ; `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439 ; `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203 ; `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193 ; `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99 ; `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458 ; `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135 ; `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409 ; `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399 ; `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375 ; `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383 ; `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391 ; `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329 ; `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320 ; `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439 ; `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203 ; `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193 ; `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80 ; `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372
 pub(all) struct Material {
   color : @math.Color
   mut side : @constants.Side
@@ -79,6 +80,7 @@ pub(all) struct Material {
   mut blend_alpha : Double
   blend_color : @math.Color
   mut blending : @constants.Blending
+  mut blend_src : @constants.BlendFactor
   kind : MaterialKind
 }
 
@@ -124,6 +126,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     blend_alpha: 0.0,
     blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
     blending: @constants.Normal,
+    blend_src: @constants.SrcAlpha,
     kind: Basic,
   }
 }
@@ -182,6 +185,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     blend_alpha: 0.0,
     blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
     blending: @constants.Normal,
+    blend_src: @constants.SrcAlpha,
     kind: Lambert,
   }
 }
@@ -246,6 +250,7 @@ pub fn Material::standard(
     blend_alpha: 0.0,
     blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
     blending: @constants.Normal,
+    blend_src: @constants.SrcAlpha,
     kind: Standard,
   }
 }

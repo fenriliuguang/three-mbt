@@ -218,3 +218,35 @@ test "Material blending defaults to normal" {
   assert_eq(@constants.Blending::Subtractive.to_int(), 3)
   assert_eq(@constants.Blending::Custom.to_int(), 5)
 }
+
+///|
+test "Material blendSrc defaults to source alpha" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(basic.material.blend_src.to_int(), 204)
+  basic.material.blend_src = @constants.BlendFactor::One
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  standard.material.blend_src = @constants.BlendFactor::Zero
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(basic.material.blend_src is @constants.BlendFactor::One, true)
+  assert_eq(basic.material.blend_src.to_int(), 201)
+  assert_eq(standard.material.blend_src is @constants.BlendFactor::Zero, true)
+  assert_eq(standard.material.blend_src.to_int(), 200)
+  assert_eq(lambert.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(@constants.BlendFactor::SrcColor.to_int(), 202)
+  assert_eq(@constants.BlendFactor::OneMinusSrcColor.to_int(), 203)
+  assert_eq(@constants.BlendFactor::OneMinusSrcAlpha.to_int(), 205)
+  assert_eq(@constants.BlendFactor::DstAlpha.to_int(), 206)
+  assert_eq(@constants.BlendFactor::OneMinusDstAlpha.to_int(), 207)
+  assert_eq(@constants.BlendFactor::DstColor.to_int(), 208)
+  assert_eq(@constants.BlendFactor::OneMinusDstColor.to_int(), 209)
+  assert_eq(@constants.BlendFactor::SrcAlphaSaturate.to_int(), 210)
+  assert_eq(@constants.BlendFactor::ConstantColor.to_int(), 211)
+  assert_eq(@constants.BlendFactor::OneMinusConstantColor.to_int(), 212)
+  assert_eq(@constants.BlendFactor::ConstantAlpha.to_int(), 213)
+  assert_eq(@constants.BlendFactor::OneMinusConstantAlpha.to_int(), 214)
+}
