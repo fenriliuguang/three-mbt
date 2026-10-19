@@ -633,3 +633,20 @@ test "Material userData starts empty" {
     Some(label) => assert_eq(label, "lit")
   }
 }
+
+///|
+test "Material version starts at zero" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.version, 0)
+  basic.material.version = 1
+  let other = @materials.Material::basic()
+  assert_eq(other.version, 0)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.version, 0)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.version, 0)
+  standard.material.version = 2
+  assert_eq(lambert.material.version, 0)
+  assert_eq(basic.material.version, 1)
+  assert_eq(standard.material.version, 2)
+}

@@ -127,6 +127,7 @@ pub(all) struct Material {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
+  mut version : Int
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
