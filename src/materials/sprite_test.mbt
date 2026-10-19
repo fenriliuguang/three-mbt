@@ -453,3 +453,18 @@ test "SpriteMaterial stores and copies blendEquationAlpha" {
     None => abort("changed destination blendEquationAlpha is empty")
   }
 }
+
+///|
+test "SpriteMaterial stores and copies stencilWriteMask" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.stencil_write_mask, 255)
+  let source = @materials.SpriteMaterial::new()
+  source.stencil_write_mask = 0
+  assert_eq(defaults.stencil_write_mask, 255)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_write_mask, 0)
+  destination.stencil_write_mask = 1
+  assert_eq(source.stencil_write_mask, 0)
+  assert_eq(destination.stencil_write_mask, 1)
+}
