@@ -491,9 +491,11 @@ pub(all) struct Raycaster {
   ray : @math.Ray
   mut near : Double
   mut far : Double
+  mut camera : Object3D?
 }
 pub fn Raycaster::new(origin? : @math.Vector3, direction? : @math.Vector3, near? : Double, far? : Double) -> Self
 pub fn Raycaster::set(Self, @math.Vector3, @math.Vector3) -> Unit
+pub fn Raycaster::set_from_camera(Self, @math.Vector2, Object3D) -> Unit
 
 pub(all) struct ShadowState {
   camera : Object3D

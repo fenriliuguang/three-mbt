@@ -2532,6 +2532,44 @@ test "set replaces the ray origin and direction" {
 }
 
 ///|
+test "setFromCamera aims an orthographic ray through NDC" {
+  let camera = @core.Object3D::new(kind=@core.OrthographicCamera)
+  let state = @core.CameraState::orthographic(
+    -2.0,
+    2.0,
+    1.0,
+    -1.0,
+    0.1,
+    10.0,
+  )
+  state.update_projection()
+  camera.camera = Some(state)
+  camera.update_matrix_world()
+  let raycaster = @core.Raycaster::new()
+  let coords = @math.Vector2::new(x=1.0, y=1.0)
+  raycaster.set_from_camera(coords, camera)
+  assert_eq(raycaster.ray.origin.x, 2.0)
+  assert_eq(raycaster.ray.origin.y, 1.0)
+  assert_eq(raycaster.ray.origin.z, 0.0)
+  assert_eq(raycaster.ray.direction.x, 0.0)
+  assert_eq(raycaster.ray.direction.y, 0.0)
+  assert_eq(raycaster.ray.direction.z, -1.0)
+  match raycaster.camera {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, camera), true)
+  }
+  ignore(camera.position.set(10.0, 0.0, 0.0))
+  camera.update_matrix_world()
+  raycaster.set_from_camera(coords, camera)
+  assert_eq(raycaster.ray.origin.x, 12.0)
+  assert_eq(raycaster.ray.origin.y, 1.0)
+  assert_eq(raycaster.ray.origin.z, 0.0)
+  assert_eq(raycaster.ray.direction.x, 0.0)
+  assert_eq(raycaster.ray.direction.y, 0.0)
+  assert_eq(raycaster.ray.direction.z, -1.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {
