@@ -6507,62 +6507,104 @@ test "Material shader writes TONE_MAPPING" {
   let shader = @materials.Material::shader()
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 6475)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 6546)
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
-  assert_eq(6475 - 1222, 5253)
+  assert_eq(6546 - 1222, 5324)
   assert_eq(
-    shader.prefixed_fragment_shader(tone_mapping=true)[1162:1182].to_owned(),
+    shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[1162:1182].to_owned(),
     "#define TONE_MAPPING",
   )
   assert_eq(
-    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true).length(),
-    6509,
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear).length(),
+    6580,
   )
   assert_eq(
-    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[1196:1216].to_owned(),
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear)[1196:1216].to_owned(),
     "#define TONE_MAPPING",
   )
   assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.No).length(), 1222)
   let raw = @materials.Material::raw()
-  assert_eq(raw.prefixed_fragment_shader(tone_mapping=true).length(), 61)
+  assert_eq(raw.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 61)
   let basic = @materials.Material::basic()
-  assert_eq(basic.prefixed_fragment_shader(tone_mapping=true), "")
+  assert_eq(basic.prefixed_fragment_shader(tone_mapping=@constants.Linear), "")
 }
 
 ///|
 test "Material shader writes tonemapping_pars_fragment" {
   let shader = @materials.Material::shader()
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 6475)
-  assert_eq(6475 - 1244, 5231)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.No).length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 6546)
   assert_eq(
-    shader.prefixed_fragment_shader(tone_mapping=true)[1184:1200].to_owned(),
+    shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[1183:6414].length(),
+    5231,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[1184:1200].to_owned(),
     "#ifndef saturate",
   )
   assert_eq(
-    shader.prefixed_fragment_shader(tone_mapping=true)[6359:6413].to_owned(),
+    shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[6359:6413].to_owned(),
     "vec3 CustomToneMapping( vec3 color ) { return color; }",
   )
   assert_eq(
-    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true).length(),
-    6509,
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear).length(),
+    6580,
   )
   assert_eq(
-    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[1218:1234].to_owned(),
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear)[1218:1234].to_owned(),
     "#ifndef saturate",
   )
   assert_eq(
-    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[6393:6447].to_owned(),
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear)[6393:6447].to_owned(),
     "vec3 CustomToneMapping( vec3 color ) { return color; }",
   )
   assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.No).length(), 1222)
   let raw = @materials.Material::raw()
-  assert_eq(raw.prefixed_fragment_shader(tone_mapping=true).length(), 61)
+  assert_eq(raw.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 61)
   let basic = @materials.Material::basic()
-  assert_eq(basic.prefixed_fragment_shader(tone_mapping=true), "")
+  assert_eq(basic.prefixed_fragment_shader(tone_mapping=@constants.Linear), "")
+}
+
+///|
+test "Material shader writes getToneMappingFunction" {
+  let shader = @materials.Material::shader()
+  let linear = "vec3 toneMapping( vec3 color ) { return LinearToneMapping( color ); }"
+  let reinhard = "vec3 toneMapping( vec3 color ) { return ReinhardToneMapping( color ); }"
+  let cineon = "vec3 toneMapping( vec3 color ) { return CineonToneMapping( color ); }"
+  let aces = "vec3 toneMapping( vec3 color ) { return ACESFilmicToneMapping( color ); }"
+  let agx = "vec3 toneMapping( vec3 color ) { return AgXToneMapping( color ); }"
+  let neutral = "vec3 toneMapping( vec3 color ) { return NeutralToneMapping( color ); }"
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.No).length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 6546)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Linear)[6415:6484].to_owned(), linear)
+  assert_eq(6546 - 6475, 71)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Reinhard).length(), 6548)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Reinhard)[6415:6486].to_owned(), reinhard)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Cineon).length(), 6546)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Cineon)[6415:6484].to_owned(), cineon)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.ACES).length(), 6550)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.ACES)[6415:6488].to_owned(), aces)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.AgX).length(), 6543)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.AgX)[6415:6481].to_owned(), agx)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Neutral).length(), 6547)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=@constants.Neutral)[6415:6485].to_owned(), neutral)
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear).length(),
+    6580,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear)[6449:6518].to_owned(),
+    linear,
+  )
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(tone_mapping=@constants.Linear).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(tone_mapping=@constants.ACES), "")
 }
 
 ///|
