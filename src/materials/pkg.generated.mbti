@@ -134,6 +134,7 @@ pub(all) struct Material {
   mut bump_scale : Double
   mut wireframe_linewidth : Double
   mut wireframe_linecap : WireframeCap
+  mut wireframe_linejoin : WireframeJoin
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -339,6 +340,12 @@ pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit
 
 pub(all) enum WireframeCap {
+  Round
+  Bevel
+  Miter
+}
+
+pub(all) enum WireframeJoin {
   Round
   Bevel
   Miter

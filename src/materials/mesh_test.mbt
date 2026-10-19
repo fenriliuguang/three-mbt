@@ -1466,3 +1466,21 @@ test "Material wireframeLinecap defaults to round and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.wireframe_linecap is @materials.WireframeCap::Round, true)
 }
+
+///|
+test "Material wireframeLinejoin defaults to round and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.wireframe_linejoin is @materials.WireframeJoin::Round, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.wireframe_linejoin is @materials.WireframeJoin::Round, true)
+  lambert.wireframe_linejoin = @materials.WireframeJoin::Bevel
+  let other = @materials.Material::lambert()
+  assert_eq(other.wireframe_linejoin is @materials.WireframeJoin::Round, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.wireframe_linejoin is @materials.WireframeJoin::Bevel, true)
+  destination.wireframe_linejoin = @materials.WireframeJoin::Miter
+  assert_eq(lambert.wireframe_linejoin is @materials.WireframeJoin::Bevel, true)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.wireframe_linejoin is @materials.WireframeJoin::Round, true)
+}
