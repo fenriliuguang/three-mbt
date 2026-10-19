@@ -299,6 +299,7 @@ pub fn Material::program_anisotropy_map(Self) -> Bool
 pub fn Material::program_ao_map(Self) -> Bool
 pub fn Material::program_ao_map_uv(Self) -> String
 pub fn Material::program_bump_map(Self) -> Bool
+pub fn Material::program_bump_map_uv(Self) -> String
 pub fn Material::program_clearcoat(Self) -> Bool
 pub fn Material::program_clearcoat_map(Self) -> Bool
 pub fn Material::program_clearcoat_normal_map(Self) -> Bool
