@@ -427,3 +427,29 @@ test "LineBasicMaterial stores and copies blending" {
   assert_eq(dashed.line.blending is @constants.Blending::Additive, true)
   assert_eq(other.line.blending.to_int(), 3)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendSrc" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(defaults.blend_src.to_int(), 204)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_src = @constants.BlendFactor::One
+  assert_eq(defaults.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blend_src is @constants.BlendFactor::One, true)
+  assert_eq(destination.blend_src.to_int(), 201)
+  destination.blend_src = @constants.BlendFactor::Zero
+  assert_eq(source.blend_src is @constants.BlendFactor::One, true)
+  assert_eq(destination.blend_src.to_int(), 200)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_src = @constants.BlendFactor::One
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.blend_src is @constants.BlendFactor::One, true)
+  assert_eq(other.line.blend_src.to_int(), 201)
+  other.line.blend_src = @constants.BlendFactor::DstColor
+  assert_eq(dashed.line.blend_src is @constants.BlendFactor::One, true)
+  assert_eq(other.line.blend_src.to_int(), 208)
+}
