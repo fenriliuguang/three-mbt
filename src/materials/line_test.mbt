@@ -349,3 +349,24 @@ test "LineBasicMaterial stores and copies allowOverride" {
   other.line.allow_override = true
   assert_eq(dashed.line.allow_override, false)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendAlpha" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_alpha, 0.0)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_alpha = 0.25
+  assert_eq(defaults.blend_alpha, 0.0)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.blend_alpha, 0.25)
+  destination.blend_alpha = 0.5
+  assert_eq(source.blend_alpha, 0.25)
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_alpha = 0.25
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  assert_eq(other.line.blend_alpha, 0.25)
+  other.line.blend_alpha = 0.75
+  assert_eq(dashed.line.blend_alpha, 0.25)
+}

@@ -414,6 +414,7 @@ pub fn PointsMaterial::copy(
 /// `clip_shadows` 默认关闭。线段仍不投射阴影。
 /// `clip_intersection` 默认关闭。线段绘制仍没有裁剪平面。
 /// `allow_override` 默认打开。线段绘制仍不用场景覆盖材质替换它。
+/// `blend_alpha` 默认 `0`。线段绘制的混合仍不用常量 alpha。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -428,6 +429,7 @@ pub fn PointsMaterial::copy(
 /// r186: `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329
 /// r186: `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320
 /// r186: `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439
+/// r186: `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203
 pub(all) struct LineBasicMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -452,6 +454,7 @@ pub(all) struct LineBasicMaterial {
   mut clip_shadows : Bool
   mut clip_intersection : Bool
   mut allow_override : Bool
+  mut blend_alpha : Double
 }
 
 ///|
@@ -480,12 +483,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     clip_shadows: false,
     clip_intersection: false,
     allow_override: true,
+    blend_alpha: 0.0,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection` 和 `allow_override` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override` 和 `blend_alpha` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -515,6 +519,7 @@ pub fn LineBasicMaterial::copy(
   self.clip_shadows = source.clip_shadows
   self.clip_intersection = source.clip_intersection
   self.allow_override = source.allow_override
+  self.blend_alpha = source.blend_alpha
   self
 }
 
