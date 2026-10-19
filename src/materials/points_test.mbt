@@ -766,3 +766,13 @@ test "PointsMaterial stores and copies name" {
   assert_eq(source.name, "point")
   assert_eq(destination.name, "copy")
 }
+
+///|
+test "PointsMaterial type_name stays PointsMaterial" {
+  let source = @materials.PointsMaterial::new()
+  assert_eq(source.type_name, "PointsMaterial")
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.type_name, "PointsMaterial")
+  assert_eq(source.type_name, "PointsMaterial")
+}
