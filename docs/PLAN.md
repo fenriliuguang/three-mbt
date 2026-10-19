@@ -2427,6 +2427,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `envMap` has landed. A material with its own env map reads `true`. Lambert, Phong, Toon, Standard, and Physical also read `true` when the scene has an environment and the material map is empty. Basic, Shader, and Matcap stay `false` in that case. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the env map is still empty. `envMapMode` stays later.
 
+`envMapMode` has landed. With no env map the parameter is empty, and a passed mapping is ignored. Lambert with a scene environment returns that mapping, so `301` stays `301`. A Shader material with its own env map returns the mapping it was given, so `302` stays `302`. Basic with only a scene environment stays empty. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the env map is still empty. `envMapCubeUVHeight` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3581,6 +3583,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `map` | `materials` |
 | planned | 7 | `matcap` | `materials` |
 | planned | 7 | `envMap` | `materials` |
+| planned | 7 | `envMapMode` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

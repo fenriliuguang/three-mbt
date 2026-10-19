@@ -293,6 +293,7 @@ pub fn Material::prefixed_vertex_shader(Self, has_tangent? : Bool, has_normal? :
 pub fn Material::program_alpha_to_coverage(Self) -> Bool
 pub fn Material::program_defines(Self) -> Map[String, String]
 pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
+pub fn Material::program_env_map_mode(Self, Int, has_scene_environment? : Bool) -> Int?
 pub fn Material::program_fragment_shader(Self) -> String?
 pub fn Material::program_glsl_version(Self) -> GlslVersion?
 pub fn Material::program_is_raw_shader_material(Self) -> Bool

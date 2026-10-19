@@ -7949,6 +7949,36 @@ test "Material shader envMap uses the scene for lit materials" {
 }
 
 ///|
+test "Material shader envMapMode is the mapping when a map exists" {
+  let shader = @materials.Material::shader()
+  match shader.program_env_map_mode(301) {
+    None => ()
+    Some(_) => abort("shader env map mode without a map")
+  }
+  match @materials.Material::basic().program_env_map_mode(301, has_scene_environment=true) {
+    None => ()
+    Some(_) => abort("basic env map mode from the scene")
+  }
+  match @materials.Material::lambert().program_env_map_mode(301, has_scene_environment=true) {
+    Some(mode) => assert_eq(mode, 301)
+    None => abort("lambert env map mode missing")
+  }
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.env_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  match shader.program_env_map_mode(302) {
+    Some(mode) => assert_eq(mode, 302)
+    None => abort("shader env map mode missing")
+  }
+  shader.env_map = None
+  match shader.program_env_map_mode(302) {
+    None => ()
+    Some(_) => abort("cleared env map kept a mode")
+  }
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
