@@ -294,6 +294,7 @@ pub fn Material::program_alpha_to_coverage(Self) -> Bool
 pub fn Material::program_ao_map(Self) -> Bool
 pub fn Material::program_bump_map(Self) -> Bool
 pub fn Material::program_defines(Self) -> Map[String, String]
+pub fn Material::program_displacement_map(Self) -> Bool
 pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
 pub fn Material::program_env_map_cube_uv_height(Self, Int, scene_environment_height? : Int, has_scene_environment? : Bool) -> Int?
 pub fn Material::program_env_map_mode(Self, Int, has_scene_environment? : Bool) -> Int?

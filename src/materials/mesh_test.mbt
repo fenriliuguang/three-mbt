@@ -8147,6 +8147,21 @@ test "Material shader packedNormalMap follows packed RG formats" {
 }
 
 ///|
+test "Material shader displacementMap follows the displacement texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_displacement_map(), false)
+  assert_eq(@materials.Material::raw().program_displacement_map(), false)
+  assert_eq(@materials.Material::lambert().program_displacement_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.displacement_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_displacement_map(), true)
+  shader.displacement_map = None
+  assert_eq(shader.program_displacement_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
