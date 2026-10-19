@@ -8942,6 +8942,29 @@ test "Material shader clearcoatRoughnessMapUv needs strength and a channel" {
 }
 
 ///|
+test "Material shader iridescenceMapUv needs strength and a channel" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_iridescence_map_uv(), "false")
+  assert_eq(@materials.Material::raw().program_iridescence_map_uv(), "false")
+  assert_eq(@materials.Material::physical().program_iridescence_map_uv(), "false")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.iridescence_map = Some(map)
+  assert_eq(shader.program_iridescence_map_uv(), "false")
+  shader.iridescence = 0.25
+  assert_eq(shader.program_iridescence_map_uv(), "uv")
+  shader.iridescence = 0.0
+  assert_eq(shader.program_iridescence_map_uv(), "false")
+  shader.iridescence = 0.25
+  map.channel = 1
+  assert_eq(shader.program_iridescence_map_uv(), "uv1")
+  shader.iridescence_map = None
+  assert_eq(shader.program_iridescence_map_uv(), "false")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
