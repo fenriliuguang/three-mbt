@@ -1188,6 +1188,30 @@ test "LineBasicMaterial clone keeps LineBasicMaterial and takes a new id" {
 }
 
 ///|
+test "LineBasicMaterial addEventListener keeps one copy of a listener" {
+  let material = @materials.LineBasicMaterial::new()
+  let listener = fn() {}
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("dispose", listener)
+  match material.listeners.get("dispose") {
+    None => abort("dispose listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+  let source = @materials.LineBasicMaterial::new()
+  source.add_event_listener("dispose", listener)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.listeners.get("dispose") {
+    None => ()
+    Some(_) => abort("copy brought listeners")
+  }
+  match source.listeners.get("dispose") {
+    None => abort("source listeners")
+    Some(listeners) => assert_eq(listeners.length(), 1)
+  }
+}
+
+///|
 test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
   let defaults = @materials.LineDashedMaterial::new()
   let defaults_clone = defaults.clone()

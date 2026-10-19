@@ -61,7 +61,9 @@ pub(all) struct LineBasicMaterial {
   mut uuid : String
   mut name : String
   type_name : String
+  listeners : Map[String, Array[() -> Unit]]
 }
+pub fn LineBasicMaterial::add_event_listener(Self, String, () -> Unit) -> Unit
 pub fn LineBasicMaterial::clone(Self) -> Self
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

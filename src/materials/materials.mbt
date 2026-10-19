@@ -872,6 +872,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 /// `uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。线段绘制仍不读它。
 /// `name` 默认空字符串。`copy` 把名字写进目标。线段绘制仍不读它。
 /// `type_name` 对应上游 `type`，固定是 `LineBasicMaterial`。`copy` 不改目标上的这个名字。线段绘制仍不读它。
+/// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。线段绘制仍不读它。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L489
@@ -960,6 +961,7 @@ pub(all) struct LineBasicMaterial {
   mut uuid : String
   mut name : String
   type_name : String
+  listeners : Map[String, Array[() -> Unit]]
 }
 
 ///|
@@ -1013,12 +1015,13 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     uuid: @math.generate_uuid(),
     name: "",
     type_name: "LineBasicMaterial",
+    listeners: Map([]),
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// `name`、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
+/// `name`、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -1082,6 +1085,26 @@ pub fn LineBasicMaterial::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
 pub fn LineBasicMaterial::clone(self : LineBasicMaterial) -> LineBasicMaterial {
   LineBasicMaterial::new().copy(self)
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。线段绘制仍不读这张表。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn LineBasicMaterial::add_event_listener(
+  self : LineBasicMaterial,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
 }
 
 ///|
