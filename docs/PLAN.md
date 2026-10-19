@@ -2347,6 +2347,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `getLuminanceFunction` has landed. Every non-raw Shader material writes `luminance` after `linearToOutputTexel`. The function is `123` characters, `125` with the newlines on each side, so the fragment string grows from `1915` to `2040`. The vertex string stays `1608`. The weights are `0.2126`, `0.7152`, and `0.0722`. `output_srgb` false makes the fragment string `2042`. `transparent` true makes it `2025`. `dithering` true makes it `2058`. `Linear` tone mapping makes it `7363`. `reversed_depth_buffer` true with `Linear` makes it `7397`, and the vertex string is `1642`. A raw material stays at `61`. A Basic material stays `""`. `DEPTH_PACKING` stays later.
 
+`DEPTH_PACKING` has landed. A Shader material with `depth_packing` below `0` adds nothing. The fragment string stays `2040` and the vertex string stays `1608`. Passing `3200` writes `#define DEPTH_PACKING 3200` and a newline, `27` characters, so the fragment string is `2067`. `3201` is the same length and writes `3201`. Passing `0` writes `#define DEPTH_PACKING 0`, `24` characters, and the fragment string is `2064`. `reversed_depth_buffer` true with `Linear` tone mapping puts that line after `luminance`, so `3200` makes the fragment string `7424` and the vertex string stays `1608`. A raw material stays at `61`. A Basic material stays `""`. The trailing newline of `prefixFragment` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3461,6 +3463,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `colorspace_pars_fragment` | `materials` |
 | planned | 7 | `getTexelEncodingFunction` | `materials` |
 | planned | 7 | `getLuminanceFunction` | `materials` |
+| planned | 7 | `DEPTH_PACKING` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -6777,6 +6777,43 @@ test "Material shader writes getLuminanceFunction" {
 }
 
 ///|
+test "Material shader writes DEPTH_PACKING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2040)
+  assert_eq(shader.prefixed_fragment_shader(depth_packing=-1).length(), 2040)
+  assert_eq(shader.prefixed_fragment_shader(depth_packing=3200).length(), 2067)
+  assert_eq(2067 - 2040, 27)
+  assert_eq(
+    shader.prefixed_fragment_shader(depth_packing=3200)[1979:2005].to_owned(),
+    "#define DEPTH_PACKING 3200",
+  )
+  assert_eq(shader.prefixed_fragment_shader(depth_packing=3201).length(), 2067)
+  assert_eq(
+    shader.prefixed_fragment_shader(depth_packing=3201)[1979:2005].to_owned(),
+    "#define DEPTH_PACKING 3201",
+  )
+  assert_eq(shader.prefixed_fragment_shader(depth_packing=0).length(), 2064)
+  assert_eq(
+    shader.prefixed_fragment_shader(depth_packing=0)[1979:2002].to_owned(),
+    "#define DEPTH_PACKING 0",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear, depth_packing=3200).length(),
+    7424,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=@constants.Linear, depth_packing=3200)[7336:7362].to_owned(),
+    "#define DEPTH_PACKING 3200",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(depth_packing=3200).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(depth_packing=3200), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
