@@ -744,6 +744,46 @@ test "Sprite.clone copies the center and keeps count at one" {
 }
 
 ///|
+test "Line.computeLineDistances accumulates segment lengths" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let line = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  let computed = line.compute_line_distances()
+  assert_eq(physical_equal(computed, line), true)
+  match geometry.get_attribute("lineDistance") {
+    None => assert_eq(false, true)
+    Some(distances) => {
+      assert_eq(distances.count, 3)
+      assert_eq(distances.get_x(0), 0.0)
+      assert_eq(distances.get_x(1), 3.0)
+      assert_eq(distances.get_x(2), 8.0)
+    }
+  }
+  let indexed = @core.BufferGeometry::new()
+  ignore(
+    indexed.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 3.0, 0.0, 0.0], 3),
+    ),
+  )
+  ignore(indexed.set_index_array([0, 1]))
+  let skipped = @objects.Line::new(indexed, @materials.LineBasicMaterial::new())
+  ignore(skipped.compute_line_distances())
+  match indexed.get_attribute("lineDistance") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
