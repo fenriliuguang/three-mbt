@@ -69,9 +69,10 @@ pub impl @core.AsNode for LOD
 
 pub(all) struct Line {
   node : @core.Object3D
-  geometry : @core.BufferGeometry
-  material : @materials.LineBasicMaterial
+  mut geometry : @core.BufferGeometry
+  mut material : @materials.LineBasicMaterial
 }
+pub fn Line::copy(Self, Self, recursive? : Bool) -> Self
 pub fn Line::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn Line::refresh(Self) -> Unit
 pub fn Line::set_fog(Self, Bool) -> Unit

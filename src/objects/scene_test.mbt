@@ -367,6 +367,56 @@ test "Points.clone shares geometry and drops children when asked" {
 }
 
 ///|
+test "Line.copy shares geometry and material" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 1.0, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.LineBasicMaterial::new(hex=0x00FF00)
+  material.opacity = 0.25
+  let source = @objects.Line::new(geometry, material)
+  ignore(source.node.position.set(0.0, 3.0, 0.0))
+  source.node.render_order = 4
+  let child = @core.Object3D::new()
+  child.name = "marker"
+  ignore(source.node.add(child))
+  let destination = @objects.Line::new(
+    @core.BufferGeometry::new(),
+    @materials.LineBasicMaterial::new(hex=0x0000FF),
+  )
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(physical_equal(destination.geometry, geometry), true)
+  assert_eq(physical_equal(destination.material, material), true)
+  assert_eq(destination.material.opacity, 0.25)
+  assert_eq(destination.material.color.g, 1.0)
+  assert_eq(destination.node.position.y, 3.0)
+  assert_eq(destination.node.render_order, 4)
+  assert_eq(destination.node.children.length(), 1)
+  assert_eq(destination.node.children[0].name, "marker")
+  assert_eq(physical_equal(destination.node.children[0], child), false)
+  match destination.node.primitive {
+    None => assert_eq(false, true)
+    Some(binding) => {
+      assert_eq(physical_equal(binding.geometry, geometry), true)
+      assert_eq(binding.opacity, 0.25)
+    }
+  }
+  let bare = @objects.Line::new(
+    @core.BufferGeometry::new(),
+    @materials.LineBasicMaterial::new(hex=0x0000FF),
+  )
+  ignore(bare.copy(source, recursive=false))
+  assert_eq(bare.node.children.length(), 0)
+  assert_eq(bare.node.position.y, 3.0)
+  assert_eq(physical_equal(bare.geometry, geometry), true)
+  assert_eq(bare.material.opacity, 0.25)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

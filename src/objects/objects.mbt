@@ -357,8 +357,8 @@ pub fn Points::set_transparent(
 /// r186: `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41
 pub(all) struct Line {
   node : Object3D
-  geometry : BufferGeometry
-  material : @materials.LineBasicMaterial
+  mut geometry : BufferGeometry
+  mut material : @materials.LineBasicMaterial
 }
 
 ///|
@@ -379,6 +379,21 @@ pub impl @core.AsNode for Line with fn to_node(self) {
 
 ///|
 pub extend Line with @core.AsNode::{to_node}
+
+///|
+/// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
+pub fn Line::copy(
+  self : Line,
+  source : Line,
+  recursive? : Bool = true,
+) -> Line {
+  ignore(self.node.copy(source.node, recursive~))
+  self.geometry = source.geometry
+  self.material = source.material
+  self.refresh()
+  self
+}
 
 ///|
 pub fn Line::refresh(self : Line) -> Unit {
