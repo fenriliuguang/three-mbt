@@ -310,6 +310,7 @@ pub fn Material::program_fragment_shader(Self) -> String?
 pub fn Material::program_glsl_version(Self) -> GlslVersion?
 pub fn Material::program_iridescence(Self) -> Bool
 pub fn Material::program_iridescence_map(Self) -> Bool
+pub fn Material::program_iridescence_thickness_map(Self) -> Bool
 pub fn Material::program_is_raw_shader_material(Self) -> Bool
 pub fn Material::program_light_map(Self) -> Bool
 pub fn Material::program_map(Self) -> Bool
