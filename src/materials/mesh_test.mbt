@@ -6503,6 +6503,34 @@ test "Material shader writes USE_REVERSED_DEPTH_BUFFER" {
 }
 
 ///|
+test "Material shader writes TONE_MAPPING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 1244)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(1244 - 1222, 22)
+  assert_eq(
+    shader.prefixed_fragment_shader(tone_mapping=true)[1162:1182].to_owned(),
+    "#define TONE_MAPPING",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true).length(),
+    1278,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[1196:1216].to_owned(),
+    "#define TONE_MAPPING",
+  )
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(tone_mapping=true).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(tone_mapping=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
