@@ -8162,6 +8162,21 @@ test "Material shader displacementMap follows the displacement texture" {
 }
 
 ///|
+test "Material shader emissiveMap follows the emissive texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_emissive_map(), false)
+  assert_eq(@materials.Material::raw().program_emissive_map(), false)
+  assert_eq(@materials.Material::standard().program_emissive_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.emissive_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_emissive_map(), true)
+  shader.emissive_map = None
+  assert_eq(shader.program_emissive_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
