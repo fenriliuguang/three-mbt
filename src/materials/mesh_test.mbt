@@ -6507,20 +6507,55 @@ test "Material shader writes TONE_MAPPING" {
   let shader = @materials.Material::shader()
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 1244)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 6475)
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
-  assert_eq(1244 - 1222, 22)
+  assert_eq(6475 - 1222, 5253)
   assert_eq(
     shader.prefixed_fragment_shader(tone_mapping=true)[1162:1182].to_owned(),
     "#define TONE_MAPPING",
   )
   assert_eq(
     shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true).length(),
-    1278,
+    6509,
   )
   assert_eq(
     shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[1196:1216].to_owned(),
     "#define TONE_MAPPING",
+  )
+  assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(tone_mapping=true).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(tone_mapping=true), "")
+}
+
+///|
+test "Material shader writes tonemapping_pars_fragment" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
+  assert_eq(shader.prefixed_fragment_shader(tone_mapping=true).length(), 6475)
+  assert_eq(6475 - 1244, 5231)
+  assert_eq(
+    shader.prefixed_fragment_shader(tone_mapping=true)[1184:1200].to_owned(),
+    "#ifndef saturate",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(tone_mapping=true)[6359:6413].to_owned(),
+    "vec3 CustomToneMapping( vec3 color ) { return color; }",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true).length(),
+    6509,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[1218:1234].to_owned(),
+    "#ifndef saturate",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(reversed_depth_buffer=true, tone_mapping=true)[6393:6447].to_owned(),
+    "vec3 CustomToneMapping( vec3 color ) { return color; }",
   )
   assert_eq(shader.prefixed_vertex_shader(reversed_depth_buffer=true).length(), 1642)
   assert_eq(shader.prefixed_fragment_shader(tone_mapping=false).length(), 1222)
