@@ -341,6 +341,35 @@ pub(all) struct LodLevel {
   hysteresis : Double
 }
 
+pub(all) struct MaterialDraw {
+  color : @math.Color
+  shading : @constants.Shading
+  side : @constants.Side
+  shadow_side : @constants.Side?
+  opacity : Double
+  transparent : Bool
+  wireframe : Bool
+  visible : Bool
+  map : @textures.Texture?
+  roughness : Double
+  metalness : Double
+  fog : Bool
+  alpha_test : Double
+  flat_shading : Bool
+  depth_write : Bool
+  depth_test : Bool
+  depth_func : @constants.DepthFunc
+  color_write : Bool
+  premultiplied_alpha : Bool
+  force_single_pass : Bool
+  emissive : @math.Color
+  emissive_intensity : Double
+  emissive_map : @textures.Texture?
+  roughness_map : @textures.Texture?
+  metalness_map : @textures.Texture?
+  alpha_map : @textures.Texture?
+}
+
 pub(all) struct MeshBinding {
   mut geometry : BufferGeometry
   color : @math.Color
@@ -371,6 +400,7 @@ pub(all) struct MeshBinding {
   alpha_map : @textures.Texture?
   instances : InstanceData?
   group_sides : Array[@constants.Side]?
+  group_draws : Array[MaterialDraw]?
 }
 
 pub(all) struct MorphState {

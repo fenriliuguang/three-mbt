@@ -1,10 +1,11 @@
-// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
+// r186: `RenderList` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L94 ; `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146 ; `test` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L100 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242
 
 ///|
 using @core {type BufferGeometry, type Object3D}
 
 ///|
 /// 网格绘制项。线框不进不透明队列，也不进透明队列。
+/// `group_count` 小于 0 时画整份几何。否则从 `group_start` 起画 `group_count` 个顶点或索引。
 /// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65
 pub(all) struct RenderItem {
   node : Object3D
@@ -33,12 +34,158 @@ pub(all) struct RenderItem {
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
   instances : @core.InstanceData?
+  group_start : Int
+  group_count : Int
+}
+
+///|
+priv enum MeshQueue {
+  Opaque
+  Transparent
+  Shadow
+}
+
+///|
+fn kept_for_queue(
+  visible : Bool,
+  transparent : Bool,
+  wireframe : Bool,
+  queue : MeshQueue,
+) -> Bool {
+  if !visible {
+    false
+  } else {
+    match queue {
+      MeshQueue::Opaque => !transparent && !wireframe
+      MeshQueue::Transparent => transparent && !wireframe
+      MeshQueue::Shadow => !transparent
+    }
+  }
+}
+
+///|
+fn push_binding_item(
+  items : Array[RenderItem],
+  node : Object3D,
+  binding : @core.MeshBinding,
+  group_start : Int,
+  group_count : Int,
+) -> Unit {
+  items.push({
+    node,
+    geometry: binding.geometry,
+    color: binding.color,
+    shading: binding.shading,
+    side: binding.side,
+    shadow_side: binding.shadow_side,
+    opacity: binding.opacity,
+    map: binding.map,
+    roughness: binding.roughness,
+    metalness: binding.metalness,
+    fog: binding.fog,
+    alpha_test: binding.alpha_test,
+    flat_shading: binding.flat_shading,
+    depth_write: binding.depth_write,
+    depth_test: binding.depth_test,
+    depth_func: binding.depth_func,
+    color_write: binding.color_write,
+    premultiplied_alpha: binding.premultiplied_alpha,
+    force_single_pass: binding.force_single_pass,
+    emissive: binding.emissive,
+    emissive_intensity: binding.emissive_intensity,
+    emissive_map: binding.emissive_map,
+    roughness_map: binding.roughness_map,
+    metalness_map: binding.metalness_map,
+    alpha_map: binding.alpha_map,
+    instances: binding.instances,
+    group_start,
+    group_count,
+  })
+}
+
+///|
+fn push_group_item(
+  items : Array[RenderItem],
+  node : Object3D,
+  binding : @core.MeshBinding,
+  draw : @core.MaterialDraw,
+  group_start : Int,
+  group_count : Int,
+) -> Unit {
+  items.push({
+    node,
+    geometry: binding.geometry,
+    color: draw.color,
+    shading: draw.shading,
+    side: draw.side,
+    shadow_side: draw.shadow_side,
+    opacity: draw.opacity,
+    map: draw.map,
+    roughness: draw.roughness,
+    metalness: draw.metalness,
+    fog: draw.fog,
+    alpha_test: draw.alpha_test,
+    flat_shading: draw.flat_shading,
+    depth_write: draw.depth_write,
+    depth_test: draw.depth_test,
+    depth_func: draw.depth_func,
+    color_write: draw.color_write,
+    premultiplied_alpha: draw.premultiplied_alpha,
+    force_single_pass: draw.force_single_pass,
+    emissive: draw.emissive,
+    emissive_intensity: draw.emissive_intensity,
+    emissive_map: draw.emissive_map,
+    roughness_map: draw.roughness_map,
+    metalness_map: draw.metalness_map,
+    alpha_map: draw.alpha_map,
+    instances: binding.instances,
+    group_start,
+    group_count,
+  })
+}
+
+///|
+/// 材质数组按几何分组各出一项。空分组不画。材质下标越界的组跳过。
+/// 没有材质数组时仍是一项，`group_count` 为 -1。
+/// r186: `_projectObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3242
+fn append_mesh(
+  items : Array[RenderItem],
+  node : Object3D,
+  binding : @core.MeshBinding,
+  queue : MeshQueue,
+) -> Unit {
+  match binding.group_draws {
+    None =>
+      if kept_for_queue(
+        binding.visible,
+        binding.transparent,
+        binding.wireframe,
+        queue,
+      ) {
+        push_binding_item(items, node, binding, 0, -1)
+      }
+    Some(draws) =>
+      for group in binding.geometry.groups {
+        if group.material_index >= 0 && group.material_index < draws.length() {
+          let draw = draws[group.material_index]
+          if kept_for_queue(
+            draw.visible,
+            draw.transparent,
+            draw.wireframe,
+            queue,
+          ) {
+            push_group_item(items, node, binding, draw, group.start, group.count)
+          }
+        }
+      }
+  }
 }
 
 ///|
 /// 收集当前可见的不透明网格。传入视锥时按包围球裁剪。
 /// 只按 `render_order` 从小到大排，相同则保持遍历顺序。不按深度排。
 /// 没有 `groupOrder`。r186 还会比较 z，这里不比较。
+/// 材质数组按几何分组展开，每一组用自己的材质。
 /// r186: `painterSortStable` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderList.js#L20
 pub fn collect_opaque(
   root : Object3D,
@@ -52,39 +199,9 @@ pub fn collect_opaque(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.visible &&
-              !binding.transparent &&
-              !binding.wireframe &&
-              on_camera_layer(node, camera) &&
+            if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              items.push({
-                node,
-                geometry: binding.geometry,
-                color: binding.color,
-                shading: binding.shading,
-                side: binding.side,
-                shadow_side: binding.shadow_side,
-                opacity: binding.opacity,
-                map: binding.map,
-                roughness: binding.roughness,
-                metalness: binding.metalness,
-                fog: binding.fog,
-                alpha_test: binding.alpha_test,
-                flat_shading: binding.flat_shading,
-                depth_write: binding.depth_write,
-                depth_test: binding.depth_test,
-                depth_func: binding.depth_func,
-                color_write: binding.color_write,
-                premultiplied_alpha: binding.premultiplied_alpha,
-                force_single_pass: binding.force_single_pass,
-                emissive: binding.emissive,
-                emissive_intensity: binding.emissive_intensity,
-                emissive_map: binding.emissive_map,
-                roughness_map: binding.roughness_map,
-                metalness_map: binding.metalness_map,
-                alpha_map: binding.alpha_map,
-                instances: binding.instances,
-              })
+              append_mesh(items, node, binding, MeshQueue::Opaque)
             }
         }
       _ => ()
@@ -140,38 +257,9 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.visible &&
-              !binding.transparent &&
-              on_camera_layer(node, camera) &&
+            if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, None) {
-              items.push({
-                node,
-                geometry: binding.geometry,
-                color: binding.color,
-                shading: binding.shading,
-                side: binding.side,
-                shadow_side: binding.shadow_side,
-                opacity: binding.opacity,
-                map: binding.map,
-                roughness: binding.roughness,
-                metalness: binding.metalness,
-                fog: binding.fog,
-                alpha_test: binding.alpha_test,
-                flat_shading: binding.flat_shading,
-                depth_write: binding.depth_write,
-                depth_test: binding.depth_test,
-                depth_func: binding.depth_func,
-                color_write: binding.color_write,
-                premultiplied_alpha: binding.premultiplied_alpha,
-                force_single_pass: binding.force_single_pass,
-                emissive: binding.emissive,
-                emissive_intensity: binding.emissive_intensity,
-                emissive_map: binding.emissive_map,
-                roughness_map: binding.roughness_map,
-                metalness_map: binding.metalness_map,
-                alpha_map: binding.alpha_map,
-                instances: binding.instances,
-              })
+              append_mesh(items, node, binding, MeshQueue::Shadow)
             }
         }
       _ => ()
@@ -200,34 +288,7 @@ pub fn collect_wireframe(
               binding.wireframe &&
               on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              items.push({
-                node,
-                geometry: binding.geometry,
-                color: binding.color,
-                shading: binding.shading,
-                side: binding.side,
-                shadow_side: binding.shadow_side,
-                opacity: binding.opacity,
-                map: binding.map,
-                roughness: binding.roughness,
-                metalness: binding.metalness,
-                fog: binding.fog,
-                alpha_test: binding.alpha_test,
-                flat_shading: binding.flat_shading,
-                depth_write: binding.depth_write,
-                depth_test: binding.depth_test,
-                depth_func: binding.depth_func,
-                color_write: binding.color_write,
-                premultiplied_alpha: binding.premultiplied_alpha,
-                force_single_pass: binding.force_single_pass,
-                emissive: binding.emissive,
-                emissive_intensity: binding.emissive_intensity,
-                emissive_map: binding.emissive_map,
-                roughness_map: binding.roughness_map,
-                metalness_map: binding.metalness_map,
-                alpha_map: binding.alpha_map,
-                instances: binding.instances,
-              })
+              push_binding_item(items, node, binding, 0, -1)
             }
         }
       _ => ()
@@ -572,39 +633,9 @@ pub fn collect_transparent(
         match node.mesh {
           None => ()
           Some(binding) =>
-            if binding.visible &&
-              binding.transparent &&
-              !binding.wireframe &&
-              on_camera_layer(node, Some(camera)) &&
+            if on_camera_layer(node, Some(camera)) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              items.push({
-                node,
-                geometry: binding.geometry,
-                color: binding.color,
-                shading: binding.shading,
-                side: binding.side,
-                shadow_side: binding.shadow_side,
-                opacity: binding.opacity,
-                map: binding.map,
-                roughness: binding.roughness,
-                metalness: binding.metalness,
-                fog: binding.fog,
-                alpha_test: binding.alpha_test,
-                flat_shading: binding.flat_shading,
-                depth_write: binding.depth_write,
-                depth_test: binding.depth_test,
-                depth_func: binding.depth_func,
-                color_write: binding.color_write,
-                premultiplied_alpha: binding.premultiplied_alpha,
-                force_single_pass: binding.force_single_pass,
-                emissive: binding.emissive,
-                emissive_intensity: binding.emissive_intensity,
-                emissive_map: binding.emissive_map,
-                roughness_map: binding.roughness_map,
-                metalness_map: binding.metalness_map,
-                alpha_map: binding.alpha_map,
-                instances: binding.instances,
-              })
+              append_mesh(items, node, binding, MeshQueue::Transparent)
             }
         }
       _ => ()

@@ -141,6 +141,8 @@ pub(all) struct RenderItem {
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
   instances : @core.InstanceData?
+  group_start : Int
+  group_count : Int
 }
 
 pub(all) struct ShadowFrame {

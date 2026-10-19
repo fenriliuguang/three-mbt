@@ -1,4 +1,4 @@
-// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65
+// r186: `RenderObject` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L65 ; `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
 
 ///|
 /// 挂在网格节点上的绘制数据。颜色与材质共享同一个 `Color`。
@@ -33,6 +33,39 @@ pub(all) struct MeshBinding {
   alpha_map : @textures.Texture?
   instances : InstanceData?
   group_sides : Array[@constants.Side]?
+  group_draws : Array[MaterialDraw]?
+}
+
+///|
+/// 材质数组里的一份绘制参数。没有同名上游类型，字段来自网格材质。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
+pub(all) struct MaterialDraw {
+  color : @math.Color
+  shading : @constants.Shading
+  side : @constants.Side
+  shadow_side : @constants.Side?
+  opacity : Double
+  transparent : Bool
+  wireframe : Bool
+  visible : Bool
+  map : @textures.Texture?
+  roughness : Double
+  metalness : Double
+  fog : Bool
+  alpha_test : Double
+  flat_shading : Bool
+  depth_write : Bool
+  depth_test : Bool
+  depth_func : @constants.DepthFunc
+  color_write : Bool
+  premultiplied_alpha : Bool
+  force_single_pass : Bool
+  emissive : @math.Color
+  emissive_intensity : Double
+  emissive_map : @textures.Texture?
+  roughness_map : @textures.Texture?
+  metalness_map : @textures.Texture?
+  alpha_map : @textures.Texture?
 }
 
 ///|

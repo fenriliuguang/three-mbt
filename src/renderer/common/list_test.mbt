@@ -2119,3 +2119,77 @@ test "frustum culls instanced meshes with their bounding sphere" {
   assert_eq(physical_equal(kept[0].node, outside.node), true)
   assert_eq(physical_equal(kept[1].node, inside.node), true)
 }
+
+///|
+test "material groups draw as separate list items" {
+  let scene = @scenes.Scene::new()
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
+          0.0, 5.0, 1.0, 0.0,
+        ],
+        3,
+      ),
+    ),
+  )
+  let red = @materials.Material::basic(hex=0xFF0000)
+  let green = @materials.Material::basic(hex=0x00FF00)
+  let mesh = @objects.Mesh::new(geometry, red)
+  mesh.set_materials([red, green])
+  ignore(scene.add(mesh))
+  assert_eq(@common.collect_opaque(scene.node).length(), 0)
+  geometry.add_group(0, 3, material_index=0)
+  geometry.add_group(3, 3, material_index=1)
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 2)
+  assert_eq(drawn[0].color.r, 1.0)
+  assert_eq(drawn[0].color.g, 0.0)
+  assert_eq(drawn[0].group_start, 0)
+  assert_eq(drawn[0].group_count, 3)
+  assert_eq(drawn[1].color.r, 0.0)
+  assert_eq(drawn[1].color.g, 1.0)
+  assert_eq(drawn[1].group_start, 3)
+  assert_eq(drawn[1].group_count, 3)
+  let shadows = @common.collect_shadow(scene.node)
+  assert_eq(shadows.length(), 2)
+  assert_eq(shadows[0].group_start, 0)
+  assert_eq(shadows[0].group_count, 3)
+  assert_eq(shadows[1].group_start, 3)
+  assert_eq(shadows[1].group_count, 3)
+  green.transparent = true
+  mesh.refresh()
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  @common.update_frame(scene.node, camera.node)
+  let kept = @common.collect_opaque(scene.node)
+  assert_eq(kept.length(), 1)
+  assert_eq(kept[0].color.r, 1.0)
+  assert_eq(kept[0].group_count, 3)
+  let glass = @common.collect_transparent(scene.node, camera.node)
+  assert_eq(glass.length(), 1)
+  assert_eq(glass[0].color.g, 1.0)
+  assert_eq(glass[0].group_start, 3)
+  assert_eq(glass[0].group_count, 3)
+  geometry.add_group(6, 3, material_index=9)
+  assert_eq(@common.collect_opaque(scene.node).length(), 1)
+  assert_eq(@common.collect_transparent(scene.node, camera.node).length(), 1)
+  let alone = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let solid = @objects.Mesh::new(
+    box.geometry,
+    @materials.MeshBasicMaterial::new().material,
+  )
+  ignore(alone.add(solid))
+  let one = @common.collect_opaque(alone.node)
+  assert_eq(one.length(), 1)
+  assert_eq(one[0].group_start, 0)
+  assert_eq(one[0].group_count, -1)
+}

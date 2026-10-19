@@ -1547,6 +1547,8 @@ Instanced mesh raycast material arrays have landed. Two instances of one triangl
 
 Skinned mesh raycast material arrays have landed. A triangle with weight `1` on a bone that moved to `y=5` produces no hit while the group list is empty. A group `(0, 3)` at material `1` then hits `(0.25, 5.25, 0)`, distance `1`, material index `1`. Cloning keeps a new list of length `2`. An out-of-range material index aborts. The renderer still draws the single `material` and ignores the array.
 
+Renderer material groups have landed. Two triangles with groups `(0, 3)` and `(3, 3)`, materials `0xFF0000` and `0x00FF00`, produce two opaque items and two shadow items. The first color is red `(1, 0)` and draws range `0` for `3`. The second is green `(0, 1)` and draws range `3` for `3`. An empty group list produces no item. Making the second material transparent leaves one opaque item and one transparent item. A material index past the array is skipped. A mesh without a material array still draws the whole geometry, with `group_count` `-1`. Wireframe groups stay later. `drawRange` intersection stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2261,6 +2263,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | mesh raycast material arrays | `core`, `objects` |
 | planned | 7 | instanced mesh raycast material arrays | `objects` |
 | planned | 7 | skinned mesh raycast material arrays | `objects` |
+| planned | 7 | renderer material groups | `renderer` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

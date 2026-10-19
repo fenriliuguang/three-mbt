@@ -1,4 +1,4 @@
-// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
+// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `WebGPUBackend` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPUBackend.js#L55 ; `Renderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L55 ; `BloomNode` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L54 ; `EffectComposer` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L42 ; `CopyShader` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/shaders/CopyShader.js#L12 ; `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42 ; `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
 
 ///|
 using @gpu {
@@ -3176,6 +3176,17 @@ fn WebGPURenderer::ensure_shadow(
 }
 
 ///|
+/// 分组范围。`group_count` 小于 0 时画全部。线框索引不走这里。
+/// r186: `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
+fn mesh_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) {
+  if group_count < 0 {
+    (full.reinterpret_as_uint(), None)
+  } else {
+    (group_count.reinterpret_as_uint(), Some(group_start.reinterpret_as_uint()))
+  }
+}
+
+///|
 fn WebGPURenderer::draw_shadow(
   self : WebGPURenderer,
   scene : @scenes.Scene,
@@ -3312,13 +3323,19 @@ fn WebGPURenderer::draw_shadow(
         }
         ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
         match geometry.indices {
-          None =>
+          None => {
+            let (count, first) = mesh_draw(
+              item.group_count,
+              item.group_start,
+              geometry.vertex_count,
+            )
             pass.draw(
-              geometry.vertex_count.reinterpret_as_uint(),
+              count,
               Some(instance_count.reinterpret_as_uint()),
-              None,
+              first,
               None,
             )
+          }
           Some(indices) => {
             pass.set_index_buffer(
               indices,
@@ -3326,10 +3343,15 @@ fn WebGPURenderer::draw_shadow(
               None,
               None,
             )
+            let (count, first) = mesh_draw(
+              item.group_count,
+              item.group_start,
+              geometry.index_count,
+            )
             pass.draw_indexed(
-              geometry.index_count.reinterpret_as_uint(),
+              count,
               Some(instance_count.reinterpret_as_uint()),
-              None,
+              first,
               None,
               None,
             )
@@ -4444,13 +4466,19 @@ fn WebGPURenderer::draw_meshes(
             }
           } else {
             match geometry.indices {
-              None =>
+              None => {
+                let (count, first) = mesh_draw(
+                  item.group_count,
+                  item.group_start,
+                  geometry.vertex_count,
+                )
                 pass.draw(
-                  geometry.vertex_count.reinterpret_as_uint(),
+                  count,
                   Some(instance_count.reinterpret_as_uint()),
-                  None,
+                  first,
                   None,
                 )
+              }
               Some(indices) => {
                 pass.set_index_buffer(
                   indices,
@@ -4458,10 +4486,15 @@ fn WebGPURenderer::draw_meshes(
                   None,
                   None,
                 )
+                let (count, first) = mesh_draw(
+                  item.group_count,
+                  item.group_start,
+                  geometry.index_count,
+                )
                 pass.draw_indexed(
-                  geometry.index_count.reinterpret_as_uint(),
+                  count,
                   Some(instance_count.reinterpret_as_uint()),
-                  None,
+                  first,
                   None,
                   None,
                 )

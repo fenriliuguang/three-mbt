@@ -916,6 +916,7 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     alpha_map: self.material.alpha_map,
     instances: None,
     group_sides: material_sides(self.materials),
+    group_draws: material_draws(self.materials),
   })
 }
 
@@ -947,6 +948,49 @@ fn material_sides(
         sides.push(material.side)
       }
       Some(sides)
+    }
+  }
+}
+
+///|
+fn material_draws(
+  materials : Array[@materials.Material]?,
+) -> Array[@core.MaterialDraw]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let draws : Array[@core.MaterialDraw] = []
+      for material in materials {
+        draws.push({
+          color: material.color,
+          shading: material.shading(),
+          side: material.side,
+          shadow_side: material.shadow_side,
+          opacity: material.opacity,
+          transparent: material.transparent,
+          wireframe: material.wireframe,
+          visible: material.visible,
+          map: material.map,
+          roughness: material.roughness,
+          metalness: material.metalness,
+          fog: material.fog,
+          alpha_test: material.alpha_test,
+          flat_shading: material.flat_shading,
+          depth_write: material.depth_write,
+          depth_test: material.depth_test,
+          depth_func: material.depth_func,
+          color_write: material.color_write,
+          premultiplied_alpha: material.premultiplied_alpha,
+          force_single_pass: material.force_single_pass,
+          emissive: material.emissive,
+          emissive_intensity: material.emissive_intensity,
+          emissive_map: material.emissive_map,
+          roughness_map: material.roughness_map,
+          metalness_map: material.metalness_map,
+          alpha_map: material.alpha_map,
+        })
+      }
+      Some(draws)
     }
   }
 }
@@ -1823,6 +1867,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     alpha_map: self.material.alpha_map,
     instances: Some(self.instances),
     group_sides: material_sides(self.materials),
+    group_draws: material_draws(self.materials),
   })
 }
 
