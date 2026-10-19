@@ -1216,6 +1216,7 @@ pub extend Points with @core.AsNode::{to_node}
 
 ///|
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// 形变权重和名字表留在目标上，不从源对象复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L81
 pub fn Points::copy(
   self : Points,

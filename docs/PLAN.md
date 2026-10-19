@@ -1563,6 +1563,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 `InstancedMesh.morphTexture` has landed as a red-format `DataTexture`. `RedFormat` is `1028` and stores one float per texel. Count `2` and weights `[0.25, 0.5]` written to instance `1` allocate six zeros. The texture is width `3` and height `2`, and `needsUpdate` stays false. The fourth value is `0.25`. Copying shares that float array. The new texture has `needsUpdate` true, and writing `1` into its fourth value changes the source to `1`. The source `needsUpdate` stays false. Copying a mesh with no morph data leaves the `1`. A clone shares the same array, so setting its fourth value to `0` changes the source to `0`. Dispose drops the texture. A clone made first still reads `0.25` and `0.5`.
 
+`Points.copy` leaves morph weights in place. A position group named `wide` and `tall`, with the first weight set to `0.5`, copies onto a point cloud that had none. The destination influences and dictionary stay empty, and the source stays at `0.5` with `wide` at `0`. A destination built from that geometry starts at `[0, 0]`. Copying the weighted cloud onto it leaves the first weight at `0`. Setting that weight to `1` leaves the source at `0.5`. Copying a cloud with no morph data onto one whose first weight is `0.25` leaves that weight and `wide` at `0`. `Points.clone` builds a new cloud first, so the clone starts at `0` with `tall` at `1`, and setting its first weight to `1` leaves the source at `0.5`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2285,6 +2287,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | point and line raycast material indices | `core` |
 | planned | 7 | `DataTexture` for skeleton bone matrices | `textures`, `objects` |
 | planned | 7 | `InstancedMesh.morphTexture` | `textures`, `objects` |
+| planned | 7 | `Points.copy` leaves morph weights in place | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
