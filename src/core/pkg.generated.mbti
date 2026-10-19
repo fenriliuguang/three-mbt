@@ -269,6 +269,8 @@ pub(all) struct InterleavedJson {
   stride : Int
   usage : Int
   array : Array[Double]
+  mesh_per_attribute : Int?
+  is_instanced_interleaved_buffer : Bool?
 }
 
 pub(all) struct Layers {

@@ -157,23 +157,33 @@ pub fn InterleavedBuffer::on_upload(
 }
 
 ///|
-/// `InterleavedBuffer.toJSON` 返回的数据。上游没有单独的类。上游把底层 `ArrayBuffer` 放进 `data.arrayBuffers`。本地没有共享缓冲区，数值直接写进 `array`。
+/// `InterleavedBuffer.toJSON` 返回的数据。上游没有单独的类。上游把底层 `ArrayBuffer` 放进 `data.arrayBuffers`。本地没有共享缓冲区，数值直接写进 `array`。重复次数不是 `1` 时带上实例字段。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L256
 pub(all) struct InterleavedJson {
   uuid : String
   stride : Int
   usage : Int
   array : Array[Double]
+  mesh_per_attribute : Int?
+  is_instanced_interleaved_buffer : Bool?
 }
 
 ///|
-/// 写出标识、步长、使用方式和一份数值副本。
+/// 写出标识、步长、使用方式和一份数值副本。没有单独的 `InstancedInterleavedBuffer` 类型，重复次数不是 `1` 时再写出 `meshPerAttribute` 和 `isInstancedInterleavedBuffer`。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L256
+/// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedInterleavedBuffer.js#L61
 pub fn InterleavedBuffer::to_json(self : InterleavedBuffer) -> InterleavedJson {
+  let instanced = self.mesh_per_attribute != 1
   {
     uuid: self.uuid,
     stride: self.stride,
     usage: self.usage,
     array: self.array.copy(),
+    mesh_per_attribute: if instanced {
+      Some(self.mesh_per_attribute)
+    } else {
+      None
+    },
+    is_instanced_interleaved_buffer: if instanced { Some(true) } else { None },
   }
 }
