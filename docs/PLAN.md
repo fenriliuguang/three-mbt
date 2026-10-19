@@ -2459,6 +2459,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `clearcoat` has landed. Shader, Raw, and Physical start `false`. A negative value stays `false`. Setting Shader to `0.25` makes the parameter `true`. Setting it back to `0` returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while clearcoat is still `0`. `clearcoatMap` stays later.
 
+`clearcoatMap` has landed. Shader, Raw, and Physical start `false`. A 1×1 clearcoat map with strength `0` stays `false`. Strength `0.25` with that map makes the parameter `true`. Returning the strength to `0` makes it `false` while the map stays. Clearing the map with strength `0.25` keeps it `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while both are still unset. `clearcoatNormalMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3629,6 +3631,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `anisotropy` | `materials` |
 | planned | 7 | `anisotropyMap` | `materials` |
 | planned | 7 | `clearcoat` | `materials` |
+| planned | 7 | `clearcoatMap` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
