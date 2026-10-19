@@ -3190,6 +3190,36 @@ test "Material raw sets isRawShaderMaterial" {
 }
 
 ///|
+test "Material shader prefixes vertex uniforms" {
+  let shader = @materials.Material::shader()
+  let raw = @materials.Material::raw()
+  let basic = @materials.Material::basic()
+  let prefixed = shader.prefixed_vertex_shader()
+  assert_eq(prefixed.length() - shader.vertex_shader.length(), 833)
+  assert_eq(prefixed.length(), 925)
+  assert_eq(prefixed[0:25].to_owned(), "uniform mat4 modelMatrix;")
+  assert_eq(
+    prefixed[392:416].to_owned(),
+    "attribute vec3 position;",
+  )
+  assert_eq(
+    prefixed[prefixed.length() - 92:prefixed.length()].to_owned(),
+    shader.vertex_shader,
+  )
+  assert_eq(raw.vertex_shader.length(), 92)
+  assert_eq(raw.prefixed_vertex_shader(), raw.vertex_shader)
+  assert_eq(raw.prefixed_vertex_shader()[0:7].to_owned(), "\nvoid m")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+  shader.vertex_shader = "void main() {}"
+  let custom = shader.prefixed_vertex_shader()
+  assert_eq(custom.length(), 847)
+  assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
+  raw.vertex_shader = "void main() {}"
+  assert_eq(raw.prefixed_vertex_shader(), "void main() {}")
+  assert_eq(raw.prefixed_vertex_shader().length(), 14)
+}
+
+///|
 test "Material shader copies defines" {
   let source = @materials.Material::shader()
   source.defines.set("FOO", "1")

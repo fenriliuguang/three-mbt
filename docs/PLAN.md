@@ -2151,6 +2151,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `RawShaderMaterial` has landed. `Material::raw` sets `is_shader_material` and `is_raw_shader_material` true, `type_name` to `RawShaderMaterial`, and shading stays Basic. `linewidth` stays `1`. `Material::shader` keeps `is_raw_shader_material` false and `type_name` `ShaderMaterial`. Copying a raw material with `lights` set true onto a shader leaves the destination flag false and stores `lights` true. Copying a shader with `lights` false onto that raw material leaves `is_raw_shader_material` true and stores `lights` false. A clone keeps the raw flag, define `FOO` = `1`, and a different id. The built-in uniform and attribute prefix stays later.
 
+`ShaderMaterial` vertex prefix has landed. `prefixed_vertex_shader` on a Shader material is `833` characters longer than `vertex_shader` and `925` characters with the default body. It starts with `uniform mat4 modelMatrix;` and has `attribute vec3 position;` at index `392`. A raw material stays at the default `92` characters and still starts with a newline. Setting both bodies to `void main() {}` makes the Shader string `847` characters and the raw string `14`. A Basic material stays `""`. The fragment prefix stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3167,6 +3169,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `UniformsGroup.clone` | `materials` |
 | planned | 7 | `UniformsGroup.copy` | `materials` |
 | planned | 7 | `RawShaderMaterial` | `materials` |
+| planned | 7 | `ShaderMaterial` vertex prefix | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

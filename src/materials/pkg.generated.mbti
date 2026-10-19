@@ -257,6 +257,7 @@ pub fn Material::matcap(hex? : Int, roughness? : Double, metalness? : Double) ->
 pub fn Material::normal(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::phong(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+pub fn Material::prefixed_vertex_shader(Self) -> String
 pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
