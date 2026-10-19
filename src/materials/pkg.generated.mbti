@@ -303,6 +303,7 @@ pub fn Material::program_bump_map(Self) -> Bool
 pub fn Material::program_bump_map_uv(Self) -> String
 pub fn Material::program_clearcoat(Self) -> Bool
 pub fn Material::program_clearcoat_map(Self) -> Bool
+pub fn Material::program_clearcoat_map_uv(Self) -> String
 pub fn Material::program_clearcoat_normal_map(Self) -> Bool
 pub fn Material::program_clearcoat_roughness_map(Self) -> Bool
 pub fn Material::program_combine(Self) -> @constants.Combine
