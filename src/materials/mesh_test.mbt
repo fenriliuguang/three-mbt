@@ -670,3 +670,33 @@ test "Material needsUpdate increments version" {
   lambert.material.set_needs_update(false)
   assert_eq(lambert.material.version, 0)
 }
+
+///|
+test "Material set_alpha_test bumps version across zero" {
+  let basic = @materials.MeshBasicMaterial::new()
+  basic.material.set_alpha_test(0.0)
+  assert_eq(basic.material.alpha_test, 0.0)
+  assert_eq(basic.material.version, 0)
+  basic.material.set_alpha_test(0.2)
+  assert_eq(basic.material.alpha_test, 0.2)
+  assert_eq(basic.material.version, 1)
+  basic.material.set_alpha_test(0.4)
+  assert_eq(basic.material.alpha_test, 0.4)
+  assert_eq(basic.material.version, 1)
+  basic.material.set_alpha_test(0.0)
+  assert_eq(basic.material.alpha_test, 0.0)
+  assert_eq(basic.material.version, 2)
+  basic.material.set_alpha_test(-1.0)
+  assert_eq(basic.material.alpha_test, -1.0)
+  assert_eq(basic.material.version, 2)
+  let other = @materials.Material::basic()
+  assert_eq(other.version, 0)
+  assert_eq(other.alpha_test, 0.0)
+  let lambert = @materials.MeshLambertMaterial::new()
+  let standard = @materials.MeshStandardMaterial::new()
+  standard.material.set_alpha_test(0.5)
+  assert_eq(standard.material.alpha_test, 0.5)
+  assert_eq(standard.material.version, 1)
+  assert_eq(lambert.material.version, 0)
+  assert_eq(lambert.material.alpha_test, 0.0)
+}

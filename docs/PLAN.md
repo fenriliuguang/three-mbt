@@ -1845,6 +1845,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `SpriteMaterial.needsUpdate` has landed. `set_needs_update(false)` leaves a new material at `0`. Two `true` calls raise it to `2` and leave another new material at `0`. Copying onto a material that already stores `3` leaves that counter at `3` and the source at `2`. The renderer still does not draw sprites.
 
+`Material.setAlphaTest` has landed. Writing `0` onto a new basic material keeps `alpha_test` at `0` and `version` at `0`. Writing `0.2` stores that threshold and raises `version` to `1`. Writing `0.4` stores `0.4` and leaves `version` at `1`. Writing `0` stores `0` and raises `version` to `2`. Writing `-1` stores `-1` and leaves `version` at `2`. Another basic material stays at `0`. Writing `0.5` on a Standard material stores `0.5` and `version` `1`, and leaves the Lambert material at `0`. The renderer still discards fragments below the stored threshold.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2708,6 +2710,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `PointsMaterial.needsUpdate` | `materials` |
 | planned | 7 | `LineBasicMaterial.needsUpdate` | `materials` |
 | planned | 7 | `SpriteMaterial.needsUpdate` | `materials` |
+| planned | 7 | `Material.setAlphaTest` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

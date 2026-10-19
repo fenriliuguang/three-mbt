@@ -10,6 +10,7 @@ pub(all) enum MaterialKind {
 
 ///|
 /// 材质的公共数据。`alpha_test` 大于片元 alpha 时丢弃该片元，默认 0。
+/// `set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
 /// `vertex_colors` 默认关闭。着色器仍不读顶点色。
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的材质生效。
 /// `alpha_hash` 默认关闭。着色器仍不做哈希透明。
@@ -372,6 +373,16 @@ pub fn Material::set_needs_update(self : Material, value : Bool) -> Unit {
   if value {
     self.version = self.version + 1
   }
+}
+
+///|
+/// 写入 `alpha_test`。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L495
+pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
+  if (self.alpha_test > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.alpha_test = value
 }
 
 ///|
