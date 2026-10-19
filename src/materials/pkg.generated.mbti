@@ -176,6 +176,7 @@ pub(all) struct Material {
   is_mesh_physical_material : Bool
   is_mesh_toon_material : Bool
   is_mesh_matcap_material : Bool
+  is_mesh_normal_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -224,6 +225,7 @@ pub fn Material::dispose(Self) -> Unit
 pub fn Material::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn Material::lambert(hex? : Int) -> Self
 pub fn Material::matcap(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+pub fn Material::normal(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
@@ -246,6 +248,7 @@ pub(all) enum MaterialKind {
   Physical
   Toon
   Matcap
+  Normal
 }
 
 pub(all) struct MeshBasicMaterial {

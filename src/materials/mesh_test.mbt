@@ -2665,3 +2665,61 @@ test "Material matcap sets isMeshMatcapMaterial and resets defines on copy" {
   assert_eq(cloned.color.b, 1.0)
   assert_eq(cloned.id == matcap.id, false)
 }
+
+///|
+test "Material normal sets isMeshNormalMaterial and keeps defines on copy" {
+  let basic = @materials.Material::basic()
+  let lambert = @materials.Material::lambert()
+  let standard = @materials.Material::standard()
+  let physical = @materials.Material::physical()
+  let toon = @materials.Material::toon()
+  let matcap = @materials.Material::matcap()
+  assert_eq(basic.is_mesh_normal_material, false)
+  assert_eq(lambert.is_mesh_normal_material, false)
+  assert_eq(standard.is_mesh_normal_material, false)
+  assert_eq(physical.is_mesh_normal_material, false)
+  assert_eq(toon.is_mesh_normal_material, false)
+  assert_eq(matcap.is_mesh_normal_material, false)
+  let normal = @materials.Material::normal(hex=0x00FF00)
+  assert_eq(normal.is_mesh_normal_material, true)
+  assert_eq(normal.is_mesh_matcap_material, false)
+  assert_eq(normal.type_name, "MeshNormalMaterial")
+  assert_eq(normal.kind is @materials.MaterialKind::Normal, true)
+  assert_eq(normal.shading() is @constants.Basic, true)
+  assert_eq(normal.color.r, 0.0)
+  assert_eq(normal.color.g, 1.0)
+  match normal.defines.get("MATCAP") {
+    None => ()
+    Some(_) => abort("normal gained matcap define")
+  }
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(normal))
+  assert_eq(destination.is_mesh_normal_material, false)
+  assert_eq(destination.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(destination.type_name, "MeshBasicMaterial")
+  assert_eq(destination.color.r, 0.0)
+  assert_eq(destination.color.g, 1.0)
+  assert_eq(normal.is_mesh_normal_material, true)
+  let onto = @materials.Material::normal()
+  onto.defines.set("FOO", "1")
+  let red = @materials.Material::matcap(hex=0xFF0000)
+  ignore(onto.copy(red))
+  assert_eq(onto.is_mesh_normal_material, true)
+  assert_eq(onto.kind is @materials.MaterialKind::Normal, true)
+  assert_eq(onto.color.r, 1.0)
+  assert_eq(onto.color.g, 0.0)
+  match onto.defines.get("FOO") {
+    None => abort("normal copy dropped define")
+    Some(value) => assert_eq(value, "1")
+  }
+  match onto.defines.get("MATCAP") {
+    None => ()
+    Some(_) => abort("normal copy gained matcap define")
+  }
+  let cloned = normal.clone()
+  assert_eq(cloned.is_mesh_normal_material, true)
+  assert_eq(cloned.type_name, "MeshNormalMaterial")
+  assert_eq(cloned.kind is @materials.MaterialKind::Normal, true)
+  assert_eq(cloned.color.g, 1.0)
+  assert_eq(cloned.id == normal.id, false)
+}
