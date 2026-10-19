@@ -1,4 +1,4 @@
-// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
+// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18 ; `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19
 
 ///|
 /// 不受光照的基础材质、Lambert，以及直接光的 Standard。
@@ -346,6 +346,51 @@ pub fn LineBasicMaterial::copy(
   self.color_write = source.color_write
   self.premultiplied_alpha = source.premultiplied_alpha
   self.visible = source.visible
+  self
+}
+
+///|
+/// 虚线材质。线段字段放在内嵌的 `line` 上。
+/// `scale` 默认 `1`，`dash_size` 默认 `3`，`gap_size` 默认 `1`。
+/// 折线仍使用 `LineBasicMaterial`。着色器仍画实线。
+/// r186: `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19
+/// r186: `scale` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L50
+/// r186: `dashSize` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L58
+/// r186: `gapSize` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L66
+pub(all) struct LineDashedMaterial {
+  line : LineBasicMaterial
+  mut scale : Double
+  mut dash_size : Double
+  mut gap_size : Double
+}
+
+///|
+pub fn LineDashedMaterial::new(
+  hex? : Int = 0xFFFFFF,
+  scale? : Double = 1.0,
+  dash_size? : Double = 3.0,
+  gap_size? : Double = 1.0,
+) -> LineDashedMaterial {
+  {
+    line: LineBasicMaterial::new(hex=hex),
+    scale,
+    dash_size,
+    gap_size,
+  }
+}
+
+///|
+/// 内嵌线段材质按 `LineBasicMaterial.copy` 复制。虚线比例、线段长度和间隔一并复制。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L72
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
+pub fn LineDashedMaterial::copy(
+  self : LineDashedMaterial,
+  source : LineDashedMaterial,
+) -> LineDashedMaterial {
+  ignore(self.line.copy(source.line))
+  self.scale = source.scale
+  self.dash_size = source.dash_size
+  self.gap_size = source.gap_size
   self
 }
 

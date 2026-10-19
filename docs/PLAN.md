@@ -1593,6 +1593,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 Point and line `alphaTest` reaches the shader. A points material and a line material with `alphaTest` `0.4` and opacity `1` each store `0.4` on the collected item. The points shader discards when fragment alpha is below `uniforms.surface.z`. The line shader already discarded on that compare, and the uniform now carries the material value. Opacity `1` stays above `0.4`. Sprite `alphaTest` still has no draw.
 
+`LineDashedMaterial` has landed. A new material has scale `1`, dash size `3`, and gap size `1`. The line fields live on the inner `line` material, which starts white with an empty map and `alphaTest` `0`. `hex=0x00FF00`, scale `2`, dash size `4`, and gap size `0.5` copy onto a default material. The destination color object stays in place and its green channel is `1`. Setting that channel to `0.5` leaves the source at `1`. Setting the destination dash size to `9` leaves the source at `4`. The color map is the source object. Another new material stays at scale `1`, dash size `3`, and gap size `1`. Lines still use `LineBasicMaterial`, and the shader still draws a solid line.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2330,6 +2332,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.alphaTest` | `materials` |
 | planned | 7 | `SpriteMaterial.alphaTest` | `materials` |
 | planned | 7 | point and line `alphaTest` in the shader | `objects`, `renderer`, `nodes` |
+| planned | 7 | `LineDashedMaterial` scale, dash size, and gap size | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -78,3 +78,48 @@ test "LineBasicMaterial stores and copies alphaTest" {
   destination.alpha_test = 0.8
   assert_eq(source.alpha_test, 0.4)
 }
+
+///|
+test "LineDashedMaterial stores scale, dash, and gap" {
+  let defaults = @materials.LineDashedMaterial::new()
+  assert_eq(defaults.scale, 1.0)
+  assert_eq(defaults.dash_size, 3.0)
+  assert_eq(defaults.gap_size, 1.0)
+  assert_eq(defaults.line.color.r, 1.0)
+  assert_eq(defaults.line.color.g, 1.0)
+  assert_eq(defaults.line.color.b, 1.0)
+  assert_eq(defaults.line.map is None, true)
+  assert_eq(defaults.line.alpha_test, 0.0)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  let source = @materials.LineDashedMaterial::new(
+    hex=0x00FF00,
+    scale=2.0,
+    dash_size=4.0,
+    gap_size=0.5,
+  )
+  source.line.map = Some(map)
+  assert_eq(source.line.color.r, 0.0)
+  assert_eq(source.line.color.g, 1.0)
+  assert_eq(source.line.color.b, 0.0)
+  let destination = @materials.LineDashedMaterial::new()
+  let color = destination.line.color
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(physical_equal(destination.line.color, color), true)
+  assert_eq(destination.line.color.g, 1.0)
+  assert_eq(destination.scale, 2.0)
+  assert_eq(destination.dash_size, 4.0)
+  assert_eq(destination.gap_size, 0.5)
+  match destination.line.map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, map), true)
+  }
+  destination.line.color.g = 0.5
+  destination.dash_size = 9.0
+  assert_eq(source.line.color.g, 1.0)
+  assert_eq(source.dash_size, 4.0)
+  assert_eq(defaults.scale, 1.0)
+  assert_eq(defaults.dash_size, 3.0)
+  assert_eq(defaults.gap_size, 1.0)
+}
