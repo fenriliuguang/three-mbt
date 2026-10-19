@@ -166,6 +166,7 @@ fn Object3D::push_triangle(
           uv1,
           normal: shading,
           index: None,
+          distance_to_ray: None,
         })
       }
     }

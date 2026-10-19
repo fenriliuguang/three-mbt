@@ -1375,6 +1375,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Line.raycast` has landed. A ray from `(0.5, 0.5, 0)` along `(0, -1, 0)` hits the segment from `(0, 0, 0)` to `(1, 0, 0)` at `(0.5, 0, 0)`, distance `0.5`, index `0`. The default line threshold is `1`. `LineSegments` uses the same test with a step of `2`.
 
+`Points.raycast` has landed. A point at `(0.5, 0, 0)` and a ray from `(0, 0.5, 0)` along `(0, -1, 0)` meet the ray at `(0, 0, 0)`. The hit distance is `0.5` and `distanceToRay` is `0.5`. The default points threshold is `1`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2003,6 +2005,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Mesh.raycast` uv1 | `core` |
 | planned | 7 | `Mesh.raycast` normal | `core` |
 | planned | 7 | `Line.raycast` | `core` |
+| planned | 7 | `Points.raycast` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
