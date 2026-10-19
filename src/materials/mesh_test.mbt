@@ -451,3 +451,20 @@ test "Material stencilRef defaults to 0" {
   assert_eq(standard.material.stencil_ref, 7)
   assert_eq(lambert.material.stencil_ref, 0)
 }
+
+///|
+test "Material stencilFuncMask defaults to 255" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_func_mask, 255)
+  basic.material.stencil_func_mask = 0
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_func_mask, 255)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_func_mask, 255)
+  standard.material.stencil_func_mask = 1
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_func_mask, 255)
+  assert_eq(basic.material.stencil_func_mask, 0)
+  assert_eq(standard.material.stencil_func_mask, 1)
+  assert_eq(lambert.material.stencil_func_mask, 255)
+}
