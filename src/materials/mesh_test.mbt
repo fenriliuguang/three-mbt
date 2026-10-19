@@ -4464,9 +4464,9 @@ test "Material shader writes MAP_UV" {
   assert_eq(shader.prefixed_vertex_shader()[699:716].to_owned(), "#define MAP_UV uv")
   map.channel = 1
   shader.map = Some(map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
-  assert_eq(1643 - 1608, 35)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1254)
+  assert_eq(1659 - 1608, 51)
   assert_eq(
     shader.prefixed_vertex_shader()[699:717].to_owned(),
     "#define MAP_UV uv1",
@@ -4504,9 +4504,9 @@ test "Material shader writes ALPHAMAP_UV" {
   )
   alpha_map.channel = 1
   shader.alpha_map = Some(alpha_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1653)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
-  assert_eq(1653 - 1608, 45)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1669)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1259)
+  assert_eq(1669 - 1608, 61)
   assert_eq(
     shader.prefixed_vertex_shader()[704:727].to_owned(),
     "#define ALPHAMAP_UV uv1",
@@ -4544,9 +4544,9 @@ test "Material shader writes LIGHTMAP_UV" {
   )
   light_map.channel = 1
   shader.light_map = Some(light_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1653)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
-  assert_eq(1653 - 1608, 45)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1669)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1259)
+  assert_eq(1669 - 1608, 61)
   assert_eq(
     shader.prefixed_vertex_shader()[704:727].to_owned(),
     "#define LIGHTMAP_UV uv1",
@@ -4584,9 +4584,9 @@ test "Material shader writes AOMAP_UV" {
   )
   ao_map.channel = 1
   shader.ao_map = Some(ao_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1647)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1240)
-  assert_eq(1647 - 1608, 39)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1663)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1256)
+  assert_eq(1663 - 1608, 55)
   assert_eq(
     shader.prefixed_vertex_shader()[701:721].to_owned(),
     "#define AOMAP_UV uv1",
@@ -4624,9 +4624,9 @@ test "Material shader writes EMISSIVEMAP_UV" {
   )
   emissive_map.channel = 1
   shader.emissive_map = Some(emissive_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
-  assert_eq(1659 - 1608, 51)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1675)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1262)
+  assert_eq(1675 - 1608, 67)
   assert_eq(
     shader.prefixed_vertex_shader()[707:733].to_owned(),
     "#define EMISSIVEMAP_UV uv1",
@@ -4664,9 +4664,9 @@ test "Material shader writes BUMPMAP_UV" {
   )
   bump_map.channel = 1
   shader.bump_map = Some(bump_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1651)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1242)
-  assert_eq(1651 - 1608, 43)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1667)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1258)
+  assert_eq(1667 - 1608, 59)
   assert_eq(
     shader.prefixed_vertex_shader()[703:725].to_owned(),
     "#define BUMPMAP_UV uv1",
@@ -4707,9 +4707,9 @@ test "Material shader writes NORMALMAP_UV" {
   )
   normal_map.channel = 1
   shader.normal_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1690)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
-  assert_eq(1690 - 1608, 82)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1706)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1295)
+  assert_eq(1706 - 1608, 98)
   assert_eq(
     shader.prefixed_vertex_shader()[740:764].to_owned(),
     "#define NORMALMAP_UV uv1",
@@ -4747,9 +4747,9 @@ test "Material shader writes DISPLACEMENTMAP_UV" {
   )
   displacement_map.channel = 1
   shader.displacement_map = Some(displacement_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1667)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(1667 - 1608, 59)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1683)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(1683 - 1608, 75)
   assert_eq(
     shader.prefixed_vertex_shader()[711:741].to_owned(),
     "#define DISPLACEMENTMAP_UV uv1",
@@ -4787,9 +4787,9 @@ test "Material shader writes METALNESSMAP_UV" {
   )
   metalness_map.channel = 1
   shader.metalness_map = Some(metalness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
-  assert_eq(1661 - 1608, 53)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1677)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1263)
+  assert_eq(1677 - 1608, 69)
   assert_eq(
     shader.prefixed_vertex_shader()[708:735].to_owned(),
     "#define METALNESSMAP_UV uv1",
@@ -4827,9 +4827,9 @@ test "Material shader writes ROUGHNESSMAP_UV" {
   )
   roughness_map.channel = 1
   shader.roughness_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1247)
-  assert_eq(1661 - 1608, 53)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1677)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1263)
+  assert_eq(1677 - 1608, 69)
   assert_eq(
     shader.prefixed_vertex_shader()[708:735].to_owned(),
     "#define ROUGHNESSMAP_UV uv1",
@@ -4870,9 +4870,9 @@ test "Material shader writes ANISOTROPYMAP_UV" {
   )
   anisotropy_map.channel = 1
   shader.anisotropy_map = Some(anisotropy_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1271)
-  assert_eq(1686 - 1608, 78)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1702)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1287)
+  assert_eq(1702 - 1608, 94)
   assert_eq(
     shader.prefixed_vertex_shader()[732:760].to_owned(),
     "#define ANISOTROPYMAP_UV uv1",
@@ -4918,9 +4918,9 @@ test "Material shader writes CLEARCOATMAP_UV" {
   )
   clearcoat_map.channel = 1
   shader.clearcoat_map = Some(clearcoat_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1269)
-  assert_eq(1661 - 1608, 53)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1677)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1285)
+  assert_eq(1677 - 1608, 69)
   assert_eq(
     shader.prefixed_vertex_shader()[708:735].to_owned(),
     "#define CLEARCOATMAP_UV uv1",
@@ -4967,9 +4967,9 @@ test "Material shader writes CLEARCOAT_NORMALMAP_UV" {
   )
   normal_map.channel = 1
   shader.clearcoat_normal_map = Some(normal_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1675)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1276)
-  assert_eq(1675 - 1608, 67)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1691)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1292)
+  assert_eq(1691 - 1608, 83)
   assert_eq(
     shader.prefixed_vertex_shader()[715:749].to_owned(),
     "#define CLEARCOAT_NORMALMAP_UV uv1",
@@ -5015,9 +5015,9 @@ test "Material shader writes CLEARCOAT_ROUGHNESSMAP_UV" {
   )
   roughness_map.channel = 1
   shader.clearcoat_roughness_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1681)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
-  assert_eq(1681 - 1608, 73)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1697)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1295)
+  assert_eq(1697 - 1608, 89)
   assert_eq(
     shader.prefixed_vertex_shader()[718:755].to_owned(),
     "#define CLEARCOAT_ROUGHNESSMAP_UV uv1",
@@ -5063,9 +5063,9 @@ test "Material shader writes IRIDESCENCEMAP_UV" {
   )
   iridescence_map.channel = 1
   shader.iridescence_map = Some(iridescence_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
-  assert_eq(1665 - 1608, 57)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1681)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1265)
+  assert_eq(1681 - 1608, 73)
   assert_eq(
     shader.prefixed_vertex_shader()[710:739].to_owned(),
     "#define IRIDESCENCEMAP_UV uv1",
@@ -5112,9 +5112,9 @@ test "Material shader writes IRIDESCENCE_THICKNESSMAP_UV" {
   )
   thickness_map.channel = 1
   shader.iridescence_thickness_map = Some(thickness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1259)
-  assert_eq(1685 - 1608, 77)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1701)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1275)
+  assert_eq(1701 - 1608, 93)
   assert_eq(
     shader.prefixed_vertex_shader()[720:759].to_owned(),
     "#define IRIDESCENCE_THICKNESSMAP_UV uv1",
@@ -5160,9 +5160,9 @@ test "Material shader writes SHEEN_COLORMAP_UV" {
   )
   sheen_color_map.channel = 1
   shader.sheen_color_map = Some(sheen_color_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
-  assert_eq(1665 - 1608, 57)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1681)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1265)
+  assert_eq(1681 - 1608, 73)
   assert_eq(
     shader.prefixed_vertex_shader()[710:739].to_owned(),
     "#define SHEEN_COLORMAP_UV uv1",
@@ -5209,9 +5209,9 @@ test "Material shader writes SHEEN_ROUGHNESSMAP_UV" {
   )
   sheen_roughness_map.channel = 1
   shader.sheen_roughness_map = Some(sheen_roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1673)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1253)
-  assert_eq(1673 - 1608, 65)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1269)
+  assert_eq(1689 - 1608, 81)
   assert_eq(
     shader.prefixed_vertex_shader()[714:747].to_owned(),
     "#define SHEEN_ROUGHNESSMAP_UV uv1",
@@ -5254,9 +5254,9 @@ test "Material shader writes SPECULARMAP_UV" {
   )
   specular_map.channel = 1
   shader.specular_map = Some(specular_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1246)
-  assert_eq(1659 - 1608, 51)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1675)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1262)
+  assert_eq(1675 - 1608, 67)
   assert_eq(
     shader.prefixed_vertex_shader()[707:733].to_owned(),
     "#define SPECULARMAP_UV uv1",
@@ -5295,9 +5295,9 @@ test "Material shader writes SPECULAR_COLORMAP_UV" {
   )
   specular_color_map.channel = 1
   shader.specular_color_map = Some(specular_color_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1671)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1252)
-  assert_eq(1671 - 1608, 63)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1687)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1268)
+  assert_eq(1687 - 1608, 79)
   assert_eq(
     shader.prefixed_vertex_shader()[713:745].to_owned(),
     "#define SPECULAR_COLORMAP_UV uv1",
@@ -5335,9 +5335,9 @@ test "Material shader writes SPECULAR_INTENSITYMAP_UV" {
   )
   specular_intensity_map.channel = 1
   shader.specular_intensity_map = Some(specular_intensity_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1679)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1256)
-  assert_eq(1679 - 1608, 71)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1695)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(1695 - 1608, 87)
   assert_eq(
     shader.prefixed_vertex_shader()[717:753].to_owned(),
     "#define SPECULAR_INTENSITYMAP_UV uv1",
@@ -5378,9 +5378,9 @@ test "Material shader writes TRANSMISSIONMAP_UV" {
   )
   transmission_map.channel = 1
   shader.transmission_map = Some(transmission_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1692)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1275)
-  assert_eq(1692 - 1608, 84)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1708)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1291)
+  assert_eq(1708 - 1608, 100)
   assert_eq(
     shader.prefixed_vertex_shader()[736:766].to_owned(),
     "#define TRANSMISSIONMAP_UV uv1",
@@ -5426,9 +5426,9 @@ test "Material shader writes THICKNESSMAP_UV" {
   )
   thickness_map.channel = 1
   shader.thickness_map = Some(thickness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
-  assert_eq(1686 - 1608, 78)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1702)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1288)
+  assert_eq(1702 - 1608, 94)
   assert_eq(
     shader.prefixed_vertex_shader()[733:760].to_owned(),
     "#define THICKNESSMAP_UV uv1",
@@ -5619,6 +5619,55 @@ test "Material shader writes USE_COLOR_ALPHA" {
   let basic = @materials.Material::basic()
   basic.vertex_colors = true
   assert_eq(basic.prefixed_vertex_shader(has_vertex_alpha=true), "")
+}
+
+///|
+test "Material shader writes USE_UV1" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  map.channel = 1
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1254)
+  assert_eq(1659 - 1643, 16)
+  assert_eq(
+    shader.prefixed_vertex_shader()[718:733].to_owned(),
+    "#define USE_UV1",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1095:1110].to_owned(),
+    "#define USE_UV1",
+  )
+  map.channel = 2
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  map.channel = 1
+  shader.map = Some(map)
+  shader.vertex_colors = true
+  assert_eq(
+    shader.prefixed_vertex_shader(has_vertex_alpha=true).length(),
+    1701,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_vertex_alpha=true)[760:775].to_owned(),
+    "#define USE_UV1",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_vertex_alpha=true).length(), 1296)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_vertex_alpha=true)[1137:1152].to_owned(),
+    "#define USE_UV1",
+  )
+  let raw = @materials.Material::raw()
+  raw.map = Some(map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.map = Some(map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
 ///|
