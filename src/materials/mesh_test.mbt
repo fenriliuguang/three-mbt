@@ -1636,3 +1636,30 @@ test "Material clearcoatRoughness defaults to zero and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.clearcoat_roughness, 0.0)
 }
+
+///|
+test "Material clearcoatRoughnessMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.clearcoat_roughness_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.clearcoat_roughness_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.clearcoat_roughness_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.clearcoat_roughness_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.clearcoat_roughness_map {
+    None => abort("copied clearcoat roughness map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.clearcoat_roughness_map = None
+  match lambert.clearcoat_roughness_map {
+    None => abort("source clearcoat roughness map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.clearcoat_roughness_map is None, true)
+}
