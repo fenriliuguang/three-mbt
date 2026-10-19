@@ -7453,6 +7453,38 @@ test "Material shader getVertexShaderStage reuses source" {
 }
 
 ///|
+test "Material shader getFragmentShaderStage reuses source" {
+  let cache = @materials.ShaderCache::new()
+  let shader = @materials.Material::shader()
+  let stage = cache.get_fragment_shader_stage(shader)
+  assert_eq(stage.code, shader.fragment_shader)
+  assert_eq(stage.used_times.val, 0)
+  let again = cache.get_fragment_shader_stage(shader)
+  assert_eq(again.id, stage.id)
+  assert_eq(again.used_times.val, 0)
+  let raw = @materials.Material::raw()
+  assert_eq(cache.get_fragment_shader_stage(raw).id, stage.id)
+  let vertex = cache.get_vertex_shader_stage(shader)
+  assert_eq(vertex.id == stage.id, false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.fragment_shader = "custom"
+  let custom = cache.get_fragment_shader_stage(shader)
+  assert_eq(custom.code, "custom")
+  assert_eq(custom.id == stage.id, false)
+  assert_eq(custom.used_times.val, 0)
+  let basic = @materials.Material::basic()
+  let empty = cache.get_fragment_shader_stage(basic)
+  assert_eq(empty.code, "")
+  assert_eq(empty.used_times.val, 0)
+  assert_eq(empty.id == custom.id, false)
+  match cache.material_cache.get(shader.id) {
+    None => ()
+    Some(_) => abort("fragment stage wrote the material map")
+  }
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
