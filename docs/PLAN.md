@@ -1419,6 +1419,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `InstancedMesh.clone` has landed. The same point, stored in a mesh of capacity `2` with `count` `1`, produces a new mesh. Capacity stays `2`, count stays `1`, the matrix translation stays `x=2`, and the color stays `(0.25, 0.5, 1)`. The node position is `y=3`, and the child named `marker` is a new node. Geometry is shared. The cloned sphere is centered at `(2, 0, 0)` with radius `0`, and setting that radius to `5` leaves the source radius at `0`. `recursive` false keeps the instance data and drops the child.
 
+`LOD.copy` has landed. Levels at distance `0` and `10`, the farther one with hysteresis `0.25`, copy onto a LOD whose current level is `3`. The copy keeps current level `3`, sets `autoUpdate` false, and moves the node to `y=4`. The near clone is named `near` at `y=1`, and the far clone is named `far`. Both clones are new objects. Renaming the near clone leaves the source name `near`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2069,6 +2071,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.raycast` | `core` |
 | planned | 7 | `InstancedMesh.copy` | `objects` |
 | planned | 7 | `InstancedMesh.clone` | `objects` |
+| planned | 7 | `LOD.copy` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

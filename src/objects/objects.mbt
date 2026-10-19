@@ -1021,3 +1021,25 @@ pub fn LOD::update(self : LOD, camera : Object3D) -> Unit {
     i = i + 1
   }
 }
+
+///|
+/// 复制变换和各级对象。子节点不从源节点整棵复制，而是克隆每一级的对象再加入。`current_level` 留在目标原来的值。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L87
+pub fn LOD::copy(self : LOD, source : LOD) -> LOD {
+  ignore(self.node.copy(source.node, recursive=false))
+  let count = source.levels.length()
+  let mut index = 0
+  while index < count {
+    let level = source.levels[index]
+    ignore(
+      self.add_level(
+        level.object.clone(),
+        distance=level.distance,
+        hysteresis=level.hysteresis,
+      ),
+    )
+    index = index + 1
+  }
+  self.auto_update = source.auto_update
+  self
+}

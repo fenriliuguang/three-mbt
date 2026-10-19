@@ -359,6 +359,43 @@ test "InstancedMesh.clone keeps capacity and detaches bounds" {
 }
 
 ///|
+test "LOD.copy clones levels and leaves the current level" {
+  let source = @objects.LOD::new()
+  let near = @core.Object3D::new()
+  near.name = "near"
+  ignore(near.position.set(0.0, 1.0, 0.0))
+  let far = @core.Object3D::new()
+  far.name = "far"
+  ignore(source.add_level(near, distance=0.0, hysteresis=0.0))
+  ignore(source.add_level(far, distance=10.0, hysteresis=0.25))
+  source.auto_update = false
+  source.current_level = 1
+  ignore(source.node.position.set(0.0, 4.0, 0.0))
+  let destination = @objects.LOD::new()
+  destination.current_level = 3
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(destination.auto_update, false)
+  assert_eq(destination.current_level, 3)
+  assert_eq(destination.node.position.y, 4.0)
+  assert_eq(destination.levels.length(), 2)
+  assert_eq(destination.levels[0].distance, 0.0)
+  assert_eq(destination.levels[0].hysteresis, 0.0)
+  assert_eq(destination.levels[1].distance, 10.0)
+  assert_eq(destination.levels[1].hysteresis, 0.25)
+  assert_eq(destination.levels[0].object.name, "near")
+  assert_eq(destination.levels[1].object.name, "far")
+  assert_eq(destination.levels[0].object.position.y, 1.0)
+  assert_eq(physical_equal(destination.levels[0].object, near), false)
+  assert_eq(physical_equal(destination.levels[1].object, far), false)
+  assert_eq(destination.node.children.length(), 2)
+  assert_eq(source.node.children.length(), 2)
+  assert_eq(source.current_level, 1)
+  destination.levels[0].object.name = "copy"
+  assert_eq(near.name, "near")
+}
+
+///|
 test "mesh raycast interpolates uv" {
   let geometry = @core.BufferGeometry::new()
   ignore(
