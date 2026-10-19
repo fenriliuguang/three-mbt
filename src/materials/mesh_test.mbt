@@ -1733,3 +1733,30 @@ test "Material ior defaults to one and a half and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.ior, 1.5)
 }
+
+///|
+test "Material iridescenceMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.iridescence_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.iridescence_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.iridescence_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.iridescence_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.iridescence_map {
+    None => abort("copied iridescence map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.iridescence_map = None
+  match lambert.iridescence_map {
+    None => abort("source iridescence map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.iridescence_map is None, true)
+}
