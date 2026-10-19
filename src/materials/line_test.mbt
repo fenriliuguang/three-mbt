@@ -123,3 +123,26 @@ test "LineDashedMaterial stores scale, dash, and gap" {
   assert_eq(defaults.dash_size, 3.0)
   assert_eq(defaults.gap_size, 1.0)
 }
+
+///|
+test "LineDashedMaterial keeps distances inside the dash" {
+  let material = @materials.LineDashedMaterial::new()
+  assert_eq(material.keeps_distance(0.0), true)
+  assert_eq(material.keeps_distance(3.0), true)
+  assert_eq(material.keeps_distance(3.5), false)
+  assert_eq(material.keeps_distance(4.0), true)
+  assert_eq(material.keeps_distance(8.0), true)
+  assert_eq(material.keeps_distance(-0.5), false)
+  let scaled = @materials.LineDashedMaterial::new(scale=2.0)
+  assert_eq(scaled.keeps_distance(1.5), true)
+  assert_eq(scaled.keeps_distance(1.75), false)
+  assert_eq(material.scale, 1.0)
+  assert_eq(material.dash_size, 3.0)
+  assert_eq(material.gap_size, 1.0)
+}
+
+///|
+test "panic LineDashedMaterial zero period" {
+  let material = @materials.LineDashedMaterial::new(dash_size=0.0, gap_size=0.0)
+  ignore(material.keeps_distance(1.0))
+}

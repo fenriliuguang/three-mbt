@@ -395,6 +395,26 @@ pub fn LineDashedMaterial::copy(
 }
 
 ///|
+/// 没有同名上游方法。距离先乘 `scale`，再按 GLSL `mod` 对 `dash_size + gap_size` 取余。
+/// 余数大于 `dash_size` 时落在间隔里，返回 false。周期为 0 时中止。
+/// 着色器仍画实线。
+/// r186: `vLineDistance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderLib/linedashed.glsl.js#L17
+/// r186: `mod` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderLib/linedashed.glsl.js#L55
+/// r186: `totalSize` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLMaterials.js#L298
+pub fn LineDashedMaterial::keeps_distance(
+  self : LineDashedMaterial,
+  distance : Double,
+) -> Bool {
+  let total = self.dash_size + self.gap_size
+  if total == 0.0 {
+    abort("LineDashedMaterial dash period is zero")
+  }
+  let scaled = self.scale * distance
+  let wrapped = scaled - total * (scaled / total).floor()
+  wrapped <= self.dash_size
+}
+
+///|
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
