@@ -712,3 +712,26 @@ test "Material id increments" {
   assert_eq(standard.material.id, lambert.material.id + 1)
   assert_eq(basic.material.id + 3, standard.material.id)
 }
+
+///|
+test "Material uuid is a version-4 id" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.uuid.length(), 36)
+  assert_eq(basic.material.uuid[14:15].to_owned(), "4")
+  let other = @materials.Material::basic()
+  assert_eq(other.uuid.length(), 36)
+  assert_eq(other.uuid[14:15].to_owned(), "4")
+  basic.material.uuid = "mesh"
+  assert_eq(other.uuid.length(), 36)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.uuid.length(), 36)
+  assert_eq(lambert.material.uuid[14:15].to_owned(), "4")
+  lambert.material.uuid = "lambert"
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.uuid.length(), 36)
+  assert_eq(standard.material.uuid[14:15].to_owned(), "4")
+  standard.material.uuid = "lit"
+  assert_eq(basic.material.uuid, "mesh")
+  assert_eq(lambert.material.uuid, "lambert")
+  assert_eq(standard.material.uuid, "lit")
+}

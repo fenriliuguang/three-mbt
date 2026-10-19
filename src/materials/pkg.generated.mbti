@@ -133,6 +133,7 @@ pub(all) struct Material {
   mut user_data : Map[String, String]
   mut version : Int
   id : Int
+  mut uuid : String
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
