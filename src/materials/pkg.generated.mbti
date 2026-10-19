@@ -53,6 +53,7 @@ pub(all) struct LineBasicMaterial {
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
   mut stencil_write : Bool
+  mut clipping_planes : Array[@math.Plane]?
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self

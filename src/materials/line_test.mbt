@@ -819,3 +819,47 @@ test "LineBasicMaterial stores and copies stencilWrite" {
   assert_eq(dashed.line.stencil_write, true)
   assert_eq(other.line.stencil_write, false)
 }
+
+///|
+test "LineBasicMaterial stores and copies clippingPlanes" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.clipping_planes is None, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.clipping_planes = Some([@math.Plane::new(constant=1.0)])
+  assert_eq(defaults.clipping_planes is None, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.clipping_planes {
+    None => abort("copied clipping planes")
+    Some(planes) => {
+      assert_eq(planes.length(), 1)
+      assert_eq(planes[0].constant, 1.0)
+    }
+  }
+  destination.clipping_planes = Some([@math.Plane::new(constant=2.0)])
+  match source.clipping_planes {
+    None => abort("source clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 1.0)
+  }
+  match destination.clipping_planes {
+    None => abort("destination clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 2.0)
+  }
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.clipping_planes = Some([@math.Plane::new(constant=1.0)])
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  match other.line.clipping_planes {
+    None => abort("dashed clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 1.0)
+  }
+  other.line.clipping_planes = Some([@math.Plane::new(constant=3.0)])
+  match dashed.line.clipping_planes {
+    None => abort("dashed source clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 1.0)
+  }
+  match other.line.clipping_planes {
+    None => abort("dashed destination clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 3.0)
+  }
+}
