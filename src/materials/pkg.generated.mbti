@@ -122,6 +122,7 @@ pub(all) struct PointsMaterial {
   mut tone_mapped : Bool
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
+  mut dithering : Bool
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self

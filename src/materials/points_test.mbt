@@ -176,3 +176,17 @@ test "PointsMaterial stores and copies alphaToCoverage" {
   destination.alpha_to_coverage = false
   assert_eq(source.alpha_to_coverage, true)
 }
+
+///|
+test "PointsMaterial stores and copies dithering" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.dithering, false)
+  let source = @materials.PointsMaterial::new()
+  source.dithering = true
+  assert_eq(defaults.dithering, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.dithering, true)
+  destination.dithering = false
+  assert_eq(source.dithering, true)
+}

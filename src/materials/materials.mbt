@@ -240,6 +240,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的点生效。
 /// `alpha_hash` 默认关闭。点着色器仍不做哈希透明。
 /// `alpha_to_coverage` 默认关闭。点绘制仍不打开 alpha to coverage。
+/// `dithering` 默认关闭。点着色器仍不对颜色做抖动。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -248,6 +249,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
 /// r186: `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135
 /// r186: `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409
+/// r186: `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -268,6 +270,7 @@ pub(all) struct PointsMaterial {
   mut tone_mapped : Bool
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
+  mut dithering : Bool
 }
 
 ///|
@@ -296,12 +299,13 @@ pub fn PointsMaterial::new(
     tone_mapped: true,
     alpha_hash: false,
     alpha_to_coverage: false,
+    dithering: false,
   }
 }
 
 ///|
 /// 把颜色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
-/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash` 和 `alpha_to_coverage` 一并复制。
+/// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage` 和 `dithering` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn PointsMaterial::copy(
@@ -327,6 +331,7 @@ pub fn PointsMaterial::copy(
   self.tone_mapped = source.tone_mapped
   self.alpha_hash = source.alpha_hash
   self.alpha_to_coverage = source.alpha_to_coverage
+  self.dithering = source.dithering
   self
 }
 
