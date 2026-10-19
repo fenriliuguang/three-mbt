@@ -91,6 +91,7 @@ pub(all) struct Material {
   mut allow_override : Bool
   mut blend_alpha : Double
   blend_color : @math.Color
+  mut blending : @constants.Blending
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

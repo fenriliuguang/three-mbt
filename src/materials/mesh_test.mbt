@@ -195,3 +195,26 @@ test "Material blendColor defaults to black" {
   assert_eq(standard.material.blend_color.g, 0.5)
   assert_eq(lambert.material.blend_color.r, 0.0)
 }
+
+///|
+test "Material blending defaults to normal" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blending is @constants.Blending::Normal, true)
+  assert_eq(basic.material.blending.to_int(), 1)
+  basic.material.blending = @constants.Blending::Additive
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blending is @constants.Blending::Normal, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blending is @constants.Blending::Normal, true)
+  standard.material.blending = @constants.Blending::Multiply
+  let other = @materials.Material::basic()
+  assert_eq(other.blending is @constants.Blending::Normal, true)
+  assert_eq(basic.material.blending is @constants.Blending::Additive, true)
+  assert_eq(basic.material.blending.to_int(), 2)
+  assert_eq(standard.material.blending is @constants.Blending::Multiply, true)
+  assert_eq(standard.material.blending.to_int(), 4)
+  assert_eq(lambert.material.blending is @constants.Blending::Normal, true)
+  assert_eq(@constants.Blending::No.to_int(), 0)
+  assert_eq(@constants.Blending::Subtractive.to_int(), 3)
+  assert_eq(@constants.Blending::Custom.to_int(), 5)
+}

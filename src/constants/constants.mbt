@@ -55,6 +55,54 @@ pub fn Side::to_int(self : Side) -> Int {
 }
 
 ///|
+/// 不做混合。对齐 `NoBlending`（0）。
+pub const NO_BLENDING : Int = 0
+
+///|
+/// 默认混合。对齐 `NormalBlending`（1）。
+pub const NORMAL_BLENDING : Int = 1
+
+///|
+/// 相加混合。对齐 `AdditiveBlending`（2）。
+pub const ADDITIVE_BLENDING : Int = 2
+
+///|
+/// 相减混合。对齐 `SubtractiveBlending`（3）。
+pub const SUBTRACTIVE_BLENDING : Int = 3
+
+///|
+/// 相乘混合。对齐 `MultiplyBlending`（4）。
+pub const MULTIPLY_BLENDING : Int = 4
+
+///|
+/// 自定义混合。对齐 `CustomBlending`（5）。
+pub const CUSTOM_BLENDING : Int = 5
+
+///|
+/// 材质混合模式。数值与 r186 `src/constants.js` 一致。默认是 `Normal`。
+/// r186: `NoBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L117 ; `NormalBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L125 ; `AdditiveBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L133 ; `SubtractiveBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L141 ; `MultiplyBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L149 ; `CustomBlending` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L157
+pub(all) enum Blending {
+  No
+  Normal
+  Additive
+  Subtractive
+  Multiply
+  Custom
+}
+
+///|
+pub fn Blending::to_int(self : Blending) -> Int {
+  match self {
+    No => NO_BLENDING
+    Normal => NORMAL_BLENDING
+    Additive => ADDITIVE_BLENDING
+    Subtractive => SUBTRACTIVE_BLENDING
+    Multiply => MULTIPLY_BLENDING
+    Custom => CUSTOM_BLENDING
+  }
+}
+
+///|
 /// 深度测试通过的条件。数值与 r186 `src/constants.js` 一致。默认是 `LessEqual`。
 /// r186: `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `LessEqualDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L359
 pub(all) enum DepthFunc {

@@ -4,6 +4,8 @@ package "fenriliuguang/three-mbt/constants"
 // Values
 pub const ACES_FILMIC_TONE_MAPPING : Int = 4
 
+pub const ADDITIVE_BLENDING : Int = 2
+
 pub const AGX_TONE_MAPPING : Int = 6
 
 pub const ALWAYS_DEPTH : Int = 1
@@ -13,6 +15,8 @@ pub const BACK_SIDE : Int = 1
 pub const CINEON_TONE_MAPPING : Int = 3
 
 pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
+
+pub const CUSTOM_BLENDING : Int = 5
 
 pub const CUSTOM_TONE_MAPPING : Int = 5
 
@@ -62,6 +66,8 @@ pub const LOOP_REPEAT : Int = 2201
 
 pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
 
+pub const MULTIPLY_BLENDING : Int = 4
+
 pub const NEAREST_FILTER : Int = 1003
 
 pub const NEAREST_MIPMAP_LINEAR_FILTER : Int = 1005
@@ -72,7 +78,11 @@ pub const NEUTRAL_TONE_MAPPING : Int = 7
 
 pub const NEVER_DEPTH : Int = 0
 
+pub const NORMAL_BLENDING : Int = 1
+
 pub const NOT_EQUAL_DEPTH : Int = 7
+
+pub const NO_BLENDING : Int = 0
 
 pub const NO_TONE_MAPPING : Int = 0
 
@@ -92,6 +102,8 @@ pub const STREAM_DRAW_USAGE : Int = 35040
 
 pub const STREAM_READ_USAGE : Int = 35041
 
+pub const SUBTRACTIVE_BLENDING : Int = 3
+
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
 pub const WEBGPU_COORDINATE_SYSTEM : Int = 2001
@@ -109,6 +121,16 @@ pub(all) enum BindMode {
   Attached
   Detached
 }
+
+pub(all) enum Blending {
+  No
+  Normal
+  Additive
+  Subtractive
+  Multiply
+  Custom
+}
+pub fn Blending::to_int(Self) -> Int
 
 pub(all) enum CoordinateSystem {
   WebGL
