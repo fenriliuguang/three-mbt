@@ -319,6 +319,7 @@ pub fn Material::program_iridescence_thickness_map(Self) -> Bool
 pub fn Material::program_is_raw_shader_material(Self) -> Bool
 pub fn Material::program_light_map(Self) -> Bool
 pub fn Material::program_map(Self) -> Bool
+pub fn Material::program_map_uv(Self) -> String
 pub fn Material::program_matcap(Self) -> Bool
 pub fn Material::program_metalness_map(Self) -> Bool
 pub fn Material::program_normal_map(Self) -> Bool
