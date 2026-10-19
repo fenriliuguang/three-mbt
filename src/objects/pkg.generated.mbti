@@ -140,6 +140,7 @@ pub(all) struct Mesh {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.Material
+  mut materials : Array[@materials.Material]?
   mut count : Int
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
@@ -150,6 +151,7 @@ pub fn Mesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn Mesh::refresh(Self) -> Unit
 pub fn Mesh::set_fog(Self, Bool) -> Unit
 pub fn Mesh::set_map(Self, @textures.Texture?) -> Unit
+pub fn Mesh::set_materials(Self, Array[@materials.Material]) -> Unit
 pub fn Mesh::set_side(Self, @constants.Side) -> Unit
 pub fn Mesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Mesh::to_node(Self) -> @core.Object3D

@@ -32,6 +32,7 @@ pub(all) struct MeshBinding {
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
   instances : InstanceData?
+  group_sides : Array[@constants.Side]?
 }
 
 ///|

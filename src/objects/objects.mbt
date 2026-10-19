@@ -748,6 +748,7 @@ pub(all) struct Mesh {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.Material
+  mut materials : Array[@materials.Material]?
   mut count : Int
   mut morph_target_influences : Array[Double]?
   mut morph_target_dictionary : Map[String, Int]?
@@ -763,6 +764,7 @@ pub fn Mesh::new(
     node,
     geometry,
     material,
+    materials: None,
     count: 1,
     morph_target_influences: None,
     morph_target_dictionary: None,
@@ -817,6 +819,7 @@ pub extend Mesh with @core.AsNode::{to_node}
 
 ///|
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// 材质数组会复制一份新列表，里面的材质仍是原来的对象。源对象没有数组时，目标的数组清掉。
 /// 源对象有形变权重或名字表时各复制一份。源对象没有时，目标上已有的值留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L110
 pub fn Mesh::copy(
@@ -827,6 +830,16 @@ pub fn Mesh::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  self.materials = match source.materials {
+    None => None
+    Some(materials) => {
+      let copied : Array[@materials.Material] = []
+      for material in materials {
+        copied.push(material)
+      }
+      Some(copied)
+    }
+  }
   match source.morph_target_influences {
     None => ()
     Some(weights) => {
@@ -891,7 +904,40 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     metalness_map: self.material.metalness_map,
     alpha_map: self.material.alpha_map,
     instances: None,
+    group_sides: material_sides(self.materials),
   })
+}
+
+///|
+/// 换成材质数组后，射线按几何分组使用各自的侧面，并写下 `material_index`。
+/// 直接改数组里的侧面不会更新节点，要再调用 `refresh`。
+/// r186: `material` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L75
+pub fn Mesh::set_materials(
+  self : Mesh,
+  materials : Array[@materials.Material],
+) -> Unit {
+  let copied : Array[@materials.Material] = []
+  for material in materials {
+    copied.push(material)
+  }
+  self.materials = Some(copied)
+  self.refresh()
+}
+
+///|
+fn material_sides(
+  materials : Array[@materials.Material]?,
+) -> Array[@constants.Side]? {
+  match materials {
+    None => None
+    Some(materials) => {
+      let sides : Array[@constants.Side] = []
+      for material in materials {
+        sides.push(material.side)
+      }
+      Some(sides)
+    }
+  }
 }
 
 ///|
@@ -1763,6 +1809,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     metalness_map: self.material.metalness_map,
     alpha_map: self.material.alpha_map,
     instances: Some(self.instances),
+    group_sides: None,
   })
 }
 

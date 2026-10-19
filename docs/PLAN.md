@@ -1541,6 +1541,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Object3D.raycast` calls `SkinnedMesh.raycast` when the mesh node carries that hook. The same triangle, after the bone moves to `y=5`, is hit through `intersect_object` at `(0.25, 5.25, 0)`, distance `1`. A clone keeps its own hook and reports the hit on the clone. A plain mesh has no hook, and the same ray misses its unskinned triangle. Material arrays in the triangle walk stay later.
 
+Mesh raycast material arrays have landed. Two triangles and an empty group list produce no hit. Groups `(0, 3)` at material `0` and `(3, 3)` at material `1`, with sides front and back, hit `(0.25, 0.25, 0)` at material index `0` and miss the second triangle. Switching the second side to front hits `(5.25, 0.25, 0)` at material index `1` and face index `1`. Copying the mesh keeps a new list of length `2`. A draw range starting at `3` with count `3` keeps only the second triangle, at material index `0`. An out-of-range material index aborts. Instanced and skinned material arrays stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2252,6 +2254,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.clone` | `objects` |
 | planned | 7 | `SkinnedMesh.raycast` | `objects` |
 | planned | 7 | `Object3D.raycast` skinned hook | `core`, `objects` |
+| planned | 7 | mesh raycast material arrays | `core`, `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

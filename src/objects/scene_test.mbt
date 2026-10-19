@@ -2757,6 +2757,126 @@ test "Object3D.raycast uses the skinned hook" {
 }
 
 ///|
+test "mesh raycast uses a material array and geometry groups" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
+          0.0, 5.0, 1.0, 0.0,
+        ],
+        3,
+      ),
+    ),
+  )
+  let front = @materials.Material::basic()
+  let back = @materials.Material::basic()
+  back.side = @constants.Back
+  let mesh = @objects.Mesh::new(geometry, front)
+  mesh.set_materials([front, back])
+  mesh.node.update_matrix_world()
+  let first = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let second = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=5.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  assert_eq(first.intersect_object(mesh.node).length(), 0)
+  geometry.add_group(0, 3, material_index=0)
+  geometry.add_group(3, 3, material_index=1)
+  let near = first.intersect_object(mesh.node)
+  assert_eq(near.length(), 1)
+  assert_eq(near[0].distance, 1.0)
+  assert_eq(near[0].point.x, 0.25)
+  assert_eq(near[0].point.y, 0.25)
+  assert_eq(near[0].point.z, 0.0)
+  match near[0].face {
+    None => assert_eq(false, true)
+    Some(face) => assert_eq(face.material_index, 0)
+  }
+  match near[0].face_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  assert_eq(second.intersect_object(mesh.node).length(), 0)
+  back.side = @constants.Front
+  mesh.refresh()
+  let far = second.intersect_object(mesh.node)
+  assert_eq(far.length(), 1)
+  assert_eq(far[0].point.x, 5.25)
+  assert_eq(far[0].point.y, 0.25)
+  assert_eq(far[0].point.z, 0.0)
+  match far[0].face {
+    None => assert_eq(false, true)
+    Some(face) => {
+      assert_eq(face.material_index, 1)
+      assert_eq(face.a, 3)
+      assert_eq(face.b, 4)
+      assert_eq(face.c, 5)
+    }
+  }
+  match far[0].face_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  let destination = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+  )
+  ignore(destination.copy(mesh))
+  match destination.materials {
+    None => assert_eq(false, true)
+    Some(copied) => {
+      assert_eq(copied.length(), 2)
+      assert_eq(physical_equal(copied[0], front), true)
+      copied.push(@materials.Material::basic())
+      assert_eq(copied.length(), 3)
+    }
+  }
+  match mesh.materials {
+    None => assert_eq(false, true)
+    Some(source) => assert_eq(source.length(), 2)
+  }
+  geometry.clear_groups()
+  geometry.add_group(0, 6, material_index=0)
+  geometry.set_draw_range(3.0, 3.0)
+  assert_eq(first.intersect_object(mesh.node).length(), 0)
+  let drawn = second.intersect_object(mesh.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(drawn[0].point.x, 5.25)
+  match drawn[0].face {
+    None => assert_eq(false, true)
+    Some(face) => assert_eq(face.material_index, 0)
+  }
+}
+
+///|
+test "panic mesh raycast material index is out of range" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  geometry.add_group(0, 3, material_index=1)
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.set_materials([@materials.Material::basic()])
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  ignore(raycaster.intersect_object(mesh.node))
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

@@ -1,7 +1,7 @@
 // r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L238
 
 ///|
-/// 单材质网格的三角形相交。材质数组和分组留在后面。没有 `uv`、法线或 `face` 时不写这些字段。
+/// 网格的三角形相交。材质数组按几何分组取侧面，并写下 `material_index`。没有 `uv`、法线或 `face` 时不写这些字段。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L238
 fn Object3D::raycast_mesh(
   self : Object3D,
@@ -73,7 +73,7 @@ fn Object3D::raycast_triangles(
 
 ///|
 /// 用调用方给出的顶点位置做三角形相交。蒙皮网格由此套入骨骼变换。
-/// 材质数组和分组留在后面。
+/// 绑定上有分组侧面时，按几何分组和绘制范围取交，越界的材质下标中止。
 /// r186: `_computeIntersections` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L284
 pub fn Object3D::raycast_triangles_with(
   self : Object3D,
@@ -84,9 +84,45 @@ pub fn Object3D::raycast_triangles_with(
   read_vertex : (Int, @math.Vector3) -> @math.Vector3,
   instance_id? : Int? = None,
 ) -> Unit {
-  let geometry = match self.mesh {
+  let (geometry, group_sides) = match self.mesh {
     None => return
-    Some(mesh) => mesh.geometry
+    Some(mesh) => (mesh.geometry, mesh.group_sides)
+  }
+  match group_sides {
+    Some(sides) => {
+      match geometry.index {
+        Some(index) =>
+          self.raycast_group_triangles(
+            raycaster,
+            intersects,
+            ray,
+            read_vertex,
+            geometry,
+            Some(index),
+            index.count,
+            sides,
+            instance_id~,
+          )
+        None =>
+          match geometry.get_attribute("position") {
+            None => ()
+            Some(position) =>
+              self.raycast_group_triangles(
+                raycaster,
+                intersects,
+                ray,
+                read_vertex,
+                geometry,
+                None,
+                position.count,
+                sides,
+                instance_id~,
+              )
+          }
+      }
+      return
+    }
+    None => ()
   }
   match geometry.index {
     Some(index) => {
@@ -143,6 +179,91 @@ pub fn Object3D::raycast_triangles_with(
 }
 
 ///|
+fn Object3D::raycast_group_triangles(
+  self : Object3D,
+  raycaster : Raycaster,
+  intersects : Array[Intersection],
+  ray : @math.Ray,
+  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
+  geometry : BufferGeometry,
+  index : BufferAttribute?,
+  limit : Int,
+  sides : Array[@constants.Side],
+  instance_id? : Int? = None,
+) -> Unit {
+  let mut group_index = 0
+  while group_index < geometry.groups.length() {
+    let group = geometry.groups[group_index]
+    if group.material_index < 0 || group.material_index >= sides.length() {
+      abort("Mesh.raycast material index is out of range")
+    }
+    let side = sides[group.material_index]
+    let (start, end) = group_draw_range(
+      group.start,
+      group.count,
+      geometry.draw_range.start,
+      geometry.draw_range.count,
+      limit,
+    )
+    let mut i = start
+    while i < end {
+      let (a, b, c) = match index {
+        None => (i, i + 1, i + 2)
+        Some(index) =>
+          (
+            index.get_x(i).to_int(),
+            index.get_x(i + 1).to_int(),
+            index.get_x(i + 2).to_int(),
+          )
+      }
+      self.push_triangle(
+        raycaster,
+        intersects,
+        ray,
+        side,
+        a,
+        b,
+        c,
+        i / 3,
+        read_vertex,
+        material_index=group.material_index,
+        instance_id~,
+      )
+      i = i + 3
+    }
+    group_index = group_index + 1
+  }
+}
+
+///|
+fn group_draw_range(
+  group_start : Int,
+  group_count : Int,
+  draw_start : Double,
+  draw_count : Double,
+  limit : Int,
+) -> (Int, Int) {
+  let drawn_start = double_index(draw_start, limit)
+  let drawn_end = double_index(draw_start + draw_count, limit)
+  let mut start = group_start
+  if drawn_start > start {
+    start = drawn_start
+  }
+  let mut end = group_start + group_count
+  if end > limit {
+    end = limit
+  }
+  if drawn_end < end {
+    end = drawn_end
+  }
+  if end < start {
+    (start, start)
+  } else {
+    (start, end)
+  }
+}
+
+///|
 fn Object3D::push_triangle(
   self : Object3D,
   raycaster : Raycaster,
@@ -154,6 +275,7 @@ fn Object3D::push_triangle(
   c : Int,
   face_index : Int,
   read_vertex : (Int, @math.Vector3) -> @math.Vector3,
+  material_index? : Int = 0,
   instance_id? : Int? = None,
 ) -> Unit {
   let point = @math.Vector3::new()
@@ -190,7 +312,7 @@ fn Object3D::push_triangle(
           distance,
           point: world,
           object: self,
-          face: Some({ a, b, c, normal, material_index: 0 }),
+          face: Some({ a, b, c, normal, material_index, }),
           face_index: Some(face_index),
           barycoord,
           uv,
