@@ -105,6 +105,11 @@ pub const ZERO_SLOPE_ENDING : Int = 2401
 // Errors
 
 // Types and methods
+pub(all) enum BindMode {
+  Attached
+  Detached
+}
+
 pub(all) enum CoordinateSystem {
   WebGL
   WebGPU

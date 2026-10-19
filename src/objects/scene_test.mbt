@@ -1869,6 +1869,36 @@ test "Skeleton.fromJSON appends bones and keeps their inverses" {
 }
 
 ///|
+test "SkinnedMesh starts attached with identity bind matrices" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.0, 0.0], 3),
+    ),
+  )
+  let material = @materials.Material::basic()
+  let skin = @objects.SkinnedMesh::new(geometry, material)
+  assert_eq(skin.mesh.node.kind is @core.NodeKind::Mesh, true)
+  assert_eq(physical_equal(skin.mesh.geometry, geometry), true)
+  assert_eq(skin.mesh.geometry.get_attribute("position").unwrap().array[0], 0.5)
+  assert_eq(skin.mesh.count, 1)
+  assert_eq(skin.bind_mode is @constants.BindMode::Attached, true)
+  assert_eq(skin.bind_matrix.elements[0], 1.0)
+  assert_eq(skin.bind_matrix.elements[13], 0.0)
+  assert_eq(skin.bind_matrix.elements[15], 1.0)
+  assert_eq(skin.bind_matrix_inverse.elements[0], 1.0)
+  assert_eq(skin.bind_matrix_inverse.elements[13], 0.0)
+  assert_eq(skin.bind_matrix_inverse.elements[15], 1.0)
+  assert_eq(skin.bounding_box is None, true)
+  assert_eq(skin.bounding_sphere is None, true)
+  assert_eq(skin.skeleton is None, true)
+  skin.bind_mode = @constants.Detached
+  assert_eq(skin.bind_mode is @constants.BindMode::Detached, true)
+  assert_eq(physical_equal(skin.to_node(), skin.mesh.node), true)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

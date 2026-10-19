@@ -42,6 +42,7 @@ pub using @constants {
   REINHARD_TONE_MAPPING,
   REPEAT_WRAPPING,
   WEBGPU_COORDINATE_SYSTEM,
+  type BindMode,
   type CoordinateSystem,
   type DepthFunc,
   type Interpolation,
@@ -147,6 +148,7 @@ pub using @objects {
   type Mesh,
   type Points,
   type Skeleton,
+  type SkinnedMesh,
   type Sprite,
 }
 

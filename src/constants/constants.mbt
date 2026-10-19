@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -19,6 +19,14 @@ pub(all) enum Side {
   Front
   Back
   Double
+}
+
+///|
+/// 蒙皮网格和骨架是否共享世界空间。默认是附着。
+/// r186: `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `DetachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L500
+pub(all) enum BindMode {
+  Attached
+  Detached
 }
 
 ///|

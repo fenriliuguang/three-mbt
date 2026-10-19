@@ -1513,6 +1513,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Skeleton.fromJSON` has landed. That serialized chain, loaded into an empty skeleton with the three bones looked up by uuid, restores the skeleton uuid, the same three bones, inverses at `y=5`, `y=5`, and identity, and a 48-zero matrix buffer. Loading it again appends three more bones and the buffer becomes 96 zeros. A bone uuid `missing` creates a new bone, stores an identity inverse, and sets the skeleton uuid to `skeleton-id`.
 
+`SkinnedMesh` has landed. A geometry point at `(0.5, 0, 0)` is kept on the inner mesh, whose count is `1` and whose node kind is `Mesh`. `bindMode` starts attached and can be set to detached. Both bind matrices are identity. The bounding box, bounding sphere, and skeleton are empty. `bind` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2210,6 +2212,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Object3D.uuid` | `core` |
 | planned | 7 | `Skeleton.toJSON` | `objects` |
 | planned | 7 | `Skeleton.fromJSON` | `objects` |
+| planned | 7 | `SkinnedMesh` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -146,6 +146,8 @@ pub using @animation {type AnimationMixer}
 
 pub using @cameras {type ArrayCamera}
 
+pub using @constants {type BindMode}
+
 pub using @post {type BloomPass}
 
 pub using @objects {type Bone}
@@ -267,6 +269,8 @@ pub using @constants {type Shading}
 pub using @constants {type Side}
 
 pub using @objects {type Skeleton}
+
+pub using @objects {type SkinnedMesh}
 
 pub using @math {type Sphere}
 

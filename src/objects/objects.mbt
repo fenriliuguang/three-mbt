@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17 ; `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17 ; `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37 ; `SkinnedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L38 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 
 ///|
 using @core {
@@ -347,6 +347,47 @@ fn zero_doubles(count : Int) -> Array[Double] {
   }
   values
 }
+
+///|
+/// 带骨架的网格。绑定模式默认是附着，两份绑定矩阵都是单位矩阵，包围体和骨架都为空。
+/// 节点种类仍是 `Mesh`。`bind` 留到后面。
+/// r186: `SkinnedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L38
+/// r186: `bindMode` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L69
+/// r186: `bindMatrix` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L76
+/// r186: `bindMatrixInverse` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L83
+pub(all) struct SkinnedMesh {
+  mesh : Mesh
+  mut bind_mode : @constants.BindMode
+  bind_matrix : @math.Matrix4
+  bind_matrix_inverse : @math.Matrix4
+  mut bounding_box : @math.Box3?
+  mut bounding_sphere : @math.Sphere?
+  mut skeleton : Skeleton?
+}
+
+///|
+pub fn SkinnedMesh::new(
+  geometry : BufferGeometry,
+  material : @materials.Material,
+) -> SkinnedMesh {
+  {
+    mesh: Mesh::new(geometry, material),
+    bind_mode: @constants.Attached,
+    bind_matrix: @math.Matrix4::new(),
+    bind_matrix_inverse: @math.Matrix4::new(),
+    bounding_box: None,
+    bounding_sphere: None,
+    skeleton: None,
+  }
+}
+
+///|
+pub impl @core.AsNode for SkinnedMesh with fn to_node(self) {
+  self.mesh.node
+}
+
+///|
+pub extend SkinnedMesh with @core.AsNode::{to_node}
 
 ///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
