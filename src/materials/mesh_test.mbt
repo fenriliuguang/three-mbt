@@ -6890,6 +6890,46 @@ test "Material shader writes USE_GRADIENTMAP" {
 }
 
 ///|
+test "Material shader writes PREMULTIPLIED_ALPHA" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.premultiplied_alpha = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2069)
+  assert_eq(2069 - 2041, 28)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1106].to_owned(),
+    "#define PREMULTIPLIED_ALPHA",
+  )
+  assert_eq(shader.prefixed_vertex_shader(num_light_probes=1).length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probes=1).length(), 2094)
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1)[1079:1106].to_owned(),
+    "#define PREMULTIPLIED_ALPHA",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1)[1107:1131].to_owned(),
+    "#define USE_LIGHT_PROBES",
+  )
+  shader.premultiplied_alpha = false
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.premultiplied_alpha = true
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 2120)
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true)[1130:1157].to_owned(),
+    "#define PREMULTIPLIED_ALPHA",
+  )
+  let raw = @materials.Material::raw()
+  raw.premultiplied_alpha = true
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.premultiplied_alpha = true
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
