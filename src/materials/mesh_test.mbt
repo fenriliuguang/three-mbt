@@ -2482,3 +2482,61 @@ test "Material physical sets isMeshPhysicalMaterial and keeps it on copy" {
   assert_eq(cloned.roughness, 0.25)
   assert_eq(cloned.id == physical.id, false)
 }
+
+///|
+test "Material toon sets isMeshToonMaterial and keeps defines on copy" {
+  let basic = @materials.Material::basic()
+  let lambert = @materials.Material::lambert()
+  let standard = @materials.Material::standard()
+  let physical = @materials.Material::physical()
+  assert_eq(basic.is_mesh_toon_material, false)
+  assert_eq(lambert.is_mesh_toon_material, false)
+  assert_eq(standard.is_mesh_toon_material, false)
+  assert_eq(physical.is_mesh_toon_material, false)
+  let toon = @materials.Material::toon(hex=0x00FF00)
+  assert_eq(toon.is_mesh_toon_material, true)
+  assert_eq(toon.is_mesh_physical_material, false)
+  assert_eq(toon.type_name, "MeshToonMaterial")
+  assert_eq(toon.kind is @materials.MaterialKind::Toon, true)
+  assert_eq(toon.shading() is @constants.Lambert, true)
+  assert_eq(toon.color.g, 1.0)
+  assert_eq(toon.color.r, 0.0)
+  match toon.defines.get("TOON") {
+    None => abort("toon define")
+    Some(value) => assert_eq(value, "")
+  }
+  match toon.defines.get("STANDARD") {
+    None => ()
+    Some(_) => abort("toon gained standard define")
+  }
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(toon))
+  assert_eq(destination.is_mesh_toon_material, false)
+  assert_eq(destination.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(destination.type_name, "MeshBasicMaterial")
+  assert_eq(destination.color.r, 0.0)
+  assert_eq(destination.color.g, 1.0)
+  assert_eq(toon.is_mesh_toon_material, true)
+  let onto = @materials.Material::toon()
+  onto.defines.set("FOO", "1")
+  let blue = @materials.Material::basic(hex=0x0000FF)
+  ignore(onto.copy(blue))
+  assert_eq(onto.is_mesh_toon_material, true)
+  assert_eq(onto.kind is @materials.MaterialKind::Toon, true)
+  assert_eq(onto.color.r, 0.0)
+  assert_eq(onto.color.b, 1.0)
+  match onto.defines.get("FOO") {
+    None => abort("toon copy dropped define")
+    Some(value) => assert_eq(value, "1")
+  }
+  match onto.defines.get("TOON") {
+    None => abort("toon copy lost toon define")
+    Some(value) => assert_eq(value, "")
+  }
+  let cloned = toon.clone()
+  assert_eq(cloned.is_mesh_toon_material, true)
+  assert_eq(cloned.type_name, "MeshToonMaterial")
+  assert_eq(cloned.kind is @materials.MaterialKind::Toon, true)
+  assert_eq(cloned.color.g, 1.0)
+  assert_eq(cloned.id == toon.id, false)
+}
