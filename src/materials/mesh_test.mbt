@@ -3793,6 +3793,38 @@ test "Material shader writes USE_ANISOTROPY" {
 }
 
 ///|
+test "Material shader writes USE_ANISOTROPYMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let anisotropy_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.anisotropy_map = Some(anisotropy_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.anisotropy = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1657)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1271)
+  assert_eq(1657 - 1631, 26)
+  assert_eq(
+    shader.prefixed_vertex_shader()[706:731].to_owned(),
+    "#define USE_ANISOTROPYMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1102:1127].to_owned(),
+    "#define USE_ANISOTROPYMAP",
+  )
+  shader.anisotropy = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  let raw = @materials.Material::raw()
+  raw.anisotropy = 1.0
+  raw.anisotropy_map = Some(anisotropy_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.anisotropy = 1.0
+  basic.anisotropy_map = Some(anisotropy_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
