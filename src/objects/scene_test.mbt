@@ -1620,6 +1620,48 @@ test "Skeleton.update writes bind matrices into the buffer" {
 }
 
 ///|
+test "Skeleton.clone shares inverses and clears the matrix buffer" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  arm.update()
+  assert_eq(arm.bone_matrices[13], 3.0)
+  let cloned = arm.clone()
+  assert_eq(physical_equal(cloned, arm), false)
+  assert_eq(cloned.bones.length(), 3)
+  assert_eq(physical_equal(cloned.bones[0], shoulder), true)
+  assert_eq(physical_equal(cloned.bones[2], hand), true)
+  cloned.bones.push(@objects.Bone::new())
+  assert_eq(cloned.bones.length(), 4)
+  assert_eq(arm.bones.length(), 3)
+  assert_eq(physical_equal(cloned.bone_inverses, arm.bone_inverses), true)
+  assert_eq(cloned.bone_inverses[0].elements[13], 5.0)
+  ignore(
+    cloned.bone_inverses[0].set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 7.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    ),
+  )
+  assert_eq(arm.bone_inverses[0].elements[13], 7.0)
+  assert_eq(cloned.bone_matrices.length(), 48)
+  assert_eq(cloned.bone_matrices[13], 0.0)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  let empty = @objects.Skeleton::new()
+  let copied = empty.clone()
+  assert_eq(copied.bones.length(), 0)
+  assert_eq(copied.bone_matrices.length(), 0)
+  assert_eq(physical_equal(copied.bone_inverses, empty.bone_inverses), true)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

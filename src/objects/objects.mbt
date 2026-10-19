@@ -218,6 +218,14 @@ pub fn Skeleton::update(self : Skeleton) -> Unit {
 }
 
 ///|
+/// 新建一个骨架。骨骼列表是新数组，逆绑定矩阵与来源共用。
+/// 矩阵缓冲重新分配为全零，不复制已经写入的蒙皮矩阵。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L232
+pub fn Skeleton::clone(self : Skeleton) -> Skeleton {
+  Skeleton::new(bones=self.bones, bone_inverses=self.bone_inverses)
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0

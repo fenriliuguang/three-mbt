@@ -1499,6 +1499,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Skeleton.update` has landed. At the bind pose the 48-float buffer holds three identity matrices. Moving the shoulder to `y=-2` writes translation `y=3` into each matrix, at floats `13`, `29`, and `45`. The shoulder position stays `-2`. An empty skeleton keeps an empty buffer. The bone texture stays later.
 
+`Skeleton.clone` has landed. The same chain, after that update has stored `3` at float `13`, clones to a new skeleton. The bones array is new and still holds the shoulder and the hand. Pushing another bone leaves the source at length `3`. The inverse matrices are the same array, so writing translation `y=7` into the clone's first inverse changes the source too. The clone's matrix buffer is 48 zeros, and the source float `13` stays `3`. An empty skeleton clones to an empty skeleton that shares its inverse list. The bone texture stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2189,6 +2191,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Skeleton` | `objects` |
 | planned | 7 | `Skeleton.pose` | `objects` |
 | planned | 7 | `Skeleton.update` | `objects` |
+| planned | 7 | `Skeleton.clone` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

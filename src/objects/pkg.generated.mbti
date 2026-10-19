@@ -180,6 +180,7 @@ pub(all) struct Skeleton {
   mut bone_matrices : Array[Double]
 }
 pub fn Skeleton::calculate_inverses(Self) -> Unit
+pub fn Skeleton::clone(Self) -> Self
 pub fn Skeleton::init(Self) -> Unit
 pub fn Skeleton::new(bones? : Array[Bone], bone_inverses? : Array[@math.Matrix4]) -> Self
 pub fn Skeleton::pose(Self) -> Unit
