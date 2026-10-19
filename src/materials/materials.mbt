@@ -1399,6 +1399,13 @@ pub fn LineDashedMaterial::clone(self : LineDashedMaterial) -> LineDashedMateria
 }
 
 ///|
+/// 没有单独的 `LineDashedMaterial.dispose`。通知内嵌线段上的 `dispose` 监听。其它事件不动。线段绘制仍不因这次调用释放资源。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1207
+pub fn LineDashedMaterial::dispose(self : LineDashedMaterial) -> Unit {
+  self.line.dispose()
+}
+
+///|
 /// 没有同名上游方法。距离先乘 `scale`，再按 GLSL `mod` 对 `dash_size + gap_size` 取余。
 /// 余数大于 `dash_size` 时落在间隔里，返回 false。周期为 0 时中止。
 /// 着色器仍画实线。

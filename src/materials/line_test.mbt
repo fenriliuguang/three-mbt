@@ -1315,3 +1315,17 @@ test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
     Some(label) => assert_eq(label, "dash")
   }
 }
+
+///|
+test "LineDashedMaterial dispose runs only the inner dispose listeners" {
+  let material = @materials.LineDashedMaterial::new()
+  let hits = Ref::Ref(0)
+  material.line.add_event_listener("dispose", fn() { hits.val = hits.val + 1 })
+  material.line.add_event_listener("change", fn() { hits.val = hits.val + 10 })
+  material.dispose()
+  assert_eq(hits.val, 1)
+  let other = @materials.LineDashedMaterial::new()
+  other.line.add_event_listener("change", fn() { hits.val = hits.val + 10 })
+  other.dispose()
+  assert_eq(hits.val, 1)
+}
