@@ -105,6 +105,7 @@ pub(all) struct Material {
   mut clipping : Bool
   mut vertex_shader : String
   mut fragment_shader : String
+  mut uniforms : Map[String, Double]
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool

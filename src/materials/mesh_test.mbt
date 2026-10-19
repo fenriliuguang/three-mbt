@@ -3317,3 +3317,53 @@ test "Material shader stores the default fragment shader" {
   cloned.fragment_shader = "clone"
   assert_eq(shader.fragment_shader, "void main() {}")
 }
+
+///|
+test "Material shader copies numeric uniforms" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  match shader.uniforms.get("time") {
+    None => ()
+    Some(_) => abort("shader uniforms should start empty")
+  }
+  match basic.uniforms.get("time") {
+    None => ()
+    Some(_) => abort("basic uniforms should start empty")
+  }
+  match phong.uniforms.get("time") {
+    None => ()
+    Some(_) => abort("phong uniforms should start empty")
+  }
+  shader.uniforms.set("time", 1.0)
+  shader.uniforms.set("scale", 2.0)
+  ignore(basic.copy(shader))
+  match basic.uniforms.get("time") {
+    None => ()
+    Some(_) => abort("basic copy gained shader uniform")
+  }
+  assert_eq(shader.uniforms.get("time"), Some(1.0))
+  let onto = @materials.Material::shader()
+  onto.uniforms.set("time", 9.0)
+  onto.uniforms.set("extra", 3.0)
+  ignore(onto.copy(shader))
+  assert_eq(onto.uniforms.get("time"), Some(1.0))
+  assert_eq(onto.uniforms.get("scale"), Some(2.0))
+  match onto.uniforms.get("extra") {
+    None => ()
+    Some(_) => abort("shader copy kept destination uniform")
+  }
+  onto.uniforms.set("time", 7.0)
+  assert_eq(shader.uniforms.get("time"), Some(1.0))
+  ignore(onto.copy(phong))
+  match onto.uniforms.get("time") {
+    None => ()
+    Some(_) => abort("shader copy kept uniform missing from source")
+  }
+  let cloned = shader.clone()
+  assert_eq(cloned.uniforms.get("time"), Some(1.0))
+  assert_eq(cloned.uniforms.get("scale"), Some(2.0))
+  assert_eq(cloned.id == shader.id, false)
+  cloned.uniforms.set("time", 8.0)
+  assert_eq(shader.uniforms.get("time"), Some(1.0))
+}
