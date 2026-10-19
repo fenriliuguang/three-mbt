@@ -113,7 +113,8 @@ pub impl @core.AsNode for Mesh with fn to_node(self) {
 pub extend Mesh with @core.AsNode::{to_node}
 
 ///|
-/// 复制变换、几何体和材质。几何体与材质沿用源对象。形变权重留在后面。
+/// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// 源对象有形变权重或名字表时各复制一份。源对象没有时，目标上已有的值留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L110
 pub fn Mesh::copy(
   self : Mesh,
@@ -123,6 +124,27 @@ pub fn Mesh::copy(
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
+  match source.morph_target_influences {
+    None => ()
+    Some(weights) => {
+      let copied : Array[Double] = []
+      for weight in weights {
+        copied.push(weight)
+      }
+      self.morph_target_influences = Some(copied)
+    }
+  }
+  match source.morph_target_dictionary {
+    None => ()
+    Some(dictionary) => {
+      let copied : Map[String, Int] = Map([])
+      for pair in dictionary.iter() {
+        let (name, index) = pair
+        copied.set(name, index)
+      }
+      self.morph_target_dictionary = Some(copied)
+    }
+  }
   self.refresh()
   self
 }

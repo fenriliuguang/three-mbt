@@ -198,6 +198,86 @@ test "Mesh.copy shares geometry and material" {
 }
 
 ///|
+test "Mesh.copy copies morph weights" {
+  let geometry = @core.BufferGeometry::new()
+  let wide = @core.BufferAttribute::new([2.0, 0.0, 0.0], 3)
+  wide.name = "wide"
+  let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
+  tall.name = "tall"
+  geometry.morph_attributes.set("position", [wide, tall])
+  let source = @objects.Mesh::new(geometry, @materials.Material::basic())
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => weights[0] = 0.5
+  }
+  let destination = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::lambert(),
+  )
+  ignore(destination.copy(source))
+  match destination.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights.length(), 2)
+      assert_eq(weights[0], 0.5)
+      assert_eq(weights[1], 0.0)
+      weights[0] = 1.0
+    }
+  }
+  match destination.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => {
+      assert_eq(dictionary.get("wide"), Some(0))
+      assert_eq(dictionary.get("tall"), Some(1))
+      dictionary.set("wide", 9)
+    }
+  }
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+  match source.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let kept = @objects.Mesh::new(geometry, @materials.Material::basic())
+  match kept.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => weights[0] = 0.25
+  }
+  let empty = @objects.Mesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(kept.copy(empty))
+  match kept.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.25)
+  }
+  match kept.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("wide"), Some(0))
+  }
+  let cloned = source.clone()
+  match cloned.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => {
+      assert_eq(weights[0], 0.5)
+      assert_eq(weights[1], 0.0)
+      weights[0] = 0.0
+    }
+  }
+  match cloned.morph_target_dictionary {
+    None => assert_eq(false, true)
+    Some(dictionary) => assert_eq(dictionary.get("tall"), Some(1))
+  }
+  match source.morph_target_influences {
+    None => assert_eq(false, true)
+    Some(weights) => assert_eq(weights[0], 0.5)
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
