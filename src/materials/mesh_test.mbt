@@ -3220,6 +3220,32 @@ test "Material shader prefixes vertex uniforms" {
 }
 
 ///|
+test "Material shader prefixes fragment uniforms" {
+  let shader = @materials.Material::shader()
+  let raw = @materials.Material::raw()
+  let basic = @materials.Material::basic()
+  let prefixed = shader.prefixed_fragment_shader()
+  assert_eq(prefixed.length() - shader.fragment_shader.length(), 82)
+  assert_eq(prefixed.length(), 143)
+  assert_eq(prefixed[0:24].to_owned(), "uniform mat4 viewMatrix;")
+  assert_eq(prefixed[54:82].to_owned(), "uniform bool isOrthographic;")
+  assert_eq(
+    prefixed[prefixed.length() - 61:prefixed.length()].to_owned(),
+    shader.fragment_shader,
+  )
+  assert_eq(raw.fragment_shader.length(), 61)
+  assert_eq(raw.prefixed_fragment_shader(), raw.fragment_shader)
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  shader.fragment_shader = "void main() {}"
+  let custom = shader.prefixed_fragment_shader()
+  assert_eq(custom.length(), 96)
+  assert_eq(custom[custom.length() - 14:custom.length()].to_owned(), "void main() {}")
+  raw.fragment_shader = "void main() {}"
+  assert_eq(raw.prefixed_fragment_shader(), "void main() {}")
+  assert_eq(raw.prefixed_fragment_shader().length(), 14)
+}
+
+///|
 test "Material shader copies defines" {
   let source = @materials.Material::shader()
   source.defines.set("FOO", "1")
