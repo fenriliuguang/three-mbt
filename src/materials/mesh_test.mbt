@@ -3564,6 +3564,23 @@ test "UniformsGroup removeEventListener drops one function" {
 }
 
 ///|
+test "UniformsGroup dispatchEvent runs listeners of one kind" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  let hits = Ref::Ref(0)
+  frame.add_event_listener("change", fn() { hits.val = hits.val + 1 })
+  frame.add_event_listener("dispose", fn() { hits.val = hits.val + 10 })
+  frame.dispatch_event("change")
+  assert_eq(hits.val, 1)
+  frame.dispatch_event("missing")
+  assert_eq(hits.val, 1)
+  frame.dispatch_event("dispose")
+  assert_eq(hits.val, 11)
+  let other = @materials.UniformsGroup::new(name="Other")
+  other.dispatch_event("change")
+  assert_eq(hits.val, 11)
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
