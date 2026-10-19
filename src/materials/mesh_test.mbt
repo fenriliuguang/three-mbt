@@ -2967,3 +2967,35 @@ test "Material specular starts at 0x111111 and copies into the destination" {
   let distance = @materials.Material::distance()
   assert_eq(distance.specular.get_hex(), 0x111111)
 }
+
+///|
+test "Material shininess defaults to 30 and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.shininess, 30.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.shininess, 30.0)
+  let phong = @materials.Material::phong()
+  assert_eq(phong.shininess, 30.0)
+  phong.shininess = 80.0
+  let other = @materials.Material::phong()
+  assert_eq(other.shininess, 30.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(phong))
+  assert_eq(destination.shininess, 80.0)
+  destination.shininess = 10.0
+  assert_eq(phong.shininess, 80.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.shininess, 30.0)
+  let physical = @materials.Material::physical()
+  assert_eq(physical.shininess, 30.0)
+  let toon = @materials.Material::toon()
+  assert_eq(toon.shininess, 30.0)
+  let matcap = @materials.Material::matcap()
+  assert_eq(matcap.shininess, 30.0)
+  let normal = @materials.Material::normal()
+  assert_eq(normal.shininess, 30.0)
+  let depth = @materials.Material::depth()
+  assert_eq(depth.shininess, 30.0)
+  let distance = @materials.Material::distance()
+  assert_eq(distance.shininess, 30.0)
+}

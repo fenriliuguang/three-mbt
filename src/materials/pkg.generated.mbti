@@ -155,6 +155,7 @@ pub(all) struct Material {
   mut iridescence_thickness_map : @textures.Texture?
   sheen_color : @math.Color
   specular : @math.Color
+  mut shininess : Double
   mut sheen_color_map : @textures.Texture?
   mut sheen_roughness : Double
   mut sheen_roughness_map : @textures.Texture?

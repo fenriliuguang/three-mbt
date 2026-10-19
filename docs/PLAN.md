@@ -2091,6 +2091,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.specular` has landed. A new Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, Depth, Distance, and Phong material each store hex `0x111111`. A Phong material's `specular_color` stays hex `0xFFFFFF`. Setting the Phong specular to `(0.25, 0.5, 0.75)` leaves another Phong material at `0x111111`. Copying onto a Basic material stores those components in the destination color. Setting the destination to red leaves the source at `(0.25, 0.5, 0.75)`. The renderer still does not use this color for Phong highlights. `shininess` stays later.
 
+`Material.shininess` has landed. A new Basic, Lambert, Standard, Physical, Toon, Matcap, Normal, Depth, Distance, and Phong material each store `30`. Setting a Phong material to `80` leaves another Phong material at `30`. Copying onto a Basic material stores `80`. Setting the destination to `10` leaves the source at `80`. The renderer still does not use this value for Phong highlights. `ShadowMaterial` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3077,6 +3079,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.isMeshDistanceMaterial` | `materials` |
 | planned | 7 | `Material.isMeshPhongMaterial` | `materials` |
 | planned | 7 | `Material.specular` | `materials` |
+| planned | 7 | `Material.shininess` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
