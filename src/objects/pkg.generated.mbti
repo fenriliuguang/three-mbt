@@ -105,6 +105,7 @@ pub(all) struct Mesh {
   node : @core.Object3D
   mut geometry : @core.BufferGeometry
   mut material : @materials.Material
+  mut count : Int
 }
 pub fn Mesh::clone(Self, recursive? : Bool) -> Self
 pub fn Mesh::copy(Self, Self, recursive? : Bool) -> Self

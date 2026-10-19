@@ -64,6 +64,18 @@ test "getVertexPosition applies a relative morph" {
 }
 
 ///|
+test "Mesh.count defaults to one instance" {
+  let geometry = @core.BufferGeometry::new()
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  assert_eq(mesh.count, 1)
+  mesh.count = 4
+  assert_eq(mesh.count, 4)
+  let other = @objects.Mesh::new(geometry, @materials.Material::basic())
+  assert_eq(other.count, 1)
+  assert_eq(mesh.count, 4)
+}
+
+///|
 test "Mesh.copy shares geometry and material" {
   let geometry = @core.BufferGeometry::new()
   ignore(

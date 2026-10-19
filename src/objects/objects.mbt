@@ -35,12 +35,14 @@ pub fn[T : @core.AsNode] Group::add(self : Group, child : T) -> Group {
 }
 
 ///|
-/// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。
+/// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
+/// r186: `count` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L104
 pub(all) struct Mesh {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.Material
+  mut count : Int
 }
 
 ///|
@@ -49,7 +51,7 @@ pub fn Mesh::new(
   material : @materials.Material,
 ) -> Mesh {
   let node = Object3D::new(kind=@core.Mesh)
-  let mesh : Mesh = { node, geometry, material, }
+  let mesh : Mesh = { node, geometry, material, count: 1, }
   mesh.refresh()
   mesh
 }
