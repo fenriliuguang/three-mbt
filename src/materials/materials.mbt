@@ -284,6 +284,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// `clip_intersection` 默认关闭。点绘制仍没有裁剪平面。
 /// `allow_override` 默认打开。点绘制仍不用场景覆盖材质替换它。
 /// `blend_alpha` 默认 `0`。点绘制的混合仍不用常量 alpha。
+/// `blend_color` 默认黑色 `(0, 0, 0)`。点绘制的混合仍不用常量颜色。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -300,6 +301,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// r186: `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320
 /// r186: `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439
 /// r186: `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203
+/// r186: `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -328,6 +330,7 @@ pub(all) struct PointsMaterial {
   mut clip_intersection : Bool
   mut allow_override : Bool
   mut blend_alpha : Double
+  blend_color : @math.Color
 }
 
 ///|
@@ -364,11 +367,12 @@ pub fn PointsMaterial::new(
     clip_intersection: false,
     allow_override: true,
     blend_alpha: 0.0,
+    blend_color: @math.Color::new(r=0.0, g=0.0, b=0.0),
   }
 }
 
 ///|
-/// 把颜色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
+/// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
 /// 尺寸、尺寸衰减、不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override` 和 `blend_alpha` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
@@ -377,6 +381,7 @@ pub fn PointsMaterial::copy(
   source : PointsMaterial,
 ) -> PointsMaterial {
   ignore(self.color.copy(source.color))
+  ignore(self.blend_color.copy(source.blend_color))
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.size = source.size
