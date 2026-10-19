@@ -7716,6 +7716,17 @@ test "Material shader defines returns the material map" {
 }
 
 ///|
+test "Material shader isRawShaderMaterial is only set on raw" {
+  assert_eq(@materials.Material::raw().program_is_raw_shader_material(), true)
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_is_raw_shader_material(), false)
+  assert_eq(@materials.Material::basic().program_is_raw_shader_material(), false)
+  assert_eq(@materials.Material::lambert().program_is_raw_shader_material(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
