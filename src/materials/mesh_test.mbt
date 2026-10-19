@@ -3974,9 +3974,9 @@ test "Material shader writes USE_IRIDESCENCEMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.iridescence = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1635)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
   assert_eq(shader.prefixed_fragment_shader().length(), 1249)
-  assert_eq(1635 - 1608, 27)
+  assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[683:709].to_owned(),
     "#define USE_IRIDESCENCEMAP",
@@ -3990,7 +3990,7 @@ test "Material shader writes USE_IRIDESCENCEMAP" {
   shader.iridescence = 1.0
   shader.clearcoat = 1.0
   shader.clearcoat_normal_map = Some(iridescence_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1701)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1730)
   assert_eq(
     shader.prefixed_vertex_shader()[715:741].to_owned(),
     "#define USE_IRIDESCENCEMAP",
@@ -4026,7 +4026,7 @@ test "Material shader writes USE_IRIDESCENCE_THICKNESSMAP" {
     "#define USE_IRIDESCENCE_THICKNESSMAP",
   )
   shader.iridescence_map = Some(thickness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1672)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1701)
   assert_eq(
     shader.prefixed_vertex_shader()[710:746].to_owned(),
     "#define USE_IRIDESCENCE_THICKNESSMAP",
@@ -5041,6 +5041,55 @@ test "Material shader writes CLEARCOAT_ROUGHNESSMAP_UV" {
   let basic = @materials.Material::basic()
   basic.clearcoat = 1.0
   basic.clearcoat_roughness_map = Some(roughness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes IRIDESCENCEMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let iridescence_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(iridescence_map.channel, 0)
+  shader.iridescence_map = Some(iridescence_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.iridescence = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
+  assert_eq(1664 - 1608, 56)
+  assert_eq(
+    shader.prefixed_vertex_shader()[710:738].to_owned(),
+    "#define IRIDESCENCEMAP_UV uv",
+  )
+  iridescence_map.channel = 1
+  shader.iridescence_map = Some(iridescence_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
+  assert_eq(1665 - 1608, 57)
+  assert_eq(
+    shader.prefixed_vertex_shader()[710:739].to_owned(),
+    "#define IRIDESCENCEMAP_UV uv1",
+  )
+  shader.iridescence = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.iridescence = 1.0
+  iridescence_map.channel = 0
+  shader.iridescence_map = Some(iridescence_map)
+  let roughness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.clearcoat = 1.0
+  shader.clearcoat_roughness_map = Some(roughness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1736)
+  assert_eq(
+    shader.prefixed_vertex_shader()[782:810].to_owned(),
+    "#define IRIDESCENCEMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.iridescence = 1.0
+  raw.iridescence_map = Some(iridescence_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.iridescence = 1.0
+  basic.iridescence_map = Some(iridescence_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
