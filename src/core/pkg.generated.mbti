@@ -492,6 +492,7 @@ pub(all) struct Raycaster {
   mut near : Double
   mut far : Double
   mut camera : Object3D?
+  layers : Layers
 }
 pub fn Raycaster::new(origin? : @math.Vector3, direction? : @math.Vector3, near? : Double, far? : Double) -> Self
 pub fn Raycaster::set(Self, @math.Vector3, @math.Vector3) -> Unit

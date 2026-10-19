@@ -2570,6 +2570,17 @@ test "setFromCamera aims an orthographic ray through NDC" {
 }
 
 ///|
+test "layers defaults to layer zero on a raycaster" {
+  let raycaster = @core.Raycaster::new()
+  assert_eq(raycaster.layers.mask, 1)
+  assert_eq(raycaster.layers.is_enabled(0), true)
+  raycaster.layers.set(1)
+  assert_eq(raycaster.layers.mask, 2)
+  assert_eq(raycaster.layers.is_enabled(0), false)
+  assert_eq(raycaster.layers.is_enabled(1), true)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

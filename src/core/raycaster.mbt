@@ -7,11 +7,13 @@
 /// r186: `near` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L38
 /// r186: `far` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L46
 /// r186: `camera` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L56
+/// r186: `layers` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L69
 pub(all) struct Raycaster {
   ray : @math.Ray
   mut near : Double
   mut far : Double
   mut camera : Object3D?
+  layers : Layers
 }
 
 ///|
@@ -30,7 +32,7 @@ pub fn Raycaster::new(
     None => ()
     Some(direction) => ignore(ray.direction.copy(direction))
   }
-  { ray, near, far, camera: None }
+  { ray, near, far, camera: None, layers: Layers::new() }
 }
 
 ///|
