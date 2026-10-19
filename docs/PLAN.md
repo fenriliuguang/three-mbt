@@ -1887,6 +1887,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineDashedMaterial.type` has landed as `type_name`. A new material stores `LineDashedMaterial`. Copying onto another new material leaves that class name in place. The inner line still stores `LineBasicMaterial`. Line draws still do not read this name.
 
+`Material.copy` has landed. A Lambert material named `lit`, colored `(1, 0, 0)`, with emissive `(0.25, 0.5, 0.75)`, intensity `2`, opacity `0.25`, transparency on, fog off, wireframe on, roughness `0.4`, metalness `0.6`, flat shading on, side `Back`, shadow side `Back`, alpha test `0.2`, user data `mesh`, and one clipping plane of constant `1` copies onto a basic material whose version was `3`. The destination color, blend color, and emissive objects stay in place. Its version becomes `4` because alpha test crosses `0`. Its id, uuid, `MeshBasicMaterial` type name, and `Basic` kind stay in place. The source stays `MeshLambertMaterial` at version `1`. Setting the destination color red channel to `0.5`, emissive green to `0`, name to `copy`, and user data to `copy` leaves the source at `1`, `0.5`, `lit`, and `mesh`. Replacing the destination plane array with constant `2` leaves the source at `1`. A new Standard material stays empty, opaque, roughness `1`, and `MeshStandardMaterial`. The renderer still does not read this copy.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2771,6 +2773,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.type` | `materials` |
 | planned | 7 | `SpriteMaterial.type` | `materials` |
 | planned | 7 | `LineDashedMaterial.type` | `materials` |
+| planned | 7 | `Material.copy` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

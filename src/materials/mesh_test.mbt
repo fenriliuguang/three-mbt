@@ -763,3 +763,90 @@ test "Material type_name matches the mesh class" {
   let standard = @materials.MeshStandardMaterial::new()
   assert_eq(standard.material.type_name, "MeshStandardMaterial")
 }
+
+///|
+test "Material copy writes shared fields and keeps identity" {
+  let source = @materials.Material::lambert()
+  source.name = "lit"
+  ignore(source.color.set_rgb(1.0, 0.0, 0.0))
+  ignore(source.emissive.set_rgb(0.25, 0.5, 0.75))
+  source.emissive_intensity = 2.0
+  source.opacity = 0.25
+  source.transparent = true
+  source.fog = false
+  source.wireframe = true
+  source.roughness = 0.4
+  source.metalness = 0.6
+  source.flat_shading = true
+  source.side = @constants.Back
+  source.shadow_side = Some(@constants.Back)
+  source.set_alpha_test(0.2)
+  source.user_data.set("label", "mesh")
+  source.clipping_planes = Some([@math.Plane::new(constant=1.0)])
+  assert_eq(source.version, 1)
+  let destination = @materials.Material::basic()
+  destination.version = 3
+  let kept_id = destination.id
+  let kept_uuid = destination.uuid
+  ignore(destination.copy(source))
+  assert_eq(destination.name, "lit")
+  assert_eq(destination.color.r, 1.0)
+  assert_eq(destination.color.g, 0.0)
+  assert_eq(destination.emissive.r, 0.25)
+  assert_eq(destination.emissive.g, 0.5)
+  assert_eq(destination.emissive.b, 0.75)
+  assert_eq(destination.emissive_intensity, 2.0)
+  assert_eq(destination.opacity, 0.25)
+  assert_eq(destination.transparent, true)
+  assert_eq(destination.fog, false)
+  assert_eq(destination.wireframe, true)
+  assert_eq(destination.roughness, 0.4)
+  assert_eq(destination.metalness, 0.6)
+  assert_eq(destination.flat_shading, true)
+  assert_eq(destination.side is @constants.Back, true)
+  match destination.shadow_side {
+    None => abort("shadow side")
+    Some(side) => assert_eq(side is @constants.Back, true)
+  }
+  assert_eq(destination.alpha_test, 0.2)
+  assert_eq(destination.version, 4)
+  assert_eq(destination.id, kept_id)
+  assert_eq(destination.uuid, kept_uuid)
+  assert_eq(destination.type_name, "MeshBasicMaterial")
+  assert_eq(destination.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(source.type_name, "MeshLambertMaterial")
+  assert_eq(source.kind is @materials.MaterialKind::Lambert, true)
+  assert_eq(source.version, 1)
+  destination.color.r = 0.5
+  assert_eq(source.color.r, 1.0)
+  destination.emissive.g = 0.0
+  assert_eq(source.emissive.g, 0.5)
+  destination.name = "copy"
+  assert_eq(source.name, "lit")
+  match destination.user_data.get("label") {
+    None => abort("copied user data")
+    Some(label) => assert_eq(label, "mesh")
+  }
+  destination.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "mesh")
+  }
+  match destination.clipping_planes {
+    None => abort("copied clipping planes")
+    Some(planes) => {
+      assert_eq(planes.length(), 1)
+      assert_eq(planes[0].constant, 1.0)
+    }
+  }
+  destination.clipping_planes = Some([@math.Plane::new(constant=2.0)])
+  match source.clipping_planes {
+    None => abort("source clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 1.0)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.name, "")
+  assert_eq(standard.opacity, 1.0)
+  assert_eq(standard.roughness, 1.0)
+  assert_eq(standard.type_name, "MeshStandardMaterial")
+}

@@ -416,6 +416,79 @@ pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
 }
 
 ///|
+/// 把颜色、常量混合色和自发光写进目标自己的颜色对象。颜色贴图、透明贴图、自发光贴图、粗糙度贴图和金属度贴图沿用源对象。
+/// `name`、`side`、`shadow_side`、不透明度、透明开关、线框、粗糙度、金属度、雾、`flat_shading`、`emissive_intensity`、`alpha_test`、深度、颜色写入、预乘、可见性、`force_single_pass`、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`clipping_planes` 沿用源数组。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`id`、`uuid`、`type_name`、`kind` 和其余的 `version` 留在目标上。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L237
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L386
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L408
+pub fn Material::copy(self : Material, source : Material) -> Material {
+  self.name = source.name
+  ignore(self.color.copy(source.color))
+  ignore(self.blend_color.copy(source.blend_color))
+  ignore(self.emissive.copy(source.emissive))
+  self.blending = source.blending
+  self.blend_src = source.blend_src
+  self.blend_dst = source.blend_dst
+  self.blend_equation = source.blend_equation
+  self.blend_src_alpha = source.blend_src_alpha
+  self.blend_dst_alpha = source.blend_dst_alpha
+  self.blend_equation_alpha = source.blend_equation_alpha
+  self.stencil_write_mask = source.stencil_write_mask
+  self.stencil_func = source.stencil_func
+  self.stencil_ref = source.stencil_ref
+  self.stencil_func_mask = source.stencil_func_mask
+  self.stencil_fail = source.stencil_fail
+  self.stencil_z_fail = source.stencil_z_fail
+  self.stencil_z_pass = source.stencil_z_pass
+  self.stencil_write = source.stencil_write
+  self.clipping_planes = source.clipping_planes
+  self.precision = source.precision
+  let copied : Map[String, String] = Map([])
+  for pair in source.user_data.iter() {
+    let (key, value) = pair
+    copied.set(key, value)
+  }
+  self.user_data = copied
+  self.map = source.map
+  self.alpha_map = source.alpha_map
+  self.emissive_map = source.emissive_map
+  self.roughness_map = source.roughness_map
+  self.metalness_map = source.metalness_map
+  self.side = source.side
+  self.shadow_side = source.shadow_side
+  self.opacity = source.opacity
+  self.set_alpha_test(source.alpha_test)
+  self.transparent = source.transparent
+  self.wireframe = source.wireframe
+  self.roughness = source.roughness
+  self.metalness = source.metalness
+  self.fog = source.fog
+  self.flat_shading = source.flat_shading
+  self.emissive_intensity = source.emissive_intensity
+  self.depth_write = source.depth_write
+  self.depth_test = source.depth_test
+  self.depth_func = source.depth_func
+  self.color_write = source.color_write
+  self.premultiplied_alpha = source.premultiplied_alpha
+  self.visible = source.visible
+  self.force_single_pass = source.force_single_pass
+  self.vertex_colors = source.vertex_colors
+  self.tone_mapped = source.tone_mapped
+  self.alpha_hash = source.alpha_hash
+  self.alpha_to_coverage = source.alpha_to_coverage
+  self.dithering = source.dithering
+  self.polygon_offset = source.polygon_offset
+  self.polygon_offset_factor = source.polygon_offset_factor
+  self.polygon_offset_units = source.polygon_offset_units
+  self.clip_shadows = source.clip_shadows
+  self.clip_intersection = source.clip_intersection
+  self.allow_override = source.allow_override
+  self.blend_alpha = source.blend_alpha
+  self
+}
+
+///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。

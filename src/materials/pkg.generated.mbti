@@ -143,6 +143,7 @@ pub(all) struct Material {
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self
+pub fn Material::copy(Self, Self) -> Self
 pub fn Material::lambert(hex? : Int) -> Self
 pub fn Material::set_alpha_test(Self, Double) -> Unit
 pub fn Material::set_needs_update(Self, Bool) -> Unit
