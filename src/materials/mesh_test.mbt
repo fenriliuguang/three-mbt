@@ -7927,6 +7927,28 @@ test "Material shader matcap follows the matcap texture" {
 }
 
 ///|
+test "Material shader envMap uses the scene for lit materials" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_env_map(), false)
+  assert_eq(shader.program_env_map(has_scene_environment=true), false)
+  assert_eq(@materials.Material::basic().program_env_map(has_scene_environment=true), false)
+  assert_eq(@materials.Material::matcap().program_env_map(has_scene_environment=true), false)
+  assert_eq(@materials.Material::lambert().program_env_map(), false)
+  assert_eq(@materials.Material::lambert().program_env_map(has_scene_environment=true), true)
+  assert_eq(@materials.Material::phong().program_env_map(has_scene_environment=true), true)
+  assert_eq(@materials.Material::toon().program_env_map(has_scene_environment=true), true)
+  assert_eq(@materials.Material::standard().program_env_map(has_scene_environment=true), true)
+  assert_eq(@materials.Material::physical().program_env_map(has_scene_environment=true), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.env_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_env_map(), true)
+  shader.env_map = None
+  assert_eq(shader.program_env_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
