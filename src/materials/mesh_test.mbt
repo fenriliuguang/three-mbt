@@ -5456,6 +5456,73 @@ test "Material shader writes THICKNESSMAP_UV" {
 }
 
 ///|
+test "Material shader writes USE_TANGENT" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let normal_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1222)
+  shader.normal_map = Some(normal_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1279)
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1709)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1299)
+  assert_eq(1709 - 1689, 20)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_tangent=true)[764:783].to_owned(),
+    "#define USE_TANGENT",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_tangent=true)[1136:1155].to_owned(),
+    "#define USE_TANGENT",
+  )
+  shader.normal_map = None
+  shader.anisotropy = 1.0
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1651)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1265)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_tangent=true)[706:725].to_owned(),
+    "#define USE_TANGENT",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_tangent=true)[1102:1121].to_owned(),
+    "#define USE_TANGENT",
+  )
+  shader.anisotropy = 0.0
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1608)
+  shader.normal_map = Some(normal_map)
+  shader.flat_shading = true
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1689)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1279)
+  shader.wireframe = true
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1709)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1299)
+  shader.wireframe = false
+  shader.flat_shading = false
+  shader.normal_map = None
+  shader.anisotropy = 1.0
+  shader.transmission = 1.0
+  let thickness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.thickness_map = Some(thickness_map)
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1728)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_tangent=true)[783:802].to_owned(),
+    "#define USE_TANGENT",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 1315)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_tangent=true)[1152:1171].to_owned(),
+    "#define USE_TANGENT",
+  )
+  let raw = @materials.Material::raw()
+  raw.anisotropy = 1.0
+  assert_eq(raw.prefixed_vertex_shader(has_tangent=true).length(), 92)
+  let basic = @materials.Material::basic()
+  basic.anisotropy = 1.0
+  assert_eq(basic.prefixed_vertex_shader(has_tangent=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
