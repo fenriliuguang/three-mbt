@@ -555,3 +555,18 @@ test "PointsMaterial stores and copies stencilZPass" {
   assert_eq(source.stencil_z_pass.to_int(), 0)
   assert_eq(destination.stencil_z_pass.to_int(), 7681)
 }
+
+///|
+test "PointsMaterial stores and copies stencilWrite" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.stencil_write, false)
+  let source = @materials.PointsMaterial::new()
+  source.stencil_write = true
+  assert_eq(defaults.stencil_write, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_write, true)
+  destination.stencil_write = false
+  assert_eq(source.stencil_write, true)
+  assert_eq(destination.stencil_write, false)
+}
