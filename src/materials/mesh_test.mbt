@@ -3333,6 +3333,38 @@ test "Material shader writes custom defines" {
 }
 
 ///|
+test "Material shader writes USE_MAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1624)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(1624 - 1608, 16)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:698].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1094].to_owned(),
+    "#define USE_MAP",
+  )
+  shader.defines.set("FOO", "1")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1638)
+  assert_eq(1638 - 1624, 14)
+  assert_eq(
+    shader.prefixed_vertex_shader()[697:712].to_owned(),
+    "#define USE_MAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.map = Some(map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.map = Some(map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
