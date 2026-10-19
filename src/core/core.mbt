@@ -18,6 +18,7 @@ pub(all) enum NodeKind {
   Points
   Line
   LineSegments
+  Sprite
 }
 
 ///|

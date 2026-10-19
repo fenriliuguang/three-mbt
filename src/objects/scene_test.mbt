@@ -288,3 +288,44 @@ test "points raycast records distance to the ray" {
     Some(distance) => assert_eq(distance, 0.5)
   }
 }
+
+///|
+test "sprite raycast hits the camera-facing quad" {
+  let sprite = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  ignore(sprite.node.position.set(0.0, 0.0, -1.0))
+  sprite.node.update_matrix_world()
+  let camera = @core.Object3D::new(kind=@core.NodeKind::PerspectiveCamera)
+  camera.camera = Some(@core.CameraState::perspective(50.0, 1.0, 0.1, 2000.0))
+  camera.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=-0.25),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  raycaster.camera = Some(camera)
+  let hits = raycaster.intersect_object(sprite.node)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, -0.25)
+  assert_eq(hits[0].point.z, -1.0)
+  assert_eq(physical_equal(hits[0].object, sprite.node), true)
+  match hits[0].uv {
+    None => assert_eq(false, true)
+    Some(uv) => {
+      assert_eq(uv.x, 0.75)
+      assert_eq(uv.y, 0.25)
+    }
+  }
+  match hits[0].face {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
+test "panic sprite raycast without a camera" {
+  let sprite = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  sprite.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new()
+  ignore(raycaster.intersect_object(sprite.node))
+}

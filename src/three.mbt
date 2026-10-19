@@ -137,6 +137,7 @@ pub using @objects {
   type LineSegments,
   type Mesh,
   type Points,
+  type Sprite,
 }
 
 ///|
@@ -151,6 +152,7 @@ pub using @materials {
   type MeshLambertMaterial,
   type MeshStandardMaterial,
   type PointsMaterial,
+  type SpriteMaterial,
 }
 
 ///|

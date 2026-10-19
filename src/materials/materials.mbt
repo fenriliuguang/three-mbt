@@ -1,4 +1,4 @@
-// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19
+// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 
 ///|
 /// 不受光照的基础材质、Lambert，以及直接光的 Standard。
@@ -277,4 +277,22 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
     premultiplied_alpha: false,
     visible: true,
   }
+}
+
+///|
+/// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。颜色、贴图和透明度留在后面。
+/// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
+/// r186: `rotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L90
+/// r186: `sizeAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L98
+pub(all) struct SpriteMaterial {
+  mut rotation : Double
+  mut size_attenuation : Bool
+}
+
+///|
+pub fn SpriteMaterial::new(
+  rotation? : Double = 0.0,
+  size_attenuation? : Bool = true,
+) -> SpriteMaterial {
+  { rotation, size_attenuation, }
 }

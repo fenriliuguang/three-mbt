@@ -258,6 +258,10 @@ pub using @math {type Sphere}
 
 pub using @lights {type SpotLight}
 
+pub using @objects {type Sprite}
+
+pub using @materials {type SpriteMaterial}
+
 pub using @compute {type StoragePositions}
 
 pub using @textures {type Texture}

@@ -77,6 +77,7 @@ pub(all) struct Object3D {
   mut light : LightState?
   mut morph : MorphState?
   mut skin : SkinState?
+  mut sprite : SpriteState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 
@@ -116,6 +117,7 @@ pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
     light: None,
     morph: None,
     skin: None,
+    sprite: None,
     listeners: Map([]),
   }
 }
@@ -790,7 +792,7 @@ pub fn Object3D::dispose(self : Object3D) -> Unit {
 }
 
 ///|
-/// 网格会把三角形交点写入列表，折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点。其他种类不产生交点。
+/// 网格会把三角形交点写入列表，折线和线段会写入距离阈值内的交点，点会写入射线附近的顶点，精灵会写入朝向相机的四边形交点。其他种类不产生交点。
 /// 返回 `None` 表示继续访问子节点；只有 `Some(false)` 会停住。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1061
 pub fn Object3D::raycast(
@@ -813,6 +815,11 @@ pub fn Object3D::raycast(
       match self.primitive {
         None => ()
         Some(_) => self.raycast_points(raycaster, intersects)
+      }
+    Sprite =>
+      match self.sprite {
+        None => ()
+        Some(_) => self.raycast_sprite(raycaster, intersects)
       }
     _ => ()
   }

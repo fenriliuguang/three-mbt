@@ -94,6 +94,16 @@ pub fn Points::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Points::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for Points
 
+pub(all) struct Sprite {
+  node : @core.Object3D
+  material : @materials.SpriteMaterial
+  center : @math.Vector2
+}
+pub fn Sprite::new(@materials.SpriteMaterial) -> Self
+pub fn Sprite::refresh(Self) -> Unit
+pub fn Sprite::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for Sprite
+
 // Type aliases
 
 // Traits

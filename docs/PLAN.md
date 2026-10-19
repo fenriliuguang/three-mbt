@@ -1377,6 +1377,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Points.raycast` has landed. A point at `(0.5, 0, 0)` and a ray from `(0, 0.5, 0)` along `(0, -1, 0)` meet the ray at `(0, 0, 0)`. The hit distance is `0.5` and `distanceToRay` is `0.5`. The default points threshold is `1`.
 
+`Sprite.raycast` has landed. A perspective camera at the origin and a sprite at `(0, 0, -1)`, center `(0.5, 0.5)`, rotation `0`, and `sizeAttenuation` true, are hit by a ray from `(0.25, -0.25, 0)` along `(0, 0, -1)` at `(0.25, -0.25, -1)`. The distance is `1` and the uv is `(0.75, 0.25)`. A raycaster without a camera aborts. Sprite geometry, `count`, and the frustum test stay later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2006,6 +2008,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Mesh.raycast` normal | `core` |
 | planned | 7 | `Line.raycast` | `core` |
 | planned | 7 | `Points.raycast` | `core` |
+| planned | 7 | `Sprite.raycast` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

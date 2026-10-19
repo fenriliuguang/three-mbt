@@ -392,6 +392,7 @@ pub(all) enum NodeKind {
   Points
   Line
   LineSegments
+  Sprite
 }
 
 pub(all) struct Object3D {
@@ -425,6 +426,7 @@ pub(all) struct Object3D {
   mut light : LightState?
   mut morph : MorphState?
   mut skin : SkinState?
+  mut sprite : SpriteState?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 pub fn Object3D::add(Self, Self) -> Self
@@ -556,6 +558,12 @@ pub(all) struct SkinState {
   weights : Array[Double]
 }
 pub fn SkinState::write(Self, Object3D, BufferGeometry) -> Unit
+
+pub(all) struct SpriteState {
+  center : @math.Vector2
+  mut rotation : Double
+  mut size_attenuation : Bool
+}
 
 pub(all) struct Timer {
   mut previous_time : Double

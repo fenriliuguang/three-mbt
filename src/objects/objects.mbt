@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
 
 ///|
 using @core {
@@ -652,4 +652,46 @@ pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {
     }
   }
   box
+}
+
+///|
+/// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。
+/// r186: `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
+/// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L110
+pub(all) struct Sprite {
+  node : Object3D
+  material : @materials.SpriteMaterial
+  center : @math.Vector2
+}
+
+///|
+pub fn Sprite::new(material : @materials.SpriteMaterial) -> Sprite {
+  let node = Object3D::new(kind=@core.NodeKind::Sprite)
+  let center = @math.Vector2::new(x=0.5, y=0.5)
+  node.sprite = Some(@core.SpriteState::{
+    center,
+    rotation: material.rotation,
+    size_attenuation: material.size_attenuation,
+  })
+  { node, material, center, }
+}
+
+///|
+pub impl @core.AsNode for Sprite with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend Sprite with @core.AsNode::{to_node}
+
+///|
+/// 把材质上的旋转和尺寸衰减写回节点。直接改这两个字段不会更新射线用的状态。锚点是共享的。
+pub fn Sprite::refresh(self : Sprite) -> Unit {
+  match self.node.sprite {
+    None => ()
+    Some(state) => {
+      state.rotation = self.material.rotation
+      state.size_attenuation = self.material.size_attenuation
+    }
+  }
 }
