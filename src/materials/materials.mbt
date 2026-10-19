@@ -398,6 +398,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// `clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。点绘制仍不按这些平面裁剪。
 /// `precision` 默认空。空着时沿用渲染器默认精度。管线仍不读这个字段。
 /// `user_data` 默认空表。自定义字符串键值。点绘制仍不读这张表。
+/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`copy` 不改目标上的这个计数。点绘制仍不读它。
 /// r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L75
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L93
@@ -433,6 +434,7 @@ pub fn Material::shading(self : Material) -> @constants.Shading {
 /// r186: `clippingPlanes` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L311
 /// r186: `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361
 /// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466
+/// r186: `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475
 pub(all) struct PointsMaterial {
   color : @math.Color
   mut map : @textures.Texture?
@@ -480,6 +482,7 @@ pub(all) struct PointsMaterial {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
+  mut version : Int
 }
 
 ///|
@@ -535,6 +538,7 @@ pub fn PointsMaterial::new(
     clipping_planes: None,
     precision: None,
     user_data: Map([]),
+    version: 0,
   }
 }
 

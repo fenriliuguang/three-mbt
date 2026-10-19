@@ -651,3 +651,20 @@ test "PointsMaterial stores and copies userData" {
     Some(label) => assert_eq(label, "copy")
   }
 }
+
+///|
+test "PointsMaterial stores version" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.version, 0)
+  let source = @materials.PointsMaterial::new()
+  source.version = 1
+  assert_eq(defaults.version, 0)
+  let destination = @materials.PointsMaterial::new()
+  destination.version = 3
+  ignore(destination.copy(source))
+  assert_eq(destination.version, 3)
+  assert_eq(source.version, 1)
+  destination.version = 2
+  assert_eq(source.version, 1)
+  assert_eq(destination.version, 2)
+}

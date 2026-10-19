@@ -203,6 +203,7 @@ pub(all) struct PointsMaterial {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
+  mut version : Int
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
