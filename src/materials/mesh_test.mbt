@@ -8425,6 +8425,26 @@ test "Material shader sheen is true above zero" {
 }
 
 ///|
+test "Material shader sheenColorMap needs strength and a texture" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_sheen_color_map(), false)
+  assert_eq(@materials.Material::raw().program_sheen_color_map(), false)
+  assert_eq(@materials.Material::physical().program_sheen_color_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.sheen_color_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_sheen_color_map(), false)
+  shader.sheen = 0.25
+  assert_eq(shader.program_sheen_color_map(), true)
+  shader.sheen = 0.0
+  assert_eq(shader.program_sheen_color_map(), false)
+  shader.sheen = 0.25
+  shader.sheen_color_map = None
+  assert_eq(shader.program_sheen_color_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
