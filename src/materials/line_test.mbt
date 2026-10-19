@@ -583,3 +583,44 @@ test "LineBasicMaterial stores and copies blendDstAlpha" {
   }
   assert_eq(other.line.blend_dst_alpha is None, true)
 }
+
+///|
+test "LineBasicMaterial stores and copies blendEquationAlpha" {
+  let defaults = @materials.LineBasicMaterial::new()
+  assert_eq(defaults.blend_equation_alpha is None, true)
+  let source = @materials.LineBasicMaterial::new()
+  source.blend_equation_alpha = Some(@constants.BlendEquation::Subtract)
+  assert_eq(defaults.blend_equation_alpha is None, true)
+  let destination = @materials.LineBasicMaterial::new()
+  ignore(destination.copy(source))
+  match destination.blend_equation_alpha {
+    Some(equation) => {
+      assert_eq(equation is @constants.BlendEquation::Subtract, true)
+      assert_eq(equation.to_int(), 101)
+    }
+    None => abort("destination blendEquationAlpha is empty")
+  }
+  destination.blend_equation_alpha = Some(@constants.BlendEquation::Max)
+  match source.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 101)
+    None => abort("source blendEquationAlpha is empty")
+  }
+  match destination.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 104)
+    None => abort("changed destination blendEquationAlpha is empty")
+  }
+  let dashed = @materials.LineDashedMaterial::new()
+  dashed.line.blend_equation_alpha = Some(@constants.BlendEquation::Subtract)
+  let other = @materials.LineDashedMaterial::new()
+  ignore(other.copy(dashed))
+  match other.line.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 101)
+    None => abort("dashed destination blendEquationAlpha is empty")
+  }
+  other.line.blend_equation_alpha = None
+  match dashed.line.blend_equation_alpha {
+    Some(equation) => assert_eq(equation.to_int(), 101)
+    None => abort("dashed source blendEquationAlpha is empty")
+  }
+  assert_eq(other.line.blend_equation_alpha is None, true)
+}

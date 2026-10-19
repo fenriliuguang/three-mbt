@@ -44,6 +44,7 @@ pub(all) struct LineBasicMaterial {
   mut blend_equation : @constants.BlendEquation
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
+  mut blend_equation_alpha : @constants.BlendEquation?
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
