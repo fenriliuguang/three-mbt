@@ -2005,6 +2005,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `SpriteMaterial.forceSinglePass` has landed. A new material stores false. Setting it to true leaves another new material at false. Copying onto a default material stores true. Setting the destination back to false leaves the source at true. The renderer still does not draw sprites.
 
+`Material.anisotropyRotation` has landed. The upstream comment says the default is `1`. The assignment stores `0`. A new Basic, Lambert, and Standard material each store `0`. A Lambert material set to `0.25` leaves another Lambert material at `0`. Copying onto a Basic material stores `0.25`. Setting the destination to `1` leaves the source at `0.25`. A new Standard material stays at `0`. The renderer still does not rotate anisotropy. `anisotropyMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2948,6 +2950,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `PointsMaterial.forceSinglePass` | `materials` |
 | planned | 7 | `LineBasicMaterial.forceSinglePass` | `materials` |
 | planned | 7 | `SpriteMaterial.forceSinglePass` | `materials` |
+| planned | 7 | `Material.anisotropyRotation` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

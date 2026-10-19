@@ -1546,3 +1546,21 @@ test "Material defines starts empty except standard and resets on copy" {
     Some(value) => assert_eq(value, "")
   }
 }
+
+///|
+test "Material anisotropyRotation defaults to zero and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.anisotropy_rotation, 0.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.anisotropy_rotation, 0.0)
+  lambert.anisotropy_rotation = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.anisotropy_rotation, 0.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.anisotropy_rotation, 0.25)
+  destination.anisotropy_rotation = 1.0
+  assert_eq(lambert.anisotropy_rotation, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.anisotropy_rotation, 0.0)
+}
