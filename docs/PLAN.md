@@ -1915,6 +1915,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `SpriteMaterial.hasEventListener` has landed. Before registration a sprite material reports false for a `dispose` listener. After `addEventListener`, that same listener reports true. A different function and the event name `change` stay false. Another new sprite material also reports false. The renderer still does not draw sprites.
 
+`Material.removeEventListener` has landed. Removing a `dispose` listener that was never registered leaves the check false. After registering that listener and a `change` listener, removing the `dispose` listener leaves `dispose` false and `change` true. The same removal on the basic material leaves a Lambert material's `dispose` listener in place. The renderer still does not read this list.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2813,6 +2815,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `PointsMaterial.hasEventListener` | `materials` |
 | planned | 7 | `LineBasicMaterial.hasEventListener` | `materials` |
 | planned | 7 | `SpriteMaterial.hasEventListener` | `materials` |
+| planned | 7 | `Material.removeEventListener` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

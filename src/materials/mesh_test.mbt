@@ -942,3 +942,21 @@ test "Material hasEventListener reports a registered listener" {
   let standard = @materials.Material::standard()
   assert_eq(standard.has_event_listener("dispose", listener), false)
 }
+
+///|
+test "Material removeEventListener drops a registered listener" {
+  let material = @materials.Material::basic()
+  let listener = fn() {}
+  let other_listener = fn() {}
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  material.add_event_listener("dispose", listener)
+  material.add_event_listener("change", other_listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(material.has_event_listener("dispose", listener), false)
+  assert_eq(material.has_event_listener("change", other_listener), true)
+  let lambert = @materials.Material::lambert()
+  lambert.add_event_listener("dispose", listener)
+  material.remove_event_listener("dispose", listener)
+  assert_eq(lambert.has_event_listener("dispose", listener), true)
+}
