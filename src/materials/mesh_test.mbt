@@ -530,3 +530,20 @@ test "Material stencilZPass defaults to Keep" {
   assert_eq(standard.material.stencil_z_pass.to_int(), 7681)
   assert_eq(lambert.material.stencil_z_pass.to_int(), 7680)
 }
+
+///|
+test "Material stencilWrite defaults to false" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_write, false)
+  basic.material.stencil_write = true
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_write, false)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_write, false)
+  standard.material.stencil_write = true
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_write, false)
+  assert_eq(basic.material.stencil_write, true)
+  assert_eq(standard.material.stencil_write, true)
+  assert_eq(lambert.material.stencil_write, false)
+}
