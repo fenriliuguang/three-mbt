@@ -3232,3 +3232,30 @@ test "Material shader defaults lights off and copies only onto shader" {
   cloned.lights = false
   assert_eq(shader.lights, true)
 }
+
+///|
+test "Material shader defaults clipping off and copies only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.clipping, false)
+  assert_eq(basic.clipping, false)
+  assert_eq(phong.clipping, false)
+  shader.clipping = true
+  ignore(basic.copy(shader))
+  assert_eq(basic.clipping, false)
+  assert_eq(shader.clipping, true)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.clipping, true)
+  onto.clipping = false
+  assert_eq(shader.clipping, true)
+  ignore(onto.copy(phong))
+  assert_eq(onto.clipping, false)
+  assert_eq(phong.clipping, false)
+  let cloned = shader.clone()
+  assert_eq(cloned.clipping, true)
+  assert_eq(cloned.id == shader.id, false)
+  cloned.clipping = false
+  assert_eq(shader.clipping, true)
+}

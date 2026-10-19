@@ -102,6 +102,7 @@ pub(all) struct Material {
   mut metalness : Double
   mut fog : Bool
   mut lights : Bool
+  mut clipping : Bool
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool
