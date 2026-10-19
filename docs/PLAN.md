@@ -1937,6 +1937,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `LineBasicMaterial.dispose` has landed. A line material's `dispose` listener adds `1` and its `change` listener adds `10`. Disposing leaves the counter at `1`. Another line material with only a `change` listener also leaves it at `1`. Line draws still do not free resources for this call.
 
+`SpriteMaterial.dispose` has landed. A sprite material's `dispose` listener adds `1` and its `change` listener adds `10`. Disposing leaves the counter at `1`. Another sprite material with only a `change` listener also leaves it at `1`. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2846,6 +2848,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.dispose` | `materials` |
 | planned | 7 | `PointsMaterial.dispose` | `materials` |
 | planned | 7 | `LineBasicMaterial.dispose` | `materials` |
+| planned | 7 | `SpriteMaterial.dispose` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

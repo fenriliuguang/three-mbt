@@ -1749,6 +1749,13 @@ pub fn SpriteMaterial::dispatch_event(self : SpriteMaterial, kind : String) -> U
 }
 
 ///|
+/// 通知 `dispose` 监听。其它事件不动。渲染器仍不画精灵。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1207
+pub fn SpriteMaterial::dispose(self : SpriteMaterial) -> Unit {
+  self.dispatch_event("dispose")
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。渲染器仍不画精灵。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn SpriteMaterial::set_needs_update(
