@@ -8409,6 +8409,22 @@ test "Material shader iridescenceThicknessMap needs strength and a texture" {
 }
 
 ///|
+test "Material shader sheen is true above zero" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_sheen(), false)
+  assert_eq(@materials.Material::raw().program_sheen(), false)
+  assert_eq(@materials.Material::physical().program_sheen(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.sheen = -1.0
+  assert_eq(shader.program_sheen(), false)
+  shader.sheen = 0.25
+  assert_eq(shader.program_sheen(), true)
+  shader.sheen = 0.0
+  assert_eq(shader.program_sheen(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
