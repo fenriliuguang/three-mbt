@@ -7388,6 +7388,41 @@ test "Material shader releaseShaderCache drops unused stages" {
 }
 
 ///|
+test "Material shader dispose clears shader caches" {
+  let cache = @materials.ShaderCache::new()
+  let programs = @materials.ProgramCache::new()
+  let shader = @materials.Material::shader()
+  ignore(programs.acquire("kept"))
+  cache.update(shader.id, "vert", "frag")
+  let vert = match cache.shader_cache.get("vert") {
+    Some(stage) => stage
+    None => abort("vertex stage missing")
+  }
+  cache.dispose()
+  match cache.shader_cache.get("vert") {
+    None => ()
+    Some(_) => abort("disposed shader code stayed")
+  }
+  match cache.material_cache.get(shader.id) {
+    None => ()
+    Some(_) => abort("disposed material stayed")
+  }
+  assert_eq(vert.used_times.val, 1)
+  assert_eq(programs.programs.length(), 1)
+  assert_eq(programs.programs[0].cache_key, "kept")
+  cache.update(shader.id, "vert", "frag")
+  let again = match cache.shader_cache.get("vert") {
+    Some(stage) => stage
+    None => abort("vertex stage missing after dispose")
+  }
+  assert_eq(again.used_times.val, 1)
+  assert_eq(again.id, vert.id + 2)
+  assert_eq(vert.used_times.val, 1)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

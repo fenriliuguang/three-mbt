@@ -2379,6 +2379,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `releaseShaderCache` has landed. A material claims a vertex code and a fragment code once each, and each distinct code starts at `usedTimes` `1`. Claiming the same codes again does not increment. Two materials sharing a vertex code make that count `2`. Releasing the first material drops it to `1` and deletes the fragment code that reached `0`. Releasing the second deletes the shared code. Identical vertex and fragment code increment once. No shader is compiled. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `dispose` stays later.
 
+`dispose` has landed. It clears the shader-code map and the material map. A stage that was already read keeps its `usedTimes`, and the next stage id keeps climbing. A program cache is left as it was. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `getVertexShaderStage` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3509,6 +3511,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `acquireProgram` | `materials` |
 | planned | 7 | `releaseProgram` | `materials` |
 | planned | 7 | `releaseShaderCache` | `materials` |
+| planned | 7 | `dispose` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
