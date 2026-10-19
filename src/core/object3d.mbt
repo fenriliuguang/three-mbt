@@ -907,3 +907,18 @@ pub fn Object3D::intersects_frustum(
     }
   }
 }
+
+///|
+/// 任一已用视锥碰到这个物体的包围球则为真。`count` 为 0 时为假。
+/// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L86
+pub fn Object3D::intersects_frustum_array(
+  self : Object3D,
+  frustums : @math.FrustumArray,
+) -> Bool {
+  for i in 0..<frustums.count {
+    if self.intersects_frustum(frustums.frustums[i]) {
+      return true
+    }
+  }
+  false
+}

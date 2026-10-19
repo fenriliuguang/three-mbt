@@ -569,3 +569,51 @@ test "Object3D.intersectsFrustum uses the geometry sphere" {
     }
   }
 }
+
+///|
+test "Object3D.intersectsFrustumArray uses only the counted frustums" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.5, 0.5, 0.5], 3),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.node.update_matrix_world()
+  let frustums = @math.FrustumArray::new()
+  assert_eq(mesh.node.intersects_frustum_array(frustums), false)
+  let cube = @math.Frustum::new()
+  ignore(
+    cube.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  frustums.frustums.push(cube)
+  assert_eq(mesh.node.intersects_frustum_array(frustums), false)
+  frustums.count = 1
+  assert_eq(mesh.node.intersects_frustum_array(frustums), true)
+  ignore(mesh.node.position.set(-2.5, 0.0, 0.0))
+  mesh.node.update_matrix_world()
+  assert_eq(mesh.node.intersects_frustum_array(frustums), false)
+  let wide = @math.Frustum::new()
+  ignore(
+    wide.set(
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+      @math.Plane::new(constant=10.0),
+    ),
+  )
+  frustums.frustums.push(wide)
+  assert_eq(mesh.node.intersects_frustum_array(frustums), false)
+  frustums.count = 2
+  assert_eq(mesh.node.intersects_frustum_array(frustums), true)
+}

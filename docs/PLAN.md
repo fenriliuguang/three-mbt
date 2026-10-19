@@ -1395,6 +1395,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Object3D.intersectsFrustum` has landed for a mesh, point, or line geometry. A single point at `(0.5, 0.5, 0.5)` has sphere radius `0` and meets the unit-cube frustum. Moving the node by `(-2.5, 0, 0)` puts that sphere at `(-2, 0.5, 0.5)` and misses. A node without geometry misses. The stored sphere stays at the local point. Instanced bounds stay later.
 
+`Object3D.intersectsFrustumArray` has landed. With `count` `0` the same point misses, including when a unit-cube frustum is already stored. `count` `1` accepts it. After the node moves by `(-2.5, 0, 0)` that one frustum misses, and a second frustum of constant `10` accepts it only once `count` is `2`.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2033,6 +2035,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineLoop` raycast | `core` |
 | planned | 7 | `Sprite.intersectsFrustum` | `objects` |
 | planned | 7 | `Object3D.intersectsFrustum` | `core` |
+| planned | 7 | `Object3D.intersectsFrustumArray` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

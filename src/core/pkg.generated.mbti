@@ -458,6 +458,7 @@ pub fn Object3D::get_world_position(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::get_world_quaternion(Self, @math.Quaternion) -> @math.Quaternion
 pub fn Object3D::get_world_scale(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::intersects_frustum(Self, @math.Frustum) -> Bool
+pub fn Object3D::intersects_frustum_array(Self, @math.FrustumArray) -> Bool
 pub fn Object3D::local_to_world(Self, @math.Vector3) -> @math.Vector3
 pub fn Object3D::look_at(Self, Double, Double, Double) -> Unit
 pub fn Object3D::look_at_vector(Self, @math.Vector3) -> Unit
