@@ -790,16 +790,21 @@ pub fn Object3D::dispose(self : Object3D) -> Unit {
 }
 
 ///|
-/// 基类不产生交点。返回 `None` 表示继续访问子节点；只有 `Some(false)` 会停住。
+/// 网格会把三角形交点写入列表。其他种类不产生交点。返回 `None` 表示继续访问子节点；只有 `Some(false)` 会停住。
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1061
 pub fn Object3D::raycast(
   self : Object3D,
   raycaster : Raycaster,
   intersects : Array[Intersection],
 ) -> Bool? {
-  ignore(self)
-  ignore(raycaster)
-  ignore(intersects)
+  match self.kind {
+    Mesh =>
+      match self.mesh {
+        None => ()
+        Some(_) => self.raycast_mesh(raycaster, intersects)
+      }
+    _ => ()
+  }
   None
 }
 

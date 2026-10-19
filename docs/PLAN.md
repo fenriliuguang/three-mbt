@@ -1361,6 +1361,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Mesh.getVertexPosition` has landed on `Object3D`. Index `1` of `[1, 2, 3, 4, 5, 6]` is `(4, 5, 6)`. A relative morph of `(2, 0, 0)` at weight `0.5` moves `(1, 2, 3)` to `(2, 2, 3)`.
 
+`Mesh.raycast` has landed for a single material. A ray from `(0.25, 0.25, 1)` along `(0, 0, -1)` hits the triangle `(0, 0, 0)`, `(1, 0, 0)`, `(0, 1, 0)` at `(0.25, 0.25, 0)`, distance `1`. Material groups, `uv`, normals, and `face` stay out of this pass.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1982,6 +1984,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Raycaster.intersectObject` | `core` |
 | planned | 7 | `Raycaster.intersectObjects` | `core` |
 | planned | 7 | `Mesh.getVertexPosition` | `core` |
+| planned | 7 | `Mesh.raycast` | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

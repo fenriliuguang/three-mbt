@@ -62,3 +62,30 @@ test "getVertexPosition applies a relative morph" {
   assert_eq(target.y, 2.0)
   assert_eq(target.z, 3.0)
 }
+
+///|
+test "mesh raycast hits a front-facing triangle" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let hits = raycaster.intersect_object(mesh.node)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 0.25)
+  assert_eq(hits[0].point.z, 0.0)
+  assert_eq(physical_equal(hits[0].object, mesh.node), true)
+}
