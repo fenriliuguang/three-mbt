@@ -6172,9 +6172,9 @@ test "Material shader writes USE_SHADOWMAP" {
   let shader = @materials.Material::shader()
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
-  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1630)
-  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1244)
-  assert_eq(1630 - 1608, 22)
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1273)
+  assert_eq(1659 - 1608, 51)
   assert_eq(
     shader.prefixed_vertex_shader(shadow_map_enabled=true)[683:704].to_owned(),
     "#define USE_SHADOWMAP",
@@ -6184,12 +6184,12 @@ test "Material shader writes USE_SHADOWMAP" {
     "#define USE_SHADOWMAP",
   )
   shader.side = @constants.Back
-  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1649)
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1678)
   assert_eq(
     shader.prefixed_vertex_shader(shadow_map_enabled=true)[702:723].to_owned(),
     "#define USE_SHADOWMAP",
   )
-  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1263)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1292)
   assert_eq(
     shader.prefixed_fragment_shader(shadow_map_enabled=true)[1098:1119].to_owned(),
     "#define USE_SHADOWMAP",
@@ -6201,6 +6201,41 @@ test "Material shader writes USE_SHADOWMAP" {
   assert_eq(raw.prefixed_vertex_shader(shadow_map_enabled=true).length(), 92)
   let basic = @materials.Material::basic()
   basic.side = @constants.Back
+  assert_eq(basic.prefixed_vertex_shader(shadow_map_enabled=true), "")
+}
+
+///|
+test "Material shader writes SHADOWMAP_TYPE_BASIC" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=false).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=false).length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1659)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1273)
+  assert_eq(1659 - 1630, 29)
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true)[705:733].to_owned(),
+    "#define SHADOWMAP_TYPE_BASIC",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true)[1101:1129].to_owned(),
+    "#define SHADOWMAP_TYPE_BASIC",
+  )
+  shader.side = @constants.Back
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=true).length(), 1678)
+  assert_eq(
+    shader.prefixed_vertex_shader(shadow_map_enabled=true)[724:752].to_owned(),
+    "#define SHADOWMAP_TYPE_BASIC",
+  )
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=true).length(), 1292)
+  assert_eq(
+    shader.prefixed_fragment_shader(shadow_map_enabled=true)[1120:1148].to_owned(),
+    "#define SHADOWMAP_TYPE_BASIC",
+  )
+  assert_eq(shader.prefixed_vertex_shader(shadow_map_enabled=false).length(), 1627)
+  assert_eq(shader.prefixed_fragment_shader(shadow_map_enabled=false).length(), 1241)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(shadow_map_enabled=true).length(), 92)
+  let basic = @materials.Material::basic()
   assert_eq(basic.prefixed_vertex_shader(shadow_map_enabled=true), "")
 }
 
