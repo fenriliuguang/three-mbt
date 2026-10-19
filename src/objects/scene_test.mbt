@@ -784,6 +784,53 @@ test "Line.computeLineDistances accumulates segment lengths" {
 }
 
 ///|
+test "LineSegments.computeLineDistances accumulates each pair" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let segments = @objects.LineSegments::new(
+    geometry,
+    @materials.LineBasicMaterial::new(),
+  )
+  let computed = segments.compute_line_distances()
+  assert_eq(physical_equal(computed, segments), true)
+  match geometry.get_attribute("lineDistance") {
+    None => assert_eq(false, true)
+    Some(distances) => {
+      assert_eq(distances.count, 4)
+      assert_eq(distances.get_x(0), 0.0)
+      assert_eq(distances.get_x(1), 3.0)
+      assert_eq(distances.get_x(2), 3.0)
+      assert_eq(distances.get_x(3), 7.0)
+    }
+  }
+  let indexed = @core.BufferGeometry::new()
+  ignore(
+    indexed.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 3.0, 0.0, 0.0], 3),
+    ),
+  )
+  ignore(indexed.set_index_array([0, 1]))
+  let skipped = @objects.LineSegments::new(
+    indexed,
+    @materials.LineBasicMaterial::new(),
+  )
+  ignore(skipped.compute_line_distances())
+  match indexed.get_attribute("lineDistance") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

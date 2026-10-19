@@ -537,6 +537,51 @@ pub fn LineSegments::clone(
 }
 
 ///|
+/// 按成对顶点累计长度，写入 `lineDistance`。每段的起点沿用上一段的终点距离，第一段从 `0` 起。
+/// 几何体带索引时上游只警告，这里不改属性。
+/// r186: `computeLineDistances` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L39
+pub fn LineSegments::compute_line_distances(self : LineSegments) -> LineSegments {
+  if self.geometry.index is Some(_) {
+    return self
+  }
+  let position = match self.geometry.get_attribute("position") {
+    None =>
+      abort("LineSegments.computeLineDistances requires a position attribute")
+    Some(position) => position
+  }
+  let distances : Array[Double] = []
+  let mut index = 0
+  while index < position.count {
+    let next = index + 1
+    let start = @math.Vector3::new(
+      x=position.get_x(index),
+      y=position.get_y(index),
+      z=position.get_z(index),
+    )
+    let end = @math.Vector3::new(
+      x=position.get_x(next),
+      y=position.get_y(next),
+      z=position.get_z(next),
+    )
+    let segment_start = if index == 0 {
+      0.0
+    } else {
+      distances[index - 1]
+    }
+    distances.push(segment_start)
+    distances.push(segment_start + start.distance_to(end))
+    index = index + 2
+  }
+  ignore(
+    self.geometry.set_attribute(
+      "lineDistance",
+      @core.BufferAttribute::new(distances, 1),
+    ),
+  )
+  self
+}
+
+///|
 pub fn LineSegments::refresh(self : LineSegments) -> Unit {
   self.node.primitive = Some(
     primitive_binding(
