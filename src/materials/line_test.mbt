@@ -1134,3 +1134,14 @@ test "LineBasicMaterial type_name stays LineBasicMaterial" {
   assert_eq(other.line.type_name, "LineBasicMaterial")
   assert_eq(dashed.line.type_name, "LineBasicMaterial")
 }
+
+///|
+test "LineDashedMaterial type_name stays LineDashedMaterial" {
+  let source = @materials.LineDashedMaterial::new()
+  assert_eq(source.type_name, "LineDashedMaterial")
+  assert_eq(source.line.type_name, "LineBasicMaterial")
+  let destination = @materials.LineDashedMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.type_name, "LineDashedMaterial")
+  assert_eq(source.type_name, "LineDashedMaterial")
+}

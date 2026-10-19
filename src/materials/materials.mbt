@@ -965,8 +965,10 @@ pub fn LineBasicMaterial::set_alpha_test(
 ///|
 /// 虚线材质。线段字段放在内嵌的 `line` 上。
 /// `scale` 默认 `1`，`dash_size` 默认 `3`，`gap_size` 默认 `1`。
+/// `type_name` 对应上游 `type`，固定是 `LineDashedMaterial`。`copy` 不改目标上的这个名字。内嵌线段仍是 `LineBasicMaterial`。线段绘制仍不读这个名字。
 /// 折线仍使用 `LineBasicMaterial`。着色器仍画实线。
 /// r186: `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19
+/// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L42
 /// r186: `scale` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L50
 /// r186: `dashSize` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L58
 /// r186: `gapSize` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L66
@@ -975,6 +977,7 @@ pub(all) struct LineDashedMaterial {
   mut scale : Double
   mut dash_size : Double
   mut gap_size : Double
+  type_name : String
 }
 
 ///|
@@ -989,6 +992,7 @@ pub fn LineDashedMaterial::new(
     scale,
     dash_size,
     gap_size,
+    type_name: "LineDashedMaterial",
   }
 }
 

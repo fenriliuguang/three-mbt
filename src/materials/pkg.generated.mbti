@@ -72,6 +72,7 @@ pub(all) struct LineDashedMaterial {
   mut scale : Double
   mut dash_size : Double
   mut gap_size : Double
+  type_name : String
 }
 pub fn LineDashedMaterial::copy(Self, Self) -> Self
 pub fn LineDashedMaterial::keeps_distance(Self, Double) -> Bool
