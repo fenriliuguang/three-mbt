@@ -4110,9 +4110,9 @@ test "Material shader writes USE_SPECULAR_INTENSITYMAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let intensity_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.specular_intensity_map = Some(intensity_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1678)
   assert_eq(shader.prefixed_fragment_shader().length(), 1256)
-  assert_eq(1642 - 1608, 34)
+  assert_eq(1678 - 1608, 70)
   assert_eq(
     shader.prefixed_vertex_shader()[683:716].to_owned(),
     "#define USE_SPECULAR_INTENSITYMAP",
@@ -4122,7 +4122,7 @@ test "Material shader writes USE_SPECULAR_INTENSITYMAP" {
     "#define USE_SPECULAR_INTENSITYMAP",
   )
   shader.specular_color_map = Some(intensity_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1704)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1740)
   assert_eq(
     shader.prefixed_vertex_shader()[713:746].to_owned(),
     "#define USE_SPECULAR_INTENSITYMAP",
@@ -4153,7 +4153,7 @@ test "Material shader writes USE_ROUGHNESSMAP" {
     "#define USE_ROUGHNESSMAP",
   )
   shader.specular_intensity_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1694)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1730)
   assert_eq(
     shader.prefixed_vertex_shader()[717:741].to_owned(),
     "#define USE_ROUGHNESSMAP",
@@ -5316,6 +5316,46 @@ test "Material shader writes SPECULAR_COLORMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.specular_color_map = Some(specular_color_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes SPECULAR_INTENSITYMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let specular_intensity_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(specular_intensity_map.channel, 0)
+  shader.specular_intensity_map = Some(specular_intensity_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1678)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1256)
+  assert_eq(1678 - 1608, 70)
+  assert_eq(
+    shader.prefixed_vertex_shader()[717:752].to_owned(),
+    "#define SPECULAR_INTENSITYMAP_UV uv",
+  )
+  specular_intensity_map.channel = 1
+  shader.specular_intensity_map = Some(specular_intensity_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1679)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1256)
+  assert_eq(1679 - 1608, 71)
+  assert_eq(
+    shader.prefixed_vertex_shader()[717:753].to_owned(),
+    "#define SPECULAR_INTENSITYMAP_UV uv1",
+  )
+  specular_intensity_map.channel = 0
+  shader.specular_intensity_map = Some(specular_intensity_map)
+  let specular_color_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.specular_color_map = Some(specular_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1740)
+  assert_eq(
+    shader.prefixed_vertex_shader()[779:814].to_owned(),
+    "#define SPECULAR_INTENSITYMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.specular_intensity_map = Some(specular_intensity_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.specular_intensity_map = Some(specular_intensity_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
