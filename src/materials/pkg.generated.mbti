@@ -320,6 +320,7 @@ pub fn Material::program_metalness_map(Self) -> Bool
 pub fn Material::program_normal_map(Self) -> Bool
 pub fn Material::program_normal_map_object_space(Self) -> Bool
 pub fn Material::program_normal_map_tangent_space(Self) -> Bool
+pub fn Material::program_opaque(Self) -> Bool
 pub fn Material::program_packed_normal_map(Self, Int) -> Bool
 pub fn Material::program_precision(Self, String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
 pub fn Material::program_retroreflection(Self) -> Bool

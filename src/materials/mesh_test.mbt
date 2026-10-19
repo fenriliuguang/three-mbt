@@ -8583,6 +8583,28 @@ test "Material shader gradientMap follows the gradient texture" {
 }
 
 ///|
+test "Material shader opaque needs normal blending" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_opaque(), true)
+  assert_eq(@materials.Material::raw().program_opaque(), true)
+  assert_eq(@materials.Material::basic().program_opaque(), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.transparent = true
+  assert_eq(shader.program_opaque(), false)
+  shader.transparent = false
+  assert_eq(shader.program_opaque(), true)
+  shader.blending = @constants.Additive
+  assert_eq(shader.program_opaque(), false)
+  shader.blending = @constants.Normal
+  assert_eq(shader.program_opaque(), true)
+  shader.alpha_to_coverage = true
+  assert_eq(shader.program_opaque(), false)
+  shader.alpha_to_coverage = false
+  assert_eq(shader.program_opaque(), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
