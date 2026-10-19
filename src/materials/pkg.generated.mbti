@@ -341,6 +341,7 @@ pub fn Material::program_normal_map_tangent_space(Self) -> Bool
 pub fn Material::program_normal_map_uv(Self) -> String
 pub fn Material::program_opaque(Self) -> Bool
 pub fn Material::program_packed_normal_map(Self, Int) -> Bool
+pub fn Material::program_points_uvs(Self, has_points_uv? : Bool) -> Bool
 pub fn Material::program_precision(Self, String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
 pub fn Material::program_retroreflection(Self) -> Bool
 pub fn Material::program_roughness_map(Self) -> Bool

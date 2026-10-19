@@ -2559,6 +2559,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `vertexAlphas` has landed. Shader, Raw, and Basic start at `false`. Turning on `vertex_colors` without a four-component color attribute stays `false`. Both together return `true`. Turning `vertex_colors` back off returns `false` while the attribute stays. The vertex prefix stays `1608` and the fragment prefix stays `2041` while `vertex_colors` is still off. `pointsUvs` stays later.
 
+`pointsUvs` has landed. Shader, Raw, and Basic start at `false`. A points object with a uv attribute but neither a color map nor an alpha map stays `false`. A 1×1 color map without that points uv stays `false`. The same map with the points uv returns `true`. Clearing the color map and setting a 1×1 alpha map with the points uv returns `true`. Clearing the alpha map returns `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while both maps are still empty. `fog` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3779,6 +3781,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `vertexNormals` | `materials` |
 | planned | 7 | `vertexColors` | `materials` |
 | planned | 7 | `vertexAlphas` | `materials` |
+| planned | 7 | `pointsUvs` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
