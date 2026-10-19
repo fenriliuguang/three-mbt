@@ -103,7 +103,7 @@ pub fn Bone::clone(self : Bone, recursive? : Bool = true) -> Bone {
 /// 骨骼纹理留到后面。
 /// r186: `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37
 pub(all) struct Skeleton {
-  uuid : String
+  mut uuid : String
   bones : Array[Bone]
   mut bone_inverses : Array[@math.Matrix4]
   mut bone_matrices : Array[Double]
@@ -305,6 +305,36 @@ pub fn Skeleton::to_json(self : Skeleton) -> SkeletonJson {
     bones,
     bone_inverses: inverses,
   }
+}
+
+///|
+/// 按编号把骨骼装回骨架，并读入逆绑定矩阵。找不到的编号会新建一根骨骼。
+/// 已有的骨骼留在列表前面。装完后重新分配全零的矩阵缓冲。
+/// r186: `fromJSON` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L317
+pub fn Skeleton::from_json(
+  self : Skeleton,
+  json : SkeletonJson,
+  bones : Map[String, Bone],
+) -> Skeleton {
+  if json.bone_inverses.length() < json.bones.length() {
+    abort("Skeleton.fromJSON inverse list is shorter than the bone list")
+  }
+  self.uuid = json.uuid
+  let count = json.bones.length()
+  let mut index = 0
+  while index < count {
+    let bone = match bones.get(json.bones[index]) {
+      None => Bone::new()
+      Some(bone) => bone
+    }
+    self.bones.push(bone)
+    let inverse = @math.Matrix4::new()
+    ignore(inverse.from_array(json.bone_inverses[index]))
+    self.bone_inverses.push(inverse)
+    index = index + 1
+  }
+  self.init()
+  self
 }
 
 ///|

@@ -50,7 +50,7 @@ fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L97
 pub(all) struct Object3D {
   id : Int
-  uuid : String
+  mut uuid : String
   mut name : String
   kind : NodeKind
   position : @math.Vector3

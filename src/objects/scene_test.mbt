@@ -1811,6 +1811,64 @@ test "Skeleton.toJSON writes bone uuids and inverse matrices" {
 }
 
 ///|
+test "Skeleton.fromJSON appends bones and keeps their inverses" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  shoulder.node.uuid = "shoulder"
+  elbow.node.uuid = "elbow"
+  hand.node.uuid = "hand"
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  let data = arm.to_json()
+  let listed : Map[String, @objects.Bone] = Map([])
+  listed.set(shoulder.node.uuid, shoulder)
+  listed.set(elbow.node.uuid, elbow)
+  listed.set(hand.node.uuid, hand)
+  let restored = @objects.Skeleton::new()
+  let loaded = restored.from_json(data, listed)
+  assert_eq(physical_equal(loaded, restored), true)
+  assert_eq(restored.uuid, arm.uuid)
+  assert_eq(restored.bones.length(), 3)
+  assert_eq(physical_equal(restored.bones[0].node, shoulder.node), true)
+  assert_eq(restored.bones[0].node.uuid, shoulder.node.uuid)
+  assert_eq(physical_equal(restored.bones[2].node, hand.node), true)
+  assert_eq(restored.bone_inverses[0].elements[13], 5.0)
+  assert_eq(restored.bone_inverses[1].elements[13], 5.0)
+  assert_eq(restored.bone_inverses[2].elements[13], 0.0)
+  assert_eq(restored.bone_matrices.length(), 48)
+  assert_eq(restored.bone_matrices[0], 0.0)
+  ignore(restored.from_json(data, listed))
+  assert_eq(restored.bones.length(), 6)
+  assert_eq(physical_equal(restored.bones[3].node, shoulder.node), true)
+  assert_eq(restored.bone_matrices.length(), 96)
+  assert_eq(restored.bone_matrices[0], 0.0)
+  let gap : @objects.SkeletonJson = {
+    version: 4.7,
+    type_name: "Skeleton",
+    generator: "Skeleton.toJSON",
+    uuid: "skeleton-id",
+    bones: ["missing"],
+    bone_inverses: [@math.Matrix4::new().to_array()],
+  }
+  let fresh = @objects.Skeleton::new()
+  let known : Map[String, @objects.Bone] = Map([])
+  ignore(fresh.from_json(gap, known))
+  assert_eq(fresh.uuid, "skeleton-id")
+  assert_eq(fresh.bones.length(), 1)
+  assert_eq(physical_equal(fresh.bones[0], shoulder), false)
+  assert_eq(fresh.bones[0].node.kind is @core.NodeKind::Bone, true)
+  assert_eq(fresh.bone_inverses[0].elements[0], 1.0)
+  assert_eq(fresh.bone_inverses[0].elements[13], 0.0)
+  assert_eq(fresh.bone_matrices.length(), 16)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

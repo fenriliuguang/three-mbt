@@ -174,7 +174,7 @@ pub fn Points::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for Points
 
 pub(all) struct Skeleton {
-  uuid : String
+  mut uuid : String
   bones : Array[Bone]
   mut bone_inverses : Array[@math.Matrix4]
   mut bone_matrices : Array[Double]
@@ -183,6 +183,7 @@ pub fn Skeleton::calculate_inverses(Self) -> Unit
 pub fn Skeleton::clone(Self) -> Self
 pub fn Skeleton::compute_bone_texture(Self) -> Self
 pub fn Skeleton::dispose(Self) -> Unit
+pub fn Skeleton::from_json(Self, SkeletonJson, Map[String, Bone]) -> Self
 pub fn Skeleton::get_bone_by_name(Self, String) -> Bone?
 pub fn Skeleton::init(Self) -> Unit
 pub fn Skeleton::new(bones? : Array[Bone], bone_inverses? : Array[@math.Matrix4]) -> Self

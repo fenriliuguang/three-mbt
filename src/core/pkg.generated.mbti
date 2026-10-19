@@ -411,7 +411,7 @@ pub(all) enum NodeKind {
 
 pub(all) struct Object3D {
   id : Int
-  uuid : String
+  mut uuid : String
   mut name : String
   kind : NodeKind
   position : @math.Vector3
