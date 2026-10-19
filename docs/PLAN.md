@@ -2233,6 +2233,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_SHEEN_COLORMAP` has landed. A Shader material with `sheen` set to `1` and a 1×1 sheen color map writes `#define USE_SHEEN_COLORMAP` and a newline, `27` characters, on both prefixed shaders. The vertex string grows from `1608` to `1635`, and the fragment string from `1222` to `1249`. `-1` adds nothing. With `transmission` at `1` and a thickness map, the vertex line follows `USE_THICKNESSMAP` and the vertex string is `1685`. The fragment line stays before `USE_TRANSMISSION`, so that string is `1299`. A raw material stays at `92`. A Basic material stays `""`. `USE_SHEEN_ROUGHNESSMAP` stays later.
 
+`USE_SHEEN_ROUGHNESSMAP` has landed. A Shader material with `sheen` set to `1` and a 1×1 sheen roughness map writes `#define USE_SHEEN_ROUGHNESSMAP` and a newline, `31` characters, on both prefixed shaders. The vertex string grows from `1608` to `1639`, and the fragment string from `1222` to `1253`. A sheen color map as well puts that line after `USE_SHEEN_COLORMAP`, so the vertex string is `1666` and the fragment string is `1280`. The roughness map with `sheen` at `0` adds nothing. A raw material stays at `92`. A Basic material stays `""`. `MAP_UV` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3290,6 +3292,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_TRANSMISSIONMAP` | `materials` |
 | planned | 7 | `USE_THICKNESSMAP` | `materials` |
 | planned | 7 | `USE_SHEEN_COLORMAP` | `materials` |
+| planned | 7 | `USE_SHEEN_ROUGHNESSMAP` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
