@@ -1367,3 +1367,21 @@ test "Material aoMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.ao_map is None, true)
 }
+
+///|
+test "Material aoMapIntensity defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.ao_map_intensity, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.ao_map_intensity, 1.0)
+  lambert.ao_map_intensity = 2.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.ao_map_intensity, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.ao_map_intensity, 2.0)
+  destination.ao_map_intensity = 0.0
+  assert_eq(lambert.ao_map_intensity, 2.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.ao_map_intensity, 1.0)
+}

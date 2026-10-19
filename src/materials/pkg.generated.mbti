@@ -129,6 +129,7 @@ pub(all) struct Material {
   mut light_map : @textures.Texture?
   mut light_map_intensity : Double
   mut ao_map : @textures.Texture?
+  mut ao_map_intensity : Double
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
