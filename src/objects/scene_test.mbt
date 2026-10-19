@@ -1662,6 +1662,44 @@ test "Skeleton.clone shares inverses and clears the matrix buffer" {
 }
 
 ///|
+test "Skeleton.getBoneByName returns the first match" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  shoulder.node.name = "shoulder"
+  elbow.node.name = "elbow"
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  match arm.get_bone_by_name("elbow") {
+    None => assert_eq(false, true)
+    Some(bone) => {
+      assert_eq(physical_equal(bone, elbow), true)
+      assert_eq(bone.node.position.y, 0.0)
+    }
+  }
+  match arm.get_bone_by_name("shoulder") {
+    None => assert_eq(false, true)
+    Some(bone) => assert_eq(bone.node.position.y, -5.0)
+  }
+  match arm.get_bone_by_name("") {
+    None => assert_eq(false, true)
+    Some(bone) => {
+      assert_eq(physical_equal(bone, hand), true)
+      assert_eq(bone.node.position.y, 5.0)
+    }
+  }
+  hand.node.name = "elbow"
+  match arm.get_bone_by_name("elbow") {
+    None => assert_eq(false, true)
+    Some(bone) => assert_eq(physical_equal(bone, elbow), true)
+  }
+  assert_eq(arm.get_bone_by_name("wrist") is None, true)
+  assert_eq(@objects.Skeleton::new().get_bone_by_name("elbow") is None, true)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

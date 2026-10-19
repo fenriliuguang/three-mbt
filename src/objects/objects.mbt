@@ -226,6 +226,22 @@ pub fn Skeleton::clone(self : Skeleton) -> Skeleton {
 }
 
 ///|
+/// 按名字找第一根骨骼。找不到时返回空。
+/// r186: `getBoneByName` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L276
+pub fn Skeleton::get_bone_by_name(self : Skeleton, name : String) -> Bone? {
+  let count = self.bones.length()
+  let mut index = 0
+  while index < count {
+    let bone = self.bones[index]
+    if bone.node.name == name {
+      return Some(bone)
+    }
+    index = index + 1
+  }
+  None
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0

@@ -1501,6 +1501,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Skeleton.clone` has landed. The same chain, after that update has stored `3` at float `13`, clones to a new skeleton. The bones array is new and still holds the shoulder and the hand. Pushing another bone leaves the source at length `3`. The inverse matrices are the same array, so writing translation `y=7` into the clone's first inverse changes the source too. The clone's matrix buffer is 48 zeros, and the source float `13` stays `3`. An empty skeleton clones to an empty skeleton that shares its inverse list. The bone texture stays later.
 
+`Skeleton.getBoneByName` has landed. A shoulder named `shoulder` at `y=-5`, an elbow named `elbow` at `y=0`, and an unnamed hand at `y=5` are searched by name. `elbow` returns the elbow, and `""` returns the hand. Naming the hand `elbow` as well still returns the first elbow. `wrist` and an empty skeleton return nothing. The bone texture stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2192,6 +2194,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Skeleton.pose` | `objects` |
 | planned | 7 | `Skeleton.update` | `objects` |
 | planned | 7 | `Skeleton.clone` | `objects` |
+| planned | 7 | `Skeleton.getBoneByName` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
