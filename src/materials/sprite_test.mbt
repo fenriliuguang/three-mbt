@@ -190,3 +190,17 @@ test "SpriteMaterial stores and copies alphaToCoverage" {
   destination.alpha_to_coverage = false
   assert_eq(source.alpha_to_coverage, true)
 }
+
+///|
+test "SpriteMaterial stores and copies dithering" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.dithering, false)
+  let source = @materials.SpriteMaterial::new()
+  source.dithering = true
+  assert_eq(defaults.dithering, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.dithering, true)
+  destination.dithering = false
+  assert_eq(source.dithering, true)
+}

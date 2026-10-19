@@ -148,6 +148,7 @@ pub(all) struct SpriteMaterial {
   mut tone_mapped : Bool
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
+  mut dithering : Bool
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
