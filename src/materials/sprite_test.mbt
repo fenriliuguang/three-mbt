@@ -566,3 +566,18 @@ test "SpriteMaterial stores and copies stencilZPass" {
   assert_eq(source.stencil_z_pass.to_int(), 0)
   assert_eq(destination.stencil_z_pass.to_int(), 7681)
 }
+
+///|
+test "SpriteMaterial stores and copies stencilWrite" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.stencil_write, false)
+  let source = @materials.SpriteMaterial::new()
+  source.stencil_write = true
+  assert_eq(defaults.stencil_write, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_write, true)
+  destination.stencil_write = false
+  assert_eq(source.stencil_write, true)
+  assert_eq(destination.stencil_write, false)
+}

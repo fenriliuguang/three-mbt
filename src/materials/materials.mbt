@@ -832,7 +832,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
-/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。`blend_src_alpha` 默认空。`blend_dst_alpha` 默认空。`blend_equation_alpha` 默认空。`stencil_write_mask` 默认 `0xFF`。`stencil_func` 默认 `Always`。`stencil_ref` 默认 `0`。`stencil_func_mask` 默认 `0xFF`。`stencil_fail` 默认 `Keep`。比较失败时的模板操作。`stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。`stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail` 和 `stencil_z_pass`。空着时 alpha 通道分别沿用 `blend_src`、`blend_dst` 与 `blend_equation`。
+/// `alpha_test` 默认 `0`。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。`blend_src_alpha` 默认空。`blend_dst_alpha` 默认空。`blend_equation_alpha` 默认空。`stencil_write_mask` 默认 `0xFF`。`stencil_func` 默认 `Always`。`stencil_ref` 默认 `0`。`stencil_func_mask` 默认 `0xFF`。`stencil_fail` 默认 `Keep`。比较失败时的模板操作。`stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。`stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。`stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass` 和 `stencil_write`。空着时 alpha 通道分别沿用 `blend_src`、`blend_dst` 与 `blend_equation`。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
@@ -861,6 +861,7 @@ pub fn LineDashedMaterial::keeps_distance(
 /// r186: `stencilFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L271
 /// r186: `stencilZFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L280
 /// r186: `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289
+/// r186: `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299
 /// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
 /// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L82
@@ -919,6 +920,7 @@ pub(all) struct SpriteMaterial {
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
+  mut stencil_write : Bool
 }
 
 ///|
@@ -973,12 +975,13 @@ pub fn SpriteMaterial::new(
     stencil_fail: @constants.StencilOp::Keep,
     stencil_z_fail: @constants.StencilOp::Keep,
     stencil_z_pass: @constants.StencilOp::Keep,
+    stencil_write: false,
   }
 }
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail` 和 `stencil_z_pass` 一并复制。
+/// 不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass` 和 `stencil_write` 一并复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -1001,6 +1004,7 @@ pub fn SpriteMaterial::copy(
   self.stencil_fail = source.stencil_fail
   self.stencil_z_fail = source.stencil_z_fail
   self.stencil_z_pass = source.stencil_z_pass
+  self.stencil_write = source.stencil_write
   self.map = source.map
   self.alpha_map = source.alpha_map
   self.opacity = source.opacity
