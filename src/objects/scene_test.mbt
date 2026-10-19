@@ -1748,6 +1748,32 @@ test "Skeleton.computeBoneTexture grows the matrix buffer" {
 }
 
 ///|
+test "Skeleton.dispose leaves the matrix buffer in place" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  arm.update()
+  ignore(arm.compute_bone_texture())
+  assert_eq(arm.bone_matrices.length(), 64)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  arm.dispose()
+  assert_eq(arm.bone_matrices.length(), 64)
+  assert_eq(arm.bone_matrices[13], 3.0)
+  assert_eq(arm.bone_matrices[63], 0.0)
+  assert_eq(arm.bones.length(), 3)
+  assert_eq(shoulder.node.position.y, -2.0)
+  let empty = @objects.Skeleton::new()
+  empty.dispose()
+  assert_eq(empty.bone_matrices.length(), 0)
+  assert_eq(empty.bones.length(), 0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

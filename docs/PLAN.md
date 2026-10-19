@@ -1505,6 +1505,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `Skeleton.computeBoneTexture` has landed for the float layout. Three bones whose update stored `3` at float `13` grow from 48 floats to 64. Float `13` stays `3`, and floats `48` and `63` are `0`. Calling it again keeps that length and the `3`. An empty skeleton grows from nothing to 64 zeros. Seventeen bones grow from 272 floats to 576, and a `4` written at the first float stays there. A buffer longer than the layout aborts. The `DataTexture` object stays later.
 
+`Skeleton.dispose` has landed. The same three-bone buffer, grown to 64 floats with `3` at float `13`, stays at that length after dispose. Float `63` stays `0`, the three bones stay, and the shoulder stays at `y=-2`. An empty skeleton stays empty. The `DataTexture` object stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2198,6 +2200,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Skeleton.clone` | `objects` |
 | planned | 7 | `Skeleton.getBoneByName` | `objects` |
 | planned | 7 | `Skeleton.computeBoneTexture` | `objects` |
+| planned | 7 | `Skeleton.dispose` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

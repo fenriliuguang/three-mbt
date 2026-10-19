@@ -267,6 +267,12 @@ pub fn Skeleton::compute_bone_texture(self : Skeleton) -> Skeleton {
 }
 
 ///|
+/// 释放骨骼贴图。贴图对象还没有落地，所以矩阵缓冲和骨骼列表保持原样。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L298
+pub fn Skeleton::dispose(_self : Skeleton) -> Unit {
+}
+
+///|
 fn zero_doubles(count : Int) -> Array[Double] {
   let values = []
   let mut index = 0
