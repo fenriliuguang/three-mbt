@@ -304,3 +304,32 @@ test "Material blendEquation defaults to add" {
   assert_eq(@constants.BlendEquation::ReverseSubtract.to_int(), 102)
   assert_eq(@constants.BlendEquation::Min.to_int(), 103)
 }
+
+///|
+test "Material blendSrcAlpha defaults to empty" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.blend_src_alpha is None, true)
+  basic.material.blend_src_alpha = Some(@constants.BlendFactor::One)
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.blend_src_alpha is None, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.blend_src_alpha is None, true)
+  standard.material.blend_src_alpha = Some(@constants.BlendFactor::Zero)
+  let other = @materials.Material::basic()
+  assert_eq(other.blend_src_alpha is None, true)
+  match basic.material.blend_src_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::One, true)
+      assert_eq(factor.to_int(), 201)
+    }
+    None => abort("basic blendSrcAlpha is empty")
+  }
+  match standard.material.blend_src_alpha {
+    Some(factor) => {
+      assert_eq(factor is @constants.BlendFactor::Zero, true)
+      assert_eq(factor.to_int(), 200)
+    }
+    None => abort("standard blendSrcAlpha is empty")
+  }
+  assert_eq(lambert.material.blend_src_alpha is None, true)
+}
