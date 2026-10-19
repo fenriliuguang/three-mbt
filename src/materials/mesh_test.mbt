@@ -4298,6 +4298,38 @@ test "Material shader writes USE_TRANSMISSION" {
 }
 
 ///|
+test "Material shader writes USE_TRANSMISSIONMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let transmission_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.transmission_map = Some(transmission_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.transmission = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1661)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1275)
+  assert_eq(1661 - 1633, 28)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:735].to_owned(),
+    "#define USE_TRANSMISSIONMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1104:1131].to_owned(),
+    "#define USE_TRANSMISSIONMAP",
+  )
+  shader.transmission = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  let raw = @materials.Material::raw()
+  raw.transmission = 1.0
+  raw.transmission_map = Some(transmission_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.transmission = 1.0
+  basic.transmission_map = Some(transmission_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
