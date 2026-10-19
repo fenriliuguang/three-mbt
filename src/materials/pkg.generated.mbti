@@ -308,6 +308,7 @@ pub fn Material::program_combine(Self) -> @constants.Combine
 pub fn Material::program_defines(Self) -> Map[String, String]
 pub fn Material::program_dispersion(Self) -> Bool
 pub fn Material::program_displacement_map(Self) -> Bool
+pub fn Material::program_displacement_map_uv(Self) -> String
 pub fn Material::program_emissive_map(Self) -> Bool
 pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
 pub fn Material::program_env_map_cube_uv_height(Self, Int, scene_environment_height? : Int, has_scene_environment? : Bool) -> Int?
