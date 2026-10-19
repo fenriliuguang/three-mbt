@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 
 ///|
 using @core {
@@ -694,4 +694,73 @@ pub fn Sprite::refresh(self : Sprite) -> Unit {
       state.size_attenuation = self.material.size_attenuation
     }
   }
+}
+
+///|
+/// 上游没有单独的类。每一级是 `levels` 里的对象、距离和滞后。
+/// r186: `levels` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L69
+pub(all) struct LodLevel {
+  object : Object3D
+  distance : Double
+  hysteresis : Double
+}
+
+///|
+/// 按距离切换显示的对象。级别从近到远排列，`auto_update` 默认真。
+/// r186: `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
+pub(all) struct LOD {
+  node : Object3D
+  mut levels : Array[LodLevel]
+  mut auto_update : Bool
+}
+
+///|
+pub fn LOD::new() -> LOD {
+  {
+    node: Object3D::new(kind=@core.NodeKind::LOD),
+    levels: [],
+    auto_update: true,
+  }
+}
+
+///|
+pub impl @core.AsNode for LOD with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend LOD with @core.AsNode::{to_node}
+
+///|
+/// 按距离插入一级，并把它加为子节点。负距离取绝对值。相等距离排在已有级别之后。
+/// r186: `addLevel` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L116
+pub fn LOD::add_level(
+  self : LOD,
+  object : Object3D,
+  distance? : Double = 0.0,
+  hysteresis? : Double = 0.0,
+) -> LOD {
+  let distance = distance.abs()
+  let mut index = 0
+  let count = self.levels.length()
+  while index < count {
+    if distance < self.levels[index].distance {
+      break
+    }
+    index = index + 1
+  }
+  let next = []
+  let mut i = 0
+  while i < index {
+    next.push(self.levels[i])
+    i = i + 1
+  }
+  next.push({ object, distance, hysteresis })
+  while i < count {
+    next.push(self.levels[i])
+    i = i + 1
+  }
+  self.levels = next
+  ignore(self.node.add(object))
+  self
 }

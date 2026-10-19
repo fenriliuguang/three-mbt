@@ -44,6 +44,16 @@ pub fn InstancedMesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn InstancedMesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for InstancedMesh
 
+pub(all) struct LOD {
+  node : @core.Object3D
+  mut levels : Array[LodLevel]
+  mut auto_update : Bool
+}
+pub fn LOD::add_level(Self, @core.Object3D, distance? : Double, hysteresis? : Double) -> Self
+pub fn LOD::new() -> Self
+pub fn LOD::to_node(Self) -> @core.Object3D
+pub impl @core.AsNode for LOD
+
 pub(all) struct Line {
   node : @core.Object3D
   geometry : @core.BufferGeometry
@@ -67,6 +77,12 @@ pub fn LineSegments::set_fog(Self, Bool) -> Unit
 pub fn LineSegments::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn LineSegments::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for LineSegments
+
+pub(all) struct LodLevel {
+  object : @core.Object3D
+  distance : Double
+  hysteresis : Double
+}
 
 pub(all) struct Mesh {
   node : @core.Object3D

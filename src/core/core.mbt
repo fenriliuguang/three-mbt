@@ -19,6 +19,7 @@ pub(all) enum NodeKind {
   Line
   LineSegments
   Sprite
+  LOD
 }
 
 ///|

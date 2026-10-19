@@ -135,6 +135,8 @@ pub using @objects {
   type InstancedMesh,
   type Line,
   type LineSegments,
+  type LodLevel,
+  type LOD,
   type Mesh,
   type Points,
   type Sprite,

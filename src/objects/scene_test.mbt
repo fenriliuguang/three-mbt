@@ -329,3 +329,26 @@ test "panic sprite raycast without a camera" {
   let raycaster = @core.Raycaster::new()
   ignore(raycaster.intersect_object(sprite.node))
 }
+
+///|
+test "LOD.addLevel sorts levels by absolute distance" {
+  let lod = @objects.LOD::new()
+  let far = @core.Object3D::new()
+  let near = @core.Object3D::new()
+  let mid = @core.Object3D::new()
+  ignore(lod.add_level(far, distance=10.0))
+  ignore(lod.add_level(near, distance=0.0))
+  ignore(lod.add_level(mid, distance=-5.0, hysteresis=0.25))
+  assert_eq(lod.levels.length(), 3)
+  assert_eq(lod.levels[0].distance, 0.0)
+  assert_eq(lod.levels[1].distance, 5.0)
+  assert_eq(lod.levels[2].distance, 10.0)
+  assert_eq(lod.levels[0].hysteresis, 0.0)
+  assert_eq(lod.levels[1].hysteresis, 0.25)
+  assert_eq(physical_equal(lod.levels[0].object, near), true)
+  assert_eq(physical_equal(lod.levels[1].object, mid), true)
+  assert_eq(physical_equal(lod.levels[2].object, far), true)
+  assert_eq(lod.node.children.length(), 3)
+  assert_eq(physical_equal(lod.node.children[0], far), true)
+  assert_eq(lod.auto_update, true)
+}

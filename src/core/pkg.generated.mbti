@@ -393,6 +393,7 @@ pub(all) enum NodeKind {
   Line
   LineSegments
   Sprite
+  LOD
 }
 
 pub(all) struct Object3D {

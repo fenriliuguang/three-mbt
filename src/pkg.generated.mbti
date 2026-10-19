@@ -198,6 +198,8 @@ pub using @constants {type Interpolation}
 
 pub using @animation {type KeyframeTrack}
 
+pub using @objects {type LOD}
+
 pub using @core {type Layers}
 
 pub using @objects {type Line}
@@ -205,6 +207,8 @@ pub using @objects {type Line}
 pub using @materials {type LineBasicMaterial}
 
 pub using @objects {type LineSegments}
+
+pub using @objects {type LodLevel}
 
 pub using @constants {type LoopMode}
 
