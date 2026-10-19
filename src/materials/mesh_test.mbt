@@ -3288,3 +3288,32 @@ test "Material shader stores the default vertex shader" {
   cloned.vertex_shader = "clone"
   assert_eq(shader.vertex_shader, "void main() {}")
 }
+
+///|
+test "Material shader stores the default fragment shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  let expected =
+    "\nvoid main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}\n"
+  assert_eq(shader.fragment_shader, expected)
+  assert_eq(basic.fragment_shader, "")
+  assert_eq(phong.fragment_shader, "")
+  shader.fragment_shader = "void main() {}"
+  ignore(basic.copy(shader))
+  assert_eq(basic.fragment_shader, "")
+  assert_eq(shader.fragment_shader, "void main() {}")
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.fragment_shader, "void main() {}")
+  onto.fragment_shader = "changed"
+  assert_eq(shader.fragment_shader, "void main() {}")
+  ignore(onto.copy(phong))
+  assert_eq(onto.fragment_shader, "")
+  assert_eq(phong.fragment_shader, "")
+  let cloned = shader.clone()
+  assert_eq(cloned.fragment_shader, "void main() {}")
+  assert_eq(cloned.id == shader.id, false)
+  cloned.fragment_shader = "clone"
+  assert_eq(shader.fragment_shader, "void main() {}")
+}

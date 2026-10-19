@@ -2107,6 +2107,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.vertexShader` has landed. A new Shader material stores a string that starts with a newline, then `void main()`, then a tab and `gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );`, and ends with a newline. A new Basic material and a new Phong material store `""`. Setting the Shader material to `void main() {}` and copying it onto a Basic material leaves the Basic material `""` and the source unchanged. Copying that Shader material onto another Shader material stores `void main() {}`. Setting the destination to `changed` leaves the source unchanged. Copying a Phong material onto that destination stores `""`. Cloning the source keeps `void main() {}`, and setting the clone to `clone` leaves the source unchanged. The renderer still does not compile the string. `fragmentShader` stays later.
 
+`ShaderMaterial.fragmentShader` has landed. A new Shader material stores a string that starts with a newline, then `void main()`, then a tab and `gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );`, and ends with a newline. A new Basic material and a new Phong material store `""`. Setting the Shader material to `void main() {}` and copying it onto a Basic material leaves the Basic material `""` and the source unchanged. Copying that Shader material onto another Shader material stores `void main() {}`. Setting the destination to `changed` leaves the source unchanged. Copying a Phong material onto that destination stores `""`. Cloning the source keeps `void main() {}`, and setting the clone to `clone` leaves the source unchanged. The renderer still does not compile the string. `uniforms` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3101,6 +3103,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.lights` | `materials` |
 | planned | 7 | `ShaderMaterial.clipping` | `materials` |
 | planned | 7 | `ShaderMaterial.vertexShader` | `materials` |
+| planned | 7 | `ShaderMaterial.fragmentShader` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

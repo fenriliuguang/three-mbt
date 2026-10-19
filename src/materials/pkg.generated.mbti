@@ -104,6 +104,7 @@ pub(all) struct Material {
   mut lights : Bool
   mut clipping : Bool
   mut vertex_shader : String
+  mut fragment_shader : String
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool
