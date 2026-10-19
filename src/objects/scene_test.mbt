@@ -1899,6 +1899,52 @@ test "SkinnedMesh starts attached with identity bind matrices" {
 }
 
 ///|
+test "SkinnedMesh.bind stores the skeleton and the inverse bind matrix" {
+  let bone = @objects.Bone::new()
+  let given = @math.Matrix4::new()
+  ignore(
+    given.set(
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    ),
+  )
+  let explicit = @objects.Skeleton::new(bones=[bone])
+  assert_eq(explicit.bone_inverses[0].elements[13], 0.0)
+  let held = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  held.bind(explicit, bind_matrix=given)
+  match held.skeleton {
+    None => assert_eq(false, true)
+    Some(skeleton) => assert_eq(physical_equal(skeleton, explicit), true)
+  }
+  assert_eq(held.bind_matrix.elements[13], 4.0)
+  assert_eq(held.bind_matrix_inverse.elements[13], -4.0)
+  assert_eq(given.elements[13], 4.0)
+  assert_eq(explicit.bone_inverses[0].elements[13], 0.0)
+  let shoulder = @objects.Bone::new()
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder])
+  assert_eq(arm.bone_inverses[0].elements[13], 5.0)
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.mesh.node.position.set(0.0, 3.0, 0.0))
+  skin.bind(arm)
+  assert_eq(arm.bone_inverses[0].elements[13], 2.0)
+  assert_eq(skin.bind_matrix.elements[13], 3.0)
+  assert_eq(skin.bind_matrix_inverse.elements[13], -3.0)
+  ignore(skin.mesh.node.position.set(0.0, 9.0, 0.0))
+  skin.mesh.node.update_matrix_world(force=true)
+  assert_eq(skin.bind_matrix.elements[13], 3.0)
+  assert_eq(skin.mesh.node.matrix_world.elements[13], 9.0)
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

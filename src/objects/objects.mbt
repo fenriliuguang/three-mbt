@@ -390,6 +390,27 @@ pub impl @core.AsNode for SkinnedMesh with fn to_node(self) {
 pub extend SkinnedMesh with @core.AsNode::{to_node}
 
 ///|
+/// 绑定骨架。给出绑定矩阵时直接使用它。没有给出时先更新世界矩阵，再按骨骼当前的世界矩阵重算逆绑定，并用网格自己的世界矩阵。
+/// r186: `bind` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L230
+pub fn SkinnedMesh::bind(
+  self : SkinnedMesh,
+  skeleton : Skeleton,
+  bind_matrix? : @math.Matrix4,
+) -> Unit {
+  self.skeleton = Some(skeleton)
+  let matrix = match bind_matrix {
+    None => {
+      self.mesh.node.update_matrix_world(force=true)
+      skeleton.calculate_inverses()
+      self.mesh.node.matrix_world
+    }
+    Some(matrix) => matrix
+  }
+  ignore(self.bind_matrix.copy(matrix))
+  ignore(self.bind_matrix_inverse.copy(matrix).invert())
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39

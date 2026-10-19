@@ -209,6 +209,7 @@ pub(all) struct SkinnedMesh {
   mut bounding_sphere : @math.Sphere?
   mut skeleton : Skeleton?
 }
+pub fn SkinnedMesh::bind(Self, Skeleton, bind_matrix? : @math.Matrix4) -> Unit
 pub fn SkinnedMesh::new(@core.BufferGeometry, @materials.Material) -> Self
 pub fn SkinnedMesh::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for SkinnedMesh
