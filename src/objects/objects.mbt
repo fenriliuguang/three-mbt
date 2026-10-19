@@ -36,13 +36,18 @@ pub fn[T : @core.AsNode] Group::add(self : Group, child : T) -> Group {
 
 ///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
+/// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
+/// r186: `morphTargetDictionary` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L85
+/// r186: `morphTargetInfluences` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L95
 /// r186: `count` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L104
 pub(all) struct Mesh {
   node : Object3D
   mut geometry : BufferGeometry
   mut material : @materials.Material
   mut count : Int
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 
 ///|
@@ -51,9 +56,52 @@ pub fn Mesh::new(
   material : @materials.Material,
 ) -> Mesh {
   let node = Object3D::new(kind=@core.Mesh)
-  let mesh : Mesh = { node, geometry, material, count: 1, }
+  let mesh : Mesh = {
+    node,
+    geometry,
+    material,
+    count: 1,
+    morph_target_influences: None,
+    morph_target_dictionary: None,
+  }
   mesh.refresh()
+  mesh.update_morph_targets()
   mesh
+}
+
+///|
+/// 按几何体里先迭代到的那一组形变属性填写权重和名字表。权重全是 `0`。
+/// 属性名为空时用下标字符串。没有形变属性时保持原值。
+/// r186: `updateMorphTargets` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L137
+pub fn Mesh::update_morph_targets(self : Mesh) -> Unit {
+  let mut chosen : Array[BufferAttribute]? = None
+  for pair in self.geometry.morph_attributes.iter() {
+    if chosen is None {
+      let (_, attributes) = pair
+      chosen = Some(attributes)
+    }
+  }
+  match chosen {
+    None => ()
+    Some(attributes) => {
+      let influences : Array[Double] = []
+      let dictionary : Map[String, Int] = Map([])
+      let mut index = 0
+      while index < attributes.length() {
+        let attribute = attributes[index]
+        let name = if attribute.name == "" {
+          index.to_string()
+        } else {
+          attribute.name
+        }
+        influences.push(0.0)
+        dictionary.set(name, index)
+        index = index + 1
+      }
+      self.morph_target_influences = Some(influences)
+      self.morph_target_dictionary = Some(dictionary)
+    }
+  }
 }
 
 ///|

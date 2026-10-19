@@ -106,6 +106,8 @@ pub(all) struct Mesh {
   mut geometry : @core.BufferGeometry
   mut material : @materials.Material
   mut count : Int
+  mut morph_target_influences : Array[Double]?
+  mut morph_target_dictionary : Map[String, Int]?
 }
 pub fn Mesh::clone(Self, recursive? : Bool) -> Self
 pub fn Mesh::copy(Self, Self, recursive? : Bool) -> Self
@@ -116,6 +118,7 @@ pub fn Mesh::set_map(Self, @textures.Texture?) -> Unit
 pub fn Mesh::set_side(Self, @constants.Side) -> Unit
 pub fn Mesh::set_transparent(Self, Bool, opacity? : Double) -> Unit
 pub fn Mesh::to_node(Self) -> @core.Object3D
+pub fn Mesh::update_morph_targets(Self) -> Unit
 pub impl @core.AsNode for Mesh
 
 pub(all) struct Points {
