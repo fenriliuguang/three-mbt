@@ -93,9 +93,10 @@ pub impl @core.AsNode for LineLoop
 
 pub(all) struct LineSegments {
   node : @core.Object3D
-  geometry : @core.BufferGeometry
-  material : @materials.LineBasicMaterial
+  mut geometry : @core.BufferGeometry
+  mut material : @materials.LineBasicMaterial
 }
+pub fn LineSegments::copy(Self, Self, recursive? : Bool) -> Self
 pub fn LineSegments::new(@core.BufferGeometry, @materials.LineBasicMaterial) -> Self
 pub fn LineSegments::refresh(Self) -> Unit
 pub fn LineSegments::set_fog(Self, Bool) -> Unit

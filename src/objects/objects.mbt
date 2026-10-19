@@ -449,8 +449,8 @@ pub fn Line::set_transparent(
 /// r186: `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14
 pub(all) struct LineSegments {
   node : Object3D
-  geometry : BufferGeometry
-  material : @materials.LineBasicMaterial
+  mut geometry : BufferGeometry
+  mut material : @materials.LineBasicMaterial
 }
 
 ///|
@@ -471,6 +471,22 @@ pub impl @core.AsNode for LineSegments with fn to_node(self) {
 
 ///|
 pub extend LineSegments with @core.AsNode::{to_node}
+
+///|
+/// 复制变换、几何体和材质。几何体与材质沿用源对象。
+/// `LineSegments` 没有自己的 `copy`，行为来自 `Line.copy`。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
+pub fn LineSegments::copy(
+  self : LineSegments,
+  source : LineSegments,
+  recursive? : Bool = true,
+) -> LineSegments {
+  ignore(self.node.copy(source.node, recursive~))
+  self.geometry = source.geometry
+  self.material = source.material
+  self.refresh()
+  self
+}
 
 ///|
 pub fn LineSegments::refresh(self : LineSegments) -> Unit {
