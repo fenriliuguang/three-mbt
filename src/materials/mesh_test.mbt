@@ -1804,3 +1804,30 @@ test "Material iridescenceThicknessRange starts at 100 and 400 and copies by val
   assert_eq(standard.iridescence_thickness_range[0], 100.0)
   assert_eq(standard.iridescence_thickness_range[1], 400.0)
 }
+
+///|
+test "Material iridescenceThicknessMap starts empty and copies by reference" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.iridescence_thickness_map is None, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.iridescence_thickness_map is None, true)
+  let pixels = FixedArray::make(4, b'\xFF')
+  pixels[1] = b'\x80'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  lambert.iridescence_thickness_map = Some(map)
+  let other = @materials.Material::lambert()
+  assert_eq(other.iridescence_thickness_map is None, true)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  match destination.iridescence_thickness_map {
+    None => abort("copied iridescence thickness map")
+    Some(copied) => assert_eq(physical_equal(copied, map), true)
+  }
+  destination.iridescence_thickness_map = None
+  match lambert.iridescence_thickness_map {
+    None => abort("source iridescence thickness map")
+    Some(kept) => assert_eq(physical_equal(kept, map), true)
+  }
+  let standard = @materials.Material::standard()
+  assert_eq(standard.iridescence_thickness_map is None, true)
+}
