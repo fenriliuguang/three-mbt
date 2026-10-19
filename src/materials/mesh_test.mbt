@@ -9278,6 +9278,23 @@ test "Material shader useFog reads the material flag" {
 }
 
 ///|
+test "Material shader fogExp2 needs scene fog of that kind" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_fog_exp2(), false)
+  assert_eq(@materials.Material::raw().program_fog_exp2(), false)
+  assert_eq(@materials.Material::basic().program_fog_exp2(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_fog_exp2(has_fog=true), false)
+  assert_eq(shader.program_fog_exp2(fog_exp2=true), false)
+  assert_eq(shader.program_fog_exp2(has_fog=true, fog_exp2=true), true)
+  shader.fog = true
+  assert_eq(shader.program_fog_exp2(), false)
+  shader.fog = false
+  assert_eq(shader.program_fog_exp2(has_fog=true, fog_exp2=true), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
