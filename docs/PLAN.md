@@ -1961,6 +1961,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.combine` has landed. A new Basic, Lambert, and Standard material each store multiply, integer `0`. A Lambert material set to mix stores `1`. Another Lambert material stays at `0`. Copying onto a Basic material stores `1`. Setting the destination to add leaves the source at `1`, and add is `2`. A new Standard material stays at `0`. The renderer still does not sample the environment map.
 
+`Material.reflectivity` has landed. A new Basic, Lambert, and Standard material each store `1`. A Lambert material set to `0.25` leaves another Lambert material at `1`. Copying onto a Basic material stores `0.25`. Setting the destination to `0` leaves the source at `0.25`. A new Standard material stays at `1`. The renderer still does not sample the environment map. `envMapIntensity` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2882,6 +2884,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.envMap` | `materials` |
 | planned | 7 | `Material.envMapRotation` | `materials` |
 | planned | 7 | `Material.combine` | `constants`, `materials` |
+| planned | 7 | `Material.reflectivity` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

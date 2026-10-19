@@ -1241,3 +1241,21 @@ test "Material combine defaults to multiply and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.combine.to_int(), 0)
 }
+
+///|
+test "Material reflectivity defaults to one and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.reflectivity, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.reflectivity, 1.0)
+  lambert.reflectivity = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.reflectivity, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.reflectivity, 0.25)
+  destination.reflectivity = 0.0
+  assert_eq(lambert.reflectivity, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.reflectivity, 1.0)
+}
