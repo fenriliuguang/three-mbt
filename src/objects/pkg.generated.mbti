@@ -28,8 +28,10 @@ pub(all) struct InstancedMesh {
   material : @materials.Material
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
+  mut bounding_sphere : @math.Sphere?
 }
 pub fn InstancedMesh::compute_bounding_box(Self) -> @math.Box3
+pub fn InstancedMesh::compute_bounding_sphere(Self) -> @math.Sphere
 pub fn InstancedMesh::get_color_at(Self, Int, @math.Color) -> @math.Color
 pub fn InstancedMesh::get_matrix_at(Self, Int, @math.Matrix4) -> @math.Matrix4
 pub fn InstancedMesh::new(@core.BufferGeometry, @materials.Material, Int) -> Self

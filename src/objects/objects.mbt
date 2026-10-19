@@ -490,6 +490,7 @@ pub(all) struct InstancedMesh {
   material : @materials.Material
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
+  mut bounding_sphere : @math.Sphere?
 }
 
 ///|
@@ -512,6 +513,7 @@ pub fn InstancedMesh::new(
     material,
     instances,
     bounding_box: None,
+    bounding_sphere: None,
   }
   mesh.refresh()
   mesh
@@ -702,6 +704,39 @@ pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {
     }
   }
   box
+}
+
+///|
+/// 局部包围球：几何体包围球按每个实例矩阵变换后再求并。
+/// r186: `computeBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L151
+pub fn InstancedMesh::compute_bounding_sphere(
+  self : InstancedMesh,
+) -> @math.Sphere {
+  self.geometry.compute_bounding_sphere()
+  let sphere = match self.bounding_sphere {
+    Some(sphere) => sphere
+    None => {
+      let sphere = @math.Sphere::new()
+      self.bounding_sphere = Some(sphere)
+      sphere
+    }
+  }
+  ignore(sphere.make_empty())
+  match self.geometry.bounding_sphere {
+    None => ()
+    Some(geometry_sphere) => {
+      let matrix = @math.Matrix4::new()
+      let mut index = 0
+      while index < self.instances.count {
+        ignore(self.get_matrix_at(index, matrix))
+        let transformed = @math.Sphere::new()
+        ignore(transformed.copy(geometry_sphere).apply_matrix4(matrix))
+        ignore(sphere.union(transformed))
+        index = index + 1
+      }
+    }
+  }
+  sphere
 }
 
 ///|

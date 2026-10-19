@@ -659,3 +659,54 @@ test "Sprite.intersectsFrustumArray uses only the counted frustums" {
   frustums.count = 2
   assert_eq(sprite.intersects_frustum_array(frustums), true)
 }
+
+///|
+test "InstancedMesh.computeBoundingSphere unions transformed geometry spheres" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
+  let moved = @math.Matrix4::new()
+  ignore(moved.make_translation(2.0, 0.0, 0.0))
+  mesh.set_matrix_at(1, moved)
+  let sphere = mesh.compute_bounding_sphere()
+  assert_eq(sphere.center.x, 1.0)
+  assert_eq(sphere.center.y, 0.0)
+  assert_eq(sphere.center.z, 0.0)
+  assert_eq(sphere.radius, 1.0)
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(geometry_sphere) => {
+      assert_eq(geometry_sphere.center.x, 0.0)
+      assert_eq(geometry_sphere.center.y, 0.0)
+      assert_eq(geometry_sphere.center.z, 0.0)
+      assert_eq(geometry_sphere.radius, 0.0)
+    }
+  }
+  mesh.set_count(1)
+  let near = mesh.compute_bounding_sphere()
+  assert_eq(near.center.x, 0.0)
+  assert_eq(near.center.y, 0.0)
+  assert_eq(near.center.z, 0.0)
+  assert_eq(near.radius, 0.0)
+  mesh.set_count(0)
+  let none_drawn = mesh.compute_bounding_sphere()
+  assert_eq(none_drawn.center.x, 0.0)
+  assert_eq(none_drawn.radius, -1.0)
+  let blank = @objects.InstancedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+    1,
+  )
+  let missing = blank.compute_bounding_sphere()
+  assert_eq(missing.center.x, 0.0)
+  assert_eq(missing.radius, -1.0)
+}
