@@ -1,9 +1,10 @@
-// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32 ; `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15 ; `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14
+// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32 ; `RenderTarget` https://github.com/mrdoob/three.js/blob/r186/src/core/RenderTarget.js#L15 ; `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14 ; `channel` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L118
 
 ///|
 /// `rgba8` 纹理。字节按行优先，第 0 行是图像顶部。没有 DOM 图片路径。
 ///
 /// `flip_y` 默认 true，与 r186 一致：上传前把行序颠倒，使图像顶部落到较高的 v。
+/// `channel` 默认 `0`。着色器前缀把 `0` 写成 `uv`，其它整数写成 `uv` 加这个数。
 /// 本阶段不生成 mipmap。
 ///
 /// `attachment` 为 true 时，像素在 GPU 颜色目标上，`data` 只是 1×1 占位。
@@ -21,6 +22,7 @@ pub(all) struct Texture {
   mut needs_update : Bool
   attachment : Bool
   mut version : Int
+  mut channel : Int
 }
 
 ///|
@@ -53,6 +55,7 @@ pub fn Texture::from_rgba8(
     needs_update: true,
     attachment: false,
     version: 0,
+    channel: 0,
   }
 }
 
@@ -79,6 +82,7 @@ pub fn Texture::attachment(width : Int, height : Int) -> Texture {
     needs_update: false,
     attachment: true,
     version: 0,
+    channel: 0,
   }
 }
 

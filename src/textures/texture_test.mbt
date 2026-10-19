@@ -74,6 +74,7 @@ test "checker is rgba8 and flip_y reverses rows" {
   assert_eq(map.data.length(), 16)
   assert_eq(map.needs_update, true)
   assert_eq(map.flip_y, true)
+  assert_eq(map.channel, 0)
   assert_eq(map.attachment, false)
   assert_eq(map.version, 0)
   assert_eq(map.wrap_s is @constants.ClampToEdge, true)

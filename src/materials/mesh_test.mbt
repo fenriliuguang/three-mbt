@@ -3338,9 +3338,9 @@ test "Material shader writes USE_MAP" {
   let pixels = FixedArray::make(4, b'\xFF')
   let map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.map = Some(map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1624)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
   assert_eq(shader.prefixed_fragment_shader().length(), 1238)
-  assert_eq(1624 - 1608, 16)
+  assert_eq(1642 - 1608, 34)
   assert_eq(
     shader.prefixed_vertex_shader()[683:698].to_owned(),
     "#define USE_MAP",
@@ -3350,8 +3350,8 @@ test "Material shader writes USE_MAP" {
     "#define USE_MAP",
   )
   shader.defines.set("FOO", "1")
-  assert_eq(shader.prefixed_vertex_shader().length(), 1638)
-  assert_eq(1638 - 1624, 14)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1656)
+  assert_eq(1656 - 1642, 14)
   assert_eq(
     shader.prefixed_vertex_shader()[697:712].to_owned(),
     "#define USE_MAP",
@@ -3382,8 +3382,8 @@ test "Material shader writes USE_ENVMAP" {
     "#define USE_ENVMAP",
   )
   shader.map = Some(env_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
-  assert_eq(1674 - 1658, 16)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1692)
+  assert_eq(1692 - 1658, 34)
   assert_eq(
     shader.prefixed_vertex_shader()[699:717].to_owned(),
     "#define USE_ENVMAP",
@@ -3414,7 +3414,7 @@ test "Material shader writes ENVMAP_MODE" {
     "#define ENVMAP_MODE_REFLECTION",
   )
   shader.map = Some(env_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1674)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1692)
   assert_eq(
     shader.prefixed_vertex_shader()[718:748].to_owned(),
     "#define ENVMAP_MODE_REFLECTION",
@@ -4448,6 +4448,43 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
   let basic = @materials.Material::basic()
   basic.sheen = 1.0
   basic.sheen_roughness_map = Some(roughness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes MAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(map.channel, 0)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(1642 - 1608, 34)
+  assert_eq(shader.prefixed_vertex_shader()[699:716].to_owned(), "#define MAP_UV uv")
+  map.channel = 1
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1238)
+  assert_eq(1643 - 1608, 35)
+  assert_eq(
+    shader.prefixed_vertex_shader()[699:717].to_owned(),
+    "#define MAP_UV uv1",
+  )
+  map.channel = 0
+  shader.map = Some(map)
+  shader.sheen = 1.0
+  shader.sheen_roughness_map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1673)
+  assert_eq(
+    shader.prefixed_vertex_shader()[730:747].to_owned(),
+    "#define MAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.map = Some(map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.map = Some(map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 

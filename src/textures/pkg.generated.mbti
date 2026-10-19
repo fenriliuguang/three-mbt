@@ -46,6 +46,7 @@ pub(all) struct Texture {
   mut needs_update : Bool
   attachment : Bool
   mut version : Int
+  mut channel : Int
 }
 pub fn Texture::attachment(Int, Int) -> Self
 pub fn Texture::checker(width~ : Int, height~ : Int, cell~ : Int, first~ : Int, second~ : Int) -> Self
