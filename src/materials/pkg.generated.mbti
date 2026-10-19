@@ -452,6 +452,7 @@ pub(all) struct UniformsGroup {
 }
 pub fn UniformsGroup::add(Self, Double) -> Self
 pub fn UniformsGroup::add_event_listener(Self, String, () -> Unit) -> Unit
+pub fn UniformsGroup::clone(Self) -> Self
 pub fn UniformsGroup::dispatch_event(Self, String) -> Unit
 pub fn UniformsGroup::dispose(Self) -> Unit
 pub fn UniformsGroup::has_event_listener(Self, String, () -> Unit) -> Bool

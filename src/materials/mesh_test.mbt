@@ -3581,6 +3581,26 @@ test "UniformsGroup dispatchEvent runs listeners of one kind" {
 }
 
 ///|
+test "UniformsGroup clone keeps values and drops listeners" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  ignore(frame.set_usage(35048))
+  ignore(frame.add(1.0).add(2.0))
+  let listener = fn() {}
+  frame.add_event_listener("dispose", listener)
+  let cloned = frame.clone()
+  assert_eq(cloned.name, "Frame")
+  assert_eq(cloned.usage, 35048)
+  assert_eq(cloned.uniforms, [1.0, 2.0])
+  assert_eq(cloned.id == frame.id, false)
+  assert_eq(cloned.has_event_listener("dispose", listener), false)
+  assert_eq(frame.has_event_listener("dispose", listener), true)
+  cloned.uniforms[0] = 9.0
+  cloned.name = "Other"
+  assert_eq(frame.uniforms[0], 1.0)
+  assert_eq(frame.name, "Frame")
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
