@@ -73,6 +73,7 @@ pub(all) struct Material {
   mut tone_mapped : Bool
   mut alpha_hash : Bool
   mut alpha_to_coverage : Bool
+  mut dithering : Bool
   kind : MaterialKind
 }
 pub fn Material::basic(hex? : Int) -> Self

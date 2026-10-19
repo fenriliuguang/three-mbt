@@ -61,3 +61,19 @@ test "Material alphaToCoverage defaults off" {
   assert_eq(basic.material.alpha_to_coverage, true)
   assert_eq(standard.material.alpha_to_coverage, true)
 }
+
+///|
+test "Material dithering defaults off" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.dithering, false)
+  basic.material.dithering = true
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.dithering, false)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.dithering, false)
+  standard.material.dithering = true
+  let other = @materials.Material::basic()
+  assert_eq(other.dithering, false)
+  assert_eq(basic.material.dithering, true)
+  assert_eq(standard.material.dithering, true)
+}
