@@ -2355,6 +2355,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `PREMULTIPLIED_ALPHA` has landed. A Shader material with `premultiplied_alpha` false adds nothing. The fragment string stays `2041` and the vertex string stays `1608`. Setting it to true writes `#define PREMULTIPLIED_ALPHA` and a newline, `28` characters, so the fragment string is `2069`. The vertex string stays `1608`. `num_light_probes` `1` keeps the vertex string at `1633` and writes the define before `USE_LIGHT_PROBES`, so the fragment string is `2094`. `shadow_map_enabled` true keeps the vertex string at `1659` and puts the define after `SHADOWMAP_TYPE_BASIC`, so the fragment string is `2120`. Setting it back to false drops the line. A raw material stays at `61`. A Basic material stays `""`. `USE_LIGHT_PROBES_GRID` stays later.
 
+`USE_LIGHT_PROBES_GRID` has landed. A Shader material with `num_light_probe_grids` at `0` or below adds nothing. The fragment string stays `2041` and the vertex string stays `1608`. Passing `1` writes `#define USE_LIGHT_PROBES_GRID` and a newline, `30` characters, so the fragment string is `2071`. The vertex string stays `1608`. `num_light_probes` `1` keeps the vertex string at `1633` and writes the grid define after `USE_LIGHT_PROBES`, so the fragment string is `2096`. `premultiplied_alpha` true keeps the vertex string at `1608` and puts the define after `PREMULTIPLIED_ALPHA`, so the fragment string is `2099`. A raw material stays at `61`. A Basic material stays `""`. `DECODE_VIDEO_TEXTURE` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3473,6 +3475,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `prefixFragment` newline | `materials` |
 | planned | 7 | `USE_GRADIENTMAP` | `materials` |
 | planned | 7 | `PREMULTIPLIED_ALPHA` | `materials` |
+| planned | 7 | `USE_LIGHT_PROBES_GRID` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

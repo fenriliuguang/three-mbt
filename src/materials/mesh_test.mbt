@@ -6930,6 +6930,42 @@ test "Material shader writes PREMULTIPLIED_ALPHA" {
 }
 
 ///|
+test "Material shader writes USE_LIGHT_PROBES_GRID" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probe_grids=0).length(), 2041)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probe_grids=-1).length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probe_grids=1).length(), 2071)
+  assert_eq(2071 - 2041, 30)
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probe_grids=1)[1079:1108].to_owned(),
+    "#define USE_LIGHT_PROBES_GRID",
+  )
+  assert_eq(shader.prefixed_vertex_shader(num_light_probes=1).length(), 1633)
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1, num_light_probe_grids=2).length(),
+    2096,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probes=1, num_light_probe_grids=2)[1104:1133].to_owned(),
+    "#define USE_LIGHT_PROBES_GRID",
+  )
+  shader.premultiplied_alpha = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(num_light_probe_grids=1).length(), 2099)
+  assert_eq(
+    shader.prefixed_fragment_shader(num_light_probe_grids=1)[1107:1136].to_owned(),
+    "#define USE_LIGHT_PROBES_GRID",
+  )
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(num_light_probe_grids=1).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(num_light_probe_grids=1), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
