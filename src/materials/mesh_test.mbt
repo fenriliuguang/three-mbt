@@ -3523,6 +3523,26 @@ test "UniformsGroup dispose runs dispose listeners" {
 }
 
 ///|
+test "UniformsGroup hasEventListener checks one function" {
+  let frame = @materials.UniformsGroup::new(name="Frame")
+  let listener = fn() {}
+  let other = fn() {}
+  assert_eq(frame.has_event_listener("dispose", listener), false)
+  frame.add_event_listener("dispose", listener)
+  assert_eq(frame.has_event_listener("dispose", listener), true)
+  assert_eq(frame.has_event_listener("dispose", other), false)
+  assert_eq(frame.has_event_listener("change", listener), false)
+  let fresh = @materials.UniformsGroup::new(name="Other")
+  assert_eq(fresh.has_event_listener("dispose", listener), false)
+  let shader = @materials.Material::shader()
+  shader.uniforms_groups.push(frame)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.uniforms_groups[0].has_event_listener("dispose", listener), false)
+  assert_eq(shader.uniforms_groups[0].has_event_listener("dispose", listener), true)
+}
+
+///|
 test "Material shader keeps its own linewidth on copy" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()

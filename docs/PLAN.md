@@ -2139,6 +2139,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `UniformsGroup.dispose` has landed. A listener registered twice for `dispose` runs once, so the hit count is `1`. A `change` listener does not run. Calling `dispose` again makes the count `2`. Copying the group onto another Shader material gives that group an empty listener table. Disposing the destination leaves the count at `2`. Disposing the source makes the count `3`. The renderer still does not free a GPU buffer from this call. `UniformsGroup.hasEventListener` stays later.
 
+`UniformsGroup.hasEventListener` has landed. Before registration a group reports false for a `dispose` listener. After `addEventListener`, that same listener reports true. A different function and the event name `change` stay false. Another new group also reports false. Copying the group onto another Shader material leaves the destination false and the source true. `UniformsGroup.removeEventListener` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3149,6 +3151,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `UniformsGroup.setName` | `materials` |
 | planned | 7 | `UniformsGroup.setUsage` | `materials` |
 | planned | 7 | `UniformsGroup.dispose` | `materials` |
+| planned | 7 | `UniformsGroup.hasEventListener` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
