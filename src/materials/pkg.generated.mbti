@@ -282,6 +282,7 @@ pub fn PointsMaterial::set_needs_update(Self, Bool) -> Unit
 pub(all) struct SpriteMaterial {
   color : @math.Color
   mut side : @constants.Side
+  mut shadow_side : @constants.Side?
   mut map : @textures.Texture?
   mut alpha_map : @textures.Texture?
   mut opacity : Double

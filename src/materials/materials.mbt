@@ -1618,10 +1618,12 @@ pub fn LineDashedMaterial::keeps_distance(
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// `side` 默认正面。背面和双面一并存储。`copy` 沿用源值。渲染器仍不画精灵。
+/// `shadow_side` 默认空。`copy` 沿用源值。渲染器仍不画精灵。
 /// 深度写入和深度测试默认打开，深度函数是 `LessEqual`。颜色写入默认打开，预乘默认关闭，可见性默认打开。
 /// `alpha_test` 默认 `0`。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`vertex_colors` 默认关闭。`tone_mapped` 默认打开。`alpha_hash` 默认关闭。`alpha_to_coverage` 默认关闭。`dithering` 默认关闭。`polygon_offset` 默认关闭，系数和单位默认 `0`。`clip_shadows` 默认关闭。`clip_intersection` 默认关闭。`allow_override` 默认打开。`blend_alpha` 默认 `0`。`blend_color` 默认黑色 `(0, 0, 0)`。`blending` 默认 `Normal`。`blend_src` 默认 `SrcAlpha`。`blend_dst` 默认 `OneMinusSrcAlpha`。`blend_equation` 默认 `Add`。`blend_src_alpha` 默认空。`blend_dst_alpha` 默认空。`blend_equation_alpha` 默认空。`stencil_write_mask` 默认 `0xFF`。`stencil_func` 默认 `Always`。`stencil_ref` 默认 `0`。`stencil_func_mask` 默认 `0xFF`。`stencil_fail` 默认 `Keep`。比较失败时的模板操作。`stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。`stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。`stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。`clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。`precision` 默认空。空着时沿用渲染器默认精度。`user_data` 默认空表。自定义字符串键值。`version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。`copy` 不改目标上的这个计数。`id` 与网格材质共用从 `0` 起的计数。每新建一份精灵材质取下一个编号。`copy` 不改目标上的这个编号。`uuid` 在新建时生成，长度 36，版本位是 4。`copy` 不改目标上的这个字符串。`name` 默认空字符串。`copy` 把名字写进目标。`type_name` 对应上游 `type`，固定是 `SpriteMaterial`。`copy` 不改目标上的这个名字。`listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。渲染器仍不画精灵。混合仍不用常量颜色，管线仍不读 `blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data`。空着时 alpha 通道分别沿用 `blend_src`、`blend_dst` 与 `blend_equation`。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 /// r186: `side` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L88
+/// r186: `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342
 /// r186: `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99
 /// r186: `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458
 /// r186: `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135
@@ -1676,6 +1678,7 @@ pub fn LineDashedMaterial::keeps_distance(
 pub(all) struct SpriteMaterial {
   color : @math.Color
   mut side : @constants.Side
+  mut shadow_side : @constants.Side?
   mut map : @textures.Texture?
   mut alpha_map : @textures.Texture?
   mut opacity : Double
@@ -1741,6 +1744,7 @@ pub fn SpriteMaterial::new(
   {
     color: @math.Color::new().set_hex(hex),
     side: @constants.Front,
+    shadow_side: None,
     map: None,
     alpha_map: None,
     opacity,
@@ -1797,7 +1801,7 @@ pub fn SpriteMaterial::new(
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。贴图和透明贴图沿用源对象。
-/// `name`、`side`、不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
+/// `name`、`side`、`shadow_side`、不透明度、`alpha_test`、透明开关、雾、旋转、尺寸衰减、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。`listeners` 留在目标上。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L121
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn SpriteMaterial::copy(
@@ -1806,6 +1810,7 @@ pub fn SpriteMaterial::copy(
 ) -> SpriteMaterial {
   self.name = source.name
   self.side = source.side
+  self.shadow_side = source.shadow_side
   ignore(self.color.copy(source.color))
   ignore(self.blend_color.copy(source.blend_color))
   self.blending = source.blending
