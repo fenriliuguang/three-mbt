@@ -2341,6 +2341,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `OPAQUE` has landed. A default Shader material is opaque: `transparent` is false, `blending` is `Normal`, and `alpha_to_coverage` is false. The fragment prefix writes `#define OPAQUE` after the builtin uniforms. A leading newline is included, so the line is `16` characters and the fragment string grows from `1222` to `1238`. The vertex string stays `1608`. `transparent` true drops it, and so do `Additive` blending and `alpha_to_coverage` true. `dithering` true already ends with a newline, so the define adds `15` characters and the fragment string is `1256`. `Linear` tone mapping likewise adds `15`, and the fragment string is `6561`. `reversed_depth_buffer` true with `Linear` puts that line after the tone-mapping function, so the fragment string is `6595` and the vertex string is `1642`. A raw material stays at `61`. A Basic material stays `""`. `colorspace_pars_fragment` stays later.
 
+`colorspace_pars_fragment` has landed. Every non-raw Shader material writes this chunk after `OPAQUE`. The chunk starts with two newlines, ends with a newline, and is `496` characters. A default opaque material grows the fragment string from `1238` to `1734`. The vertex string stays `1608`. `transparent` true, with no dithering and `tone_mapping` at `No`, adds one more leading newline, so the fragment string is `1719`. `dithering` true keeps the chunk after `OPAQUE` and the fragment string is `1752`. `Linear` tone mapping makes the fragment string `7057`. `reversed_depth_buffer` true with `Linear` makes it `7091`, and the vertex string is `1642`. A raw material stays at `61`. A Basic material stays `""`. `getTexelEncodingFunction` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3452,6 +3454,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `getToneMappingFunction` | `materials` |
 | planned | 7 | `DITHERING` | `materials` |
 | planned | 7 | `OPAQUE` | `materials` |
+| planned | 7 | `colorspace_pars_fragment` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
