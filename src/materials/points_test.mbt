@@ -888,6 +888,20 @@ test "PointsMaterial dispatchEvent runs listeners of one kind" {
 }
 
 ///|
+test "PointsMaterial side defaults to front and copies" {
+  let material = @materials.PointsMaterial::new()
+  assert_eq(material.side is @constants.Front, true)
+  material.side = @constants.Back
+  let other = @materials.PointsMaterial::new()
+  assert_eq(other.side is @constants.Front, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(material))
+  assert_eq(destination.side is @constants.Back, true)
+  destination.side = @constants.Double
+  assert_eq(material.side is @constants.Back, true)
+}
+
+///|
 test "PointsMaterial dispose runs only dispose listeners" {
   let material = @materials.PointsMaterial::new()
   let hits = Ref::Ref(0)

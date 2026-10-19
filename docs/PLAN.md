@@ -1987,6 +1987,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.defines` has landed. A new Basic material and a new Lambert material each store an empty map. A new Standard material stores `STANDARD` mapped to an empty string. Setting `FOO` to `1` on one Standard material leaves another Standard material without `FOO`, and its `STANDARD` value stays an empty string. Copying that Standard material onto a Basic material leaves the destination without `STANDARD` and without `FOO`, and the source keeps `FOO` as `1`. Copying onto another Standard material stores only `STANDARD` mapped to an empty string. Setting the destination `STANDARD` to `x` leaves the source as an empty string. The renderer still does not read the map.
 
+`PointsMaterial.side` has landed. A new material stores front. Setting it to back leaves another new material at front. Copying onto a default material stores back. Setting the destination to double leaves the source at back. Point drawing still does not cull from this value. `LineBasicMaterial.side` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2921,6 +2923,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.wireframeLinecap` | `materials` |
 | planned | 7 | `Material.wireframeLinejoin` | `materials` |
 | planned | 7 | `Material.defines` | `materials` |
+| planned | 7 | `PointsMaterial.side` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
