@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -243,6 +243,31 @@ pub fn TextureFilter::mip_linear(self : TextureFilter) -> Bool {
     NearestMipmapLinear => true
     LinearMipmapLinear => true
     _ => false
+  }
+}
+
+///|
+/// 纹素通道。`RGBA` 是四个浮点，`Red` 是一个浮点。
+/// r186: `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788
+pub(all) enum PixelFormat {
+  RGBA
+  Red
+}
+
+///|
+pub fn PixelFormat::to_int(self : PixelFormat) -> Int {
+  match self {
+    RGBA => 1023
+    Red => 1028
+  }
+}
+
+///|
+/// 每个纹素的浮点个数。
+pub fn PixelFormat::components(self : PixelFormat) -> Int {
+  match self {
+    RGBA => 4
+    Red => 1
   }
 }
 

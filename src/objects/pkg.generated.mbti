@@ -42,7 +42,7 @@ pub(all) struct InstancedMesh {
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
-  mut morph_texture : Array[Double]?
+  mut morph_texture : @textures.DataTexture?
 }
 pub fn InstancedMesh::clone(Self, recursive? : Bool) -> Self
 pub fn InstancedMesh::compute_bounding_box(Self) -> @math.Box3

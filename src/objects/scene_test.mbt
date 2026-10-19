@@ -1161,28 +1161,33 @@ test "InstancedMesh.setMorphAt stores base influence and weights" {
   assert_eq(physical_equal(written, mesh), true)
   match mesh.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data.length(), 6)
-      assert_eq(data[0], 0.0)
-      assert_eq(data[1], 0.0)
-      assert_eq(data[2], 0.0)
-      assert_eq(data[3], 0.25)
-      assert_eq(data[4], 0.25)
-      assert_eq(data[5], 0.5)
+    Some(texture) => {
+      assert_eq(texture.width, 3)
+      assert_eq(texture.height, 2)
+      assert_eq(texture.format is @constants.PixelFormat::Red, true)
+      assert_eq(texture.format.to_int(), 1028)
+      assert_eq(texture.needs_update, false)
+      assert_eq(texture.data.length(), 6)
+      assert_eq(texture.data[0], 0.0)
+      assert_eq(texture.data[1], 0.0)
+      assert_eq(texture.data[2], 0.0)
+      assert_eq(texture.data[3], 0.25)
+      assert_eq(texture.data[4], 0.25)
+      assert_eq(texture.data[5], 0.5)
     }
   }
   geometry.morph_targets_relative = true
   ignore(mesh.set_morph_at(0, source))
   match mesh.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data.length(), 6)
-      assert_eq(data[0], 1.0)
-      assert_eq(data[1], 0.25)
-      assert_eq(data[2], 0.5)
-      assert_eq(data[3], 0.25)
-      assert_eq(data[4], 0.25)
-      assert_eq(data[5], 0.5)
+    Some(texture) => {
+      assert_eq(texture.data.length(), 6)
+      assert_eq(texture.data[0], 1.0)
+      assert_eq(texture.data[1], 0.25)
+      assert_eq(texture.data[2], 0.5)
+      assert_eq(texture.data[3], 0.25)
+      assert_eq(texture.data[4], 0.25)
+      assert_eq(texture.data[5], 0.5)
     }
   }
 }
@@ -1216,7 +1221,7 @@ test "InstancedMesh.getMorphAt reads weights and skips the base" {
   }
   match mesh.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => assert_eq(data[0], 1.0)
+    Some(texture) => assert_eq(texture.data[0], 1.0)
   }
   match source.morph_target_influences {
     None => assert_eq(false, true)
@@ -1246,18 +1251,25 @@ test "InstancedMesh.copy clones the morph buffer" {
   ignore(destination.copy(source))
   match destination.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data.length(), 6)
-      assert_eq(data[0], 0.0)
-      assert_eq(data[3], 0.25)
-      assert_eq(data[4], 0.25)
-      assert_eq(data[5], 0.5)
-      data[3] = 1.0
+    Some(texture) => {
+      assert_eq(texture.width, 3)
+      assert_eq(texture.height, 2)
+      assert_eq(texture.format is @constants.PixelFormat::Red, true)
+      assert_eq(texture.needs_update, true)
+      assert_eq(texture.data.length(), 6)
+      assert_eq(texture.data[0], 0.0)
+      assert_eq(texture.data[3], 0.25)
+      assert_eq(texture.data[4], 0.25)
+      assert_eq(texture.data[5], 0.5)
+      texture.data[3] = 1.0
     }
   }
   match source.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => assert_eq(data[3], 0.25)
+    Some(texture) => {
+      assert_eq(texture.needs_update, false)
+      assert_eq(texture.data[3], 1.0)
+    }
   }
   let empty = @objects.InstancedMesh::new(
     geometry,
@@ -1267,20 +1279,21 @@ test "InstancedMesh.copy clones the morph buffer" {
   ignore(destination.copy(empty))
   match destination.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => assert_eq(data[3], 1.0)
+    Some(texture) => assert_eq(texture.data[3], 1.0)
   }
   let cloned = source.clone()
   match cloned.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data[3], 0.25)
-      assert_eq(data[5], 0.5)
-      data[3] = 0.0
+    Some(texture) => {
+      assert_eq(texture.needs_update, true)
+      assert_eq(texture.data[3], 1.0)
+      assert_eq(texture.data[5], 0.5)
+      texture.data[3] = 0.0
     }
   }
   match source.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => assert_eq(data[3], 0.25)
+    Some(texture) => assert_eq(texture.data[3], 0.0)
   }
 }
 
@@ -1304,9 +1317,9 @@ test "InstancedMesh.dispose clears the morph buffer" {
   assert_eq(mesh.morph_texture is None, true)
   match cloned.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data[3], 0.25)
-      assert_eq(data[5], 0.5)
+    Some(texture) => {
+      assert_eq(texture.data[3], 0.25)
+      assert_eq(texture.data[5], 0.5)
     }
   }
   let bare = @objects.InstancedMesh::new(
@@ -1341,11 +1354,11 @@ test "InstancedMesh.updateMorphTargets leaves the morph buffer alone" {
   mesh.update_morph_targets()
   match mesh.morph_texture {
     None => assert_eq(false, true)
-    Some(data) => {
-      assert_eq(data.length(), 6)
-      assert_eq(data[3], 0.25)
-      assert_eq(data[4], 0.25)
-      assert_eq(data[5], 0.5)
+    Some(texture) => {
+      assert_eq(texture.data.length(), 6)
+      assert_eq(texture.data[3], 0.25)
+      assert_eq(texture.data[4], 0.25)
+      assert_eq(texture.data[5], 0.5)
     }
   }
 }

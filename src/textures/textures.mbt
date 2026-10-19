@@ -163,7 +163,7 @@ pub fn RenderTarget::set_size(
 }
 
 ///|
-/// 直接用浮点缓冲建的纹理。这一份只存 `RGBA` 浮点，四个数一个纹素。
+/// 直接用浮点缓冲建的纹理。默认是 `RGBA`，四个数一个纹素。`Red` 是一个数一个纹素。
 /// 过滤默认最近邻，`flipY` 关闭，不生成 mipmap，行对齐是 `1`。
 /// `needsUpdate` 跟 `Texture` 一样从 false 开始，调用方需要上传时自己打开。
 /// r186: `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L14
@@ -175,6 +175,7 @@ pub(all) struct DataTexture {
   mut width : Int
   mut height : Int
   data : Array[Double]
+  mut format : @constants.PixelFormat
   mut needs_update : Bool
   mut flip_y : Bool
   mut generate_mipmaps : Bool
@@ -186,20 +187,24 @@ pub(all) struct DataTexture {
 }
 
 ///|
-/// 浮点个数必须是 `width * height * 4`。宽或高小于 1 同样失败。
+/// 浮点个数必须是 `width * height * components`。`RGBA` 是 4，`Red` 是 1。宽或高小于 1 同样失败。
 /// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
 pub fn DataTexture::new(
   data : Array[Double],
   width? : Int = 1,
   height? : Int = 1,
+  format? : @constants.PixelFormat = @constants.PixelFormat::RGBA,
 ) -> DataTexture {
-  if width < 1 || height < 1 || data.length() != width * height * 4 {
+  if width < 1 ||
+    height < 1 ||
+    data.length() != width * height * format.components() {
     abort("DataTexture size does not match its floats")
   }
   {
     width,
     height,
     data,
+    format,
     needs_update: false,
     flip_y: false,
     generate_mipmaps: false,
@@ -209,6 +214,28 @@ pub fn DataTexture::new(
     mag_filter: @constants.Nearest,
     min_filter: @constants.Nearest,
   }
+}
+
+///|
+/// 新建一张纹理，浮点数组与来源共用。`needsUpdate` 打开。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L462
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L474
+pub fn DataTexture::clone(self : DataTexture) -> DataTexture {
+  let cloned = DataTexture::new(
+    self.data,
+    width=self.width,
+    height=self.height,
+    format=self.format,
+  )
+  cloned.needs_update = true
+  cloned.flip_y = self.flip_y
+  cloned.generate_mipmaps = self.generate_mipmaps
+  cloned.unpack_alignment = self.unpack_alignment
+  cloned.wrap_s = self.wrap_s
+  cloned.wrap_t = self.wrap_t
+  cloned.mag_filter = self.mag_filter
+  cloned.min_filter = self.min_filter
+  cloned
 }
 
 ///|

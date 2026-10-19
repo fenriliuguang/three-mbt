@@ -14,6 +14,7 @@ pub(all) struct DataTexture {
   mut width : Int
   mut height : Int
   data : Array[Double]
+  mut format : @constants.PixelFormat
   mut needs_update : Bool
   mut flip_y : Bool
   mut generate_mipmaps : Bool
@@ -23,8 +24,9 @@ pub(all) struct DataTexture {
   mut mag_filter : @constants.TextureFilter
   mut min_filter : @constants.TextureFilter
 }
+pub fn DataTexture::clone(Self) -> Self
 pub fn DataTexture::dispose(Self) -> Unit
-pub fn DataTexture::new(Array[Double], width? : Int, height? : Int) -> Self
+pub fn DataTexture::new(Array[Double], width? : Int, height? : Int, format? : @constants.PixelFormat) -> Self
 
 pub(all) struct RenderTarget {
   texture : Texture

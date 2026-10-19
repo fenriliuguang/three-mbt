@@ -143,6 +143,13 @@ pub(all) enum LoopMode {
 }
 pub fn LoopMode::to_int(Self) -> Int
 
+pub(all) enum PixelFormat {
+  RGBA
+  Red
+}
+pub fn PixelFormat::components(Self) -> Int
+pub fn PixelFormat::to_int(Self) -> Int
+
 pub(all) enum Shading {
   Basic
   Lambert

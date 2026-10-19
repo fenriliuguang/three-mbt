@@ -1973,7 +1973,7 @@ fn read_matrix(
 ///|
 /// 同一几何体画多次。实例矩阵在物体矩阵之前相乘，和 r186 `InstancedMesh` 一样。
 /// 没有 `instanceColor` 时渲染器使用白色。默认不做视锥裁剪。
-/// `morph_texture` 是形变纹理的浮点数据，默认没有。
+/// `morph_texture` 是红色浮点 `DataTexture`，默认没有。宽是权重个数加一，高是实例个数。
 /// r186: `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28
 /// r186: `morphTexture` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L77
 pub(all) struct InstancedMesh {
@@ -1984,7 +1984,7 @@ pub(all) struct InstancedMesh {
   instances : @core.InstanceData
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
-  mut morph_texture : Array[Double]?
+  mut morph_texture : @textures.DataTexture?
 }
 
 ///|
@@ -2193,9 +2193,10 @@ pub fn InstancedMesh::get_color_at(
 ///|
 /// 把一只网格的形变权重写进第 `index` 个实例。
 /// 缓冲第一个数是底权重：相对形变时是 `1`，否则是 `1` 减各项权重之和。后面接各项权重。
-/// 第一次调用按 `(权重个数 + 1) * count` 分配，其余位置是 `0`。
-/// 这里存的是 `DataTexture` 的浮点数据，纹理对象留在后面。
+/// 第一次调用按 `(权重个数 + 1) * count` 分配红色浮点纹理，宽是这个长度，高是实例个数，其余位置是 `0`。
+/// `needsUpdate` 保持 false，调用方要上传时自己打开。
 /// r186: `setMorphAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L355
+/// r186: `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
 pub fn InstancedMesh::set_morph_at(
   self : InstancedMesh,
   index : Int,
@@ -2214,11 +2215,18 @@ pub fn InstancedMesh::set_morph_at(
       created.push(0.0)
       fill = fill + 1
     }
-    self.morph_texture = Some(created)
+    self.morph_texture = Some(
+      @textures.DataTexture::new(
+        created,
+        width=len,
+        height=self.instances.count,
+        format=@constants.PixelFormat::Red,
+      ),
+    )
   }
   let data = match self.morph_texture {
     None => abort("InstancedMesh.setMorphAt requires morphTexture")
-    Some(data) => data
+    Some(texture) => texture.data
   }
   let mut sum = 0.0
   let mut cursor = 0
@@ -2251,7 +2259,7 @@ pub fn InstancedMesh::get_morph_at(
   }
   let data = match self.morph_texture {
     None => abort("InstancedMesh.getMorphAt requires morphTexture")
-    Some(data) => data
+    Some(texture) => texture.data
   }
   let len = influences.length() + 1
   let data_index = index * len + 1
@@ -2265,7 +2273,7 @@ pub fn InstancedMesh::get_morph_at(
 ///|
 /// 复制变换、实例矩阵、颜色、个数和包围体。几何体与材质沿用源对象。包围盒和包围球是克隆。
 /// 材质数组会复制一份新列表，里面的材质仍是原来的对象。源对象没有数组时，目标的数组清掉。
-/// 源对象有形变缓冲时复制一份。源对象没有时，目标上已有的缓冲留着。
+/// 源对象有形变纹理时克隆一张。浮点数组与来源共用。源对象没有时，目标上已有的纹理留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L182
 pub fn InstancedMesh::copy(
   self : InstancedMesh,
@@ -2308,13 +2316,7 @@ pub fn InstancedMesh::copy(
   }
   match source.morph_texture {
     None => ()
-    Some(data) => {
-      let copied : Array[Double] = []
-      for value in data {
-        copied.push(value)
-      }
-      self.morph_texture = Some(copied)
-    }
+    Some(texture) => self.morph_texture = Some(texture.clone())
   }
   self.refresh()
   self
@@ -2343,10 +2345,14 @@ pub fn InstancedMesh::update_morph_targets(_self : InstancedMesh) -> Unit {
 }
 
 ///|
-/// 发出 `dispose`，并清掉形变缓冲。
+/// 发出 `dispose`，释放形变纹理并清空字段。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L396
 pub fn InstancedMesh::dispose(self : InstancedMesh) -> Unit {
   self.node.dispose()
+  match self.morph_texture {
+    None => ()
+    Some(texture) => texture.dispose()
+  }
   self.morph_texture = None
 }
 

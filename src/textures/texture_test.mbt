@@ -10,6 +10,10 @@ test "wrapping and filters keep r186 numbers" {
   assert_eq(@constants.TextureFilter::LinearMipmapLinear.mip_linear(), true)
   assert_eq(@constants.TextureFilter::Nearest.is_nearest(), true)
   assert_eq(@constants.TextureFilter::Nearest.mip_linear(), false)
+  assert_eq(@constants.PixelFormat::RGBA.to_int(), 1023)
+  assert_eq(@constants.PixelFormat::Red.to_int(), 1028)
+  assert_eq(@constants.PixelFormat::RGBA.components(), 4)
+  assert_eq(@constants.PixelFormat::Red.components(), 1)
   assert_eq(@constants.TextureFilter::NearestMipmapLinear.mip_linear(), true)
 }
 
@@ -21,6 +25,7 @@ test "DataTexture stores rgba floats without flipping" {
   assert_eq(map.height, 1)
   assert_eq(map.data.length(), 4)
   assert_eq(map.needs_update, false)
+  assert_eq(map.format is @constants.PixelFormat::RGBA, true)
   assert_eq(map.flip_y, false)
   assert_eq(map.generate_mipmaps, false)
   assert_eq(map.unpack_alignment, 1)
@@ -33,6 +38,21 @@ test "DataTexture stores rgba floats without flipping" {
   assert_eq(map.data[0], 0.25)
   map.dispose()
   assert_eq(map.data[0], 0.25)
+  let red = @textures.DataTexture::new(
+    [0.25, 0.5, 0.0],
+    width=3,
+    height=1,
+    format=@constants.PixelFormat::Red,
+  )
+  assert_eq(red.format is @constants.PixelFormat::Red, true)
+  let cloned = red.clone()
+  assert_eq(physical_equal(cloned, red), false)
+  assert_eq(cloned.needs_update, true)
+  assert_eq(cloned.width, 3)
+  assert_eq(cloned.height, 1)
+  cloned.data[0] = 1.0
+  assert_eq(red.data[0], 1.0)
+  assert_eq(red.needs_update, false)
 }
 
 ///|
