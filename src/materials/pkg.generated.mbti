@@ -203,6 +203,7 @@ pub(all) struct Material {
   is_mesh_phong_material : Bool
   is_shadow_material : Bool
   is_shader_material : Bool
+  is_raw_shader_material : Bool
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool
@@ -256,6 +257,7 @@ pub fn Material::matcap(hex? : Int, roughness? : Double, metalness? : Double) ->
 pub fn Material::normal(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::phong(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
+pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
 pub fn Material::set_anisotropy(Self, Double) -> Unit
@@ -285,6 +287,7 @@ pub(all) enum MaterialKind {
   Phong
   Shadow
   Shader
+  Raw
 }
 
 pub(all) struct MeshBasicMaterial {
