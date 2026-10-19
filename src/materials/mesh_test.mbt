@@ -3492,3 +3492,55 @@ test "Material shader copies extensions only onto shader" {
   cloned.extensions.multi_draw = false
   assert_eq(shader.extensions.multi_draw, true)
 }
+
+///|
+test "Material shader copies default attribute values only onto shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.default_attribute_values.get("color"), Some([1.0, 1.0, 1.0]))
+  assert_eq(shader.default_attribute_values.get("uv"), Some([0.0, 0.0]))
+  assert_eq(shader.default_attribute_values.get("uv1"), Some([0.0, 0.0]))
+  match basic.default_attribute_values.get("color") {
+    None => ()
+    Some(_) => abort("basic default attributes should start empty")
+  }
+  match phong.default_attribute_values.get("color") {
+    None => ()
+    Some(_) => abort("phong default attributes should start empty")
+  }
+  shader.default_attribute_values.set("color", [2.0, 3.0, 4.0])
+  shader.default_attribute_values.set("tangent", [5.0])
+  ignore(basic.copy(shader))
+  match basic.default_attribute_values.get("color") {
+    None => ()
+    Some(_) => abort("basic copy gained shader default attributes")
+  }
+  assert_eq(shader.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
+  let onto = @materials.Material::shader()
+  onto.default_attribute_values.set("color", [9.0, 9.0, 9.0])
+  onto.default_attribute_values.set("drop", [1.0])
+  ignore(onto.copy(shader))
+  assert_eq(onto.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
+  assert_eq(onto.default_attribute_values.get("uv"), Some([0.0, 0.0]))
+  assert_eq(onto.default_attribute_values.get("uv1"), Some([0.0, 0.0]))
+  assert_eq(onto.default_attribute_values.get("tangent"), Some([5.0]))
+  match onto.default_attribute_values.get("drop") {
+    None => ()
+    Some(_) => abort("shader copy kept destination default attribute")
+  }
+  onto.default_attribute_values.get("color").unwrap()[0] = 8.0
+  assert_eq(onto.default_attribute_values.get("color"), Some([8.0, 3.0, 4.0]))
+  assert_eq(shader.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
+  ignore(onto.copy(phong))
+  match onto.default_attribute_values.get("color") {
+    None => ()
+    Some(_) => abort("shader copy kept default attribute missing from source")
+  }
+  let cloned = shader.clone()
+  assert_eq(cloned.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
+  assert_eq(cloned.default_attribute_values.get("uv"), Some([0.0, 0.0]))
+  assert_eq(cloned.id == shader.id, false)
+  cloned.default_attribute_values.get("color").unwrap()[0] = 6.0
+  assert_eq(shader.default_attribute_values.get("color"), Some([2.0, 3.0, 4.0]))
+}

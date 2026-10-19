@@ -2119,6 +2119,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `ShaderMaterial.extensions` has landed. A new Shader, Basic, and Phong material each store `clip_cull_distance` false and `multi_draw` false. Setting both switches on a Shader material and copying it onto a Basic material leaves the Basic switches false and the source true. Copying that Shader material onto another Shader material stores both true. Setting the destination `clip_cull_distance` back to false leaves the source true. Copying a Phong material onto that destination stores both false. Cloning the source keeps both true, with a new id, and setting the clone's `multi_draw` to false leaves the source true. The renderer still does not enable these WebGL extensions. `defaultAttributeValues` stays later.
 
+`ShaderMaterial.defaultAttributeValues` has landed. A new Shader material stores `color` `[1, 1, 1]`, `uv` `[0, 0]`, and `uv1` `[0, 0]`. A new Basic material and a new Phong material store an empty table. Setting the Shader `color` to `[2, 3, 4]` and `tangent` to `[5]`, then copying onto a Basic material, leaves the Basic table empty and the source `color` at `[2, 3, 4]`. Copying onto another Shader material that had `color` `[9, 9, 9]` and `drop` `[1]` stores `color` `[2, 3, 4]`, `uv` `[0, 0]`, `uv1` `[0, 0]`, and `tangent` `[5]`, and drops `drop`. Setting the destination `color` first component to `8` leaves the source at `2`. Copying an empty Phong material onto that destination drops `color`. Cloning keeps `color` `[2, 3, 4]` and `uv` `[0, 0]`, with a new id. Setting the clone's `color` first component to `6` leaves the source at `2`. The renderer still does not fill missing vertex attributes from these numbers. `glslVersion` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3119,6 +3121,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `ShaderMaterial.linewidth` | `materials` |
 | planned | 7 | `ShaderMaterial.forceSinglePass` | `materials` |
 | planned | 7 | `ShaderMaterial.extensions` | `materials` |
+| planned | 7 | `ShaderMaterial.defaultAttributeValues` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

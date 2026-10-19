@@ -107,6 +107,7 @@ pub(all) struct Material {
   mut fragment_shader : String
   mut uniforms : Map[String, Double]
   mut uniforms_groups : Array[UniformsGroup]
+  mut default_attribute_values : Map[String, Array[Double]]
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool
