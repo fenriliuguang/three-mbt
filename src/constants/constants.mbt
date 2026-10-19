@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788 ; `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -794,3 +794,27 @@ pub const INT_TYPE : Int = 1013
 /// 浮点纹理类型。对齐 `FloatType`（1015）。
 /// r186: `FloatType` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L691
 pub const FLOAT_TYPE : Int = 1015
+
+///|
+/// 切线空间法线贴图。对齐 `TangentSpaceNormalMap`（0）。
+pub const TANGENT_SPACE_NORMAL_MAP : Int = 0
+
+///|
+/// 物体空间法线贴图。对齐 `ObjectSpaceNormalMap`（1）。
+pub const OBJECT_SPACE_NORMAL_MAP : Int = 1
+
+///|
+/// 法线贴图的空间。数值与 r186 `src/constants.js` 一致。默认是切线空间。
+/// r186: `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283 ; `ObjectSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1291
+pub(all) enum NormalMapType {
+  TangentSpace
+  ObjectSpace
+}
+
+///|
+pub fn NormalMapType::to_int(self : NormalMapType) -> Int {
+  match self {
+    TangentSpace => TANGENT_SPACE_NORMAL_MAP
+    ObjectSpace => OBJECT_SPACE_NORMAL_MAP
+  }
+}

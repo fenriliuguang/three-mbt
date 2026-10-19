@@ -114,6 +114,7 @@ pub(all) struct Material {
   mut metalness_map : @textures.Texture?
   mut alpha_map : @textures.Texture?
   mut normal_map : @textures.Texture?
+  mut normal_map_type : @constants.NormalMapType
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

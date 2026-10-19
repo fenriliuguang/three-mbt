@@ -128,6 +128,8 @@ pub const NO_BLENDING : Int = 0
 
 pub const NO_TONE_MAPPING : Int = 0
 
+pub const OBJECT_SPACE_NORMAL_MAP : Int = 1
+
 pub const ONE_FACTOR : Int = 201
 
 pub const ONE_MINUS_CONSTANT_ALPHA_FACTOR : Int = 214
@@ -171,6 +173,8 @@ pub const STREAM_READ_USAGE : Int = 35041
 pub const SUBTRACTIVE_BLENDING : Int = 3
 
 pub const SUBTRACT_EQUATION : Int = 101
+
+pub const TANGENT_SPACE_NORMAL_MAP : Int = 0
 
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
@@ -264,6 +268,12 @@ pub(all) enum LoopMode {
   PingPong
 }
 pub fn LoopMode::to_int(Self) -> Int
+
+pub(all) enum NormalMapType {
+  TangentSpace
+  ObjectSpace
+}
+pub fn NormalMapType::to_int(Self) -> Int
 
 pub(all) enum PixelFormat {
   RGBA

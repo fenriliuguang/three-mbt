@@ -1022,3 +1022,23 @@ test "Material normalMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.normal_map is None, true)
 }
+
+///|
+test "Material normalMapType defaults to tangent space and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.normal_map_type.to_int(), 0)
+  assert_eq(basic.normal_map_type is @constants.TangentSpace, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.normal_map_type.to_int(), @constants.TANGENT_SPACE_NORMAL_MAP)
+  lambert.normal_map_type = @constants.ObjectSpace
+  let other = @materials.Material::lambert()
+  assert_eq(other.normal_map_type.to_int(), 0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.normal_map_type.to_int(), 1)
+  assert_eq(destination.normal_map_type is @constants.ObjectSpace, true)
+  destination.normal_map_type = @constants.TangentSpace
+  assert_eq(lambert.normal_map_type.to_int(), @constants.OBJECT_SPACE_NORMAL_MAP)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.normal_map_type.to_int(), 0)
+}
