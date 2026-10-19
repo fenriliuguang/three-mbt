@@ -4198,6 +4198,37 @@ test "Material shader writes USE_METALNESSMAP" {
 }
 
 ///|
+test "Material shader writes USE_ALPHAMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.alpha_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1629)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1629 - 1608, 21)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:703].to_owned(),
+    "#define USE_ALPHAMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1099].to_owned(),
+    "#define USE_ALPHAMAP",
+  )
+  shader.metalness_map = Some(alpha_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1654)
+  assert_eq(
+    shader.prefixed_vertex_shader()[708:728].to_owned(),
+    "#define USE_ALPHAMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.alpha_map = Some(alpha_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.alpha_map = Some(alpha_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
