@@ -256,3 +256,17 @@ test "SpriteMaterial stores and copies clipIntersection" {
   destination.clip_intersection = false
   assert_eq(source.clip_intersection, true)
 }
+
+///|
+test "SpriteMaterial stores and copies allowOverride" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.allow_override, true)
+  let source = @materials.SpriteMaterial::new()
+  source.allow_override = false
+  assert_eq(defaults.allow_override, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.allow_override, false)
+  destination.allow_override = true
+  assert_eq(source.allow_override, false)
+}
