@@ -505,3 +505,29 @@ test "LOD.update shows the level for the camera distance" {
   assert_eq(mid.visible, false)
   assert_eq(far.visible, false)
 }
+
+///|
+test "Sprite.intersectsFrustum uses a sphere around the sprite" {
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  let inside = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  ignore(inside.node.position.set(0.5, 0.5, 0.5))
+  inside.node.update_matrix_world()
+  assert_eq(inside.intersects_frustum(frustum), true)
+  let outside = @objects.Sprite::new(@materials.SpriteMaterial::new())
+  ignore(outside.node.position.set(-2.0, 0.5, 0.5))
+  outside.node.update_matrix_world()
+  assert_eq(outside.intersects_frustum(frustum), false)
+  assert_eq(inside.center.x, 0.5)
+  assert_eq(inside.center.y, 0.5)
+  assert_eq(frustum.planes[0].constant, 0.0)
+}

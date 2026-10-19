@@ -747,6 +747,21 @@ pub fn Sprite::refresh(self : Sprite) -> Unit {
 }
 
 ///|
+/// 用世界矩阵变换一个包围球，再交给视锥。球心从原点出发，半径是 `sqrt(2) / 2` 加上锚点到 `(0.5, 0.5)` 的距离。
+/// r186: `intersectsFrustum` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L129
+/// r186: `intersectsSprite` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L174
+pub fn Sprite::intersects_frustum(
+  self : Sprite,
+  frustum : @math.Frustum,
+) -> Bool {
+  let sphere = @math.Sphere::new(radius=0.0)
+  let offset = @math.Vector2::new(x=0.5, y=0.5).distance_to(self.center)
+  sphere.radius = 0.7071067811865476 + offset
+  ignore(sphere.apply_matrix4(self.node.matrix_world))
+  frustum.intersects_sphere(sphere)
+}
+
+///|
 /// 按距离切换显示的对象。级别从近到远排列，`auto_update` 默认真。节点上的级别数组与 `levels` 是同一份。
 /// r186: `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 pub(all) struct LOD {

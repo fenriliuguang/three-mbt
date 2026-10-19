@@ -123,6 +123,7 @@ pub(all) struct Sprite {
   material : @materials.SpriteMaterial
   center : @math.Vector2
 }
+pub fn Sprite::intersects_frustum(Self, @math.Frustum) -> Bool
 pub fn Sprite::new(@materials.SpriteMaterial) -> Self
 pub fn Sprite::refresh(Self) -> Unit
 pub fn Sprite::to_node(Self) -> @core.Object3D

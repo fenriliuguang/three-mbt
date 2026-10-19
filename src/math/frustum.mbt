@@ -142,7 +142,7 @@ pub fn Frustum::intersects_sphere(self : Frustum, sphere : Sphere) -> Bool {
 
 ///|
 /// 盒子是否与视锥相交。完全落在某个裁剪面外侧才算不相交。
-/// `intersectsObject` 需要 `Object3D`，`intersectsSprite` 需要精灵，这两项留在后面。
+/// `intersectsObject` 需要 `Object3D`，留在后面。精灵测试在 `Sprite.intersects_frustum`。
 /// r186: `intersectsBox` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L230
 pub fn Frustum::intersects_box(self : Frustum, box : Box3) -> Bool {
   let corner = Vector3::new()
