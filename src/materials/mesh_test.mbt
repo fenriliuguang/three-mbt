@@ -850,3 +850,50 @@ test "Material copy writes shared fields and keeps identity" {
   assert_eq(standard.roughness, 1.0)
   assert_eq(standard.type_name, "MeshStandardMaterial")
 }
+
+///|
+test "Material clone keeps kind and takes a new id" {
+  let basic = @materials.Material::basic()
+  basic.name = "plain"
+  let basic_clone = basic.clone()
+  assert_eq(basic_clone.name, "plain")
+  assert_eq(basic_clone.type_name, "MeshBasicMaterial")
+  assert_eq(basic_clone.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(basic_clone.version, 0)
+  assert_eq(basic_clone.id == basic.id, false)
+  basic_clone.name = "copy"
+  assert_eq(basic.name, "plain")
+  let source = @materials.Material::lambert()
+  source.name = "lit"
+  ignore(source.color.set_rgb(1.0, 0.0, 0.0))
+  source.set_alpha_test(0.2)
+  source.version = 5
+  source.uuid = "mesh"
+  source.user_data.set("label", "mesh")
+  let cloned = source.clone()
+  assert_eq(cloned.name, "lit")
+  assert_eq(cloned.color.r, 1.0)
+  assert_eq(cloned.alpha_test, 0.2)
+  assert_eq(cloned.version, 1)
+  assert_eq(cloned.type_name, "MeshLambertMaterial")
+  assert_eq(cloned.kind is @materials.MaterialKind::Lambert, true)
+  assert_eq(cloned.id == source.id, false)
+  assert_eq(cloned.uuid.length(), 36)
+  assert_eq(cloned.uuid[14:15].to_owned(), "4")
+  assert_eq(source.uuid, "mesh")
+  assert_eq(source.version, 5)
+  cloned.color.r = 0.5
+  assert_eq(source.color.r, 1.0)
+  cloned.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "mesh")
+  }
+  let standard = @materials.Material::standard(roughness=0.2, metalness=0.8)
+  let standard_clone = standard.clone()
+  assert_eq(standard_clone.roughness, 0.2)
+  assert_eq(standard_clone.metalness, 0.8)
+  assert_eq(standard_clone.type_name, "MeshStandardMaterial")
+  assert_eq(standard_clone.kind is @materials.MaterialKind::Standard, true)
+  assert_eq(standard.roughness, 0.2)
+}

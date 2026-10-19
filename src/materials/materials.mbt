@@ -489,6 +489,18 @@ pub fn Material::copy(self : Material, source : Material) -> Material {
 }
 
 ///|
+/// 按 `kind` 新建一份材质，再 `copy`。新材质有自己的 `id` 和 `uuid`。`type_name` 跟着 `kind`：基础是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`。`copy` 不改这三项。`alpha_test` 穿过 `0` 时新材质的 `version` 从 `0` 加一。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
+pub fn Material::clone(self : Material) -> Material {
+  let created = match self.kind {
+    Basic => Material::basic()
+    Lambert => Material::lambert()
+    Standard => Material::standard()
+  }
+  created.copy(self)
+}
+
+///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `alpha_test` 默认 `0`。点着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
