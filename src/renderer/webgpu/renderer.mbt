@@ -2635,34 +2635,26 @@ fn WebGPURenderer::draw_lines(
   pass : @gpu.GpuRenderPassEncoder,
   pipeline : GpuRenderPipeline,
   geometry : PositionGpu,
+  draw_start : Int,
+  draw_count : Int,
 ) -> Unit {
   ignore(self)
-  let indexed = match geometry.indices {
-    Some(_) => geometry.index_count >= 2
-    None => geometry.vertex_count >= 2
+  let full = match geometry.indices {
+    Some(_) => geometry.index_count
+    None => geometry.vertex_count
   }
-  if !indexed {
+  let count_int = if draw_count < 0 { full } else { draw_count }
+  if count_int < 2 {
     return
   }
+  let (count, first) = mesh_draw(draw_count, draw_start, full)
   pass.set_pipeline(pipeline)
   pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
   match geometry.indices {
-    None =>
-      pass.draw(
-        geometry.vertex_count.reinterpret_as_uint(),
-        Some(1U),
-        None,
-        None,
-      )
+    None => pass.draw(count, Some(1U), first, None)
     Some(indices) => {
       pass.set_index_buffer(indices, @gpu.GpuIndexFormat::UINT32, None, None)
-      pass.draw_indexed(
-        geometry.index_count.reinterpret_as_uint(),
-        Some(1U),
-        None,
-        None,
-        None,
-      )
+      pass.draw_indexed(count, Some(1U), first, None, None)
     }
   }
 }
@@ -4581,7 +4573,12 @@ fn WebGPURenderer::draw_strokes(
         match item.kind {
           @core.PrimitiveKind::Points => {
             let instances = self.point_instances(geometry)
-            if geometry.point_count > 0 {
+            let instance_count = if item.draw_count < 0 {
+              geometry.point_count
+            } else {
+              item.draw_count
+            }
+            if instance_count > 0 {
               pass.set_pipeline(
                 self.stroke_pipeline(
                   item.kind,
@@ -4595,11 +4592,16 @@ fn WebGPURenderer::draw_strokes(
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
               pass.set_vertex_buffer(1U, Some(instances), None, None)
+              let first_instance = if item.draw_count < 0 {
+                None
+              } else {
+                Some(item.draw_start.reinterpret_as_uint())
+              }
               pass.draw(
                 6U,
-                Some(geometry.point_count.reinterpret_as_uint()),
+                Some(instance_count.reinterpret_as_uint()),
                 None,
-                None,
+                first_instance,
               )
             }
           }
@@ -4616,6 +4618,8 @@ fn WebGPURenderer::draw_strokes(
                 item.premultiplied_alpha,
               ),
               geometry,
+              item.draw_start,
+              item.draw_count,
             )
           @core.PrimitiveKind::LineSegments =>
             self.draw_lines(
@@ -4630,6 +4634,8 @@ fn WebGPURenderer::draw_strokes(
                 item.premultiplied_alpha,
               ),
               geometry,
+              item.draw_start,
+              item.draw_count,
             )
         }
       }

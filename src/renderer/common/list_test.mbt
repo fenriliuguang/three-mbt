@@ -2354,3 +2354,76 @@ test "draw range clips mesh groups" {
   ignore(scene.add(empty))
   assert_eq(@common.collect_opaque(scene.node).length(), 0)
 }
+
+///|
+test "draw range clips points and lines" {
+  let scene = @scenes.Scene::new()
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let points = @objects.Points::new(geometry, @materials.PointsMaterial::new())
+  ignore(scene.add(points))
+  let line = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  ignore(scene.add(line))
+  let strokes = @common.collect_primitives(scene.node)
+  assert_eq(strokes.length(), 2)
+  assert_eq(strokes[0].draw_start, 0)
+  assert_eq(strokes[0].draw_count, -1)
+  assert_eq(strokes[1].draw_start, 0)
+  assert_eq(strokes[1].draw_count, -1)
+  geometry.set_draw_range(1.0, 2.0)
+  let clipped = @common.collect_primitives(scene.node)
+  assert_eq(clipped.length(), 2)
+  assert_eq(clipped[0].draw_start, 1)
+  assert_eq(clipped[0].draw_count, 2)
+  assert_eq(clipped[1].kind is @core.PrimitiveKind::Line, true)
+  assert_eq(clipped[1].draw_start, 1)
+  assert_eq(clipped[1].draw_count, 2)
+  geometry.set_draw_range(1.0, 0.0)
+  assert_eq(@common.collect_primitives(scene.node)[0].draw_count, 0)
+  geometry.set_draw_range(8.0, 1.0)
+  assert_eq(@common.collect_primitives(scene.node).length(), 0)
+  ignore(geometry.set_index_array([2, 0, 1]))
+  geometry.set_draw_range(1.0, 4.0)
+  let indexed = @common.collect_primitives(scene.node)
+  assert_eq(indexed.length(), 2)
+  assert_eq(indexed[0].draw_start, 1)
+  assert_eq(indexed[0].draw_count, 2)
+  assert_eq(indexed[1].draw_count, 2)
+  points.set_transparent(true, opacity=0.5)
+  let camera = @cameras.PerspectiveCamera::new(
+    fov=50.0,
+    aspect=1.0,
+    near=0.1,
+    far=100.0,
+  )
+  @common.update_frame(scene.node, camera.node)
+  let glass = @common.collect_transparent_primitives(scene.node, camera.node)
+  assert_eq(glass.length(), 1)
+  assert_eq(glass[0].draw_start, 1)
+  assert_eq(glass[0].draw_count, 2)
+  assert_eq(glass[0].opacity, 0.5)
+  let segments = @objects.LineSegments::new(
+    geometry,
+    @materials.LineBasicMaterial::new(),
+  )
+  ignore(scene.add(segments))
+  let paired = @common.collect_primitives(scene.node)
+  assert_eq(paired.length(), 2)
+  assert_eq(paired[1].kind is @core.PrimitiveKind::LineSegments, true)
+  assert_eq(paired[1].draw_start, 1)
+  assert_eq(paired[1].draw_count, 2)
+  let empty = @objects.Points::new(
+    @core.BufferGeometry::new(),
+    @materials.PointsMaterial::new(),
+  )
+  ignore(scene.add(empty))
+  assert_eq(@common.collect_primitives(scene.node).length(), 2)
+}

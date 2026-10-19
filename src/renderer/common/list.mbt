@@ -440,6 +440,7 @@ pub fn wireframe_line_indices(geometry : BufferGeometry) -> Array[Int] {
 
 ///|
 /// 点和线。透明的点和线仍不绘制。
+/// `draw_count` 小于 0 时画全部顶点或索引。否则从 `draw_start` 起画 `draw_count` 个。
 pub(all) struct PrimitiveItem {
   node : Object3D
   geometry : BufferGeometry
@@ -454,6 +455,38 @@ pub(all) struct PrimitiveItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  draw_start : Int
+  draw_count : Int
+}
+
+///|
+/// 点和线的绘制范围。没有位置时不收集。范围盖住全部顶点或索引时 `draw_count` 为 -1。
+fn push_primitive(
+  items : Array[PrimitiveItem],
+  node : Object3D,
+  binding : @core.PrimitiveBinding,
+) -> Unit {
+  match resolve_draw(binding.geometry, 0, -1, false) {
+    None => ()
+    Some((start, count)) =>
+      items.push({
+        node,
+        geometry: binding.geometry,
+        color: binding.color,
+        kind: binding.kind,
+        size: binding.size,
+        size_attenuation: binding.size_attenuation,
+        opacity: binding.opacity,
+        fog: binding.fog,
+        depth_write: binding.depth_write,
+        depth_test: binding.depth_test,
+        depth_func: binding.depth_func,
+        color_write: binding.color_write,
+        premultiplied_alpha: binding.premultiplied_alpha,
+        draw_start: start,
+        draw_count: count,
+      })
+  }
 }
 
 ///|
@@ -474,21 +507,7 @@ pub fn collect_primitives(
           !binding.transparent &&
           on_camera_layer(node, camera) &&
           kept_by_frustum(node, binding.geometry, frustum) {
-          items.push({
-            node,
-            geometry: binding.geometry,
-            color: binding.color,
-            kind: binding.kind,
-            size: binding.size,
-            size_attenuation: binding.size_attenuation,
-            opacity: binding.opacity,
-            fog: binding.fog,
-            depth_write: binding.depth_write,
-            depth_test: binding.depth_test,
-            depth_func: binding.depth_func,
-            color_write: binding.color_write,
-            premultiplied_alpha: binding.premultiplied_alpha,
-          })
+          push_primitive(items, node, binding)
         }
     }
   })
@@ -512,21 +531,7 @@ pub fn collect_transparent_primitives(
           binding.transparent &&
           on_camera_layer(node, Some(camera)) &&
           kept_by_frustum(node, binding.geometry, frustum) {
-          items.push({
-            node,
-            geometry: binding.geometry,
-            color: binding.color,
-            kind: binding.kind,
-            size: binding.size,
-            size_attenuation: binding.size_attenuation,
-            opacity: binding.opacity,
-            fog: binding.fog,
-            depth_write: binding.depth_write,
-            depth_test: binding.depth_test,
-            depth_func: binding.depth_func,
-            color_write: binding.color_write,
-            premultiplied_alpha: binding.premultiplied_alpha,
-          })
+          push_primitive(items, node, binding)
         }
     }
   })

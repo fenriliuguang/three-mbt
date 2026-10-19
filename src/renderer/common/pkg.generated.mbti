@@ -114,6 +114,8 @@ pub(all) struct PrimitiveItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  draw_start : Int
+  draw_count : Int
 }
 
 pub(all) struct RenderItem {
