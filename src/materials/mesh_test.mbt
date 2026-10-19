@@ -8243,6 +8243,22 @@ test "Material shader anisotropyMap needs strength and a texture" {
 }
 
 ///|
+test "Material shader clearcoat is true above zero" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_clearcoat(), false)
+  assert_eq(@materials.Material::raw().program_clearcoat(), false)
+  assert_eq(@materials.Material::physical().program_clearcoat(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.clearcoat = -1.0
+  assert_eq(shader.program_clearcoat(), false)
+  shader.clearcoat = 0.25
+  assert_eq(shader.program_clearcoat(), true)
+  shader.clearcoat = 0.0
+  assert_eq(shader.program_clearcoat(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
