@@ -1759,6 +1759,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.stencilRef` has landed. A new basic, Lambert, or Standard material stores `0`. Setting the basic material to `1` leaves another basic material at `0`. Setting the Standard material to `7` leaves the Lambert material at `0`. The pipeline still does not read this field.
 
+`PointsMaterial.stencilRef` has landed. A new material stores `0`. Setting it to `1` leaves another new material at `0`. Copying onto a default material stores `1`. Setting the destination to `7` leaves the source at `1`. Point draws still do not read this field.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2579,6 +2581,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.stencilFunc` | `materials` |
 | planned | 7 | `SpriteMaterial.stencilFunc` | `materials` |
 | planned | 7 | `Material.stencilRef` | `materials` |
+| planned | 7 | `PointsMaterial.stencilRef` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

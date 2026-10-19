@@ -474,3 +474,18 @@ test "PointsMaterial stores and copies stencilFunc" {
   assert_eq(source.stencil_func.to_int(), 512)
   assert_eq(destination.stencil_func.to_int(), 514)
 }
+
+///|
+test "PointsMaterial stores and copies stencilRef" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.stencil_ref, 0)
+  let source = @materials.PointsMaterial::new()
+  source.stencil_ref = 1
+  assert_eq(defaults.stencil_ref, 0)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.stencil_ref, 1)
+  destination.stencil_ref = 7
+  assert_eq(source.stencil_ref, 1)
+  assert_eq(destination.stencil_ref, 7)
+}
