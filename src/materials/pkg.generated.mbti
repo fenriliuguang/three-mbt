@@ -40,6 +40,7 @@ pub(all) struct LineBasicMaterial {
   blend_color : @math.Color
   mut blending : @constants.Blending
   mut blend_src : @constants.BlendFactor
+  mut blend_dst : @constants.BlendFactor
 }
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
