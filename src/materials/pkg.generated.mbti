@@ -103,6 +103,7 @@ pub(all) struct Material {
   mut fog : Bool
   mut lights : Bool
   mut clipping : Bool
+  mut vertex_shader : String
   mut alpha_test : Double
   mut flat_shading : Bool
   mut depth_write : Bool

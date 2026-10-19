@@ -3259,3 +3259,32 @@ test "Material shader defaults clipping off and copies only onto shader" {
   cloned.clipping = false
   assert_eq(shader.clipping, true)
 }
+
+///|
+test "Material shader stores the default vertex shader" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  let expected =
+    "\nvoid main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}\n"
+  assert_eq(shader.vertex_shader, expected)
+  assert_eq(basic.vertex_shader, "")
+  assert_eq(phong.vertex_shader, "")
+  shader.vertex_shader = "void main() {}"
+  ignore(basic.copy(shader))
+  assert_eq(basic.vertex_shader, "")
+  assert_eq(shader.vertex_shader, "void main() {}")
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(shader))
+  assert_eq(onto.vertex_shader, "void main() {}")
+  onto.vertex_shader = "changed"
+  assert_eq(shader.vertex_shader, "void main() {}")
+  ignore(onto.copy(phong))
+  assert_eq(onto.vertex_shader, "")
+  assert_eq(phong.vertex_shader, "")
+  let cloned = shader.clone()
+  assert_eq(cloned.vertex_shader, "void main() {}")
+  assert_eq(cloned.id == shader.id, false)
+  cloned.vertex_shader = "clone"
+  assert_eq(shader.vertex_shader, "void main() {}")
+}
