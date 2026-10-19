@@ -4374,9 +4374,9 @@ test "Material shader writes USE_SHEEN_COLORMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.sheen = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1635)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
   assert_eq(shader.prefixed_fragment_shader().length(), 1249)
-  assert_eq(1635 - 1608, 27)
+  assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[683:709].to_owned(),
     "#define USE_SHEEN_COLORMAP",
@@ -4390,7 +4390,7 @@ test "Material shader writes USE_SHEEN_COLORMAP" {
   shader.sheen = 1.0
   shader.transmission = 1.0
   shader.thickness_map = Some(sheen_color_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1714)
   assert_eq(
     shader.prefixed_vertex_shader()[733:759].to_owned(),
     "#define USE_SHEEN_COLORMAP",
@@ -4431,7 +4431,7 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
   shader.sheen_color_map = Some(roughness_map)
-  assert_eq(shader.prefixed_vertex_shader().length(), 1666)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1695)
   assert_eq(
     shader.prefixed_vertex_shader()[710:740].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
@@ -5138,6 +5138,55 @@ test "Material shader writes IRIDESCENCE_THICKNESSMAP_UV" {
   let basic = @materials.Material::basic()
   basic.iridescence = 1.0
   basic.iridescence_thickness_map = Some(thickness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes SHEEN_COLORMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let sheen_color_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(sheen_color_map.channel, 0)
+  shader.sheen_color_map = Some(sheen_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.sheen = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
+  assert_eq(1664 - 1608, 56)
+  assert_eq(
+    shader.prefixed_vertex_shader()[710:738].to_owned(),
+    "#define SHEEN_COLORMAP_UV uv",
+  )
+  sheen_color_map.channel = 1
+  shader.sheen_color_map = Some(sheen_color_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1665)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1249)
+  assert_eq(1665 - 1608, 57)
+  assert_eq(
+    shader.prefixed_vertex_shader()[710:739].to_owned(),
+    "#define SHEEN_COLORMAP_UV uv1",
+  )
+  shader.sheen = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.sheen = 1.0
+  sheen_color_map.channel = 0
+  shader.sheen_color_map = Some(sheen_color_map)
+  let thickness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.iridescence = 1.0
+  shader.iridescence_thickness_map = Some(thickness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1740)
+  assert_eq(
+    shader.prefixed_vertex_shader()[786:814].to_owned(),
+    "#define SHEEN_COLORMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.sheen = 1.0
+  raw.sheen_color_map = Some(sheen_color_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.sheen = 1.0
+  basic.sheen_color_map = Some(sheen_color_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
