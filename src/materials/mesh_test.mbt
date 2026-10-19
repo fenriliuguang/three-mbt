@@ -8046,6 +8046,25 @@ test "Material shader lightMap follows the light texture" {
 }
 
 ///|
+test "Material shader bumpMap turns off for wireframe" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_bump_map(), false)
+  assert_eq(@materials.Material::raw().program_bump_map(), false)
+  assert_eq(@materials.Material::phong().program_bump_map(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.bump_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_bump_map(), true)
+  shader.wireframe = true
+  assert_eq(shader.program_bump_map(), false)
+  shader.wireframe = false
+  assert_eq(shader.program_bump_map(), true)
+  shader.bump_map = None
+  assert_eq(shader.program_bump_map(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
