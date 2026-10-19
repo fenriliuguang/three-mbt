@@ -321,6 +321,7 @@ fn Object3D::push_triangle(
           index: None,
           distance_to_ray: None,
           instance_id,
+          material_index: None,
         })
       }
     }

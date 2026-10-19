@@ -9,9 +9,9 @@ fn Object3D::raycast_line(
   raycaster : Raycaster,
   intersects : Array[Intersection],
 ) -> Unit {
-  let geometry = match self.primitive {
+  let (geometry, group_draws) = match self.primitive {
     None => return
-    Some(primitive) => primitive.geometry
+    Some(primitive) => (primitive.geometry, primitive.group_draws)
   }
   if geometry.bounding_sphere is None {
     geometry.compute_bounding_sphere()
@@ -42,13 +42,86 @@ fn Object3D::raycast_line(
     None => return
     Some(position) => position
   }
-  match geometry.index {
-    Some(index) => {
+  let close = self.kind is LineLoop
+  match group_draws {
+    None => {
+      let limit = match geometry.index {
+        Some(index) => index.count
+        None => position.count
+      }
       let (start, end) = triangle_bounds(
-        index.count,
+        limit,
         geometry.draw_range.start,
         geometry.draw_range.count,
       )
+      self.scan_lines(
+        raycaster,
+        intersects,
+        ray,
+        position,
+        geometry.index,
+        local_threshold_sq,
+        start,
+        end,
+        step,
+        None,
+        close,
+      )
+    }
+    Some(draws) => {
+      let limit = match geometry.index {
+        Some(index) => index.count
+        None => position.count
+      }
+      let mut group_index = 0
+      while group_index < geometry.groups.length() {
+        let group = geometry.groups[group_index]
+        if group.material_index < 0 || group.material_index >= draws.length() {
+          abort("Line.raycast material index is out of range")
+        }
+        let (start, end) = group_draw_range(
+          group.start,
+          group.count,
+          geometry.draw_range.start,
+          geometry.draw_range.count,
+          limit,
+        )
+        self.scan_lines(
+          raycaster,
+          intersects,
+          ray,
+          position,
+          geometry.index,
+          local_threshold_sq,
+          start,
+          end,
+          step,
+          Some(group.material_index),
+          false,
+        )
+        group_index = group_index + 1
+      }
+    }
+  }
+}
+
+///|
+fn Object3D::scan_lines(
+  self : Object3D,
+  raycaster : Raycaster,
+  intersects : Array[Intersection],
+  ray : @math.Ray,
+  position : BufferAttribute,
+  index : BufferAttribute?,
+  threshold_sq : Double,
+  start : Int,
+  end : Int,
+  step : Int,
+  material_index : Int?,
+  close : Bool,
+) -> Unit {
+  match index {
+    Some(index) => {
       let mut i = start
       while i < end - 1 {
         self.push_line_segment(
@@ -56,32 +129,29 @@ fn Object3D::raycast_line(
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           index.get_x(i).to_int(),
           index.get_x(i + 1).to_int(),
           i,
+          material_index,
         )
         i = i + step
       }
-      if self.kind is LineLoop && end > start {
+      if close && end > start {
         self.push_line_segment(
           raycaster,
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           index.get_x(end - 1).to_int(),
           index.get_x(start).to_int(),
           end - 1,
+          material_index,
         )
       }
     }
     None => {
-      let (start, end) = triangle_bounds(
-        position.count,
-        geometry.draw_range.start,
-        geometry.draw_range.count,
-      )
       let mut i = start
       while i < end - 1 {
         self.push_line_segment(
@@ -89,23 +159,25 @@ fn Object3D::raycast_line(
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           i,
           i + 1,
           i,
+          material_index,
         )
         i = i + step
       }
-      if self.kind is LineLoop && end > start {
+      if close && end > start {
         self.push_line_segment(
           raycaster,
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           end - 1,
           start,
           end - 1,
+          material_index,
         )
       }
     }
@@ -123,6 +195,7 @@ fn Object3D::push_line_segment(
   a : Int,
   b : Int,
   index : Int,
+  material_index : Int?,
 ) -> Unit {
   let start = @math.Vector3::new()
   let end = @math.Vector3::new()
@@ -158,5 +231,6 @@ fn Object3D::push_line_segment(
     index: Some(index),
     distance_to_ray: None,
     instance_id: None,
+    material_index,
   })
 }

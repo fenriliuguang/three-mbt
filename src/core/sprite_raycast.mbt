@@ -98,6 +98,7 @@ fn Object3D::raycast_sprite(
     index: None,
     distance_to_ray: None,
     instance_id: None,
+    material_index: None,
   })
 }
 

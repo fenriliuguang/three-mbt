@@ -1557,6 +1557,8 @@ Point and line draw ranges have landed. Four vertices start with `draw_count` `-
 
 Point and line material arrays have landed. Four points with groups `(0, 2)` and `(2, 2)`, sizes `4` and `8`, produce two items. The first is red `(1, 0)` from `0` for `2`. The second is green `(0, 1)` from `2` for `2`, with size attenuation off. An empty group list produces no item. `setDrawRange(1, 2)` clips them to `(1, 1)` and `(2, 1)`. Making the second material transparent leaves one opaque item and one transparent item. A material index past the array is skipped. Cloning keeps a new list of length `2`. A line and line segments with the same groups draw `(0, 2)` and `(2, 2)`. Raycast material indices stay later.
 
+Point and line raycast material indices have landed. Points at `x=0` and `x=2` with groups `(0, 1)` and `(1, 1)` miss while the group list is empty. A ray from `(0, 0.25, 0)` then hits `(0, 0, 0)` at material `0`, and a ray from `(2, 0.25, 0)` hits `(2, 0, 0)` at material `1`. `setDrawRange(1, 1)` keeps only the second hit. A line from `(0, 0, 0)` to `(1, 0, 0)` and `(2, 0, 0)` to `(3, 0, 0)` hits `(0.5, 0, 0)` at material `0` and `(2.5, 0, 0)` at material `1`. Line segments report the same second material. An out-of-range material index aborts. A point or line without a material array leaves `material_index` empty.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2276,6 +2278,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | draw range intersection | `renderer` |
 | planned | 7 | point and line draw ranges | `renderer` |
 | planned | 7 | point and line material arrays | `objects`, `renderer` |
+| planned | 7 | point and line raycast material indices | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

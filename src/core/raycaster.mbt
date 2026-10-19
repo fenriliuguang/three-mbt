@@ -1,4 +1,4 @@
-// r186: `Raycaster` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L13
+// r186: `Raycaster` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L13 ; `materialIndex` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L324
 
 ///|
 /// 从一条射线挑出场景里的交点。缺省原点是 `(0, 0, 0)`，方向是 `(0, 0, -1)`。`near` 默认是 `0`，`far` 默认是正无穷。
@@ -31,6 +31,8 @@ pub(all) struct Raycaster {
 /// r186: `index` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L331
 /// r186: `distanceToRay` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L226
 /// r186: `instanceId` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L171
+/// 点和线命中材质数组的分组时写下 `material_index`。网格的下标仍在 `face` 上。没有同名交点字段，最近的上游是网格面的 `materialIndex`。
+/// r186: `materialIndex` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L324
 pub(all) struct Intersection {
   distance : Double
   point : @math.Vector3
@@ -44,6 +46,7 @@ pub(all) struct Intersection {
   index : Int?
   distance_to_ray : Double?
   instance_id : Int?
+  material_index : Int?
 }
 
 ///|

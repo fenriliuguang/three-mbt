@@ -3692,6 +3692,171 @@ test "points raycast records distance to the ray" {
     None => assert_eq(false, true)
     Some(distance) => assert_eq(distance, 0.5)
   }
+  assert_eq(hits[0].material_index is None, true)
+}
+
+///|
+test "point and line raycasts record the group material index" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 2.0, 0.0, 0.0], 3),
+    ),
+  )
+  let points = @objects.Points::new(geometry, @materials.PointsMaterial::new())
+  points.set_materials([
+    @materials.PointsMaterial::new(),
+    @materials.PointsMaterial::new(),
+  ])
+  points.node.update_matrix_world()
+  let near = @core.Raycaster::new(
+    origin=@math.Vector3::new(y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  assert_eq(near.intersect_object(points.node).length(), 0)
+  geometry.add_group(0, 1, material_index=0)
+  geometry.add_group(1, 1, material_index=1)
+  let first = near.intersect_object(points.node)
+  assert_eq(first.length(), 1)
+  assert_eq(first[0].point.x, 0.0)
+  assert_eq(first[0].point.y, 0.0)
+  assert_eq(first[0].distance, 0.25)
+  match first[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  match first[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  let far = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=2.0, y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  let second = far.intersect_object(points.node)
+  assert_eq(second.length(), 1)
+  assert_eq(second[0].point.x, 2.0)
+  match second[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  match second[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  geometry.set_draw_range(1.0, 1.0)
+  assert_eq(near.intersect_object(points.node).length(), 0)
+  let kept = far.intersect_object(points.node)
+  assert_eq(kept.length(), 1)
+  match kept[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  let line_geometry = @core.BufferGeometry::new()
+  ignore(
+    line_geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let line = @objects.Line::new(line_geometry, @materials.LineBasicMaterial::new())
+  line.set_materials([
+    @materials.LineBasicMaterial::new(),
+    @materials.LineBasicMaterial::new(),
+  ])
+  line.node.update_matrix_world()
+  line_geometry.add_group(0, 2, material_index=0)
+  line_geometry.add_group(2, 2, material_index=1)
+  let line_near = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.5, y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  let line_hit = line_near.intersect_object(line.node)
+  assert_eq(line_hit.length(), 1)
+  assert_eq(line_hit[0].point.x, 0.5)
+  assert_eq(line_hit[0].point.y, 0.0)
+  match line_hit[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  match line_hit[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 0)
+  }
+  let line_far = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=2.5, y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  let line_second = line_far.intersect_object(line.node)
+  assert_eq(line_second.length(), 1)
+  assert_eq(line_second[0].point.x, 2.5)
+  match line_second[0].index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 2)
+  }
+  match line_second[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+  let segments = @objects.LineSegments::new(
+    line_geometry,
+    @materials.LineBasicMaterial::new(),
+  )
+  segments.set_materials([
+    @materials.LineBasicMaterial::new(),
+    @materials.LineBasicMaterial::new(),
+  ])
+  segments.node.update_matrix_world()
+  let segment_hit = line_far.intersect_object(segments.node)
+  assert_eq(segment_hit.length(), 1)
+  match segment_hit[0].material_index {
+    None => assert_eq(false, true)
+    Some(index) => assert_eq(index, 1)
+  }
+}
+
+///|
+test "panic Points.raycast material index is out of range" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  geometry.add_group(0, 1, material_index=5)
+  let points = @objects.Points::new(geometry, @materials.PointsMaterial::new())
+  points.set_materials([@materials.PointsMaterial::new()])
+  points.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  ignore(raycaster.intersect_object(points.node))
+}
+
+///|
+test "panic Line.raycast material index is out of range" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 1.0, 0.0, 0.0], 3),
+    ),
+  )
+  geometry.add_group(0, 2, material_index=5)
+  let line = @objects.Line::new(geometry, @materials.LineBasicMaterial::new())
+  line.set_materials([@materials.LineBasicMaterial::new()])
+  line.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.5, y=0.25),
+    direction=@math.Vector3::new(y=-1.0),
+  )
+  ignore(raycaster.intersect_object(line.node))
 }
 
 ///|

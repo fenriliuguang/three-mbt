@@ -8,9 +8,9 @@ fn Object3D::raycast_points(
   raycaster : Raycaster,
   intersects : Array[Intersection],
 ) -> Unit {
-  let geometry = match self.primitive {
+  let (geometry, group_draws) = match self.primitive {
     None => return
-    Some(primitive) => primitive.geometry
+    Some(primitive) => (primitive.geometry, primitive.group_draws)
   }
   if geometry.bounding_sphere is None {
     geometry.compute_bounding_sphere()
@@ -37,13 +37,79 @@ fn Object3D::raycast_points(
     None => return
     Some(position) => position
   }
-  match geometry.index {
-    Some(index) => {
+  match group_draws {
+    None => {
+      let limit = match geometry.index {
+        Some(index) => index.count
+        None => position.count
+      }
       let (start, end) = triangle_bounds(
-        index.count,
+        limit,
         geometry.draw_range.start,
         geometry.draw_range.count,
       )
+      self.scan_points(
+        raycaster,
+        intersects,
+        ray,
+        position,
+        geometry.index,
+        local_threshold_sq,
+        start,
+        end,
+        None,
+      )
+    }
+    Some(draws) => {
+      let limit = match geometry.index {
+        Some(index) => index.count
+        None => position.count
+      }
+      let mut group_index = 0
+      while group_index < geometry.groups.length() {
+        let group = geometry.groups[group_index]
+        if group.material_index < 0 || group.material_index >= draws.length() {
+          abort("Points.raycast material index is out of range")
+        }
+        let (start, end) = group_draw_range(
+          group.start,
+          group.count,
+          geometry.draw_range.start,
+          geometry.draw_range.count,
+          limit,
+        )
+        self.scan_points(
+          raycaster,
+          intersects,
+          ray,
+          position,
+          geometry.index,
+          local_threshold_sq,
+          start,
+          end,
+          Some(group.material_index),
+        )
+        group_index = group_index + 1
+      }
+    }
+  }
+}
+
+///|
+fn Object3D::scan_points(
+  self : Object3D,
+  raycaster : Raycaster,
+  intersects : Array[Intersection],
+  ray : @math.Ray,
+  position : BufferAttribute,
+  index : BufferAttribute?,
+  threshold_sq : Double,
+  start : Int,
+  end : Int,
+  material_index : Int?,
+) -> Unit {
+  match index {
+    Some(index) => {
       let mut i = start
       while i < end {
         let vertex = index.get_x(i).to_int()
@@ -52,19 +118,15 @@ fn Object3D::raycast_points(
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           vertex,
           vertex,
+          material_index,
         )
         i = i + 1
       }
     }
     None => {
-      let (start, end) = triangle_bounds(
-        position.count,
-        geometry.draw_range.start,
-        geometry.draw_range.count,
-      )
       let mut i = start
       while i < end {
         self.push_point(
@@ -72,9 +134,10 @@ fn Object3D::raycast_points(
           intersects,
           ray,
           position,
-          local_threshold_sq,
+          threshold_sq,
           i,
           i,
+          material_index,
         )
         i = i + 1
       }
@@ -92,6 +155,7 @@ fn Object3D::push_point(
   threshold_sq : Double,
   vertex : Int,
   index : Int,
+  material_index : Int?,
 ) -> Unit {
   let point = @math.Vector3::new()
   ignore(position.copy_to_vector3(vertex, point))
@@ -119,5 +183,6 @@ fn Object3D::push_point(
     index: Some(index),
     distance_to_ray: Some(dist_sq.sqrt()),
     instance_id: None,
+    material_index,
   })
 }

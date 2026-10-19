@@ -299,6 +299,7 @@ pub(all) struct Intersection {
   index : Int?
   distance_to_ray : Double?
   instance_id : Int?
+  material_index : Int?
 }
 
 pub(all) struct Layers {
