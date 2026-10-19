@@ -3435,3 +3435,25 @@ test "Material shader keeps its own linewidth on copy" {
   assert_eq(cloned.id == shader.id, false)
   assert_eq(shader.linewidth, 4.0)
 }
+
+///|
+test "Material shader defaults forceSinglePass on" {
+  let shader = @materials.Material::shader()
+  let basic = @materials.Material::basic()
+  let phong = @materials.Material::phong()
+  assert_eq(shader.force_single_pass, true)
+  assert_eq(basic.force_single_pass, false)
+  assert_eq(phong.force_single_pass, false)
+  ignore(basic.copy(shader))
+  assert_eq(basic.force_single_pass, true)
+  assert_eq(shader.force_single_pass, true)
+  basic.force_single_pass = false
+  assert_eq(shader.force_single_pass, true)
+  let onto = @materials.Material::shader()
+  ignore(onto.copy(phong))
+  assert_eq(onto.force_single_pass, false)
+  assert_eq(phong.force_single_pass, false)
+  let cloned = shader.clone()
+  assert_eq(cloned.force_single_pass, true)
+  assert_eq(cloned.id == shader.id, false)
+}
