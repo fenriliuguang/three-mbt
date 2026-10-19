@@ -3371,7 +3371,7 @@ test "Material shader writes USE_ENVMAP" {
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
   assert_eq(1658 - 1608, 50)
   assert_eq(
     shader.prefixed_vertex_shader()[683:701].to_owned(),
@@ -3403,14 +3403,14 @@ test "Material shader writes ENVMAP_MODE" {
   let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
   shader.env_map = Some(env_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
-  assert_eq(shader.prefixed_fragment_shader().length(), 1272)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
   assert_eq(1658 - 1627, 31)
   assert_eq(
     shader.prefixed_vertex_shader()[702:732].to_owned(),
     "#define ENVMAP_MODE_REFLECTION",
   )
   assert_eq(
-    shader.prefixed_fragment_shader()[1098:1128].to_owned(),
+    shader.prefixed_fragment_shader()[1123:1153].to_owned(),
     "#define ENVMAP_MODE_REFLECTION",
   )
   shader.map = Some(env_map)
@@ -3425,6 +3425,31 @@ test "Material shader writes ENVMAP_MODE" {
   let basic = @materials.Material::basic()
   basic.env_map = Some(env_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes ENVMAP_TYPE" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.env_map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1297)
+  assert_eq(1297 - 1272, 25)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1098:1122].to_owned(),
+    "#define ENVMAP_TYPE_CUBE",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader()[702:732].to_owned(),
+    "#define ENVMAP_MODE_REFLECTION",
+  )
+  let raw = @materials.Material::raw()
+  raw.env_map = Some(env_map)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.env_map = Some(env_map)
+  assert_eq(basic.prefixed_fragment_shader(), "")
 }
 
 ///|
