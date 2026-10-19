@@ -62,6 +62,7 @@ pub(all) struct LineBasicMaterial {
   mut name : String
   type_name : String
 }
+pub fn LineBasicMaterial::clone(Self) -> Self
 pub fn LineBasicMaterial::copy(Self, Self) -> Self
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
 pub fn LineBasicMaterial::set_alpha_test(Self, Double) -> Unit

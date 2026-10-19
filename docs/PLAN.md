@@ -1893,6 +1893,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `PointsMaterial.clone` has landed. A new material clones to `PointsMaterial` at version `0`, size `1`, and a new id. A material named `point`, colored `(1, 0, 0)`, size `4`, size attenuation off, alpha test `0.2`, version `5`, uuid `point`, and user data `point` clones to `PointsMaterial`. The clone's version is `1`. Its uuid is 36 characters with version nibble `4`, and its id differs from the source. The source stays at version `5` and uuid `point`. Setting the clone's size to `8` and red channel to `0.5` leaves the source at `4` and `1`. Point draws still do not read this clone.
 
+`LineBasicMaterial.clone` has landed. A new material clones to `LineBasicMaterial` at version `0`, opacity `1`, and a new id. A material named `line`, colored `(0, 1, 0)`, opacity `0.25`, fog off, alpha test `0.2`, version `5`, uuid `line`, and user data `line` clones to `LineBasicMaterial`. The clone's version is `1`. Its uuid is 36 characters with version nibble `4`, and its id differs from the source. The source stays at version `5` and uuid `line`. Setting the clone's opacity to `1` and green channel to `0.5` leaves the source at `0.25` and `1`. Line draws still do not read this clone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2780,6 +2782,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.copy` | `materials` |
 | planned | 7 | `Material.clone` | `materials` |
 | planned | 7 | `PointsMaterial.clone` | `materials` |
+| planned | 7 | `LineBasicMaterial.clone` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

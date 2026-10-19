@@ -1145,3 +1145,44 @@ test "LineDashedMaterial type_name stays LineDashedMaterial" {
   assert_eq(destination.type_name, "LineDashedMaterial")
   assert_eq(source.type_name, "LineDashedMaterial")
 }
+
+///|
+test "LineBasicMaterial clone keeps LineBasicMaterial and takes a new id" {
+  let defaults = @materials.LineBasicMaterial::new()
+  let defaults_clone = defaults.clone()
+  assert_eq(defaults_clone.type_name, "LineBasicMaterial")
+  assert_eq(defaults_clone.version, 0)
+  assert_eq(defaults_clone.opacity, 1.0)
+  assert_eq(defaults_clone.id == defaults.id, false)
+  let source = @materials.LineBasicMaterial::new()
+  source.name = "line"
+  ignore(source.color.set_rgb(0.0, 1.0, 0.0))
+  source.opacity = 0.25
+  source.fog = false
+  source.set_alpha_test(0.2)
+  source.version = 5
+  source.uuid = "line"
+  source.user_data.set("label", "line")
+  let cloned = source.clone()
+  assert_eq(cloned.name, "line")
+  assert_eq(cloned.color.g, 1.0)
+  assert_eq(cloned.opacity, 0.25)
+  assert_eq(cloned.fog, false)
+  assert_eq(cloned.alpha_test, 0.2)
+  assert_eq(cloned.version, 1)
+  assert_eq(cloned.type_name, "LineBasicMaterial")
+  assert_eq(cloned.id == source.id, false)
+  assert_eq(cloned.uuid.length(), 36)
+  assert_eq(cloned.uuid[14:15].to_owned(), "4")
+  assert_eq(source.uuid, "line")
+  assert_eq(source.version, 5)
+  cloned.opacity = 1.0
+  cloned.color.g = 0.5
+  assert_eq(source.opacity, 0.25)
+  assert_eq(source.color.g, 1.0)
+  cloned.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "line")
+  }
+}
