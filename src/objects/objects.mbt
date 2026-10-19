@@ -1311,6 +1311,14 @@ pub fn InstancedMesh::clone(
 }
 
 ///|
+/// 发出 `dispose`，并清掉形变缓冲。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L396
+pub fn InstancedMesh::dispose(self : InstancedMesh) -> Unit {
+  self.node.dispose()
+  self.morph_texture = None
+}
+
+///|
 /// 局部包围盒：几何体包围盒按每个实例矩阵变换后再求并。
 /// r186: `computeBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L115
 pub fn InstancedMesh::compute_bounding_box(self : InstancedMesh) -> @math.Box3 {

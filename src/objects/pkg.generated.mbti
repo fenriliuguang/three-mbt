@@ -35,6 +35,7 @@ pub fn InstancedMesh::clone(Self, recursive? : Bool) -> Self
 pub fn InstancedMesh::compute_bounding_box(Self) -> @math.Box3
 pub fn InstancedMesh::compute_bounding_sphere(Self) -> @math.Sphere
 pub fn InstancedMesh::copy(Self, Self, recursive? : Bool) -> Self
+pub fn InstancedMesh::dispose(Self) -> Unit
 pub fn InstancedMesh::get_color_at(Self, Int, @math.Color) -> @math.Color
 pub fn InstancedMesh::get_matrix_at(Self, Int, @math.Matrix4) -> @math.Matrix4
 pub fn InstancedMesh::get_morph_at(Self, Int, Mesh) -> Unit

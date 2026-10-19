@@ -1285,6 +1285,40 @@ test "InstancedMesh.copy clones the morph buffer" {
 }
 
 ///|
+test "InstancedMesh.dispose clears the morph buffer" {
+  let geometry = @core.BufferGeometry::new()
+  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let weights = @objects.Mesh::new(geometry, @materials.Material::basic())
+  weights.morph_target_influences = Some([0.25, 0.5])
+  ignore(mesh.set_morph_at(1, weights))
+  let cloned = mesh.clone()
+  let hits = Ref::Ref(0)
+  let kind = Ref::Ref("")
+  mesh.node.add_event_listener("dispose", fn(event) {
+    hits.val = hits.val + 1
+    kind.val = event.kind
+  })
+  mesh.dispose()
+  assert_eq(hits.val, 1)
+  assert_eq(kind.val, "dispose")
+  assert_eq(mesh.morph_texture is None, true)
+  match cloned.morph_texture {
+    None => assert_eq(false, true)
+    Some(data) => {
+      assert_eq(data[3], 0.25)
+      assert_eq(data[5], 0.5)
+    }
+  }
+  let bare = @objects.InstancedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+    1,
+  )
+  bare.dispose()
+  assert_eq(bare.morph_texture is None, true)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(

@@ -1479,6 +1479,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `InstancedMesh.copy` now copies the morph buffer. Instance `1` with weights `[0.25, 0.5]` stores `[0, 0, 0, 0.25, 0.25, 0.5]`. The copy has those six values. Setting the copy's fourth value to `1` leaves the source at `0.25`. Copying a mesh with no morph data onto that copy leaves the `1` in place. `InstancedMesh.clone` uses the same copy, so the clone's fourth value starts at `0.25`, and setting it to `0` leaves the source at `0.25`. The texture object stays later.
 
+`InstancedMesh.dispose` has landed. Instance `1` with weights `[0.25, 0.5]` stores `0.25` at the fourth buffer value. Dispose emits one `dispose` event and clears that buffer. A clone made first still has `0.25` and `0.5` at the fourth and sixth values. A mesh with no morph data stays empty after dispose.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2159,6 +2161,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `InstancedMesh.setMorphAt` | `objects` |
 | planned | 7 | `InstancedMesh.getMorphAt` | `objects` |
 | planned | 7 | `InstancedMesh.copy` copies the morph buffer | `objects` |
+| planned | 7 | `InstancedMesh.dispose` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
