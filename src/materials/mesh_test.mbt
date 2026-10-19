@@ -4105,6 +4105,37 @@ test "Material shader writes USE_SPECULAR_COLORMAP" {
 }
 
 ///|
+test "Material shader writes USE_SPECULAR_INTENSITYMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let intensity_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.specular_intensity_map = Some(intensity_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1256)
+  assert_eq(1642 - 1608, 34)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:716].to_owned(),
+    "#define USE_SPECULAR_INTENSITYMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1112].to_owned(),
+    "#define USE_SPECULAR_INTENSITYMAP",
+  )
+  shader.specular_color_map = Some(intensity_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1672)
+  assert_eq(
+    shader.prefixed_vertex_shader()[713:746].to_owned(),
+    "#define USE_SPECULAR_INTENSITYMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.specular_intensity_map = Some(intensity_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.specular_intensity_map = Some(intensity_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
