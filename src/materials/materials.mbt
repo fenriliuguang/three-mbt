@@ -758,6 +758,13 @@ pub fn PointsMaterial::copy(
 }
 
 ///|
+/// 没有单独的 `PointsMaterial.clone`。按 `Material.clone` 新建一份点材质，再 `copy`。新材质有自己的 `id` 和 `uuid`，`type_name` 仍是 `PointsMaterial`。`alpha_test` 穿过 `0` 时新材质的 `version` 从 `0` 加一。点绘制仍不读这份克隆。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
+pub fn PointsMaterial::clone(self : PointsMaterial) -> PointsMaterial {
+  PointsMaterial::new().copy(self)
+}
+
+///|
 /// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。点绘制仍不因这次标记重新编译。
 /// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
 pub fn PointsMaterial::set_needs_update(

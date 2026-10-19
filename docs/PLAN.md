@@ -1891,6 +1891,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.clone` has landed. It builds a new material of the same kind and then copies. A basic material named `plain` clones to another `MeshBasicMaterial` at version `0` with a new id. Renaming the clone to `copy` leaves the source at `plain`. A Lambert material named `lit`, colored `(1, 0, 0)`, with alpha test `0.2`, version `5`, uuid `mesh`, and user data `mesh` clones to `MeshLambertMaterial`. The clone's version is `1` because alpha test crosses `0` on a new material. Its uuid is 36 characters with version nibble `4`, and its id differs from the source. The source stays at version `5` and uuid `mesh`. Setting the clone's red channel to `0.5` and user data to `copy` leaves the source at `1` and `mesh`. A Standard material at roughness `0.2` and metalness `0.8` clones to `MeshStandardMaterial` with those values. The renderer still does not read this clone.
 
+`PointsMaterial.clone` has landed. A new material clones to `PointsMaterial` at version `0`, size `1`, and a new id. A material named `point`, colored `(1, 0, 0)`, size `4`, size attenuation off, alpha test `0.2`, version `5`, uuid `point`, and user data `point` clones to `PointsMaterial`. The clone's version is `1`. Its uuid is 36 characters with version nibble `4`, and its id differs from the source. The source stays at version `5` and uuid `point`. Setting the clone's size to `8` and red channel to `0.5` leaves the source at `4` and `1`. Point draws still do not read this clone.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2777,6 +2779,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineDashedMaterial.type` | `materials` |
 | planned | 7 | `Material.copy` | `materials` |
 | planned | 7 | `Material.clone` | `materials` |
+| planned | 7 | `PointsMaterial.clone` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -225,6 +225,7 @@ pub(all) struct PointsMaterial {
   mut name : String
   type_name : String
 }
+pub fn PointsMaterial::clone(Self) -> Self
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 pub fn PointsMaterial::set_alpha_test(Self, Double) -> Unit

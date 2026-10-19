@@ -776,3 +776,42 @@ test "PointsMaterial type_name stays PointsMaterial" {
   assert_eq(destination.type_name, "PointsMaterial")
   assert_eq(source.type_name, "PointsMaterial")
 }
+
+///|
+test "PointsMaterial clone keeps PointsMaterial and takes a new id" {
+  let defaults = @materials.PointsMaterial::new()
+  let defaults_clone = defaults.clone()
+  assert_eq(defaults_clone.type_name, "PointsMaterial")
+  assert_eq(defaults_clone.version, 0)
+  assert_eq(defaults_clone.size, 1.0)
+  assert_eq(defaults_clone.id == defaults.id, false)
+  let source = @materials.PointsMaterial::new(size=4.0, size_attenuation=false)
+  source.name = "point"
+  ignore(source.color.set_rgb(1.0, 0.0, 0.0))
+  source.set_alpha_test(0.2)
+  source.version = 5
+  source.uuid = "point"
+  source.user_data.set("label", "point")
+  let cloned = source.clone()
+  assert_eq(cloned.name, "point")
+  assert_eq(cloned.color.r, 1.0)
+  assert_eq(cloned.size, 4.0)
+  assert_eq(cloned.size_attenuation, false)
+  assert_eq(cloned.alpha_test, 0.2)
+  assert_eq(cloned.version, 1)
+  assert_eq(cloned.type_name, "PointsMaterial")
+  assert_eq(cloned.id == source.id, false)
+  assert_eq(cloned.uuid.length(), 36)
+  assert_eq(cloned.uuid[14:15].to_owned(), "4")
+  assert_eq(source.uuid, "point")
+  assert_eq(source.version, 5)
+  cloned.size = 8.0
+  cloned.color.r = 0.5
+  assert_eq(source.size, 4.0)
+  assert_eq(source.color.r, 1.0)
+  cloned.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "point")
+  }
+}
