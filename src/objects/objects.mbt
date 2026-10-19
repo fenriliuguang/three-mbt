@@ -740,6 +740,23 @@ pub fn InstancedMesh::compute_bounding_sphere(
 }
 
 ///|
+/// 用这份实例包围球做视锥测试。还没算过就先算。测试用的是拷贝，局部球和几何体的球都不改。
+/// three.js 没有 `InstancedMesh.intersectsFrustum`。对象自带包围球时走 `Frustum.intersectsObject` 的这条分支。
+/// r186: `intersectsObject` https://github.com/mrdoob/three.js/blob/r186/src/math/Frustum.js#L146
+pub fn InstancedMesh::intersects_frustum(
+  self : InstancedMesh,
+  frustum : @math.Frustum,
+) -> Bool {
+  let sphere = match self.bounding_sphere {
+    Some(sphere) => sphere
+    None => self.compute_bounding_sphere()
+  }
+  let copy = @math.Sphere::new()
+  ignore(copy.copy(sphere).apply_matrix4(self.node.matrix_world))
+  frustum.intersects_sphere(copy)
+}
+
+///|
 /// 始终朝向相机的四边形。`center` 与节点上的锚点是同一个向量，默认 `(0.5, 0.5)`。
 /// r186: `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47
 /// r186: `center` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L110

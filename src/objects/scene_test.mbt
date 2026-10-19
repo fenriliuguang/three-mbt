@@ -710,3 +710,82 @@ test "InstancedMesh.computeBoundingSphere unions transformed geometry spheres" {
   assert_eq(missing.center.x, 0.0)
   assert_eq(missing.radius, -1.0)
 }
+
+///|
+test "InstancedMesh.intersectsFrustum uses the instanced bounding sphere" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
+  )
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    1,
+  )
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_translation(-2.0, 0.0, 0.0))
+  mesh.set_matrix_at(0, matrix)
+  mesh.node.update_matrix_world()
+  assert_eq(mesh.bounding_sphere is None, true)
+  let frustum = @math.Frustum::new()
+  ignore(
+    frustum.set(
+      @math.Plane::new(normal=@math.Vector3::new(x=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(x=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(y=-1.0), constant=1.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=1.0), constant=0.0),
+      @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
+    ),
+  )
+  assert_eq(mesh.intersects_frustum(frustum), false)
+  match mesh.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, -2.0)
+      assert_eq(sphere.center.y, 0.0)
+      assert_eq(sphere.center.z, 0.0)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+  match geometry.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(geometry_sphere) => {
+      assert_eq(geometry_sphere.center.x, 0.0)
+      assert_eq(geometry_sphere.center.y, 0.0)
+      assert_eq(geometry_sphere.center.z, 0.0)
+      assert_eq(geometry_sphere.radius, 0.0)
+    }
+  }
+  ignore(matrix.make_translation(0.5, 0.5, 0.5))
+  mesh.set_matrix_at(0, matrix)
+  ignore(mesh.compute_bounding_sphere())
+  assert_eq(mesh.intersects_frustum(frustum), true)
+  match mesh.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 0.5)
+      assert_eq(sphere.center.y, 0.5)
+      assert_eq(sphere.center.z, 0.5)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+  ignore(matrix.make_translation(0.0, 0.0, 0.0))
+  mesh.set_matrix_at(0, matrix)
+  ignore(mesh.compute_bounding_sphere())
+  ignore(mesh.node.position.set(-2.5, 0.0, 0.0))
+  mesh.node.update_matrix_world()
+  assert_eq(mesh.intersects_frustum(frustum), false)
+  match mesh.bounding_sphere {
+    None => assert_eq(false, true)
+    Some(sphere) => {
+      assert_eq(sphere.center.x, 0.0)
+      assert_eq(sphere.center.y, 0.0)
+      assert_eq(sphere.center.z, 0.0)
+      assert_eq(sphere.radius, 0.0)
+    }
+  }
+}
