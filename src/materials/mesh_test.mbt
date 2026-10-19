@@ -7850,6 +7850,41 @@ test "Material shader instancingMorph needs a morph texture" {
 }
 
 ///|
+test "Material shader outputColorSpace picks the active space" {
+  assert_eq(@materials.program_output_color_space("srgb", "srgb-linear"), "srgb")
+  assert_eq(
+    @materials.program_output_color_space(
+      "srgb",
+      "srgb-linear",
+      is_xr_render_target=true,
+      target_color_space="display-p3",
+    ),
+    "srgb",
+  )
+  assert_eq(
+    @materials.program_output_color_space(
+      "srgb",
+      "srgb-linear",
+      has_render_target=true,
+    ),
+    "srgb-linear",
+  )
+  assert_eq(
+    @materials.program_output_color_space(
+      "srgb",
+      "srgb-linear",
+      has_render_target=true,
+      is_xr_render_target=true,
+      target_color_space="display-p3",
+    ),
+    "display-p3",
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

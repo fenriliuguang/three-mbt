@@ -23,6 +23,8 @@ pub fn program_instancing_color(is_instanced_mesh? : Bool, has_instance_color? :
 
 pub fn program_instancing_morph(is_instanced_mesh? : Bool, has_morph_texture? : Bool) -> Bool
 
+pub fn program_output_color_space(String, String, has_render_target? : Bool, is_xr_render_target? : Bool, target_color_space? : String) -> String
+
 pub fn program_uniforms(String, Map[String, Double], Map[String, Map[String, Double]]) -> Map[String, Double]
 
 pub fn replace_clipping_plane_nums(String, num_clipping_planes? : Int, num_clip_intersection? : Int) -> String
