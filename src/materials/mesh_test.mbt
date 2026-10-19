@@ -6994,6 +6994,50 @@ test "Material shader writes DECODE_VIDEO_TEXTURE" {
 }
 
 ///|
+test "Material shader writes DECODE_VIDEO_TEXTURE_EMISSIVE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_fragment_shader(decode_video_texture_emissive=false).length(),
+    2041,
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader(decode_video_texture_emissive=true).length(),
+    2079,
+  )
+  assert_eq(2079 - 2041, 38)
+  assert_eq(
+    shader.prefixed_fragment_shader(decode_video_texture_emissive=true)[1079:1116].to_owned(),
+    "#define DECODE_VIDEO_TEXTURE_EMISSIVE",
+  )
+  assert_eq(
+    shader
+    .prefixed_fragment_shader(
+      decode_video_texture=true,
+      decode_video_texture_emissive=true,
+    )
+    .length(),
+    2108,
+  )
+  assert_eq(
+    shader
+    .prefixed_fragment_shader(
+      decode_video_texture=true,
+      decode_video_texture_emissive=true,
+    )[1108:1145]
+    .to_owned(),
+    "#define DECODE_VIDEO_TEXTURE_EMISSIVE",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(decode_video_texture_emissive=true).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(decode_video_texture_emissive=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
