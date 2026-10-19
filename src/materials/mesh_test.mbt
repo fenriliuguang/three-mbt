@@ -3365,6 +3365,38 @@ test "Material shader writes USE_MAP" {
 }
 
 ///|
+test "Material shader writes USE_ENVMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.env_map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1627)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1241)
+  assert_eq(1627 - 1608, 19)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:701].to_owned(),
+    "#define USE_ENVMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1097].to_owned(),
+    "#define USE_ENVMAP",
+  )
+  shader.map = Some(env_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1643)
+  assert_eq(1643 - 1627, 16)
+  assert_eq(
+    shader.prefixed_vertex_shader()[699:717].to_owned(),
+    "#define USE_ENVMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.env_map = Some(env_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.env_map = Some(env_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
