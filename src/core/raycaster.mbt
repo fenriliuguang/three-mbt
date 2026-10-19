@@ -8,12 +8,36 @@
 /// r186: `far` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L46
 /// r186: `camera` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L56
 /// r186: `layers` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L69
+/// r186: `params` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L88
 pub(all) struct Raycaster {
   ray : @math.Ray
   mut near : Double
   mut far : Double
   mut camera : Object3D?
   layers : Layers
+  params : RaycasterParams
+}
+
+///|
+/// 上游没有单独的类。线段相交的世界单位容差，来自 `params.Line.threshold`，默认 `1`。
+/// r186: `params` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L88
+pub(all) struct RaycasterLineParams {
+  mut threshold : Double
+}
+
+///|
+/// 上游没有单独的类。点相交的世界单位容差，来自 `params.Points.threshold`，默认 `1`。
+/// r186: `params` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L88
+pub(all) struct RaycasterPointsParams {
+  mut threshold : Double
+}
+
+///|
+/// 上游没有单独的类。`Mesh`、`LOD`、`Sprite` 在 r186 里是空对象，这里不设字段。
+/// r186: `params` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L88
+pub(all) struct RaycasterParams {
+  line : RaycasterLineParams
+  points : RaycasterPointsParams
 }
 
 ///|
@@ -32,7 +56,14 @@ pub fn Raycaster::new(
     None => ()
     Some(direction) => ignore(ray.direction.copy(direction))
   }
-  { ray, near, far, camera: None, layers: Layers::new() }
+  {
+    ray,
+    near,
+    far,
+    camera: None,
+    layers: Layers::new(),
+    params: { line: { threshold: 1.0 }, points: { threshold: 1.0 } },
+  }
 }
 
 ///|

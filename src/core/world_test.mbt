@@ -2581,6 +2581,17 @@ test "layers defaults to layer zero on a raycaster" {
 }
 
 ///|
+test "params starts line and points thresholds at one" {
+  let raycaster = @core.Raycaster::new()
+  assert_eq(raycaster.params.line.threshold, 1.0)
+  assert_eq(raycaster.params.points.threshold, 1.0)
+  raycaster.params.line.threshold = 0.5
+  raycaster.params.points.threshold = 2.0
+  assert_eq(raycaster.params.line.threshold, 0.5)
+  assert_eq(raycaster.params.points.threshold, 2.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {
