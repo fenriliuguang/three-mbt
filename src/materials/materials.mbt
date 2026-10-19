@@ -650,7 +650,7 @@ pub fn PointsMaterial::set_alpha_test(self : PointsMaterial, value : Double) -> 
 ///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
-/// `alpha_test` 默认 `0`。线段着色器在片元 alpha 小于它时丢弃。
+/// `alpha_test` 默认 `0`。线段着色器在片元 alpha 小于它时丢弃。`set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
 /// `vertex_colors` 默认关闭。线段着色器仍不读顶点色。
 /// `tone_mapped` 默认打开。色调映射仍对每份绘制过的线段生效。
 /// `alpha_hash` 默认关闭。线段着色器仍不做哈希透明。
@@ -815,7 +815,7 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
 
 ///|
 /// 把颜色和常量混合色写进目标自己的颜色对象。颜色贴图沿用源对象。
-/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。
+/// 不透明度、`alpha_test`、透明开关、雾、深度、颜色写入、预乘、可见性、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`alpha_test` 经 `set_alpha_test` 写入，穿过 `0` 时目标的 `version` 加一。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L106
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
 pub fn LineBasicMaterial::copy(
@@ -849,7 +849,7 @@ pub fn LineBasicMaterial::copy(
   self.user_data = copied
   self.map = source.map
   self.opacity = source.opacity
-  self.alpha_test = source.alpha_test
+  self.set_alpha_test(source.alpha_test)
   self.transparent = source.transparent
   self.fog = source.fog
   self.depth_write = source.depth_write
@@ -883,6 +883,19 @@ pub fn LineBasicMaterial::set_needs_update(
   if value {
     self.version = self.version + 1
   }
+}
+
+///|
+/// 写入 `alpha_test`。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L495
+pub fn LineBasicMaterial::set_alpha_test(
+  self : LineBasicMaterial,
+  value : Double,
+) -> Unit {
+  if (self.alpha_test > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.alpha_test = value
 }
 
 ///|
