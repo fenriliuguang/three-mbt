@@ -2301,6 +2301,8 @@ Custom defines have landed. An empty `defines` table adds nothing, so the defaul
 
 `USE_SKINNING` has landed. A Shader material with `has_skinning` false adds nothing. Passing `has_skinning` as true writes `#define USE_SKINNING` and a newline, `21` characters, on the vertex prefix only. The vertex string grows from `1608` to `1629`. The fragment string stays `1222`. `flat_shading` true puts that line after `FLAT_SHADED`, so the vertex string is `1649` and the fragment string is `1242`. Passing `has_skinning` as false drops the line. A raw material stays at `92`. A Basic material stays `""`. `USE_MORPHTARGETS` stays later.
 
+`USE_MORPHTARGETS` has landed. A Shader material with `has_morph_targets` false adds nothing. Passing `has_morph_targets` as true writes `#define USE_MORPHTARGETS` and a newline, `25` characters, on the vertex prefix only. The vertex string grows from `1608` to `1633`. The fragment string stays `1222`. `has_skinning` true puts that line after `USE_SKINNING`, so the vertex string is `1654` and the fragment string stays `1222`. Passing `has_morph_targets` as false drops the line. A raw material stays at `92`. A Basic material stays `""`. `USE_MORPHNORMALS` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3392,6 +3394,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `USE_POINTS_UV` | `materials` |
 | planned | 7 | `FLAT_SHADED` | `materials` |
 | planned | 7 | `USE_SKINNING` | `materials` |
+| planned | 7 | `USE_MORPHTARGETS` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -5903,6 +5903,31 @@ test "Material shader writes USE_SKINNING" {
 }
 
 ///|
+test "Material shader writes USE_MORPHTARGETS" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(has_morph_targets=true).length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(1633 - 1608, 25)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_morph_targets=true)[683:707].to_owned(),
+    "#define USE_MORPHTARGETS",
+  )
+  assert_eq(shader.prefixed_vertex_shader(has_skinning=true, has_morph_targets=true).length(), 1654)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_skinning=true, has_morph_targets=true)[704:728].to_owned(),
+    "#define USE_MORPHTARGETS",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  assert_eq(shader.prefixed_vertex_shader(has_morph_targets=false).length(), 1608)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(has_morph_targets=true).length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(has_morph_targets=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
