@@ -2223,6 +2223,82 @@ test "panic SkinnedMesh.getVertexPosition requires a skeleton" {
 }
 
 ///|
+test "SkinnedMesh.computeBoundingBox unions skinned vertices" {
+  let bone = @objects.Bone::new()
+  bone.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[bone])
+  ignore(bone.node.position.set(0.0, 5.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 4.0, 0.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinIndex",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "skinWeight",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+    ),
+  )
+  let skin = @objects.SkinnedMesh::new(geometry, @materials.Material::basic())
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  let box = skin.compute_bounding_box()
+  match skin.bounding_box {
+    None => abort("bounding box was not stored")
+    Some(stored) => assert_eq(physical_equal(box, stored), true)
+  }
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 5.0)
+  assert_eq(box.min.z, 0.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 9.0)
+  assert_eq(box.max.z, 0.0)
+  ignore(bone.node.position.set(0.0, 1.0, 0.0))
+  bone.node.update_matrix_world(force=true)
+  let again = skin.compute_bounding_box()
+  assert_eq(physical_equal(again, box), true)
+  assert_eq(box.min.x, 0.0)
+  assert_eq(box.min.y, 1.0)
+  assert_eq(box.min.z, 0.0)
+  assert_eq(box.max.x, 1.0)
+  assert_eq(box.max.y, 5.0)
+  assert_eq(box.max.z, 0.0)
+  let empty_geometry = @core.BufferGeometry::new()
+  ignore(
+    empty_geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([], 3),
+    ),
+  )
+  let empty_skin = @objects.SkinnedMesh::new(
+    empty_geometry,
+    @materials.Material::basic(),
+  )
+  let empty_box = empty_skin.compute_bounding_box()
+  assert_eq(empty_box.is_empty(), true)
+  let empty_again = empty_skin.compute_bounding_box()
+  assert_eq(physical_equal(empty_again, empty_box), true)
+  assert_eq(empty_box.is_empty(), true)
+}
+
+///|
+test "panic SkinnedMesh.computeBoundingBox requires a position attribute" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  ignore(skin.compute_bounding_box())
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

@@ -1529,6 +1529,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.getVertexPosition` has landed. A vertex `(1, 2, 3)` with weight `1` on a bone that moved to `y=5` becomes `(1, 7, 3)`. A relative morph `(2, 0, 0)` at weight `0.5` then becomes `(2, 7, 3)`. The bind matrix is identity. Calling it without a skeleton aborts. `computeBoundingBox` stays later.
 
+`SkinnedMesh.computeBoundingBox` has landed. Vertices `(1, 0, 0)` and `(0, 4, 0)` with weight `1` on a bone that moved to `y=5` produce a box from `(0, 5, 0)` to `(1, 9, 0)`. Moving the bone to `y=1` and computing again writes `(0, 1, 0)` to `(1, 5, 0)` into the same box. An empty position attribute leaves the box empty. A mesh without `position` aborts. `computeBoundingSphere` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2234,6 +2236,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `SkinnedMesh.applyBoneTransform` | `objects` |
 | planned | 7 | `SkinnedMesh.applyBoneTransform` for `Vector4` | `objects` |
 | planned | 7 | `SkinnedMesh.getVertexPosition` | `objects` |
+| planned | 7 | `SkinnedMesh.computeBoundingBox` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
