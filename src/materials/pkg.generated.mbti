@@ -136,6 +136,7 @@ pub(all) struct SpriteMaterial {
   mut premultiplied_alpha : Bool
   mut visible : Bool
   mut vertex_colors : Bool
+  mut tone_mapped : Bool
 }
 pub fn SpriteMaterial::copy(Self, Self) -> Self
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
