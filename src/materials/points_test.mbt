@@ -46,3 +46,63 @@ test "PointsMaterial stores an alpha map" {
   assert_eq(defaults.alpha_map is None, true)
   assert_eq(defaults.fog, true)
 }
+
+///|
+test "PointsMaterial.copy writes color and shares maps" {
+  let color_pixels = FixedArray::make(4, b'\xFF')
+  let color_map = @textures.Texture::from_rgba8(1, 1, color_pixels)
+  let alpha_pixels = FixedArray::make(4, b'\x00')
+  alpha_pixels[1] = b'\x80'
+  let alpha_map = @textures.Texture::from_rgba8(1, 1, alpha_pixels)
+  let source = @materials.PointsMaterial::new(
+    hex=0xFF0000,
+    size=4.0,
+    size_attenuation=false,
+  )
+  source.map = Some(color_map)
+  source.alpha_map = Some(alpha_map)
+  source.opacity = 0.25
+  source.transparent = true
+  source.fog = false
+  source.depth_write = false
+  source.depth_test = false
+  source.depth_func = @constants.DepthFunc::Greater
+  source.color_write = false
+  source.premultiplied_alpha = true
+  source.visible = false
+  let destination = @materials.PointsMaterial::new()
+  let color = destination.color
+  let copied = destination.copy(source)
+  assert_eq(physical_equal(copied, destination), true)
+  assert_eq(physical_equal(destination.color, color), true)
+  assert_eq(destination.color.r, 1.0)
+  assert_eq(destination.color.g, 0.0)
+  assert_eq(destination.color.b, 0.0)
+  assert_eq(destination.size, 4.0)
+  assert_eq(destination.size_attenuation, false)
+  assert_eq(destination.opacity, 0.25)
+  assert_eq(destination.transparent, true)
+  assert_eq(destination.fog, false)
+  assert_eq(destination.depth_write, false)
+  assert_eq(destination.depth_test, false)
+  assert_eq(destination.depth_func.to_int(), 6)
+  assert_eq(destination.color_write, false)
+  assert_eq(destination.premultiplied_alpha, true)
+  assert_eq(destination.visible, false)
+  match destination.map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, color_map), true)
+  }
+  match destination.alpha_map {
+    None => assert_eq(false, true)
+    Some(stored) => {
+      assert_eq(physical_equal(stored, alpha_map), true)
+      assert_eq(stored.data[1], b'\x80')
+    }
+  }
+  destination.color.r = 0.5
+  destination.size = 8.0
+  assert_eq(source.color.r, 1.0)
+  assert_eq(source.size, 4.0)
+  assert_eq(source.opacity, 0.25)
+}

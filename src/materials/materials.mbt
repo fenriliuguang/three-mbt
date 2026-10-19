@@ -255,6 +255,32 @@ pub fn PointsMaterial::new(
 }
 
 ///|
+/// 把颜色写进目标自己的颜色对象。颜色贴图和透明贴图沿用源对象。
+/// 尺寸、尺寸衰减、不透明度、透明开关、雾、深度、颜色写入、预乘和可见性一并复制。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L125
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
+pub fn PointsMaterial::copy(
+  self : PointsMaterial,
+  source : PointsMaterial,
+) -> PointsMaterial {
+  ignore(self.color.copy(source.color))
+  self.map = source.map
+  self.alpha_map = source.alpha_map
+  self.size = source.size
+  self.size_attenuation = source.size_attenuation
+  self.opacity = source.opacity
+  self.transparent = source.transparent
+  self.fog = source.fog
+  self.depth_write = source.depth_write
+  self.depth_test = source.depth_test
+  self.depth_func = source.depth_func
+  self.color_write = source.color_write
+  self.premultiplied_alpha = source.premultiplied_alpha
+  self.visible = source.visible
+  self
+}
+
+///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 pub(all) struct LineBasicMaterial {

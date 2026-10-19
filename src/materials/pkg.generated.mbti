@@ -96,6 +96,7 @@ pub(all) struct PointsMaterial {
   mut premultiplied_alpha : Bool
   mut visible : Bool
 }
+pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 
 pub(all) struct SpriteMaterial {

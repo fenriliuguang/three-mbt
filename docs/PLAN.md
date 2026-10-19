@@ -1577,6 +1577,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 `PointsMaterial.alphaMap` has landed. A new material has an empty alpha map and fog on. A 1×1 alpha map whose second byte is `0x80` stays that texture object. Another new material stays empty, and fog stays on. The point shader still draws from the material color and does not sample this map.
 
+`PointsMaterial.copy` has landed. A red material at size `4`, size attenuation off, opacity `0.25`, transparent on, fog off, depth write off, depth test off, depth func `6`, color write off, premultiplied alpha on, and visible off copies onto a white material. The destination color object stays in place and becomes `(1, 0, 0)`. Setting its red channel to `0.5` leaves the source at `1`. Setting the destination size to `8` leaves the source at `4`. The color map and the alpha map are the source objects. Opacity, transparency, fog, size attenuation, depth, color write, premultiplied alpha, and visibility match the source.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2306,6 +2308,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Line.copy` leaves morph weights in place | `objects` |
 | planned | 7 | `PointsMaterial.map` | `materials` |
 | planned | 7 | `PointsMaterial.alphaMap` | `materials` |
+| planned | 7 | `PointsMaterial.copy` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
