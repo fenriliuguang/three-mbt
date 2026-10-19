@@ -327,6 +327,7 @@ pub fn Material::program_map(Self) -> Bool
 pub fn Material::program_map_uv(Self) -> String
 pub fn Material::program_matcap(Self) -> Bool
 pub fn Material::program_metalness_map(Self) -> Bool
+pub fn Material::program_metalness_map_uv(Self) -> String
 pub fn Material::program_normal_map(Self) -> Bool
 pub fn Material::program_normal_map_object_space(Self) -> Bool
 pub fn Material::program_normal_map_tangent_space(Self) -> Bool
