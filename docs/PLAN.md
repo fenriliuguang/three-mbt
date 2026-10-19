@@ -1565,6 +1565,8 @@ Point and line raycast material indices have landed. Points at `x=0` and `x=2` w
 
 `Points.copy` leaves morph weights in place. A position group named `wide` and `tall`, with the first weight set to `0.5`, copies onto a point cloud that had none. The destination influences and dictionary stay empty, and the source stays at `0.5` with `wide` at `0`. A destination built from that geometry starts at `[0, 0]`. Copying the weighted cloud onto it leaves the first weight at `0`. Setting that weight to `1` leaves the source at `0.5`. Copying a cloud with no morph data onto one whose first weight is `0.25` leaves that weight and `wide` at `0`. `Points.clone` builds a new cloud first, so the clone starts at `0` with `tall` at `1`, and setting its first weight to `1` leaves the source at `0.5`.
 
+`SpriteMaterial` color, map, and transparency have landed. A new material is white `(1, 1, 1)`, opacity `1`, transparent, rotation `0`, and size attenuation on. The map is empty. `hex=0xFF0000`, opacity `0.25`, and transparent off store red `(1, 0, 0)`. A 1×1 map stays that texture object. Setting the red channel to `0.5` leaves another new material at `1`. `alphaMap` and fog stay later. The renderer still does not draw sprites.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2288,6 +2290,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `DataTexture` for skeleton bone matrices | `textures`, `objects` |
 | planned | 7 | `InstancedMesh.morphTexture` | `textures`, `objects` |
 | planned | 7 | `Points.copy` leaves morph weights in place | `objects` |
+| planned | 7 | `SpriteMaterial` color, map, and transparency | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

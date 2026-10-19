@@ -97,10 +97,14 @@ pub(all) struct PointsMaterial {
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
 
 pub(all) struct SpriteMaterial {
+  color : @math.Color
+  mut map : @textures.Texture?
+  mut opacity : Double
+  mut transparent : Bool
   mut rotation : Double
   mut size_attenuation : Bool
 }
-pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool) -> Self
+pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool) -> Self
 
 // Type aliases
 

@@ -280,11 +280,21 @@ pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
 }
 
 ///|
-/// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。颜色、贴图和透明度留在后面。
+/// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
+/// 颜色默认白，贴图默认空，透明度默认打开，不透明度默认 `1`。
+/// `alphaMap` 和 `fog` 留在后面。
 /// r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
+/// r186: `color` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L50
+/// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L64
 /// r186: `rotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L90
 /// r186: `sizeAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L98
+/// r186: `transparent` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L107
+/// r186: `opacity` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L111
 pub(all) struct SpriteMaterial {
+  color : @math.Color
+  mut map : @textures.Texture?
+  mut opacity : Double
+  mut transparent : Bool
   mut rotation : Double
   mut size_attenuation : Bool
 }
@@ -293,6 +303,16 @@ pub(all) struct SpriteMaterial {
 pub fn SpriteMaterial::new(
   rotation? : Double = 0.0,
   size_attenuation? : Bool = true,
+  hex? : Int = 0xFFFFFF,
+  opacity? : Double = 1.0,
+  transparent? : Bool = true,
 ) -> SpriteMaterial {
-  { rotation, size_attenuation, }
+  {
+    color: @math.Color::new().set_hex(hex),
+    map: None,
+    opacity,
+    transparent,
+    rotation,
+    size_attenuation,
+  }
 }
