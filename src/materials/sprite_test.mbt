@@ -134,3 +134,17 @@ test "SpriteMaterial stores and copies alphaTest" {
   destination.alpha_test = 0.8
   assert_eq(source.alpha_test, 0.4)
 }
+
+///|
+test "SpriteMaterial stores and copies vertex colors" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.vertex_colors, false)
+  let source = @materials.SpriteMaterial::new()
+  source.vertex_colors = true
+  assert_eq(defaults.vertex_colors, false)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.vertex_colors, true)
+  destination.vertex_colors = false
+  assert_eq(source.vertex_colors, true)
+}
