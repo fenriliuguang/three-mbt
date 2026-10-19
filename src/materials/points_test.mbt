@@ -148,3 +148,17 @@ test "PointsMaterial stores and copies toneMapped" {
   destination.tone_mapped = true
   assert_eq(source.tone_mapped, false)
 }
+
+///|
+test "PointsMaterial stores and copies alphaHash" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.alpha_hash, false)
+  let source = @materials.PointsMaterial::new()
+  source.alpha_hash = true
+  assert_eq(defaults.alpha_hash, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.alpha_hash, true)
+  destination.alpha_hash = false
+  assert_eq(source.alpha_hash, true)
+}
