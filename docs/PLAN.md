@@ -1517,6 +1517,8 @@ Opaque list culling uses that same instance sphere when `frustum_culled` is true
 
 `SkinnedMesh.bind` has landed. A bind matrix translating by `y=4` is copied in, and its inverse translates by `y=-4`. The supplied matrix stays at `y=4`, and the bone inverse stays `0`. Binding without a matrix updates the mesh at `y=3`, recalculates the bone that moved from `y=-5` to `y=-2`, and stores inverse `y=2`. The bind matrix translates by `y=3` and its inverse by `y=-3`. Moving the mesh to `y=9` leaves the stored bind matrix at `y=3`.
 
+`SkinnedMesh.pose` has landed. A shoulder at `y=-5`, an elbow at `0`, and a hand at `5` are bound with an identity matrix, then the shoulder moves to `y=-2`. Pose restores local positions `-5`, `0`, and `5`. The shoulder world translation is `y=-5`, the hand world translation is `0`, and the stored inverse stays at `y=5`. Posing without a skeleton aborts.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2216,6 +2218,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Skeleton.fromJSON` | `objects` |
 | planned | 7 | `SkinnedMesh` | `objects` |
 | planned | 7 | `SkinnedMesh.bind` | `objects` |
+| planned | 7 | `SkinnedMesh.pose` | `objects` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

@@ -1945,6 +1945,44 @@ test "SkinnedMesh.bind stores the skeleton and the inverse bind matrix" {
 }
 
 ///|
+test "SkinnedMesh.pose restores the bound skeleton" {
+  let shoulder = @objects.Bone::new()
+  let elbow = @objects.Bone::new()
+  let hand = @objects.Bone::new()
+  ignore(shoulder.add(elbow))
+  ignore(elbow.add(hand))
+  ignore(shoulder.node.position.set(0.0, -5.0, 0.0))
+  ignore(elbow.node.position.set(0.0, 0.0, 0.0))
+  ignore(hand.node.position.set(0.0, 5.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  let arm = @objects.Skeleton::new(bones=[shoulder, elbow, hand])
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  skin.bind(arm, bind_matrix=@math.Matrix4::new())
+  ignore(shoulder.node.position.set(0.0, -2.0, 0.0))
+  shoulder.node.update_matrix_world(force=true)
+  assert_eq(shoulder.node.position.y, -2.0)
+  skin.pose()
+  assert_eq(shoulder.node.position.y, -5.0)
+  assert_eq(elbow.node.position.y, 0.0)
+  assert_eq(hand.node.position.y, 5.0)
+  assert_eq(shoulder.node.matrix_world.elements[13], -5.0)
+  assert_eq(hand.node.matrix_world.elements[13], 0.0)
+  assert_eq(arm.bone_inverses[0].elements[13], 5.0)
+}
+
+///|
+test "panic SkinnedMesh.pose requires a skeleton" {
+  let skin = @objects.SkinnedMesh::new(
+    @core.BufferGeometry::new(),
+    @materials.Material::basic(),
+  )
+  skin.pose()
+}
+
+///|
 test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   let arm = @objects.Skeleton::new(bones=[@objects.Bone::new()])
   let big = []

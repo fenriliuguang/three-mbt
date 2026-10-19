@@ -411,6 +411,16 @@ pub fn SkinnedMesh::bind(
 }
 
 ///|
+/// 把已绑定的骨架收回绑定姿态。还没有骨架时中止。
+/// r186: `pose` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L252
+pub fn SkinnedMesh::pose(self : SkinnedMesh) -> Unit {
+  match self.skeleton {
+    None => abort("SkinnedMesh.pose requires a skeleton")
+    Some(skeleton) => skeleton.pose()
+  }
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
