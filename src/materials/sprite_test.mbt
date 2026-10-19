@@ -632,3 +632,33 @@ test "SpriteMaterial stores and copies precision" {
     Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
   }
 }
+
+///|
+test "SpriteMaterial stores and copies userData" {
+  let defaults = @materials.SpriteMaterial::new()
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("default user data")
+  }
+  let source = @materials.SpriteMaterial::new()
+  source.user_data.set("label", "sprite")
+  match defaults.user_data.get("label") {
+    None => ()
+    Some(_) => abort("other user data")
+  }
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  match destination.user_data.get("label") {
+    None => abort("copied user data")
+    Some(label) => assert_eq(label, "sprite")
+  }
+  destination.user_data.set("label", "copy")
+  match source.user_data.get("label") {
+    None => abort("source user data")
+    Some(label) => assert_eq(label, "sprite")
+  }
+  match destination.user_data.get("label") {
+    None => abort("destination user data")
+    Some(label) => assert_eq(label, "copy")
+  }
+}
