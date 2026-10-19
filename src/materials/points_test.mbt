@@ -242,3 +242,17 @@ test "PointsMaterial stores and copies clipIntersection" {
   destination.clip_intersection = false
   assert_eq(source.clip_intersection, true)
 }
+
+///|
+test "PointsMaterial stores and copies allowOverride" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.allow_override, true)
+  let source = @materials.PointsMaterial::new()
+  source.allow_override = false
+  assert_eq(defaults.allow_override, true)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.allow_override, false)
+  destination.allow_override = true
+  assert_eq(source.allow_override, false)
+}
