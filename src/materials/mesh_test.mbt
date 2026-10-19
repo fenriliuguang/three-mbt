@@ -3801,9 +3801,9 @@ test "Material shader writes USE_ANISOTROPYMAP" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(shader.prefixed_fragment_shader().length(), 1222)
   shader.anisotropy = 1.0
-  assert_eq(shader.prefixed_vertex_shader().length(), 1657)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
   assert_eq(shader.prefixed_fragment_shader().length(), 1271)
-  assert_eq(1657 - 1631, 26)
+  assert_eq(1685 - 1659, 26)
   assert_eq(
     shader.prefixed_vertex_shader()[706:731].to_owned(),
     "#define USE_ANISOTROPYMAP",
@@ -4848,6 +4848,54 @@ test "Material shader writes ROUGHNESSMAP_UV" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.roughness_map = Some(roughness_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes ANISOTROPYMAP_UV" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let anisotropy_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  assert_eq(anisotropy_map.channel, 0)
+  shader.anisotropy_map = Some(anisotropy_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1222)
+  shader.anisotropy = 1.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1685)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1271)
+  assert_eq(1685 - 1608, 77)
+  assert_eq(
+    shader.prefixed_vertex_shader()[732:759].to_owned(),
+    "#define ANISOTROPYMAP_UV uv",
+  )
+  anisotropy_map.channel = 1
+  shader.anisotropy_map = Some(anisotropy_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1686)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1271)
+  assert_eq(1686 - 1608, 78)
+  assert_eq(
+    shader.prefixed_vertex_shader()[732:760].to_owned(),
+    "#define ANISOTROPYMAP_UV uv1",
+  )
+  shader.anisotropy = 0.0
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.anisotropy = 1.0
+  anisotropy_map.channel = 0
+  shader.anisotropy_map = Some(anisotropy_map)
+  let roughness_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.roughness_map = Some(roughness_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1737)
+  assert_eq(
+    shader.prefixed_vertex_shader()[784:811].to_owned(),
+    "#define ANISOTROPYMAP_UV uv",
+  )
+  let raw = @materials.Material::raw()
+  raw.anisotropy = 1.0
+  raw.anisotropy_map = Some(anisotropy_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.anisotropy = 1.0
+  basic.anisotropy_map = Some(anisotropy_map)
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
 
