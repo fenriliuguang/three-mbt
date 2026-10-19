@@ -1958,3 +1958,21 @@ test "Material transmissionMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.transmission_map is None, true)
 }
+
+///|
+test "Material thickness defaults to zero and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.thickness, 0.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.thickness, 0.0)
+  lambert.thickness = 0.25
+  let other = @materials.Material::lambert()
+  assert_eq(other.thickness, 0.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.thickness, 0.25)
+  destination.thickness = 1.0
+  assert_eq(lambert.thickness, 0.25)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.thickness, 0.0)
+}
