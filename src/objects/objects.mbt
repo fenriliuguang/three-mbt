@@ -675,6 +675,45 @@ pub fn LineLoop::clone(self : LineLoop, recursive? : Bool = true) -> LineLoop {
 }
 
 ///|
+/// 沿折线累计每个顶点到起点的距离，写入 `lineDistance`。
+/// `LineLoop` 没有自己的 `computeLineDistances`，行为来自 `Line`。
+/// 几何体带索引时上游只警告，这里不改属性。
+/// r186: `computeLineDistances` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L121
+pub fn LineLoop::compute_line_distances(self : LineLoop) -> LineLoop {
+  if self.geometry.index is Some(_) {
+    return self
+  }
+  let position = match self.geometry.get_attribute("position") {
+    None => abort("Line.computeLineDistances requires a position attribute")
+    Some(position) => position
+  }
+  let distances = [0.0]
+  let mut index = 1
+  while index < position.count {
+    let previous = index - 1
+    let start = @math.Vector3::new(
+      x=position.get_x(previous),
+      y=position.get_y(previous),
+      z=position.get_z(previous),
+    )
+    let end = @math.Vector3::new(
+      x=position.get_x(index),
+      y=position.get_y(index),
+      z=position.get_z(index),
+    )
+    distances.push(distances[previous] + start.distance_to(end))
+    index = index + 1
+  }
+  ignore(
+    self.geometry.set_attribute(
+      "lineDistance",
+      @core.BufferAttribute::new(distances, 1),
+    ),
+  )
+  self
+}
+
+///|
 pub fn LineLoop::refresh(self : LineLoop) -> Unit {
   self.node.primitive = Some(
     primitive_binding(

@@ -831,6 +831,46 @@ test "LineSegments.computeLineDistances accumulates each pair" {
 }
 
 ///|
+test "LineLoop.computeLineDistances follows the open line" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let closed = @objects.LineLoop::new(geometry, @materials.LineBasicMaterial::new())
+  let computed = closed.compute_line_distances()
+  assert_eq(physical_equal(computed, closed), true)
+  match geometry.get_attribute("lineDistance") {
+    None => assert_eq(false, true)
+    Some(distances) => {
+      assert_eq(distances.count, 3)
+      assert_eq(distances.get_x(0), 0.0)
+      assert_eq(distances.get_x(1), 3.0)
+      assert_eq(distances.get_x(2), 8.0)
+    }
+  }
+  let indexed = @core.BufferGeometry::new()
+  ignore(
+    indexed.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0, 3.0, 0.0, 0.0], 3),
+    ),
+  )
+  ignore(indexed.set_index_array([0, 1]))
+  let skipped = @objects.LineLoop::new(indexed, @materials.LineBasicMaterial::new())
+  ignore(skipped.compute_line_distances())
+  match indexed.get_attribute("lineDistance") {
+    None => ()
+    Some(_) => assert_eq(false, true)
+  }
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
