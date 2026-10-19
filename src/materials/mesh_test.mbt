@@ -8122,6 +8122,31 @@ test "Material shader normalMapTangentSpace follows tangent space" {
 }
 
 ///|
+test "Material shader packedNormalMap follows packed RG formats" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_packed_normal_map(1030), false)
+  assert_eq(@materials.Material::raw().program_packed_normal_map(37490), false)
+  assert_eq(@materials.Material::standard().program_packed_normal_map(36285), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_packed_normal_map(1023), false)
+  assert_eq(shader.program_packed_normal_map(1028), false)
+  assert_eq(shader.program_packed_normal_map(1030), true)
+  assert_eq(shader.program_packed_normal_map(37490), true)
+  assert_eq(shader.program_packed_normal_map(36285), true)
+  assert_eq(shader.program_packed_normal_map(37491), false)
+  assert_eq(shader.program_packed_normal_map(36286), false)
+  shader.normal_map_type = @constants.ObjectSpace
+  assert_eq(shader.program_packed_normal_map(1030), false)
+  shader.normal_map_type = @constants.TangentSpace
+  assert_eq(shader.program_packed_normal_map(1030), true)
+  shader.normal_map = None
+  assert_eq(shader.program_packed_normal_map(1030), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

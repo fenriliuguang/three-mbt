@@ -2443,6 +2443,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `normalMapTangentSpace` has landed. Shader, Raw, and Standard start `false`. Tangent space without a normal map stays `false`. Giving Shader a 1×1 normal map in tangent space makes the parameter `true`. Object space with that map stays `false`. Clearing the map keeps it `false`. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the normal map is still empty. `packedNormalMap` stays later.
 
+`packedNormalMap` has landed. Shader, Raw, and Standard stay `false` without a normal map, even when the passed format is `1030`, `37490`, or `36285`. Those integers are `RGFormat`, `RG11_EAC_Format`, and `RED_GREEN_RGTC2_Format`. A Shader material with a 1×1 normal map in tangent space stays `false` for `1023` and `1028`, and reads `true` for the three packed formats. The signed formats `37491` and `36286` stay `false`. Object space with format `1030` stays `false`. Clearing the map keeps it `false`. The texture still has no format field, so the caller passes the integer. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the normal map is still empty. `displacementMap` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3605,6 +3607,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `normalMap` | `materials` |
 | planned | 7 | `normalMapObjectSpace` | `materials` |
 | planned | 7 | `normalMapTangentSpace` | `materials` |
+| planned | 7 | `packedNormalMap` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
