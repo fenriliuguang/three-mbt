@@ -3492,6 +3492,42 @@ test "Material shader writes ENVMAP_BLENDING" {
 }
 
 ///|
+test "Material shader writes USE_LIGHTMAP" {
+  let shader = @materials.Material::shader()
+  let pixels = FixedArray::make(4, b'\xFF')
+  let light_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.light_map = Some(light_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1629)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1243)
+  assert_eq(1629 - 1608, 21)
+  assert_eq(
+    shader.prefixed_vertex_shader()[683:703].to_owned(),
+    "#define USE_LIGHTMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1099].to_owned(),
+    "#define USE_LIGHTMAP",
+  )
+  shader.env_map = Some(light_map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1679)
+  assert_eq(
+    shader.prefixed_vertex_shader()[733:753].to_owned(),
+    "#define USE_LIGHTMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 1351)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1187:1207].to_owned(),
+    "#define USE_LIGHTMAP",
+  )
+  let raw = @materials.Material::raw()
+  raw.light_map = Some(light_map)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.light_map = Some(light_map)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
