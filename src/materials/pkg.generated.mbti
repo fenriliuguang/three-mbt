@@ -122,6 +122,7 @@ pub(all) struct Material {
   mut specular_map : @textures.Texture?
   mut env_map : @textures.Texture?
   env_map_rotation : @math.Euler
+  mut combine : @constants.Combine
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

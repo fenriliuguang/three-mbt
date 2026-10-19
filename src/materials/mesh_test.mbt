@@ -1220,3 +1220,24 @@ test "Material envMapRotation starts at zero and copies into the destination" {
   assert_eq(standard.env_map_rotation.y, 0.0)
   assert_eq(standard.env_map_rotation.z, 0.0)
 }
+
+///|
+test "Material combine defaults to multiply and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.combine.to_int(), 0)
+  assert_eq(basic.combine is @constants.Combine::Multiply, true)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.combine.to_int(), @constants.MULTIPLY_OPERATION)
+  lambert.combine = @constants.Combine::Mix
+  let other = @materials.Material::lambert()
+  assert_eq(other.combine.to_int(), 0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.combine.to_int(), 1)
+  assert_eq(destination.combine is @constants.Combine::Mix, true)
+  destination.combine = @constants.Combine::Add
+  assert_eq(lambert.combine.to_int(), @constants.MIX_OPERATION)
+  assert_eq(@constants.Combine::Add.to_int(), @constants.ADD_OPERATION)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.combine.to_int(), 0)
+}

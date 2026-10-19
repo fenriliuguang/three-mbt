@@ -8,6 +8,8 @@ pub const ADDITIVE_BLENDING : Int = 2
 
 pub const ADD_EQUATION : Int = 100
 
+pub const ADD_OPERATION : Int = 2
+
 pub const AGX_TONE_MAPPING : Int = 6
 
 pub const ALWAYS_DEPTH : Int = 1
@@ -104,7 +106,11 @@ pub const MIN_EQUATION : Int = 103
 
 pub const MIRRORED_REPEAT_WRAPPING : Int = 1002
 
+pub const MIX_OPERATION : Int = 1
+
 pub const MULTIPLY_BLENDING : Int = 4
+
+pub const MULTIPLY_OPERATION : Int = 0
 
 pub const NEAREST_FILTER : Int = 1003
 
@@ -235,6 +241,13 @@ pub(all) enum Blending {
   Custom
 }
 pub fn Blending::to_int(Self) -> Int
+
+pub(all) enum Combine {
+  Multiply
+  Mix
+  Add
+}
+pub fn Combine::to_int(Self) -> Int
 
 pub(all) enum CoordinateSystem {
   WebGL

@@ -1,4 +1,4 @@
-// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788 ; `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283
+// r186: `FrontSide` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L92 ; `NeverDepth` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L335 ; `RepeatWrapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L556 ; `NearestFilter` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L581 ; `LoopOnce` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1125 ; `WebGPUCoordinateSystem` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1664 ; `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `AttachedBindMode` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L491 ; `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788 ; `TangentSpaceNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1283 ; `MultiplyOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L399
 
 ///|
 /// 正面。对齐 three.js r186 `FrontSide`（0）。
@@ -816,5 +816,35 @@ pub fn NormalMapType::to_int(self : NormalMapType) -> Int {
   match self {
     TangentSpace => TANGENT_SPACE_NORMAL_MAP
     ObjectSpace => OBJECT_SPACE_NORMAL_MAP
+  }
+}
+
+///|
+/// 环境贴图与表面颜色相乘。对齐 `MultiplyOperation`（0）。
+pub const MULTIPLY_OPERATION : Int = 0
+
+///|
+/// 环境贴图与表面颜色按反射率混合。对齐 `MixOperation`（1）。
+pub const MIX_OPERATION : Int = 1
+
+///|
+/// 环境贴图加到表面颜色上。对齐 `AddOperation`（2）。
+pub const ADD_OPERATION : Int = 2
+
+///|
+/// 环境贴图与表面颜色的合成方式。数值与 r186 `src/constants.js` 一致。默认是相乘。
+/// r186: `MultiplyOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L399 ; `MixOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L407 ; `AddOperation` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L415
+pub(all) enum Combine {
+  Multiply
+  Mix
+  Add
+}
+
+///|
+pub fn Combine::to_int(self : Combine) -> Int {
+  match self {
+    Multiply => MULTIPLY_OPERATION
+    Mix => MIX_OPERATION
+    Add => ADD_OPERATION
   }
 }
