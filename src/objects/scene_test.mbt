@@ -404,3 +404,35 @@ test "LOD.getObjectForDistance applies visible hysteresis" {
     Some(object) => assert_eq(physical_equal(object, near), true)
   }
 }
+
+///|
+test "LOD.raycast hits the level selected by distance" {
+  let lod = @objects.LOD::new()
+  lod.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  assert_eq(raycaster.intersect_object(lod.node, recursive=false).length(), 0)
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  ignore(lod.add_level(@core.Object3D::new(), distance=0.0))
+  ignore(lod.add_level(mesh.node, distance=0.5))
+  lod.node.update_matrix_world()
+  let hits = raycaster.intersect_object(lod.node, recursive=false)
+  assert_eq(hits.length(), 1)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 0.25)
+  assert_eq(hits[0].point.y, 0.25)
+  assert_eq(hits[0].point.z, 0.0)
+  assert_eq(physical_equal(hits[0].object, mesh.node), true)
+}

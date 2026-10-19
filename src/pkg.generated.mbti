@@ -208,7 +208,7 @@ pub using @materials {type LineBasicMaterial}
 
 pub using @objects {type LineSegments}
 
-pub using @objects {type LodLevel}
+pub using @core {type LodLevel}
 
 pub using @constants {type LoopMode}
 

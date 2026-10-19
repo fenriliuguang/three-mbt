@@ -10,6 +10,8 @@ import {
 // Values
 pub fn apply_skins(Object3D) -> Unit
 
+pub fn lod_object_for_distance(Array[LodLevel], Double) -> Object3D?
+
 // Errors
 
 // Types and methods
@@ -330,6 +332,12 @@ pub(all) struct LightState {
   mut shadow : ShadowState?
 }
 
+pub(all) struct LodLevel {
+  object : Object3D
+  distance : Double
+  hysteresis : Double
+}
+
 pub(all) struct MeshBinding {
   mut geometry : BufferGeometry
   color : @math.Color
@@ -428,6 +436,7 @@ pub(all) struct Object3D {
   mut morph : MorphState?
   mut skin : SkinState?
   mut sprite : SpriteState?
+  mut lod_levels : Array[LodLevel]?
   listeners : Map[String, Array[(ObjectEvent) -> Unit]]
 }
 pub fn Object3D::add(Self, Self) -> Self

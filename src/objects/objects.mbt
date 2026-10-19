@@ -697,30 +697,26 @@ pub fn Sprite::refresh(self : Sprite) -> Unit {
 }
 
 ///|
-/// 上游没有单独的类。每一级是 `levels` 里的对象、距离和滞后。
-/// r186: `levels` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L69
-pub(all) struct LodLevel {
-  object : Object3D
-  distance : Double
-  hysteresis : Double
-}
-
-///|
-/// 按距离切换显示的对象。级别从近到远排列，`auto_update` 默认真。
+/// 按距离切换显示的对象。级别从近到远排列，`auto_update` 默认真。节点上的级别数组与 `levels` 是同一份。
 /// r186: `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 pub(all) struct LOD {
   node : Object3D
-  mut levels : Array[LodLevel]
+  mut levels : Array[@core.LodLevel]
   mut auto_update : Bool
 }
 
 ///|
+fn LOD::write_levels(self : LOD, levels : Array[@core.LodLevel]) -> Unit {
+  self.levels = levels
+  self.node.lod_levels = Some(levels)
+}
+
+///|
 pub fn LOD::new() -> LOD {
-  {
-    node: Object3D::new(kind=@core.NodeKind::LOD),
-    levels: [],
-    auto_update: true,
-  }
+  let levels : Array[@core.LodLevel] = []
+  let node = Object3D::new(kind=@core.NodeKind::LOD)
+  node.lod_levels = Some(levels)
+  { node, levels, auto_update: true, }
 }
 
 ///|
@@ -749,7 +745,7 @@ pub fn LOD::add_level(
     }
     index = index + 1
   }
-  let next = []
+  let next : Array[@core.LodLevel] = []
   let mut i = 0
   while i < index {
     next.push(self.levels[i])
@@ -760,7 +756,7 @@ pub fn LOD::add_level(
     next.push(self.levels[i])
     i = i + 1
   }
-  self.levels = next
+  self.write_levels(next)
   ignore(self.node.add(object))
   self
 }
@@ -783,7 +779,7 @@ pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
     None => false
     Some(index) => {
       let object = self.levels[index].object
-      let next = []
+      let next : Array[@core.LodLevel] = []
       let mut j = 0
       while j < count {
         if j != index {
@@ -791,7 +787,7 @@ pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
         }
         j = j + 1
       }
-      self.levels = next
+      self.write_levels(next)
       ignore(self.node.remove(object))
       true
     }
@@ -805,21 +801,5 @@ pub fn LOD::get_object_for_distance(
   self : LOD,
   distance : Double,
 ) -> Object3D? {
-  let count = self.levels.length()
-  if count == 0 {
-    return None
-  }
-  let mut i = 1
-  while i < count {
-    let level = self.levels[i]
-    let mut level_distance = level.distance
-    if level.object.visible {
-      level_distance = level_distance - level_distance * level.hysteresis
-    }
-    if distance < level_distance {
-      break
-    }
-    i = i + 1
-  }
-  Some(self.levels[i - 1].object)
+  @core.lod_object_for_distance(self.levels, distance)
 }
