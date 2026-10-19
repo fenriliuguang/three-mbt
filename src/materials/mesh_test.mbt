@@ -1277,3 +1277,21 @@ test "Material envMapIntensity defaults to one and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.env_map_intensity, 1.0)
 }
+
+///|
+test "Material refractionRatio defaults to 0.98 and copies" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.refraction_ratio, 0.98)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.refraction_ratio, 0.98)
+  lambert.refraction_ratio = 0.5
+  let other = @materials.Material::lambert()
+  assert_eq(other.refraction_ratio, 0.98)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.refraction_ratio, 0.5)
+  destination.refraction_ratio = 1.0
+  assert_eq(lambert.refraction_ratio, 0.5)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.refraction_ratio, 0.98)
+}
