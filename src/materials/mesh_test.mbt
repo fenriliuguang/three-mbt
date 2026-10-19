@@ -5584,6 +5584,44 @@ test "Material shader writes USE_COLOR" {
 }
 
 ///|
+test "Material shader writes USE_COLOR_ALPHA" {
+  let shader = @materials.Material::shader()
+  shader.vertex_colors = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1626)
+  assert_eq(shader.prefixed_fragment_shader().length(), 1240)
+  assert_eq(shader.prefixed_vertex_shader(has_vertex_alpha=true).length(), 1650)
+  assert_eq(shader.prefixed_fragment_shader(has_vertex_alpha=true).length(), 1264)
+  assert_eq(1650 - 1626, 24)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_vertex_alpha=true)[701:724].to_owned(),
+    "#define USE_COLOR_ALPHA",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_vertex_alpha=true)[1097:1120].to_owned(),
+    "#define USE_COLOR_ALPHA",
+  )
+  shader.vertex_colors = false
+  assert_eq(shader.prefixed_vertex_shader(has_vertex_alpha=true).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(has_vertex_alpha=true).length(), 1222)
+  shader.vertex_colors = true
+  assert_eq(
+    shader.prefixed_vertex_shader(has_normal=true, has_vertex_alpha=true).length(),
+    1669,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_normal=true, has_vertex_alpha=true)[720:743].to_owned(),
+    "#define USE_COLOR_ALPHA",
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_vertex_alpha=true).length(), 1264)
+  let raw = @materials.Material::raw()
+  raw.vertex_colors = true
+  assert_eq(raw.prefixed_vertex_shader(has_vertex_alpha=true).length(), 92)
+  let basic = @materials.Material::basic()
+  basic.vertex_colors = true
+  assert_eq(basic.prefixed_vertex_shader(has_vertex_alpha=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
