@@ -14,6 +14,7 @@ import {
 // Types and methods
 pub(all) struct LineBasicMaterial {
   color : @math.Color
+  mut map : @textures.Texture?
   mut opacity : Double
   mut transparent : Bool
   mut fog : Bool

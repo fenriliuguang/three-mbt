@@ -282,9 +282,12 @@ pub fn PointsMaterial::copy(
 
 ///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
+/// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
 /// r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
+/// r186: `map` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L60
 pub(all) struct LineBasicMaterial {
   color : @math.Color
+  mut map : @textures.Texture?
   mut opacity : Double
   mut transparent : Bool
   mut fog : Bool
@@ -300,6 +303,7 @@ pub(all) struct LineBasicMaterial {
 pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
   {
     color: @math.Color::new().set_hex(hex),
+    map: None,
     opacity: 1.0,
     transparent: false,
     fog: true,
