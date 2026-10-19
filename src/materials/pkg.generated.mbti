@@ -149,6 +149,7 @@ pub(all) struct Material {
   mut ior : Double
   mut iridescence_map : @textures.Texture?
   mut iridescence_ior : Double
+  mut iridescence_thickness_range : Array[Double]
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

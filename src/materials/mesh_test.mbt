@@ -1778,3 +1778,29 @@ test "Material iridescenceIOR defaults to 1.3 and copies" {
   let standard = @materials.Material::standard()
   assert_eq(standard.iridescence_ior, 1.3)
 }
+
+///|
+test "Material iridescenceThicknessRange starts at 100 and 400 and copies by value" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.iridescence_thickness_range.length(), 2)
+  assert_eq(basic.iridescence_thickness_range[0], 100.0)
+  assert_eq(basic.iridescence_thickness_range[1], 400.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.iridescence_thickness_range[0], 100.0)
+  assert_eq(lambert.iridescence_thickness_range[1], 400.0)
+  lambert.iridescence_thickness_range[0] = 20.0
+  lambert.iridescence_thickness_range[1] = 80.0
+  let other = @materials.Material::lambert()
+  assert_eq(other.iridescence_thickness_range[0], 100.0)
+  assert_eq(other.iridescence_thickness_range[1], 400.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.iridescence_thickness_range[0], 20.0)
+  assert_eq(destination.iridescence_thickness_range[1], 80.0)
+  destination.iridescence_thickness_range[0] = 0.0
+  assert_eq(lambert.iridescence_thickness_range[0], 20.0)
+  assert_eq(lambert.iridescence_thickness_range[1], 80.0)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.iridescence_thickness_range[0], 100.0)
+  assert_eq(standard.iridescence_thickness_range[1], 400.0)
+}
