@@ -144,6 +144,7 @@ pub(all) struct Material {
   mut clearcoat_map : @textures.Texture?
   mut clearcoat_roughness : Double
   mut clearcoat_roughness_map : @textures.Texture?
+  clearcoat_normal_scale : @math.Vector2
   mut vertex_colors : Bool
   mut tone_mapped : Bool
   mut alpha_hash : Bool

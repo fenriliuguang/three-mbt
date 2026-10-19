@@ -1663,3 +1663,28 @@ test "Material clearcoatRoughnessMap starts empty and copies by reference" {
   let standard = @materials.Material::standard()
   assert_eq(standard.clearcoat_roughness_map is None, true)
 }
+
+///|
+test "Material clearcoatNormalScale starts at one and copies into the destination" {
+  let basic = @materials.Material::basic()
+  assert_eq(basic.clearcoat_normal_scale.x, 1.0)
+  assert_eq(basic.clearcoat_normal_scale.y, 1.0)
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.clearcoat_normal_scale.x, 1.0)
+  assert_eq(lambert.clearcoat_normal_scale.y, 1.0)
+  lambert.clearcoat_normal_scale.x = 0.25
+  lambert.clearcoat_normal_scale.y = 0.5
+  let other = @materials.Material::lambert()
+  assert_eq(other.clearcoat_normal_scale.x, 1.0)
+  assert_eq(other.clearcoat_normal_scale.y, 1.0)
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(lambert))
+  assert_eq(destination.clearcoat_normal_scale.x, 0.25)
+  assert_eq(destination.clearcoat_normal_scale.y, 0.5)
+  destination.clearcoat_normal_scale.x = 0.0
+  assert_eq(lambert.clearcoat_normal_scale.x, 0.25)
+  assert_eq(lambert.clearcoat_normal_scale.y, 0.5)
+  let standard = @materials.Material::standard()
+  assert_eq(standard.clearcoat_normal_scale.x, 1.0)
+  assert_eq(standard.clearcoat_normal_scale.y, 1.0)
+}
