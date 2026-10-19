@@ -581,3 +581,30 @@ test "SpriteMaterial stores and copies stencilWrite" {
   assert_eq(source.stencil_write, true)
   assert_eq(destination.stencil_write, false)
 }
+
+///|
+test "SpriteMaterial stores and copies clippingPlanes" {
+  let defaults = @materials.SpriteMaterial::new()
+  assert_eq(defaults.clipping_planes is None, true)
+  let source = @materials.SpriteMaterial::new()
+  source.clipping_planes = Some([@math.Plane::new(constant=1.0)])
+  assert_eq(defaults.clipping_planes is None, true)
+  let destination = @materials.SpriteMaterial::new()
+  ignore(destination.copy(source))
+  match destination.clipping_planes {
+    None => abort("copied clipping planes")
+    Some(planes) => {
+      assert_eq(planes.length(), 1)
+      assert_eq(planes[0].constant, 1.0)
+    }
+  }
+  destination.clipping_planes = Some([@math.Plane::new(constant=2.0)])
+  match source.clipping_planes {
+    None => abort("source clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 1.0)
+  }
+  match destination.clipping_planes {
+    None => abort("destination clipping planes")
+    Some(planes) => assert_eq(planes[0].constant, 2.0)
+  }
+}
