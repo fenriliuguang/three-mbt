@@ -291,6 +291,7 @@ pub(all) struct Intersection {
   barycoord : @math.Vector3?
   uv : @math.Vector2?
   uv1 : @math.Vector2?
+  normal : @math.Vector3?
 }
 
 pub(all) struct Layers {

@@ -154,6 +154,7 @@ fn Object3D::push_triangle(
         )
         let uv = interpolated_uv(self.mesh, "uv", a, b, c, barycoord)
         let uv1 = interpolated_uv(self.mesh, "uv1", a, b, c, barycoord)
+        let shading = interpolated_normal(self.mesh, a, b, c, barycoord, ray)
         intersects.push({
           distance,
           point: world,
@@ -163,6 +164,7 @@ fn Object3D::push_triangle(
           barycoord,
           uv,
           uv1,
+          normal: shading,
         })
       }
     }
@@ -190,6 +192,41 @@ fn interpolated_uv(
               Some(
                 attribute.interpolate_vector2(a, b, c, bary, @math.Vector2::new()),
               )
+          }
+      }
+  }
+}
+
+///|
+fn interpolated_normal(
+  mesh : MeshBinding?,
+  a : Int,
+  b : Int,
+  c : Int,
+  barycoord : @math.Vector3?,
+  ray : @math.Ray,
+) -> @math.Vector3? {
+  match barycoord {
+    None => None
+    Some(bary) =>
+      match mesh {
+        None => None
+        Some(mesh) =>
+          match mesh.geometry.get_attribute("normal") {
+            None => None
+            Some(attribute) => {
+              let shading = attribute.interpolate_vector3(
+                a,
+                b,
+                c,
+                bary,
+                @math.Vector3::new(),
+              )
+              if shading.dot(ray.direction) > 0.0 {
+                ignore(shading.multiply_scalar(-1.0))
+              }
+              Some(shading)
+            }
           }
       }
   }

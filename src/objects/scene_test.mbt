@@ -191,3 +191,42 @@ test "mesh raycast interpolates uv1" {
     }
   }
 }
+
+///|
+test "mesh raycast flips a back-facing shading normal" {
+  let geometry = @core.BufferGeometry::new()
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        3,
+      ),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "normal",
+      @core.BufferAttribute::new(
+        [0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0],
+        3,
+      ),
+    ),
+  )
+  let mesh = @objects.Mesh::new(geometry, @materials.Material::basic())
+  mesh.node.update_matrix_world()
+  let raycaster = @core.Raycaster::new(
+    origin=@math.Vector3::new(x=0.25, y=0.25, z=1.0),
+    direction=@math.Vector3::new(z=-1.0),
+  )
+  let hits = raycaster.intersect_object(mesh.node)
+  assert_eq(hits.length(), 1)
+  match hits[0].normal {
+    None => assert_eq(false, true)
+    Some(normal) => {
+      assert_eq(normal.x, 0.0)
+      assert_eq(normal.y, 0.0)
+      assert_eq(normal.z, 1.0)
+    }
+  }
+}

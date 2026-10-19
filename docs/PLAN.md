@@ -1371,6 +1371,8 @@ Object3D local-axis `rotateOnAxis` and `translateOnAxis` have landed, with the X
 
 `Mesh.raycast` now writes `uv1` the same way. UVs `(0, 1)`, `(1, 1)`, and `(0, 0)` on that ray store `(0.25, 0.75)`. A geometry without `uv1` leaves the field empty.
 
+`Mesh.raycast` now writes an interpolated `normal`. Vertex normals `(0, 0, -1)` face the local ray, so the hit stores `(0, 0, 1)`. A geometry without `normal` leaves the field empty. The triangle `face.normal` stays the geometric normal.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -1997,6 +1999,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Triangle.getInterpolatedAttribute` for `Vector2` | `core` |
 | planned | 7 | `Mesh.raycast` uv | `core` |
 | planned | 7 | `Mesh.raycast` uv1 | `core` |
+| planned | 7 | `Mesh.raycast` normal | `core` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
