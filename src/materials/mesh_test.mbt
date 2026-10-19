@@ -512,3 +512,21 @@ test "Material stencilZFail defaults to Keep" {
   assert_eq(standard.material.stencil_z_fail.to_int(), 7681)
   assert_eq(lambert.material.stencil_z_fail.to_int(), 7680)
 }
+
+///|
+test "Material stencilZPass defaults to Keep" {
+  let basic = @materials.MeshBasicMaterial::new()
+  assert_eq(basic.material.stencil_z_pass is @constants.StencilOp::Keep, true)
+  assert_eq(basic.material.stencil_z_pass.to_int(), 7680)
+  basic.material.stencil_z_pass = @constants.StencilOp::Zero
+  let lambert = @materials.MeshLambertMaterial::new()
+  assert_eq(lambert.material.stencil_z_pass is @constants.StencilOp::Keep, true)
+  let standard = @materials.MeshStandardMaterial::new()
+  assert_eq(standard.material.stencil_z_pass is @constants.StencilOp::Keep, true)
+  standard.material.stencil_z_pass = @constants.StencilOp::Replace
+  let other = @materials.Material::basic()
+  assert_eq(other.stencil_z_pass is @constants.StencilOp::Keep, true)
+  assert_eq(basic.material.stencil_z_pass.to_int(), 0)
+  assert_eq(standard.material.stencil_z_pass.to_int(), 7681)
+  assert_eq(lambert.material.stencil_z_pass.to_int(), 7680)
+}
