@@ -137,6 +137,7 @@ pub using @gltf {parse, type Gltf, type GltfError}
 
 ///|
 pub using @objects {
+  type Bone,
   type Group,
   type InstancedMesh,
   type Line,

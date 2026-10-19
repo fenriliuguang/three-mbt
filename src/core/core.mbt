@@ -21,6 +21,7 @@ pub(all) enum NodeKind {
   LineLoop
   Sprite
   LOD
+  Bone
 }
 
 ///|

@@ -148,6 +148,8 @@ pub using @cameras {type ArrayCamera}
 
 pub using @post {type BloomPass}
 
+pub using @objects {type Bone}
+
 pub using @math {type Box3}
 
 pub using @geometries {type BoxGeometry}

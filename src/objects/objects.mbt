@@ -1,4 +1,4 @@
-// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
+// r186: `Group` https://github.com/mrdoob/three.js/blob/r186/src/objects/Group.js#L20 ; `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17 ; `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39 ; `Points` https://github.com/mrdoob/three.js/blob/r186/src/objects/Points.js#L19 ; `Line` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L41 ; `LineSegments` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L14 ; `LineLoop` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineLoop.js#L10 ; `InstancedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L28 ; `Sprite` https://github.com/mrdoob/three.js/blob/r186/src/objects/Sprite.js#L47 ; `LOD` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L33
 
 ///|
 using @core {
@@ -51,6 +51,32 @@ pub fn Group::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn Group::clone(self : Group, recursive? : Bool = true) -> Group {
   Group::new().copy(self, recursive~)
+}
+
+///|
+/// 骨架上的一根骨骼。种类是 `Bone`。
+/// r186: `Bone` https://github.com/mrdoob/three.js/blob/r186/src/objects/Bone.js#L17
+pub(all) struct Bone {
+  node : Object3D
+}
+
+///|
+pub fn Bone::new() -> Bone {
+  { node: Object3D::new(kind=@core.Bone), }
+}
+
+///|
+pub impl @core.AsNode for Bone with fn to_node(self) {
+  self.node
+}
+
+///|
+pub extend Bone with @core.AsNode::{to_node}
+
+///|
+pub fn[T : @core.AsNode] Bone::add(self : Bone, child : T) -> Bone {
+  ignore(self.node.add(child.to_node()))
+  self
 }
 
 ///|

@@ -1401,6 +1401,20 @@ test "Group.clone keeps the transform and drops children when asked" {
 }
 
 ///|
+test "Bone adds a child bone at y 5" {
+  let root = @objects.Bone::new()
+  let child = @objects.Bone::new()
+  ignore(root.add(child))
+  ignore(child.node.position.set(0.0, 5.0, 0.0))
+  assert_eq(root.node.kind is @core.NodeKind::Bone, true)
+  assert_eq(child.node.kind is @core.NodeKind::Bone, true)
+  assert_eq(child.node.position.y, 5.0)
+  assert_eq(root.node.children.length(), 1)
+  assert_eq(physical_equal(root.node.children[0], child.node), true)
+  assert_eq(root.node.children[0].position.y, 5.0)
+}
+
+///|
 test "Mesh.clone shares geometry and drops children when asked" {
   let geometry = @core.BufferGeometry::new()
   ignore(
