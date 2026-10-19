@@ -764,3 +764,36 @@ pub fn LOD::add_level(
   ignore(self.node.add(object))
   self
 }
+
+///|
+/// 按距离删掉第一级匹配，并把该对象从子节点拿掉。没有这一级时返回假，级别和子节点都不改。
+/// r186: `removeLevel` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L149
+pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
+  let mut found = None
+  let mut i = 0
+  let count = self.levels.length()
+  while i < count {
+    if self.levels[i].distance == distance {
+      found = Some(i)
+      break
+    }
+    i = i + 1
+  }
+  match found {
+    None => false
+    Some(index) => {
+      let object = self.levels[index].object
+      let next = []
+      let mut j = 0
+      while j < count {
+        if j != index {
+          next.push(self.levels[j])
+        }
+        j = j + 1
+      }
+      self.levels = next
+      ignore(self.node.remove(object))
+      true
+    }
+  }
+}

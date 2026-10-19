@@ -352,3 +352,28 @@ test "LOD.addLevel sorts levels by absolute distance" {
   assert_eq(physical_equal(lod.node.children[0], far), true)
   assert_eq(lod.auto_update, true)
 }
+
+///|
+test "LOD.removeLevel drops the matching distance" {
+  let lod = @objects.LOD::new()
+  let far = @core.Object3D::new()
+  let near = @core.Object3D::new()
+  let mid = @core.Object3D::new()
+  ignore(lod.add_level(far, distance=10.0))
+  ignore(lod.add_level(near, distance=0.0))
+  ignore(lod.add_level(mid, distance=5.0))
+  assert_eq(lod.remove_level(5.0), true)
+  assert_eq(lod.levels.length(), 2)
+  assert_eq(lod.levels[0].distance, 0.0)
+  assert_eq(lod.levels[1].distance, 10.0)
+  assert_eq(physical_equal(lod.levels[0].object, near), true)
+  assert_eq(physical_equal(lod.levels[1].object, far), true)
+  assert_eq(lod.node.children.length(), 2)
+  match mid.parent {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  assert_eq(lod.remove_level(7.0), false)
+  assert_eq(lod.levels.length(), 2)
+  assert_eq(lod.node.children.length(), 2)
+}

@@ -51,6 +51,7 @@ pub(all) struct LOD {
 }
 pub fn LOD::add_level(Self, @core.Object3D, distance? : Double, hysteresis? : Double) -> Self
 pub fn LOD::new() -> Self
+pub fn LOD::remove_level(Self, Double) -> Bool
 pub fn LOD::to_node(Self) -> @core.Object3D
 pub impl @core.AsNode for LOD
 
