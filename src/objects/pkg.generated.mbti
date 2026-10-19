@@ -50,6 +50,7 @@ pub(all) struct LOD {
   mut auto_update : Bool
 }
 pub fn LOD::add_level(Self, @core.Object3D, distance? : Double, hysteresis? : Double) -> Self
+pub fn LOD::get_object_for_distance(Self, Double) -> @core.Object3D?
 pub fn LOD::new() -> Self
 pub fn LOD::remove_level(Self, Double) -> Bool
 pub fn LOD::to_node(Self) -> @core.Object3D

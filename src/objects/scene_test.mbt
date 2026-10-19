@@ -377,3 +377,30 @@ test "LOD.removeLevel drops the matching distance" {
   assert_eq(lod.levels.length(), 2)
   assert_eq(lod.node.children.length(), 2)
 }
+
+///|
+test "LOD.getObjectForDistance applies visible hysteresis" {
+  let empty = @objects.LOD::new()
+  match empty.get_object_for_distance(1.0) {
+    None => assert_eq(true, true)
+    Some(_) => assert_eq(false, true)
+  }
+  let lod = @objects.LOD::new()
+  let near = @core.Object3D::new()
+  let far = @core.Object3D::new()
+  ignore(lod.add_level(near, distance=0.0))
+  ignore(lod.add_level(far, distance=10.0, hysteresis=0.5))
+  match lod.get_object_for_distance(4.0) {
+    None => assert_eq(false, true)
+    Some(object) => assert_eq(physical_equal(object, near), true)
+  }
+  match lod.get_object_for_distance(5.0) {
+    None => assert_eq(false, true)
+    Some(object) => assert_eq(physical_equal(object, far), true)
+  }
+  far.visible = false
+  match lod.get_object_for_distance(8.0) {
+    None => assert_eq(false, true)
+    Some(object) => assert_eq(physical_equal(object, near), true)
+  }
+}

@@ -797,3 +797,29 @@ pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
     }
   }
 }
+
+///|
+/// 返回第一个距离阈值大于给定距离的前一级对象。对象可见时，阈值会减去 `distance * hysteresis`。没有级别时返回空。
+/// r186: `getObjectForDistance` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L188
+pub fn LOD::get_object_for_distance(
+  self : LOD,
+  distance : Double,
+) -> Object3D? {
+  let count = self.levels.length()
+  if count == 0 {
+    return None
+  }
+  let mut i = 1
+  while i < count {
+    let level = self.levels[i]
+    let mut level_distance = level.distance
+    if level.object.visible {
+      level_distance = level_distance - level_distance * level.hysteresis
+    }
+    if distance < level_distance {
+      break
+    }
+    i = i + 1
+  }
+  Some(self.levels[i - 1].object)
+}
