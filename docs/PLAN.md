@@ -1695,6 +1695,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.blendSrc` has landed. A new basic, Lambert, or Standard material stores `SrcAlpha`, whose integer is `204`. Setting the basic material to `One` (`201`) leaves another basic material at `SrcAlpha`. Setting the Standard material to `Zero` (`200`) leaves the Lambert material at `SrcAlpha`. The remaining factors are `SrcColor` `202`, `OneMinusSrcColor` `203`, `OneMinusSrcAlpha` `205`, `DstAlpha` `206`, `OneMinusDstAlpha` `207`, `DstColor` `208`, `OneMinusDstColor` `209`, `SrcAlphaSaturate` `210`, `ConstantColor` `211`, `OneMinusConstantColor` `212`, `ConstantAlpha` `213`, and `OneMinusConstantAlpha` `214`. Transparent draws still use the existing source-alpha blend. The pipeline still does not read this field.
 
+`PointsMaterial.blendSrc` has landed. A new material stores `SrcAlpha`, whose integer is `204`. Setting it to `One` (`201`) leaves another new material at `SrcAlpha`. Copying onto a default material stores `One`. Setting the destination to `Zero` (`200`) leaves the source at `One`. Point draws still use the existing source-alpha blend. The pipeline still does not read this field.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -2483,6 +2485,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `LineBasicMaterial.blending` | `materials` |
 | planned | 7 | `SpriteMaterial.blending` | `materials` |
 | planned | 7 | `Material.blendSrc` | `materials` |
+| planned | 7 | `PointsMaterial.blendSrc` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
