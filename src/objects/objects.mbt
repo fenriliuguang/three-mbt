@@ -654,6 +654,31 @@ pub fn SkinnedMesh::compute_bounding_sphere(self : SkinnedMesh) -> @math.Sphere 
 }
 
 ///|
+/// 复制网格、绑定和包围体。几何体、材质和骨架沿用源对象。
+/// 包围盒和包围球各克隆一份。源对象没有包围体时，目标上已有的值留着。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L161
+pub fn SkinnedMesh::copy(
+  self : SkinnedMesh,
+  source : SkinnedMesh,
+  recursive? : Bool = true,
+) -> SkinnedMesh {
+  ignore(self.mesh.copy(source.mesh, recursive~))
+  self.bind_mode = source.bind_mode
+  ignore(self.bind_matrix.copy(source.bind_matrix))
+  ignore(self.bind_matrix_inverse.copy(source.bind_matrix_inverse))
+  self.skeleton = source.skeleton
+  match source.bounding_box {
+    None => ()
+    Some(box) => self.bounding_box = Some(box.clone())
+  }
+  match source.bounding_sphere {
+    None => ()
+    Some(sphere) => self.bounding_sphere = Some(sphere.clone())
+  }
+  self
+}
+
+///|
 /// 三角网格。`geometry` 与 `material.color` 同时挂在场景节点上，遍历时可以读到。`count` 默认是 `1`。
 /// 没有形变属性时，权重和名字表保持空。
 /// r186: `Mesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L39
