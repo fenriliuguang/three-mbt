@@ -2630,6 +2630,33 @@ test "intersectObject sorts hits by distance" {
 }
 
 ///|
+test "intersectObjects sorts hits from several roots" {
+  let first = @core.Object3D::new()
+  let second = @core.Object3D::new()
+  let child = @core.Object3D::new()
+  ignore(second.add(child))
+  let raycaster = @core.Raycaster::new()
+  let hits : Array[@core.Intersection] = [
+    @core.Intersection::{
+      distance: 3.0,
+      point: @math.Vector3::new(),
+      object: first,
+    },
+    @core.Intersection::{
+      distance: 1.0,
+      point: @math.Vector3::new(x=5.0),
+      object: second,
+    },
+  ]
+  let written = raycaster.intersect_objects([first, second], intersects=hits)
+  assert_eq(physical_equal(written, hits), true)
+  assert_eq(hits.length(), 2)
+  assert_eq(hits[0].distance, 1.0)
+  assert_eq(hits[0].point.x, 5.0)
+  assert_eq(hits[1].distance, 3.0)
+}
+
+///|
 test "toJSON writes meshPerAttribute when an interleaved repeat count is not one" {
   let plain = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3).to_json()
   match plain.mesh_per_attribute {

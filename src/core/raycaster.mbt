@@ -144,6 +144,27 @@ pub fn Raycaster::intersect_object(
 }
 
 ///|
+/// 对一组对象收集交点，全部走完后再按距离从近到远排序。
+/// 返回的是传入的数组；没传时用一个新数组。
+/// r186: `intersectObjects` https://github.com/mrdoob/three.js/blob/r186/src/core/Raycaster.js#L218
+pub fn Raycaster::intersect_objects(
+  self : Raycaster,
+  objects : Array[Object3D],
+  recursive? : Bool = true,
+  intersects? : Array[Intersection],
+) -> Array[Intersection] {
+  let intersects = match intersects {
+    None => []
+    Some(intersects) => intersects
+  }
+  for object in objects {
+    self.intersect(object, intersects, recursive)
+  }
+  intersects.sort_by_key(fn(hit) { hit.distance })
+  intersects
+}
+
+///|
 fn Raycaster::intersect(
   self : Raycaster,
   object : Object3D,
