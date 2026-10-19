@@ -120,3 +120,17 @@ test "PointsMaterial stores and copies alphaTest" {
   destination.alpha_test = 0.8
   assert_eq(source.alpha_test, 0.4)
 }
+
+///|
+test "PointsMaterial stores and copies vertex colors" {
+  let defaults = @materials.PointsMaterial::new()
+  assert_eq(defaults.vertex_colors, false)
+  let source = @materials.PointsMaterial::new()
+  source.vertex_colors = true
+  assert_eq(defaults.vertex_colors, false)
+  let destination = @materials.PointsMaterial::new()
+  ignore(destination.copy(source))
+  assert_eq(destination.vertex_colors, true)
+  destination.vertex_colors = false
+  assert_eq(source.vertex_colors, true)
+}

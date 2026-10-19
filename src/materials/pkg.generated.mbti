@@ -110,6 +110,7 @@ pub(all) struct PointsMaterial {
   mut color_write : Bool
   mut premultiplied_alpha : Bool
   mut visible : Bool
+  mut vertex_colors : Bool
 }
 pub fn PointsMaterial::copy(Self, Self) -> Self
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
