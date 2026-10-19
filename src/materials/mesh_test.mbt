@@ -7168,6 +7168,46 @@ test "Material shader unrollLoops expands indexed loops" {
 }
 
 ///|
+test "Material shader getProgramCacheKey joins parameters" {
+  assert_eq(
+    @materials.program_cache_key(),
+    ",,highp,,false,,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,0,false,false,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,",
+  )
+  assert_eq(
+    @materials.program_cache_key(shader_id=Some("lambert"), custom_program_cache_key="custom"),
+    "lambert,highp,,false,,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,0,false,false,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,custom",
+  )
+  assert_eq(
+    @materials.program_cache_key(
+      shader_id=Some("basic"),
+      is_raw=true,
+      defines=[("FOO", "1"), ("BAR", "2")],
+      custom_program_cache_key="k",
+    ),
+    "basic,FOO,1,BAR,2,k",
+  )
+  assert_eq(
+    @materials.program_cache_key(shader_id=Some("phong"), defines=[("A", "1"), ("B", "2")])[0:15].to_owned(),
+    "phong,A,1,B,2,h",
+  )
+  assert_eq(
+    @materials.program_cache_key(num_dir_lights="3").contains("0,,0,3,0"),
+    true,
+  )
+  assert_eq(
+    @materials.program_cache_key(instancing=true, retroreflection=true).contains(",16777217,0,,"),
+    true,
+  )
+  assert_eq(
+    @materials.program_cache_key(is_opaque=true, light_probe_grids=true).contains(",0,4325376,,"),
+    true,
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
