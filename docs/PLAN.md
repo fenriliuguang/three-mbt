@@ -2077,6 +2077,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 
 `Material.matcap` has landed. A new Basic, Lambert, Standard, Physical, and Toon material each start with an empty matcap. A Lambert material stores a 1×1 map whose second byte is `0x80`. Another Lambert material stays empty. Copying onto a Basic material keeps that same texture object. Clearing the destination leaves the source map in place. The renderer still does not sample this map. `isMeshMatcapMaterial` stays later.
 
+`Material.isMeshMatcapMaterial` has landed. Basic, Lambert, Standard, Physical, and Toon stay false. `Material::matcap` with hex `0x0000FF` stores true, type `MeshMatcapMaterial`, kind `Matcap`, and shading `Basic`. The red channel is `0` and the blue channel is `1`. Its defines map `MATCAP` to an empty string and have no `TOON` key. Copying it onto a Basic material keeps the destination false, kind `Basic`, and type `MeshBasicMaterial`, and stores red `0` with blue `1`. Copying a Standard material onto a Matcap material keeps the destination true and resets its defines to `MATCAP`, dropping a `FOO` key and leaving out `STANDARD`. Cloning keeps the flag, the type, the kind, and blue `1`, with a new id. The renderer still shades it as Basic. `MeshNormalMaterial` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3056,6 +3058,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `Material.isMeshToonMaterial` | `materials` |
 | planned | 7 | `Material.gradientMap` | `materials` |
 | planned | 7 | `Material.matcap` | `materials` |
+| planned | 7 | `Material.isMeshMatcapMaterial` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

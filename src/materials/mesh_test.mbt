@@ -2602,3 +2602,66 @@ test "Material matcap starts empty and copies by reference" {
   let toon = @materials.Material::toon()
   assert_eq(toon.matcap is None, true)
 }
+
+///|
+test "Material matcap sets isMeshMatcapMaterial and resets defines on copy" {
+  let basic = @materials.Material::basic()
+  let lambert = @materials.Material::lambert()
+  let standard = @materials.Material::standard()
+  let physical = @materials.Material::physical()
+  let toon = @materials.Material::toon()
+  assert_eq(basic.is_mesh_matcap_material, false)
+  assert_eq(lambert.is_mesh_matcap_material, false)
+  assert_eq(standard.is_mesh_matcap_material, false)
+  assert_eq(physical.is_mesh_matcap_material, false)
+  assert_eq(toon.is_mesh_matcap_material, false)
+  let matcap = @materials.Material::matcap(hex=0x0000FF)
+  assert_eq(matcap.is_mesh_matcap_material, true)
+  assert_eq(matcap.is_mesh_toon_material, false)
+  assert_eq(matcap.type_name, "MeshMatcapMaterial")
+  assert_eq(matcap.kind is @materials.MaterialKind::Matcap, true)
+  assert_eq(matcap.shading() is @constants.Basic, true)
+  assert_eq(matcap.color.r, 0.0)
+  assert_eq(matcap.color.b, 1.0)
+  match matcap.defines.get("MATCAP") {
+    None => abort("matcap define")
+    Some(value) => assert_eq(value, "")
+  }
+  match matcap.defines.get("TOON") {
+    None => ()
+    Some(_) => abort("matcap gained toon define")
+  }
+  let destination = @materials.Material::basic()
+  ignore(destination.copy(matcap))
+  assert_eq(destination.is_mesh_matcap_material, false)
+  assert_eq(destination.kind is @materials.MaterialKind::Basic, true)
+  assert_eq(destination.type_name, "MeshBasicMaterial")
+  assert_eq(destination.color.r, 0.0)
+  assert_eq(destination.color.b, 1.0)
+  assert_eq(matcap.is_mesh_matcap_material, true)
+  let onto = @materials.Material::matcap()
+  onto.defines.set("FOO", "1")
+  ignore(onto.copy(standard))
+  assert_eq(onto.is_mesh_matcap_material, true)
+  assert_eq(onto.kind is @materials.MaterialKind::Matcap, true)
+  assert_eq(onto.type_name, "MeshMatcapMaterial")
+  assert_eq(onto.roughness, 1.0)
+  match onto.defines.get("FOO") {
+    None => ()
+    Some(_) => abort("matcap copy kept source define")
+  }
+  match onto.defines.get("MATCAP") {
+    None => abort("matcap copy define")
+    Some(value) => assert_eq(value, "")
+  }
+  match onto.defines.get("STANDARD") {
+    None => ()
+    Some(_) => abort("matcap copy gained standard define")
+  }
+  let cloned = matcap.clone()
+  assert_eq(cloned.is_mesh_matcap_material, true)
+  assert_eq(cloned.type_name, "MeshMatcapMaterial")
+  assert_eq(cloned.kind is @materials.MaterialKind::Matcap, true)
+  assert_eq(cloned.color.b, 1.0)
+  assert_eq(cloned.id == matcap.id, false)
+}
