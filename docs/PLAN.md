@@ -2591,6 +2591,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `numSunLights` has landed. Shader, Raw, and Basic start at `0`. Passing two sun lights returns `2`. Passing none returns `0`. A color morph attribute does not add a sun light. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `numDirLights` stays later.
 
+`numDirLights` has landed. Shader, Raw, and Basic start at `0`. Passing three directional lights returns `3`. Passing none returns `0`. Two sun lights do not count as directional lights. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `numPointLights` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3827,6 +3829,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `morphTargetsCount` | `materials` |
 | planned | 7 | `morphTextureStride` | `materials` |
 | planned | 7 | `numSunLights` | `materials` |
+| planned | 7 | `numDirLights` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

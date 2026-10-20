@@ -349,6 +349,7 @@ pub fn Material::program_normal_map(Self) -> Bool
 pub fn Material::program_normal_map_object_space(Self) -> Bool
 pub fn Material::program_normal_map_tangent_space(Self) -> Bool
 pub fn Material::program_normal_map_uv(Self) -> String
+pub fn Material::program_num_dir_lights(Self, num_dir_lights? : Int) -> Int
 pub fn Material::program_num_sun_lights(Self, num_sun_lights? : Int) -> Int
 pub fn Material::program_opaque(Self) -> Bool
 pub fn Material::program_packed_normal_map(Self, Int) -> Bool
