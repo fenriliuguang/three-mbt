@@ -9991,6 +9991,30 @@ test "Material shader extensionClipCullDistance needs the flag and the extension
 }
 
 ///|
+test "Material shader extensionMultiDraw needs the extension and a draw path" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_extension_multi_draw(), false)
+  assert_eq(@materials.Material::raw().program_extension_multi_draw(), false)
+  assert_eq(@materials.Material::basic().program_extension_multi_draw(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.extensions.clip_cull_distance = true
+  assert_eq(shader.program_extension_clip_cull_distance(has_extension=true), true)
+  assert_eq(shader.program_extension_multi_draw(has_extension=true), false)
+  shader.extensions.clip_cull_distance = false
+  assert_eq(shader.program_extension_multi_draw(is_batched_mesh=true), false)
+  shader.extensions.multi_draw = true
+  assert_eq(shader.program_extension_multi_draw(), false)
+  assert_eq(shader.program_extension_multi_draw(has_extension=true), true)
+  shader.extensions.multi_draw = false
+  assert_eq(
+    shader.program_extension_multi_draw(has_extension=true, is_batched_mesh=true),
+    true,
+  )
+  assert_eq(shader.program_extension_multi_draw(has_extension=true), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

@@ -325,6 +325,7 @@ pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
 pub fn Material::program_env_map_cube_uv_height(Self, Int, scene_environment_height? : Int, has_scene_environment? : Bool) -> Int?
 pub fn Material::program_env_map_mode(Self, Int, has_scene_environment? : Bool) -> Int?
 pub fn Material::program_extension_clip_cull_distance(Self, has_extension? : Bool) -> Bool
+pub fn Material::program_extension_multi_draw(Self, has_extension? : Bool, is_batched_mesh? : Bool) -> Bool
 pub fn Material::program_flat_shading(Self, has_normal? : Bool) -> Bool
 pub fn Material::program_flip_sided(Self) -> Bool
 pub fn Material::program_fog(Self, has_fog? : Bool) -> Bool
