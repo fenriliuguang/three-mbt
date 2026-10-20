@@ -340,6 +340,7 @@ pub fn Material::program_map_uv(Self) -> String
 pub fn Material::program_matcap(Self) -> Bool
 pub fn Material::program_metalness_map(Self) -> Bool
 pub fn Material::program_metalness_map_uv(Self) -> String
+pub fn Material::program_morph_colors(Self, has_morph_colors? : Bool) -> Bool
 pub fn Material::program_morph_normals(Self, has_morph_normals? : Bool) -> Bool
 pub fn Material::program_morph_targets(Self, has_morph_targets? : Bool) -> Bool
 pub fn Material::program_normal_map(Self) -> Bool
