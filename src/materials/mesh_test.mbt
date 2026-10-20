@@ -9829,6 +9829,38 @@ test "Material shader decodeVideoTexture needs a video map in sRGB" {
 }
 
 ///|
+test "Material shader decodeVideoTextureEmissive needs a video emissive map in sRGB" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_decode_video_texture_emissive(), false)
+  assert_eq(@materials.Material::raw().program_decode_video_texture_emissive(), false)
+  assert_eq(@materials.Material::basic().program_decode_video_texture_emissive(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.program_decode_video_texture_emissive(video_texture=true, srgb_transfer=true),
+    false,
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(
+    shader.program_decode_video_texture(video_texture=true, srgb_transfer=true),
+    true,
+  )
+  assert_eq(
+    shader.program_decode_video_texture_emissive(video_texture=true, srgb_transfer=true),
+    false,
+  )
+  shader.emissive_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.program_decode_video_texture_emissive(), false)
+  assert_eq(shader.program_decode_video_texture_emissive(video_texture=true), false)
+  assert_eq(shader.program_decode_video_texture_emissive(srgb_transfer=true), false)
+  assert_eq(
+    shader.program_decode_video_texture_emissive(video_texture=true, srgb_transfer=true),
+    true,
+  )
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
