@@ -9762,6 +9762,23 @@ test "Material shader shadowMapEnabled needs the renderer flag and a shadow" {
 }
 
 ///|
+test "Material shader shadowMapType reads the renderer type" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_shadow_map_type(), 0)
+  assert_eq(@materials.Material::raw().program_shadow_map_type(), 0)
+  assert_eq(@materials.Material::basic().program_shadow_map_type(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_shadow_map_type(shadow_map_type=1), 1)
+  assert_eq(shader.program_shadow_map_type(shadow_map_type=3), 3)
+  assert_eq(
+    shader.program_shadow_map_enabled(shadow_map_enabled=true, has_shadows=true),
+    true,
+  )
+  assert_eq(shader.program_shadow_map_type(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

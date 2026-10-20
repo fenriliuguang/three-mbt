@@ -375,6 +375,7 @@ pub fn Material::program_reversed_depth_buffer(Self, reversed_depth_buffer? : Bo
 pub fn Material::program_roughness_map(Self) -> Bool
 pub fn Material::program_roughness_map_uv(Self) -> String
 pub fn Material::program_shadow_map_enabled(Self, shadow_map_enabled? : Bool, has_shadows? : Bool) -> Bool
+pub fn Material::program_shadow_map_type(Self, shadow_map_type? : Int) -> Int
 pub fn Material::program_sheen(Self) -> Bool
 pub fn Material::program_sheen_color_map(Self) -> Bool
 pub fn Material::program_sheen_color_map_uv(Self) -> String
