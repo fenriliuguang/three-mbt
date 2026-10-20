@@ -9400,6 +9400,20 @@ test "Material shader hasPositionAttribute reads the geometry position" {
 }
 
 ///|
+test "Material shader morphTargets reads position morph attributes" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_morph_targets(), false)
+  assert_eq(@materials.Material::raw().program_morph_targets(), false)
+  assert_eq(@materials.Material::basic().program_morph_targets(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_morph_targets(has_morph_targets=true), true)
+  assert_eq(shader.program_morph_targets(has_morph_targets=false), false)
+  assert_eq(shader.program_has_position_attribute(has_position=true), true)
+  assert_eq(shader.program_morph_targets(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
