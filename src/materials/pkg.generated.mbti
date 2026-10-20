@@ -357,6 +357,7 @@ pub fn Material::program_num_point_lights(Self, num_point_lights? : Int) -> Int
 pub fn Material::program_num_rect_area_lights(Self, num_rect_area_lights? : Int) -> Int
 pub fn Material::program_num_spot_light_maps(Self, num_spot_light_maps? : Int) -> Int
 pub fn Material::program_num_spot_light_shadows(Self, num_spot_light_shadows? : Int) -> Int
+pub fn Material::program_num_spot_light_shadows_with_maps(Self, num_spot_light_shadows_with_maps? : Int) -> Int
 pub fn Material::program_num_spot_lights(Self, num_spot_lights? : Int) -> Int
 pub fn Material::program_num_sun_light_shadows(Self, num_sun_light_shadows? : Int) -> Int
 pub fn Material::program_num_sun_lights(Self, num_sun_lights? : Int) -> Int
