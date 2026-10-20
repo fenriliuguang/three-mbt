@@ -9880,6 +9880,24 @@ test "Material shader premultipliedAlpha reads the material flag" {
 }
 
 ///|
+test "Material shader doubleSided reads Double side" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_double_sided(), false)
+  assert_eq(@materials.Material::raw().program_double_sided(), false)
+  assert_eq(@materials.Material::basic().program_double_sided(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.side = @constants.Back
+  assert_eq(shader.program_double_sided(), false)
+  shader.side = @constants.Double
+  assert_eq(shader.program_double_sided(), true)
+  shader.side = @constants.Front
+  assert_eq(shader.program_double_sided(), false)
+  shader.premultiplied_alpha = true
+  assert_eq(shader.program_double_sided(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

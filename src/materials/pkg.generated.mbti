@@ -317,6 +317,7 @@ pub fn Material::program_dispersion(Self) -> Bool
 pub fn Material::program_displacement_map(Self) -> Bool
 pub fn Material::program_displacement_map_uv(Self) -> String
 pub fn Material::program_dithering(Self) -> Bool
+pub fn Material::program_double_sided(Self) -> Bool
 pub fn Material::program_emissive_map(Self) -> Bool
 pub fn Material::program_emissive_map_uv(Self) -> String
 pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
