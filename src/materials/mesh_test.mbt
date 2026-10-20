@@ -9468,6 +9468,33 @@ test "Material shader morphTargetsCount prefers position then normal then color"
 }
 
 ///|
+test "Material shader morphTextureStride lets later attributes overwrite" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_morph_texture_stride(), 0)
+  assert_eq(@materials.Material::raw().program_morph_texture_stride(), 0)
+  assert_eq(@materials.Material::basic().program_morph_texture_stride(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_morph_texture_stride(has_position_morph=true), 1)
+  assert_eq(
+    shader.program_morph_texture_stride(has_position_morph=true, has_normal_morph=true),
+    2,
+  )
+  assert_eq(
+    shader.program_morph_texture_stride(
+      has_position_morph=true,
+      has_normal_morph=true,
+      has_color_morph=true,
+    ),
+    3,
+  )
+  assert_eq(shader.program_morph_texture_stride(has_color_morph=true), 3)
+  assert_eq(shader.program_morph_texture_stride(has_normal_morph=true), 2)
+  assert_eq(shader.program_morph_targets_count(position_count=Some(4)), 4)
+  assert_eq(shader.program_morph_texture_stride(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

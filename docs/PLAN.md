@@ -2587,6 +2587,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `morphTargetsCount` has landed. Shader, Raw, and Basic start at `0`. A position morph list of `3` wins over a normal list of `2` and a color list of `4`. With no position list, a normal list of `2` is used. With only a color list of `4`, that count is used. An empty position list counts as present and returns `0` instead of falling through. A color morph flag without a list stays `0`. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `morphTextureStride` stays later.
 
+`morphTextureStride` has landed. Shader, Raw, and Basic start at `0`. A position morph attribute returns `1`. Adding a normal morph attribute returns `2`. Adding a color morph attribute returns `3`. Color alone is `3`, and normal alone is `2`. A position morph count does not set the stride by itself. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `numSunLights` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3821,6 +3823,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `morphNormals` | `materials` |
 | planned | 7 | `morphColors` | `materials` |
 | planned | 7 | `morphTargetsCount` | `materials` |
+| planned | 7 | `morphTextureStride` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |
