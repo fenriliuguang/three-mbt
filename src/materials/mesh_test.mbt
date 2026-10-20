@@ -9442,6 +9442,32 @@ test "Material shader morphColors reads color morph attributes" {
 }
 
 ///|
+test "Material shader morphTargetsCount prefers position then normal then color" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_morph_targets_count(), 0)
+  assert_eq(@materials.Material::raw().program_morph_targets_count(), 0)
+  assert_eq(@materials.Material::basic().program_morph_targets_count(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.program_morph_targets_count(
+      position_count=Some(3),
+      normal_count=Some(2),
+      color_count=Some(4),
+    ),
+    3,
+  )
+  assert_eq(shader.program_morph_targets_count(normal_count=Some(2)), 2)
+  assert_eq(shader.program_morph_targets_count(color_count=Some(4)), 4)
+  assert_eq(
+    shader.program_morph_targets_count(position_count=Some(0), normal_count=Some(5)),
+    0,
+  )
+  assert_eq(shader.program_morph_colors(has_morph_colors=true), true)
+  assert_eq(shader.program_morph_targets_count(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
