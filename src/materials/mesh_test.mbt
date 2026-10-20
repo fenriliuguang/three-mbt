@@ -9779,6 +9779,30 @@ test "Material shader shadowMapType reads the renderer type" {
 }
 
 ///|
+test "Material shader toneMapping follows toneMapped and the render target" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_tone_mapping() is @constants.No, true)
+  assert_eq(shader.program_tone_mapping().to_int(), 0)
+  assert_eq(@materials.Material::raw().program_tone_mapping().to_int(), 0)
+  assert_eq(@materials.Material::basic().program_tone_mapping().to_int(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.Linear) is @constants.Linear, true)
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.Linear).to_int(), 1)
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.ACES) is @constants.ACES, true)
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.ACES).to_int(), 4)
+  shader.tone_mapped = false
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.Linear).to_int(), 0)
+  shader.tone_mapped = true
+  assert_eq(
+    shader.program_tone_mapping(tone_mapping=@constants.Linear, has_render_target=true).to_int(),
+    0,
+  )
+  assert_eq(shader.program_shadow_map_type(shadow_map_type=3), 3)
+  assert_eq(shader.program_tone_mapping().to_int(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

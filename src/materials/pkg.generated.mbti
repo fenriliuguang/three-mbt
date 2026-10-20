@@ -391,6 +391,7 @@ pub fn Material::program_specular_map(Self) -> Bool
 pub fn Material::program_specular_map_uv(Self) -> String
 pub fn Material::program_thickness_map(Self) -> Bool
 pub fn Material::program_thickness_map_uv(Self) -> String
+pub fn Material::program_tone_mapping(Self, tone_mapping? : @constants.ToneMapping, has_render_target? : Bool) -> @constants.ToneMapping
 pub fn Material::program_transmission(Self) -> Bool
 pub fn Material::program_transmission_map(Self) -> Bool
 pub fn Material::program_transmission_map_uv(Self) -> String
