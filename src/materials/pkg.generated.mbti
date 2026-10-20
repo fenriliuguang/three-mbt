@@ -313,6 +313,7 @@ pub fn Material::program_combine(Self) -> @constants.Combine
 pub fn Material::program_decode_video_texture(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
 pub fn Material::program_decode_video_texture_emissive(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
 pub fn Material::program_defines(Self) -> Map[String, String]
+pub fn Material::program_depth_packing(Self) -> Int
 pub fn Material::program_dispersion(Self) -> Bool
 pub fn Material::program_displacement_map(Self) -> Bool
 pub fn Material::program_displacement_map_uv(Self) -> String
