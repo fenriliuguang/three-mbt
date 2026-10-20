@@ -9861,6 +9861,25 @@ test "Material shader decodeVideoTextureEmissive needs a video emissive map in s
 }
 
 ///|
+test "Material shader premultipliedAlpha reads the material flag" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_premultiplied_alpha(), false)
+  assert_eq(@materials.Material::raw().program_premultiplied_alpha(), false)
+  assert_eq(@materials.Material::basic().program_premultiplied_alpha(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.premultiplied_alpha = true
+  assert_eq(shader.program_premultiplied_alpha(), true)
+  shader.premultiplied_alpha = false
+  assert_eq(shader.program_premultiplied_alpha(), false)
+  assert_eq(
+    shader.program_decode_video_texture_emissive(video_texture=true, srgb_transfer=true),
+    false,
+  )
+  assert_eq(shader.program_premultiplied_alpha(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
