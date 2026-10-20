@@ -9372,6 +9372,20 @@ test "Material shader reversedDepthBuffer reads the renderer flag" {
 }
 
 ///|
+test "Material shader skinning reads whether the object is skinned" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_skinning(), false)
+  assert_eq(@materials.Material::raw().program_skinning(), false)
+  assert_eq(@materials.Material::basic().program_skinning(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_skinning(has_skinning=true), true)
+  assert_eq(shader.program_skinning(has_skinning=false), false)
+  assert_eq(shader.program_reversed_depth_buffer(reversed_depth_buffer=true), true)
+  assert_eq(shader.program_skinning(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
