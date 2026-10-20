@@ -2621,6 +2621,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `numClipIntersection` has landed. Shader, Raw, and Basic start at `0`. Passing two clip intersections returns `2`. Passing none returns `0`. Three clipping planes do not count as clip intersections. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `dithering` stays later.
 
+`dithering` has landed. Shader, Raw, and Basic start at `false`. Setting Shader `dithering` to `true` returns `true`. Setting it back to `false` returns `false`. Two clip intersections do not turn dithering on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while `dithering` is still off. `shadowMapEnabled` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3872,6 +3874,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `numLightProbeGrids` | `materials` |
 | planned | 7 | `numClippingPlanes` | `materials` |
 | planned | 7 | `numClipIntersection` | `materials` |
+| planned | 7 | `dithering` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

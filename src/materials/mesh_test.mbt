@@ -9728,6 +9728,22 @@ test "Material shader numClipIntersection reads the intersection count" {
 }
 
 ///|
+test "Material shader dithering reads the material flag" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_dithering(), false)
+  assert_eq(@materials.Material::raw().program_dithering(), false)
+  assert_eq(@materials.Material::basic().program_dithering(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.dithering = true
+  assert_eq(shader.program_dithering(), true)
+  shader.dithering = false
+  assert_eq(shader.program_dithering(), false)
+  assert_eq(shader.program_num_clip_intersection(num_clip_intersection=2), 2)
+  assert_eq(shader.program_dithering(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
