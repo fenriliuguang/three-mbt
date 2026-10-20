@@ -351,6 +351,7 @@ pub fn Material::program_normal_map_tangent_space(Self) -> Bool
 pub fn Material::program_normal_map_uv(Self) -> String
 pub fn Material::program_num_dir_lights(Self, num_dir_lights? : Int) -> Int
 pub fn Material::program_num_point_lights(Self, num_point_lights? : Int) -> Int
+pub fn Material::program_num_rect_area_lights(Self, num_rect_area_lights? : Int) -> Int
 pub fn Material::program_num_spot_light_maps(Self, num_spot_light_maps? : Int) -> Int
 pub fn Material::program_num_spot_lights(Self, num_spot_lights? : Int) -> Int
 pub fn Material::program_num_sun_lights(Self, num_sun_lights? : Int) -> Int
