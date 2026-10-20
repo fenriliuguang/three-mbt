@@ -332,6 +332,7 @@ pub fn Material::program_fragment_shader(Self) -> String?
 pub fn Material::program_glsl_version(Self) -> GlslVersion?
 pub fn Material::program_gradient_map(Self) -> Bool
 pub fn Material::program_has_position_attribute(Self, has_position? : Bool) -> Bool
+pub fn Material::program_index0_attribute_name(Self) -> String?
 pub fn Material::program_iridescence(Self) -> Bool
 pub fn Material::program_iridescence_map(Self) -> Bool
 pub fn Material::program_iridescence_map_uv(Self) -> String

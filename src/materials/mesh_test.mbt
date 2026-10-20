@@ -9955,6 +9955,23 @@ test "Material shader depthPacking reads the packing integer" {
 }
 
 ///|
+test "Material shader index0AttributeName reads the attribute name" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_index0_attribute_name(), None)
+  assert_eq(@materials.Material::raw().program_index0_attribute_name(), None)
+  assert_eq(@materials.Material::basic().program_index0_attribute_name(), None)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.index0_attribute_name = Some("position")
+  assert_eq(shader.program_index0_attribute_name(), Some("position"))
+  shader.index0_attribute_name = None
+  assert_eq(shader.program_index0_attribute_name(), None)
+  shader.depth_packing = @constants.DepthPacking::RGBA
+  assert_eq(shader.program_depth_packing(), 3201)
+  assert_eq(shader.program_index0_attribute_name(), None)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
