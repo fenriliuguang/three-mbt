@@ -9621,6 +9621,20 @@ test "Material shader numDirLightShadows reads the directional shadow count" {
 }
 
 ///|
+test "Material shader numPointLightShadows reads the point shadow count" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_num_point_light_shadows(), 0)
+  assert_eq(@materials.Material::raw().program_num_point_light_shadows(), 0)
+  assert_eq(@materials.Material::basic().program_num_point_light_shadows(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_num_point_light_shadows(num_point_light_shadows=3), 3)
+  assert_eq(shader.program_num_point_light_shadows(num_point_light_shadows=0), 0)
+  assert_eq(shader.program_num_point_lights(num_point_lights=4), 4)
+  assert_eq(shader.program_num_point_light_shadows(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
