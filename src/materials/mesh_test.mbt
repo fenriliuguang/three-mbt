@@ -9669,6 +9669,23 @@ test "Material shader numSpotLightShadowsWithMaps reads that shadow count" {
 }
 
 ///|
+test "Material shader numLightProbes reads the light probe count" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_num_light_probes(), 0)
+  assert_eq(@materials.Material::raw().program_num_light_probes(), 0)
+  assert_eq(@materials.Material::basic().program_num_light_probes(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_num_light_probes(num_light_probes=2), 2)
+  assert_eq(shader.program_num_light_probes(num_light_probes=0), 0)
+  assert_eq(
+    shader.program_num_spot_light_shadows_with_maps(num_spot_light_shadows_with_maps=1),
+    1,
+  )
+  assert_eq(shader.program_num_light_probes(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
