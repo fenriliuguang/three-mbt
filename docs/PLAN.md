@@ -2645,6 +2645,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `index0AttributeName` has landed. Shader, Raw, and Basic start at `None`. Setting Shader to `position` returns that name. Clearing it returns `None`. `RGBA` depth packing does not invent a name. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the name is still empty. `extensionClipCullDistance` stays later.
 
+`extensionClipCullDistance` has landed. Shader, Raw, and Basic start at `false`. The extension without the material flag stays `false`. The material flag without the extension stays `false`. Both together return `true`. An `index0` name does not turn it on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while `clip_cull_distance` is still off. `extensionMultiDraw` stays later.
+
 Material `visible` has landed. It defaults to true. A mesh, point, or line with it set to false stays out of the opaque, transparent, wireframe, and shadow lists. `Object3D.visible` still hides the whole subtree on its own.
 
 `forceSinglePass` has landed. It defaults to false. A transparent double-sided mesh draws its back faces, then its front faces, in that order inside the same sorted slot. Setting it to true keeps the one double-sided draw. Opaque meshes and wireframes stay one draw. The normal uniform still uses the material side.
@@ -3908,6 +3910,7 @@ Status: planned = ported in that phase; later = decided in phase 7; excluded = s
 | planned | 7 | `useDepthPacking` | `materials` |
 | planned | 7 | `depthPacking` | `materials` |
 | planned | 7 | `index0AttributeName` | `materials` |
+| planned | 7 | `extensionClipCullDistance` | `materials` |
 | planned | 7 | material `visible` on meshes, points, and lines | `materials`, `renderer` |
 | planned | 7 | `forceSinglePass` on transparent double-sided meshes | `materials`, `renderer` |
 | planned | 7 | `shadowSide` on shadow casters | `materials`, `renderer` |

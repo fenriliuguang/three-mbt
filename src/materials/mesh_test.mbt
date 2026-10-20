@@ -9972,6 +9972,25 @@ test "Material shader index0AttributeName reads the attribute name" {
 }
 
 ///|
+test "Material shader extensionClipCullDistance needs the flag and the extension" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_extension_clip_cull_distance(), false)
+  assert_eq(@materials.Material::raw().program_extension_clip_cull_distance(), false)
+  assert_eq(@materials.Material::basic().program_extension_clip_cull_distance(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.index0_attribute_name = Some("position")
+  assert_eq(shader.program_extension_clip_cull_distance(has_extension=true), false)
+  shader.index0_attribute_name = None
+  assert_eq(shader.program_extension_clip_cull_distance(has_extension=true), false)
+  shader.extensions.clip_cull_distance = true
+  assert_eq(shader.program_extension_clip_cull_distance(), false)
+  assert_eq(shader.program_extension_clip_cull_distance(has_extension=true), true)
+  shader.extensions.clip_cull_distance = false
+  assert_eq(shader.program_extension_clip_cull_distance(has_extension=true), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
