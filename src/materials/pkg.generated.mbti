@@ -400,6 +400,7 @@ pub fn Material::program_tone_mapping(Self, tone_mapping? : @constants.ToneMappi
 pub fn Material::program_transmission(Self) -> Bool
 pub fn Material::program_transmission_map(Self) -> Bool
 pub fn Material::program_transmission_map_uv(Self) -> String
+pub fn Material::program_use_depth_packing(Self) -> Bool
 pub fn Material::program_use_fog(Self) -> Bool
 pub fn Material::program_vertex_alphas(Self, has_vertex_alpha? : Bool) -> Bool
 pub fn Material::program_vertex_colors(Self) -> Bool

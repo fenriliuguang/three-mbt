@@ -9917,6 +9917,23 @@ test "Material shader flipSided reads Back side" {
 }
 
 ///|
+test "Material shader useDepthPacking is on for a stored packing" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_use_depth_packing(), true)
+  assert_eq(@materials.Material::raw().program_use_depth_packing(), true)
+  assert_eq(@materials.Material::basic().program_use_depth_packing(), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.depth_packing = @constants.DepthPacking::RGBA
+  assert_eq(shader.program_use_depth_packing(), true)
+  shader.depth_packing = @constants.DepthPacking::Basic
+  assert_eq(shader.program_use_depth_packing(), true)
+  shader.side = @constants.Back
+  assert_eq(shader.program_flip_sided(), true)
+  assert_eq(shader.program_use_depth_packing(), true)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
