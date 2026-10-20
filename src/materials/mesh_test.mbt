@@ -9686,6 +9686,20 @@ test "Material shader numLightProbes reads the light probe count" {
 }
 
 ///|
+test "Material shader numLightProbeGrids reads the probe grid count" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_num_light_probe_grids(), 0)
+  assert_eq(@materials.Material::raw().program_num_light_probe_grids(), 0)
+  assert_eq(@materials.Material::basic().program_num_light_probe_grids(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_num_light_probe_grids(num_light_probe_grids=2), 2)
+  assert_eq(shader.program_num_light_probe_grids(num_light_probe_grids=0), 0)
+  assert_eq(shader.program_num_light_probes(num_light_probes=2), 2)
+  assert_eq(shader.program_num_light_probe_grids(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
