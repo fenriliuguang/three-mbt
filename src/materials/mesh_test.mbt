@@ -9386,6 +9386,20 @@ test "Material shader skinning reads whether the object is skinned" {
 }
 
 ///|
+test "Material shader hasPositionAttribute reads the geometry position" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_has_position_attribute(), false)
+  assert_eq(@materials.Material::raw().program_has_position_attribute(), false)
+  assert_eq(@materials.Material::basic().program_has_position_attribute(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_has_position_attribute(has_position=true), true)
+  assert_eq(shader.program_has_position_attribute(has_position=false), false)
+  assert_eq(shader.program_skinning(has_skinning=true), true)
+  assert_eq(shader.program_has_position_attribute(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
