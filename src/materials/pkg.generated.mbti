@@ -349,6 +349,7 @@ pub fn Material::program_normal_map(Self) -> Bool
 pub fn Material::program_normal_map_object_space(Self) -> Bool
 pub fn Material::program_normal_map_tangent_space(Self) -> Bool
 pub fn Material::program_normal_map_uv(Self) -> String
+pub fn Material::program_num_clip_intersection(Self, num_clip_intersection? : Int) -> Int
 pub fn Material::program_num_clipping_planes(Self, num_clipping_planes? : Int) -> Int
 pub fn Material::program_num_dir_light_shadows(Self, num_dir_light_shadows? : Int) -> Int
 pub fn Material::program_num_dir_lights(Self, num_dir_lights? : Int) -> Int

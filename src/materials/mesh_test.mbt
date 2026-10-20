@@ -9714,6 +9714,20 @@ test "Material shader numClippingPlanes reads the clipping plane count" {
 }
 
 ///|
+test "Material shader numClipIntersection reads the intersection count" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_num_clip_intersection(), 0)
+  assert_eq(@materials.Material::raw().program_num_clip_intersection(), 0)
+  assert_eq(@materials.Material::basic().program_num_clip_intersection(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_num_clip_intersection(num_clip_intersection=2), 2)
+  assert_eq(shader.program_num_clip_intersection(num_clip_intersection=0), 0)
+  assert_eq(shader.program_num_clipping_planes(num_clipping_planes=3), 3)
+  assert_eq(shader.program_num_clip_intersection(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
