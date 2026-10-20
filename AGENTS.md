@@ -1,6 +1,6 @@
 # three-mbt
 
-MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](docs/PLAN.md)。
+MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](docs/PLAN.md)。已完成、活跃中、待实现分在 `docs/plan/done/`、`docs/plan/active/`、`docs/plan/later/`。当前下一刀写在 `docs/plan/active/materials.md` 最后一段末尾。
 
 ## 边界
 
