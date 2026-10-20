@@ -9744,6 +9744,24 @@ test "Material shader dithering reads the material flag" {
 }
 
 ///|
+test "Material shader shadowMapEnabled needs the renderer flag and a shadow" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_shadow_map_enabled(), false)
+  assert_eq(@materials.Material::raw().program_shadow_map_enabled(), false)
+  assert_eq(@materials.Material::basic().program_shadow_map_enabled(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_shadow_map_enabled(shadow_map_enabled=true), false)
+  assert_eq(shader.program_shadow_map_enabled(has_shadows=true), false)
+  assert_eq(
+    shader.program_shadow_map_enabled(shadow_map_enabled=true, has_shadows=true),
+    true,
+  )
+  shader.dithering = true
+  assert_eq(shader.program_shadow_map_enabled(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
