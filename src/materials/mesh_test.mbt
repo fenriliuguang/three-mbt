@@ -9803,6 +9803,32 @@ test "Material shader toneMapping follows toneMapped and the render target" {
 }
 
 ///|
+test "Material shader decodeVideoTexture needs a video map in sRGB" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_decode_video_texture(), false)
+  assert_eq(@materials.Material::raw().program_decode_video_texture(), false)
+  assert_eq(@materials.Material::basic().program_decode_video_texture(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.program_decode_video_texture(video_texture=true, srgb_transfer=true),
+    false,
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.program_decode_video_texture(), false)
+  assert_eq(shader.program_decode_video_texture(video_texture=true), false)
+  assert_eq(shader.program_decode_video_texture(srgb_transfer=true), false)
+  assert_eq(
+    shader.program_decode_video_texture(video_texture=true, srgb_transfer=true),
+    true,
+  )
+  assert_eq(shader.program_tone_mapping(tone_mapping=@constants.Linear).to_int(), 1)
+  assert_eq(shader.program_decode_video_texture(), false)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
