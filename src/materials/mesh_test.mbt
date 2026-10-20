@@ -9607,6 +9607,20 @@ test "Material shader numSunLightShadows reads the sun shadow count" {
 }
 
 ///|
+test "Material shader numDirLightShadows reads the directional shadow count" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_num_dir_light_shadows(), 0)
+  assert_eq(@materials.Material::raw().program_num_dir_light_shadows(), 0)
+  assert_eq(@materials.Material::basic().program_num_dir_light_shadows(), 0)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_num_dir_light_shadows(num_dir_light_shadows=2), 2)
+  assert_eq(shader.program_num_dir_light_shadows(num_dir_light_shadows=0), 0)
+  assert_eq(shader.program_num_dir_lights(num_dir_lights=3), 3)
+  assert_eq(shader.program_num_dir_light_shadows(), 0)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
