@@ -1,0 +1,860 @@
+// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19
+
+///|
+let next_material_id : Ref[Int] = Ref::Ref(0)
+
+///|
+fn fresh_material_id() -> Int {
+  let id = next_material_id.val
+  next_material_id.val = id + 1
+  id
+}
+
+///|
+/// 不受光照的基础材质、Lambert、直接光的 Standard、带物理扩展的 Physical、卡通着色的 Toon、不受光的 Matcap、把法线画成颜色的 Normal、按深度画成颜色的 Depth、点光源阴影用的 Distance、Blinn-Phong 的 Phong，以及只接收阴影的 Shadow，还有自定义着色器的 Shader，以及沿用这份着色器、但不自动加上内置 uniform 和 attribute 的 Raw。
+pub(all) enum MaterialKind {
+  Basic
+  Lambert
+  Standard
+  Physical
+  Toon
+  Matcap
+  Normal
+  Depth
+  Distance
+  Phong
+  Shadow
+  Shader
+  Raw
+}
+
+///|
+/// 线框端点。默认圆角。斜角和尖角一并存储。渲染器仍按 1 像素画线框。
+/// r186: `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L354 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L376
+pub(all) enum WireframeCap {
+  Round
+  Bevel
+  Miter
+}
+
+///|
+/// 线框拐角。默认圆角。斜角和尖角一并存储。渲染器仍按 1 像素画线框。
+/// r186: `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L364 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L386
+pub(all) enum WireframeJoin {
+  Round
+  Bevel
+  Miter
+}
+
+///|
+/// 材质的公共数据。`alpha_test` 大于片元 alpha 时丢弃该片元，默认 0。
+/// `set_alpha_test` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。
+/// `vertex_colors` 默认关闭。着色器仍不读顶点色。
+/// `tone_mapped` 默认打开。色调映射仍对每份绘制过的材质生效。
+/// `alpha_hash` 默认关闭。着色器仍不做哈希透明。
+/// `alpha_to_coverage` 默认关闭。管线仍不打开 alpha to coverage。
+/// `dithering` 默认关闭。着色器仍不对颜色做抖动。
+/// `polygon_offset` 默认关闭，`polygon_offset_factor` 和 `polygon_offset_units` 默认 `0`。管线仍不做多边形偏移。
+/// `clip_shadows` 默认关闭。阴影通道仍不按裁剪平面裁剪。
+/// `clip_intersection` 默认关闭。裁剪仍按并集，渲染器仍没有裁剪平面。
+/// `allow_override` 默认打开。渲染器仍不用场景覆盖材质替换它。
+/// `blend_alpha` 默认 `0`。混合仍不用常量 alpha。
+/// `blend_color` 默认黑色 `(0, 0, 0)`。混合仍不用常量颜色。
+/// `blending` 默认 `Normal`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blend_src` 默认 `SrcAlpha`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blend_dst` 默认 `OneMinusSrcAlpha`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blend_equation` 默认 `Add`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blend_src_alpha` 默认空。空着时 alpha 通道沿用 `blend_src`。管线仍不读这个字段。
+/// `blend_dst_alpha` 默认空。空着时 alpha 通道沿用 `blend_dst`。管线仍不读这个字段。
+/// `blend_equation_alpha` 默认空。空着时 alpha 通道沿用 `blend_equation`。管线仍不读这个字段。
+/// `stencil_write_mask` 默认 `0xFF`。管线仍不读这个字段。
+/// `stencil_func` 默认 `Always`。管线仍不读这个字段。
+/// `stencil_ref` 默认 `0`。管线仍不读这个字段。
+/// `stencil_func_mask` 默认 `0xFF`。管线仍不读这个字段。
+/// `stencil_fail` 默认 `Keep`。比较失败时的模板操作。管线仍不读这个字段。
+/// `stencil_z_fail` 默认 `Keep`。比较通过但深度测试失败时的模板操作。管线仍不读这个字段。
+/// `stencil_z_pass` 默认 `Keep`。比较通过且深度测试通过时的模板操作。管线仍不读这个字段。
+/// `stencil_write` 默认关闭。打开后才对模板缓冲做写入和比较。管线仍不读这个字段。
+/// `clipping_planes` 默认空。世界空间平面，有符号距离为负的点会被裁掉。渲染器仍不按这些平面裁剪。
+/// `precision` 默认空。空着时 Shader 的顶点前缀和片元前缀按 `highp` 写 17 行 `precision`，并加上 `#define HIGH_PRECISION`，这段长 `543`。`mediump` 长 `579`，`lowp` 长 `525`。Raw 不加。管线仍不按这个字段改 WGSL。
+/// `user_data` 默认空表。自定义字符串键值。渲染器仍不读这张表。
+/// `version` 默认 `0`。记录这份材质被标记为需要重新编译的次数。`set_needs_update(true)` 把它加一，`false` 不改计数。渲染器仍不读这个计数。
+/// `id` 从 `0` 起递增。每新建一份基础、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow、Shader 或 Raw 材质取下一个编号。渲染器仍不读这个编号。
+/// `uuid` 在新建时生成，长度 36，版本位是 4。渲染器仍不读这个字符串。
+/// `name` 默认空字符串。Shader 的顶点前缀和片元前缀写 `#define SHADER_NAME ` 加上这个名字。空名字这行长 `21`。名字 `Cube` 时多 `4`，这行变成 `25`。Raw 不加。渲染器仍不读这个名字去做别的事。
+/// `type_name` 对应上游 `type`。基础材质是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`，Shader 是 `ShaderMaterial`，Raw 是 `RawShaderMaterial`。Shader 的顶点前缀和片元前缀写 `#define SHADER_TYPE ShaderMaterial`。渲染器仍不拿它选 WGSL。
+/// `is_mesh_physical_material` 对应上游只读标记。Basic、Lambert、Standard 是 `false`。`Material::physical` 是 `true`。`copy` 不改这个标记，也不改 `kind`。渲染器仍按 Standard 着色。
+/// `is_mesh_toon_material` 对应上游只读标记。Basic、Lambert、Standard、Physical 是 `false`。`Material::toon` 是 `true`，`defines` 只有 `TOON` 对空字符串。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Lambert 着色。
+/// `is_mesh_matcap_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon 是 `false`。`Material::matcap` 是 `true`，`defines` 只有 `MATCAP` 对空字符串。`copy` 不改这个标记，也不改 `kind`，但会把目标的 `defines` 重写成这张表。渲染器仍按 Basic 着色。
+/// `is_mesh_normal_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap 是 `false`。`Material::normal` 是 `true`，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
+/// `is_mesh_depth_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal 是 `false`。`Material::depth` 是 `true`，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
+/// `depth_packing` 默认 `Basic`，整数 `3200`。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth 都存这个字段。`copy` 把值写进目标。渲染器仍不按这个方式打包深度。
+/// `is_mesh_distance_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth 是 `false`。`Material::distance` 是 `true`，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
+/// `is_mesh_phong_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance 是 `false`。`Material::phong` 是 `true`，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Lambert 着色。
+/// `specular` 默认 `0x111111`。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong 都存这份 Phong 高光颜色，和物理材质的 `specular_color` 分开。`copy` 写进目标自己的颜色对象。渲染器仍不用它做高光。
+/// `shininess` 默认 `30`。数值越大，Phong 高光越集中。这些材质都存这个字段。`copy` 把值写进目标。渲染器仍不用它做高光。
+/// `is_shadow_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong 是 `false`。`Material::shadow` 是 `true`，颜色默认黑，`transparent` 默认打开，`fog` 默认打开，`defines` 保持空表。`copy` 不改这个标记，也不改 `kind` 和这张表。渲染器仍按 Basic 着色。
+/// `is_shader_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow 是 `false`。`Material::shader` 与 `Material::raw` 是 `true`。Shader 的 `type_name` 是 `ShaderMaterial`，Raw 的 `type_name` 是 `RawShaderMaterial`。`defines` 保持空表，`fog` 默认关闭。`copy` 不改这个标记，也不改 `kind`，但会把源的 `defines` 复制成一张新表，并把 `fog` 写进目标。渲染器仍按 Basic 着色，场景雾只在这个开关打开时混入。
+/// `is_raw_shader_material` 对应上游只读标记。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow、Shader 是 `false`。`Material::raw` 是 `true`，同时 `is_shader_material` 也是 `true`。`copy` 不改这个标记，也不改 `kind`。渲染器仍按 Basic 着色。`prefixed_vertex_shader` 在 Shader 前先写 `#version 300 es`，再写 `68` 个字符的顶点 GLSL3 改写，再加这段长 `833` 的内置 uniform 和 attribute，Raw 原样返回。`prefixed_fragment_shader` 同样以这 16 个字符开头，再写 GLSL3 宏，空版本是 `464` 个字符，再加长 `82` 的内置 uniform，Raw 原样返回。
+/// `lights` 默认关闭。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow、Shader、Raw 都存这个字段。`copy` 只在目标是 Shader 或 Raw 时把源的值写进去，其它目标留着自己的值。渲染器仍不按它传入光照。
+/// `clipping` 默认关闭。这些材质都存这个开关，和 `clipping_planes` 分开。`copy` 只在目标是 Shader 或 Raw 时把源的值写进去，其它目标留着自己的值。渲染器仍不按它传入裁剪平面。
+/// `vertex_shader` 在 Shader 和 Raw 上是默认顶点着色器，正文以换行开头，接着 `void main()`，用制表符缩进 `gl_Position`。其它材质存空字符串。`copy` 只在目标是 Shader 或 Raw 时把源的字符串写进去。渲染器仍不编译这串代码。
+/// `fragment_shader` 在 Shader 和 Raw 上是默认片元着色器，正文以换行开头，接着 `void main()`，用制表符缩进 `gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );`。其它材质存空字符串。`copy` 只在目标是 Shader 或 Raw 时把源的字符串写进去。渲染器仍不编译这串代码。
+/// `uniforms` 默认空表。键是 uniform 名字，值是它的数字 `value`。Basic、Lambert、Standard、Physical、Toon、Matcap、Normal、Depth、Distance、Phong、Shadow、Shader、Raw 都存这张表。`copy` 只在目标是 Shader 或 Raw 时把源表复制成一张新表，目标上多出来的键丢掉，改这张新表不改源。颜色、向量、数组和贴图仍不在这张表里。渲染器仍不把这些数传给着色器。
+/// `uniforms_groups` 默认空数组。每一组有自己的 `id`、`name` 和 `usage`，`usage` 默认 `35044`，组里的 `uniforms` 默认空，只存数字。`copy` 只在目标是 Shader 或 Raw 时换成一组新对象，每组拿新的 `id`，名字、`usage` 和这串数字跟着走，数字数组是新的一份，改副本不改源。颜色、向量、数组和贴图仍不进组。渲染器仍不把这些组收成 UBO。
+/// `default_attribute_values` 在 Shader 和 Raw 上有三组数：`color` 是 `[1, 1, 1]`，`uv` 和 `uv1` 是 `[0, 0]`。其它网格材质是空表。`copy` 只在目标是 Shader 或 Raw 时换成一张新表，每个数组也是新的一份，目标上多出来的键丢掉，改副本里的数不改源。渲染器仍不把这些数填进缺失的顶点属性。
+/// `glsl_version` 默认空。`GLSL1` 的版本串是 `100`，`GLSL3` 是 `300 es`。这些网格材质都存这个字段。`copy` 只在目标是 Shader 或 Raw 时把源的值写进去。Shader 的 `prefixed_fragment_shader` 在空值和 `GLSL1` 时写上 `layout(location = 0)` 与 `gl_FragColor`，`GLSL3` 时这两行留空。Shader 的两段前缀固定以 `#version 300 es` 开头，不读这个字段。Raw 仍不写 `#version`。
+/// `index0_attribute_name` 默认空。设了名字之后，上游会把通用顶点属性 0 绑到这个名字。这些网格材质都存这个字段。`copy` 只在目标是 Shader 或 Raw 时把源的字符串写进去，改目标不改源。渲染器仍不调用 `bindAttribLocation`。
+/// `uniforms_need_update` 默认关闭。打开后，上游会在 `onBeforeRender` 里改 uniform 时强制刷新。这些网格材质都存这个开关。`copy` 只在目标是 Shader 或 Raw 时把源的值写进去。渲染器仍不按它强制上传 uniform。
+/// `gradient_map` 默认空。Toon 用它做色阶。Basic、Lambert、Standard、Physical 也存这个字段。`copy` 沿用源对象。渲染器仍不采样这张贴图。
+/// `matcap` 默认空。Basic、Lambert、Standard、Physical、Toon 都存这个字段。`copy` 沿用源对象。渲染器仍不采样这张贴图。
+/// `listeners` 默认空表。同一种事件里，同一个函数只保留一次。`copy` 不改目标上的这张表。渲染器仍不读它。
+/// `emissive` 默认黑色。Lambert 和 Standard 在光照之后加上它，Basic 不用。
+/// `emissive_intensity` 默认 1，写入 uniform 时乘在自发光上。`0` 会把它写成黑。
+/// `emissive_map` 再乘一次。没有贴图时渲染器绑一张白纹理。
+/// `roughness_map` 只进 Standard：绿色通道乘在粗糙度上，再取 0.0525 下限。没有贴图时同样绑白纹理。
+/// `metalness_map` 也只进 Standard：蓝色通道乘在金属度上，再夹到 0 和 1。没有贴图时绑白纹理。
+/// `alpha_map` 的绿色通道乘在片元 alpha 上，乘完再做 `alpha_test`。Basic、Lambert、Standard 都采样。没有贴图时绑白纹理。
+/// `normal_map` 默认空。Lambert 与 Standard 存这张切线空间法线贴图。`copy` 沿用源对象。Basic 也有这个字段。渲染器仍不采样它。
+/// `normal_map_type` 默认切线空间，整数 `0`。物体空间是 `1`。Lambert 与 Standard 存这个类型。`copy` 沿用源对象。Basic 也有这个字段。渲染器仍不按它采样法线贴图。
+/// `normal_scale` 默认 `(1, 1)`。Lambert 与 Standard 用它缩放法线贴图。`copy` 写进目标自己的向量。Basic 也有这个字段。渲染器仍不采样法线贴图。
+/// `displacement_map` 默认空。Lambert 与 Standard 存这张顶点位移贴图。`copy` 沿用源对象。Basic 也有这个字段。渲染器仍不按它移动顶点。
+/// `displacement_scale` 默认 `1`。Lambert 与 Standard 用它缩放位移贴图。`copy` 沿用源数值。Basic 也有这个字段。渲染器仍不按它移动顶点。
+/// `displacement_bias` 默认 `0`。Lambert 与 Standard 把它加在缩放后的位移上。`copy` 沿用源数值。Basic 也有这个字段。渲染器仍不按它移动顶点。
+/// `specular_map` 默认空。Lambert 存这张高光贴图。`copy` 沿用源对象。Basic 与 Standard 也有这个字段。渲染器仍不采样它。
+/// `env_map` 默认空。Basic、Lambert、Standard 都存这张环境贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `env_map_rotation` 默认 `(0, 0, 0)`，顺序 `XYZ`。Basic、Lambert、Standard 用它旋转环境贴图。`copy` 写进目标自己的欧拉角。渲染器仍不采样环境贴图。
+/// `combine` 默认相乘，整数 `0`。混合是 `1`，相加是 `2`。Basic 与 Lambert 用它把表面颜色和环境贴图合在一起。`copy` 沿用源值。Standard 也有这个字段。渲染器仍不采样环境贴图。
+/// `reflectivity` 默认 `1`。Basic 与 Lambert 在 `combine` 为混合时用它决定环境贴图的比重。`copy` 沿用源数值。Standard 也有这个字段。渲染器仍不采样环境贴图。
+/// `env_map_intensity` 默认 `1`。Lambert 与 Standard 用它乘环境贴图的颜色。`copy` 沿用源数值。Basic 也有这个字段。渲染器仍不采样环境贴图。
+/// `refraction_ratio` 默认 `0.98`。Basic 与 Lambert 存空气折射率与材质折射率的比。`copy` 沿用源数值。Standard 也有这个字段。渲染器仍不按它做折射。
+/// `light_map` 默认空。Basic、Lambert、Standard 都存这张光照贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `light_map_intensity` 默认 `1`。Basic、Lambert、Standard 用它乘光照贴图。`copy` 沿用源数值。渲染器仍不采样光照贴图。
+/// `ao_map` 默认空。Basic、Lambert、Standard 都存这张环境光遮蔽贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `ao_map_intensity` 默认 `1`。Basic、Lambert、Standard 用它乘环境光遮蔽。`copy` 沿用源数值。渲染器仍不采样环境光遮蔽贴图。
+/// `bump_map` 默认空。Lambert 与 Standard 存这张凹凸贴图。`copy` 沿用源对象。Basic 也有这个字段。渲染器仍不采样它。
+/// `bump_scale` 默认 `1`。Lambert 与 Standard 用它缩放凹凸贴图。`copy` 沿用源数值。Basic 也有这个字段。渲染器仍不采样凹凸贴图。
+/// `wireframe_linewidth` 默认 `1`。Basic、Lambert、Standard 存线框宽度。`copy` 沿用源数值。渲染器仍按 1 像素画线框。
+/// `linewidth` 默认 `1`。它和 `wireframe_linewidth` 分开，表示线宽。这些网格材质都存这个字段。`copy` 不写它，目标留着自己的值，所以克隆出来仍是 `1`。渲染器仍按 1 像素画线。
+/// `wireframe_linecap` 默认圆角。斜角和尖角一并存储。Basic、Lambert、Standard 存线框端点。`copy` 沿用源值。渲染器仍按 1 像素画线框。
+/// `wireframe_linejoin` 默认圆角。斜角和尖角一并存储。Basic、Lambert、Standard 存线框拐角。`copy` 沿用源值。渲染器仍按 1 像素画线框。
+/// `defines` 默认空。Standard 新建以及 `copy` 到 Standard 时写成只有 `STANDARD` 对空字符串。Physical 新建以及 `copy` 到 Physical 时写成 `STANDARD` 和 `PHYSICAL` 都对空字符串。Matcap 新建以及 `copy` 到 Matcap 时写成只有 `MATCAP` 对空字符串。源上改过的键不跟着走。Toon 新建时写成只有 `TOON` 对空字符串，`copy` 留着目标上的这张表。Normal、Depth、Distance、Phong 与 Shadow 新建时表是空的，`copy` 也留着目标上的这张表。Shader 与 Raw 新建时表是空的，`copy` 到 Shader 或 Raw 时把源表复制成一张新表，目标上多出来的键丢掉，改这张新表不改源。Basic 与 Lambert 的表也留在目标上。Shader 的顶点前缀和片元前缀在表非空时把每个键写成一行 `#define 键 值`。`FOO` 对 `1` 增加 `14` 个字符。空表不加字符。Raw 不加。渲染器仍不读这张表去做别的事。
+/// `anisotropy_rotation` 默认 `0`。上游注释写默认 `1`，赋值是 `0`。Basic、Lambert、Standard 一并存储。`copy` 沿用源数值。渲染器仍不旋转各向异性。
+/// `anisotropy_map` 默认空。Basic、Lambert、Standard 都存这张各向异性贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `clearcoat_map` 默认空。Basic、Lambert、Standard 都存这张清漆贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `clearcoat_roughness` 默认 `0`。Basic、Lambert、Standard 用它表示清漆层的粗糙度。`copy` 沿用源数值。渲染器仍不画清漆。
+/// `clearcoat_roughness_map` 默认空。Basic、Lambert、Standard 都存这张清漆粗糙度贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `clearcoat_normal_scale` 默认 `(1, 1)`。Basic、Lambert、Standard 用它缩放清漆法线贴图。`copy` 写进目标自己的向量。渲染器仍不采样清漆法线。
+/// `clearcoat_normal_map` 默认空。Basic、Lambert、Standard 都存这张清漆法线贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `ior` 默认 `1.5`。Basic、Lambert、Standard 用它表示非金属的折射率。`copy` 沿用源数值。渲染器仍不按它算反射率。
+/// `iridescence_map` 默认空。Basic、Lambert、Standard 都存这张彩虹贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `iridescence_ior` 默认 `1.3`。Basic、Lambert、Standard 用它表示彩虹层的折射率。`copy` 沿用源数值。渲染器仍不算彩虹。
+/// `iridescence_thickness_range` 默认 `[100, 400]`。Basic、Lambert、Standard 用它表示彩虹层的最小和最大厚度。`copy` 复制成一张新数组。渲染器仍不算彩虹。
+/// `iridescence_thickness_map` 默认空。Basic、Lambert、Standard 都存这张彩虹厚度贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `sheen_color` 默认黑色。Basic、Lambert、Standard 用它表示光泽颜色。`copy` 写进目标自己的颜色。渲染器仍不算光泽。
+/// `sheen_color_map` 默认空。Basic、Lambert、Standard 都存这张光泽颜色贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `sheen_roughness` 默认 `1`。Basic、Lambert、Standard 用它表示光泽层的粗糙度。`copy` 沿用源数值。渲染器仍不算光泽。
+/// `sheen_roughness_map` 默认空。Basic、Lambert、Standard 都存这张光泽粗糙度贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `transmission_map` 默认空。Basic、Lambert、Standard 都存这张透射贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `thickness` 默认 `0`。Basic、Lambert、Standard 用它表示表面下体积的厚度，`0` 表示薄壁。`copy` 沿用源数值。渲染器仍不算透射。
+/// `thickness_map` 默认空。Basic、Lambert、Standard 都存这张厚度贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `attenuation_distance` 默认正无穷。Basic、Lambert、Standard 用它表示光在介质里走到下一次相互作用的平均距离。`copy` 沿用源数值。渲染器仍不算衰减。
+/// `attenuation_color` 默认白色。Basic、Lambert、Standard 用它表示光走到衰减距离时变成的颜色。`copy` 写进目标自己的颜色。渲染器仍不算衰减。
+/// `specular_intensity` 默认 `1`。Basic、Lambert、Standard 用它缩放非金属的高光强度。`copy` 沿用源数值。渲染器仍不按它调高光。
+/// `specular_intensity_map` 默认空。Basic、Lambert、Standard 都存这张高光强度贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `specular_color` 默认白色。Basic、Lambert、Standard 用它给非金属的正向高光着色。`copy` 写进目标自己的颜色。渲染器仍不按它调高光。
+/// `specular_color_map` 默认空。Basic、Lambert、Standard 都存这张高光颜色贴图。`copy` 沿用源对象。渲染器仍不采样它。
+/// `anisotropy` 默认 `0`。Basic、Lambert、Standard 用它表示各向异性强度。`set_anisotropy` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不画各向异性。
+/// `clearcoat` 默认 `0`。Basic、Lambert、Standard 用它表示清漆层强度。`set_clearcoat` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不画清漆。
+/// `iridescence` 默认 `0`。Basic、Lambert、Standard 用它表示彩虹层强度。`set_iridescence` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不算彩虹。
+/// `dispersion` 默认 `0`。Basic、Lambert、Standard 用它表示透射色散强度。`set_dispersion` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不算色散。
+/// `retroreflectivity` 默认 `0`。Basic、Lambert、Standard 用它表示逆反射强度。`set_retroreflectivity` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不算逆反射。
+/// `sheen` 默认 `0`。Basic、Lambert、Standard 用它表示光泽层强度。`set_sheen` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不算光泽。
+/// `transmission` 默认 `0`。Basic、Lambert、Standard 用它表示透射强度。`set_transmission` 在新值和旧值是否大于 `0` 发生变化时把 `version` 加一。`copy` 经这个写入。渲染器仍不算透射。
+/// `flat_shading` 默认关闭。打开后 Lambert 和 Standard 忽略顶点法线，改用视图空间位置的屏幕导数。
+/// `depth_write` 默认打开。关掉后颜色通道不写深度，阴影通道仍写深度。
+/// `depth_test` 默认打开。关掉后比较改为 `always`，片段始终通过深度测试。`depth_write` 不跟着关。阴影通道仍用 `less` 并写深度。
+/// `depth_func` 默认 `LessEqual`。只在 `depth_test` 打开时决定颜色通道的比较函数。点材质和线材质用同一组字段。
+/// `color_write` 默认打开。关掉后颜色通道不写颜色，深度测试和深度写入不变。阴影通道没有颜色目标。
+/// `premultiplied_alpha` 默认关闭。打开后透明混合的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。不透明绘制没有混合，这个开关不起作用。
+/// `shadow_side` 默认空。空着时阴影通道把正面翻成背面、背面翻成正面，双面保持双面。设了值就按那个面投射，不再翻转。
+/// `visible` 默认打开。关掉后这个材质不进颜色列表，也不进阴影列表。节点的 `visible` 仍然单独决定整棵子树。
+/// `force_single_pass` 默认关闭。透明且双面时，先画背面再画正面。打开后这两次合成一次双面绘制。不透明双面本来就是一次。Shader 新建时打开，其它网格材质仍关闭。`copy` 把值写进目标。
+/// `extensions` 的 `clip_cull_distance` 和 `multi_draw` 默认关闭。这些网格材质都存这两个开关。`copy` 只在目标是 Shader 或 Raw 时把源的两个值写进一份新记录，改目标不改源。Shader 的 `prefixed_vertex_shader` 在 `clip_cull_distance` 打开时多 `48` 个字符，在 `multi_draw` 打开时多 `40` 个字符。渲染器仍不打开这两个 WebGL 扩展。
+/// 改 `side`、`shadow_side`、`visible`、`force_single_pass`、`alpha_test`、`flat_shading`、`depth_write`、`depth_test`、`depth_func`、`color_write`、`premultiplied_alpha`、`emissive_intensity`、`emissive_map`、`roughness_map`、`metalness_map`、`alpha_map` 或换一份 `emissive` 之后，网格需要调用 `Mesh::refresh` 才能写回节点。
+/// r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19 ; `vertexColors` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L99 ; `toneMapped` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L458 ; `alphaHash` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L135 ; `alphaToCoverage` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L409 ; `dithering` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L399 ; `polygonOffset` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L375 ; `polygonOffsetFactor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L383 ; `polygonOffsetUnits` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L391 ; `clipShadows` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L329 ; `clipIntersection` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L320 ; `allowOverride` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L439 ; `blendAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L203 ; `blendColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L193 ; `blending` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L80 ; `blendSrc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L143 ; `blendDst` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L151 ; `blendEquation` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L159 ; `blendSrcAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L167 ; `blendDstAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L175 ; `blendEquationAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L183 ; `stencilWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L239 ; `stencilFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L247 ; `stencilRef` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L255 ; `stencilFuncMask` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L263 ; `stencilFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L271 ; `stencilZFail` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L280 ; `stencilZPass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L289 ; `stencilWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L299 ; `clippingPlanes` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L311 ; `precision` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L361 ; `userData` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L466 ; `version` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L475 ; `id` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L44 ; `uuid` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L52 ; `name` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L59 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L38 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L48 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L65 ; `depthFunc` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L211 ; `depthTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L220 ; `depthWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L231 ; `colorWrite` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L353 ; `premultipliedAlpha` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L417 ; `shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L342 ; `visible` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L447 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L431 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; `_getDepthCompare` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L948 ; `_getColorWriteMask` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L935 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L130 ; `emissiveIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L170 ; `roughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L288 ; `metalnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L300 ; `alphaMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L133 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L182 ; `normalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L222 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L190 ; `normalMapType` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L230 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L198 ; `normalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L238 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L216 ; `displacementMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L256 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L226 ; `displacementScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L266 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L236 ; `displacementBias` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L276 ; `specularMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L248 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L146 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L279 ; `envMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L332 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L154 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L287 ; `envMapRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L340 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L165 ; `combine` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L298 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L174 ; `reflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L307 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L315 ; `envMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L348 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L185 ; `refractionRatio` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L326 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L73 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L83 ; `lightMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L123 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L81 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L91 ; `lightMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L131 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L93 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L103 ; `aoMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L143 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L103 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L113 ; `aoMapIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L153 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L158 ; `bumpMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L198 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L166 ; `bumpScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L206 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L203 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L344 ; `wireframeLinewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L366 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L213 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L354 ; `wireframeLinecap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L376 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L223 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L364 ; `wireframeLinejoin` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L386 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L67 ; `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L75 ; `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L88 ; `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L100 ; `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L108 ; `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L120 ; `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L129 ; `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L140 ; `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L148 ; `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L184 ; `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L193 ; `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L202 ; `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L217 ; `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L225 ; `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L238 ; `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L246 ; `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L258 ; `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L270 ; `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L280 ; `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L292 ; `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L302 ; `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L311 ; `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L320 ; `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L332 ; `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L340 ; `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L353 ; `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L373 ; `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L399 ; `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L423 ; `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L449 ; `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L476 ; `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L500 ; `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L530 ; `isMeshPhysicalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L56 ; `isMeshToonMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L34 ; `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L73 ; `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L66 ; `isMeshMatcapMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L40 ; `isMeshNormalMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L33 ; `isMeshDepthMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L33 ; `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L43 ; `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36 ; `isMeshPhongMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L44 ; `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L63 ; `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L71 ; `isShadowMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L44 ; `isShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L67 ; `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L288 ; `fog` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L186 ; `lights` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L195 ; `clipping` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L204 ; `vertexShader` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L127 ; `fragmentShader` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L134 ; `uniforms` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L113 ; `uniformsGroups` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L120 ; `linewidth` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L145 ; `forceSinglePass` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L212 ; `extensions` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L222 ; `defaultAttributeValues` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L238 ; `glslVersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L268 ; `index0AttributeName` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L251 ; `uniformsNeedUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L260 ; `flatShading` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L372 ; `RawShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L12 ; `isRawShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L34 ; `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L36
+pub(all) struct Material {
+  color : @math.Color
+  mut side : @constants.Side
+  mut shadow_side : @constants.Side?
+  mut opacity : Double
+  mut transparent : Bool
+  mut wireframe : Bool
+  mut map : @textures.Texture?
+  mut roughness : Double
+  mut metalness : Double
+  mut fog : Bool
+  mut lights : Bool
+  mut clipping : Bool
+  mut vertex_shader : String
+  mut fragment_shader : String
+  mut uniforms : Map[String, Double]
+  mut uniforms_groups : Array[UniformsGroup]
+  mut default_attribute_values : Map[String, Array[Double]]
+  mut glsl_version : GlslVersion?
+  mut index0_attribute_name : String?
+  mut uniforms_need_update : Bool
+  mut alpha_test : Double
+  mut flat_shading : Bool
+  mut depth_write : Bool
+  mut depth_test : Bool
+  mut depth_func : @constants.DepthFunc
+  mut color_write : Bool
+  mut premultiplied_alpha : Bool
+  mut visible : Bool
+  mut force_single_pass : Bool
+  mut extensions : ShaderExtensions
+  emissive : @math.Color
+  mut emissive_intensity : Double
+  mut emissive_map : @textures.Texture?
+  mut roughness_map : @textures.Texture?
+  mut metalness_map : @textures.Texture?
+  mut alpha_map : @textures.Texture?
+  mut normal_map : @textures.Texture?
+  mut normal_map_type : @constants.NormalMapType
+  normal_scale : @math.Vector2
+  mut displacement_map : @textures.Texture?
+  mut displacement_scale : Double
+  mut displacement_bias : Double
+  mut specular_map : @textures.Texture?
+  mut env_map : @textures.Texture?
+  env_map_rotation : @math.Euler
+  mut combine : @constants.Combine
+  mut reflectivity : Double
+  mut env_map_intensity : Double
+  mut refraction_ratio : Double
+  mut light_map : @textures.Texture?
+  mut light_map_intensity : Double
+  mut ao_map : @textures.Texture?
+  mut ao_map_intensity : Double
+  mut bump_map : @textures.Texture?
+  mut gradient_map : @textures.Texture?
+  mut matcap : @textures.Texture?
+  mut bump_scale : Double
+  mut wireframe_linewidth : Double
+  mut linewidth : Double
+  mut wireframe_linecap : WireframeCap
+  mut wireframe_linejoin : WireframeJoin
+  mut defines : Map[String, String]
+  mut anisotropy_rotation : Double
+  mut anisotropy_map : @textures.Texture?
+  mut clearcoat_map : @textures.Texture?
+  mut clearcoat_roughness : Double
+  mut clearcoat_roughness_map : @textures.Texture?
+  clearcoat_normal_scale : @math.Vector2
+  mut clearcoat_normal_map : @textures.Texture?
+  mut ior : Double
+  mut iridescence_map : @textures.Texture?
+  mut iridescence_ior : Double
+  mut iridescence_thickness_range : Array[Double]
+  mut iridescence_thickness_map : @textures.Texture?
+  sheen_color : @math.Color
+  specular : @math.Color
+  mut shininess : Double
+  mut sheen_color_map : @textures.Texture?
+  mut sheen_roughness : Double
+  mut sheen_roughness_map : @textures.Texture?
+  mut transmission_map : @textures.Texture?
+  mut thickness : Double
+  mut thickness_map : @textures.Texture?
+  mut attenuation_distance : Double
+  attenuation_color : @math.Color
+  mut specular_intensity : Double
+  mut specular_intensity_map : @textures.Texture?
+  specular_color : @math.Color
+  mut specular_color_map : @textures.Texture?
+  mut anisotropy : Double
+  mut clearcoat : Double
+  mut iridescence : Double
+  mut dispersion : Double
+  mut retroreflectivity : Double
+  mut sheen : Double
+  mut transmission : Double
+  is_mesh_physical_material : Bool
+  is_mesh_toon_material : Bool
+  is_mesh_matcap_material : Bool
+  is_mesh_normal_material : Bool
+  is_mesh_depth_material : Bool
+  mut depth_packing : @constants.DepthPacking
+  is_mesh_distance_material : Bool
+  is_mesh_phong_material : Bool
+  is_shadow_material : Bool
+  is_shader_material : Bool
+  is_raw_shader_material : Bool
+  mut vertex_colors : Bool
+  mut tone_mapped : Bool
+  mut alpha_hash : Bool
+  mut alpha_to_coverage : Bool
+  mut dithering : Bool
+  mut polygon_offset : Bool
+  mut polygon_offset_factor : Double
+  mut polygon_offset_units : Double
+  mut clip_shadows : Bool
+  mut clip_intersection : Bool
+  mut allow_override : Bool
+  mut blend_alpha : Double
+  blend_color : @math.Color
+  mut blending : @constants.Blending
+  mut blend_src : @constants.BlendFactor
+  mut blend_dst : @constants.BlendFactor
+  mut blend_equation : @constants.BlendEquation
+  mut blend_src_alpha : @constants.BlendFactor?
+  mut blend_dst_alpha : @constants.BlendFactor?
+  mut blend_equation_alpha : @constants.BlendEquation?
+  mut stencil_write_mask : Int
+  mut stencil_func : @constants.StencilFunc
+  mut stencil_ref : Int
+  mut stencil_func_mask : Int
+  mut stencil_fail : @constants.StencilOp
+  mut stencil_z_fail : @constants.StencilOp
+  mut stencil_z_pass : @constants.StencilOp
+  mut stencil_write : Bool
+  mut clipping_planes : Array[@math.Plane]?
+  mut precision : @constants.Precision?
+  mut user_data : Map[String, String]
+  mut version : Int
+  id : Int
+  mut uuid : String
+  mut name : String
+  type_name : String
+  kind : MaterialKind
+  listeners : Map[String, Array[() -> Unit]]
+}
+
+///|
+pub fn Material::shading(self : Material) -> @constants.Shading {
+  match self.kind {
+    Basic => @constants.Basic
+    Lambert => @constants.Lambert
+    Standard => @constants.Standard
+    Physical => @constants.Standard
+    Toon => @constants.Lambert
+    Matcap => @constants.Basic
+    Normal => @constants.Basic
+    Depth => @constants.Basic
+    Distance => @constants.Basic
+    Phong => @constants.Lambert
+    Shadow => @constants.Basic
+    Shader => @constants.Basic
+    Raw => @constants.Basic
+  }
+}
+
+///|
+/// 传入 `true` 时把 `version` 加一。传入 `false` 时计数不变。渲染器仍不因这次标记重新编译。
+/// r186: `needsUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1227
+pub fn Material::set_needs_update(self : Material, value : Bool) -> Unit {
+  if value {
+    self.version = self.version + 1
+  }
+}
+
+///|
+/// 写入 `alpha_test`。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L495
+pub fn Material::set_alpha_test(self : Material, value : Double) -> Unit {
+  if (self.alpha_test > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.alpha_test = value
+}
+
+///|
+/// 写入各向异性强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L379
+pub fn Material::set_anisotropy(self : Material, value : Double) -> Unit {
+  if (self.anisotropy > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.anisotropy = value
+}
+
+///|
+/// 写入清漆层强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L405
+pub fn Material::set_clearcoat(self : Material, value : Double) -> Unit {
+  if (self.clearcoat > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.clearcoat = value
+}
+
+///|
+/// 写入彩虹层强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L429
+pub fn Material::set_iridescence(self : Material, value : Double) -> Unit {
+  if (self.iridescence > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.iridescence = value
+}
+
+///|
+/// 写入透射色散强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L455
+pub fn Material::set_dispersion(self : Material, value : Double) -> Unit {
+  if (self.dispersion > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.dispersion = value
+}
+
+///|
+/// 写入逆反射强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L482
+pub fn Material::set_retroreflectivity(self : Material, value : Double) -> Unit {
+  if (self.retroreflectivity > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.retroreflectivity = value
+}
+
+///|
+/// 写入光泽层强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L506
+pub fn Material::set_sheen(self : Material, value : Double) -> Unit {
+  if (self.sheen > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.sheen = value
+}
+
+///|
+/// 写入透射强度。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
+/// r186: `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L536
+pub fn Material::set_transmission(self : Material, value : Double) -> Unit {
+  if (self.transmission > 0.0) != (value > 0.0) {
+    self.version = self.version + 1
+  }
+  self.transmission = value
+}
+
+///|
+fn fresh_iridescence_thickness_range() -> Array[Double] {
+  [100.0, 400.0]
+}
+
+///|
+/// 把厚度范围复制成一张新数组。改目标里的数不会改到源。
+fn copied_doubles(source : Array[Double]) -> Array[Double] {
+  let copied : Array[Double] = []
+  for value in source {
+    copied.push(value)
+  }
+  copied
+}
+
+///|
+/// 着色器材质缺省的顶点属性。`color` 是 `[1, 1, 1]`，`uv` 和 `uv1` 是 `[0, 0]`。
+/// r186: `defaultAttributeValues` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L238
+fn fresh_default_attribute_values() -> Map[String, Array[Double]] {
+  let values : Map[String, Array[Double]] = Map([])
+  values.set("color", [1.0, 1.0, 1.0])
+  values.set("uv", [0.0, 0.0])
+  values.set("uv1", [0.0, 0.0])
+  values
+}
+
+///|
+/// 把缺省顶点属性复制成一张新表。每个数组也是新的一份。改目标里的数不会改到源。
+/// r186: `defaultAttributeValues` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L301
+fn copied_default_attribute_values(
+  source : Map[String, Array[Double]],
+) -> Map[String, Array[Double]] {
+  let copied : Map[String, Array[Double]] = Map([])
+  for pair in source.iter() {
+    let (key, value) = pair
+    copied.set(key, copied_doubles(value))
+  }
+  copied
+}
+
+///|
+/// Standard 的着色器宏。新建一张表，只有 `STANDARD` 对空字符串。
+fn fresh_standard_defines() -> Map[String, String] {
+  let defines : Map[String, String] = Map([])
+  defines.set("STANDARD", "")
+  defines
+}
+
+///|
+/// Physical 的着色器宏。新建一张表，`STANDARD` 和 `PHYSICAL` 都对空字符串。
+fn fresh_physical_defines() -> Map[String, String] {
+  let defines : Map[String, String] = Map([])
+  defines.set("STANDARD", "")
+  defines.set("PHYSICAL", "")
+  defines
+}
+
+///|
+/// Toon 的着色器宏。新建一张表，只有 `TOON` 对空字符串。
+fn fresh_toon_defines() -> Map[String, String] {
+  let defines : Map[String, String] = Map([])
+  defines.set("TOON", "")
+  defines
+}
+
+///|
+/// Matcap 的着色器宏。新建一张表，只有 `MATCAP` 对空字符串。
+fn fresh_matcap_defines() -> Map[String, String] {
+  let defines : Map[String, String] = Map([])
+  defines.set("MATCAP", "")
+  defines
+}
+
+///|
+/// 把着色器宏复制成一张新表。改目标里的值不会改到源。
+fn copied_defines(source : Map[String, String]) -> Map[String, String] {
+  let copied : Map[String, String] = Map([])
+  for pair in source.iter() {
+    let (key, value) = pair
+    copied.set(key, value)
+  }
+  copied
+}
+
+///|
+/// 把颜色、常量混合色、自发光、光泽颜色、衰减颜色、高光颜色、法线缩放、清漆法线缩放和环境贴图旋转写进目标自己的对象。颜色贴图、透明贴图、法线贴图、`normal_map_type`、位移贴图、高光贴图、环境贴图、光照贴图、环境光遮蔽贴图、凹凸贴图、各向异性贴图、清漆贴图、清漆粗糙度贴图、清漆法线贴图、彩虹贴图、彩虹厚度贴图、光泽颜色贴图、光泽粗糙度贴图、透射贴图、厚度贴图、高光强度贴图、高光颜色贴图、自发光贴图、粗糙度贴图和金属度贴图沿用源对象。
+/// `name`、`side`、`shadow_side`、不透明度、透明开关、线框、`wireframe_linewidth`、留在目标上的 `linewidth`、`wireframe_linecap`、`wireframe_linejoin`、`anisotropy`、`anisotropy_rotation`、`clearcoat`、`clearcoat_roughness`、`dispersion`、`retroreflectivity`、`ior`、`iridescence`、`iridescence_ior`、`iridescence_thickness_range`、`sheen`、`sheen_roughness`、`transmission`、`thickness`、`attenuation_distance`、`specular_intensity`、粗糙度、金属度、`displacement_scale`、`displacement_bias`、`combine`、`reflectivity`、`env_map_intensity`、`refraction_ratio`、`light_map_intensity`、`ao_map_intensity`、`bump_scale`、雾、目标是 Shader 或 Raw 时的 `lights`、`clipping`、`vertex_shader`、`fragment_shader`、`uniforms`、`uniforms_groups`、`extensions`、`default_attribute_values`、`glsl_version`、`index0_attribute_name` 和 `uniforms_need_update`、`flat_shading`、`emissive_intensity`、`alpha_test`、深度、颜色写入、预乘、可见性、`force_single_pass`、顶点色、色调映射、`alpha_hash`、`alpha_to_coverage`、`dithering`、多边形偏移、`clip_shadows`、`clip_intersection`、`allow_override`、`blend_alpha`、`blending`、`blend_src`、`blend_dst`、`blend_equation`、`blend_src_alpha`、`blend_dst_alpha`、`blend_equation_alpha`、`stencil_write_mask`、`stencil_func`、`stencil_ref`、`stencil_func_mask`、`stencil_fail`、`stencil_z_fail`、`stencil_z_pass`、`stencil_write`、`clipping_planes`、`precision` 和 `user_data` 一并复制。`user_data` 复制成一张新表。`iridescence_thickness_range` 复制成一张新数组。`clipping_planes` 沿用源数组。目标是 Standard 时，`defines` 换成一张新表，只有 `STANDARD` 对空字符串。目标是 Physical 时，换成 `STANDARD` 和 `PHYSICAL` 都对空字符串。源表不复制。目标是 Matcap 时，换成只有 `MATCAP` 对空字符串。Basic、Lambert、Toon、Normal、Depth、Distance、Phong 与 Shadow 的 `defines` 留在目标上。目标是 Shader 时，`defines` 换成源表的一张新副本，目标上多出来的键丢掉，改副本不改源。`gradient_map` 和 `matcap` 沿用源对象。`depth_packing` 把值写进目标。`specular` 写进目标自己的颜色对象。`shininess` 把值写进目标。`alpha_test` 经 `set_alpha_test` 写入，`anisotropy` 经 `set_anisotropy` 写入，`clearcoat` 经 `set_clearcoat` 写入，`iridescence` 经 `set_iridescence` 写入，`dispersion` 经 `set_dispersion` 写入，`retroreflectivity` 经 `set_retroreflectivity` 写入，`sheen` 经 `set_sheen` 写入，`transmission` 经 `set_transmission` 写入，穿过 `0` 时目标的 `version` 加一。`id`、`uuid`、`type_name`、`kind`、`listeners` 和其余的 `version` 留在目标上。
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1119
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L237
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L386
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L408
+/// r186: `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L412
+/// r186: `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L552
+/// r186: `gradientMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshToonMaterial.js#L316
+/// r186: `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L235
+/// r186: `matcap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshMatcapMaterial.js#L239
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshNormalMaterial.js#L157
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L135
+/// r186: `depthPacking` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDepthMaterial.js#L139
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L111
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L403
+/// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShadowMaterial.js#L77
+/// r186: `uniformsGroups` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L286
+/// r186: `uniforms` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L285
+/// r186: `fragmentShader` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L282
+/// r186: `vertexShader` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L283
+/// r186: `defines` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L288
+/// r186: `lights` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L294
+/// r186: `clipping` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L295
+/// r186: `extensions` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L297
+/// r186: `glslVersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L299
+/// r186: `defaultAttributeValues` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L301
+/// r186: `index0AttributeName` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L303
+/// r186: `uniformsNeedUpdate` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L305
+/// r186: `anisotropy` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L559
+/// r186: `anisotropyRotation` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L560
+/// r186: `anisotropyMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L561
+/// r186: `clearcoat` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L563
+/// r186: `clearcoatMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L564
+/// r186: `clearcoatRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L565
+/// r186: `clearcoatRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L566
+/// r186: `clearcoatNormalScale` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L568
+/// r186: `clearcoatNormalMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L567
+/// r186: `dispersion` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L570
+/// r186: `ior` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L571
+/// r186: `iridescence` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L573
+/// r186: `iridescenceMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L574
+/// r186: `iridescenceIOR` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L575
+/// r186: `iridescenceThicknessRange` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L576
+/// r186: `iridescenceThicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L577
+/// r186: `retroreflectivity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L579
+/// r186: `sheen` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L581
+/// r186: `sheenColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L582
+/// r186: `sheenColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L583
+/// r186: `sheenRoughness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L584
+/// r186: `sheenRoughnessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L585
+/// r186: `transmission` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L587
+/// r186: `transmissionMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L588
+/// r186: `thickness` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L590
+/// r186: `thicknessMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L591
+/// r186: `attenuationDistance` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L592
+/// r186: `attenuationColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L593
+/// r186: `specularIntensity` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L595
+/// r186: `specularIntensityMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L596
+/// r186: `specularColor` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L597
+/// r186: `specular` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L408
+/// r186: `shininess` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhongMaterial.js#L409
+/// r186: `specularColorMap` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshPhysicalMaterial.js#L598
+pub fn Material::copy(self : Material, source : Material) -> Material {
+  self.name = source.name
+  ignore(self.color.copy(source.color))
+  ignore(self.blend_color.copy(source.blend_color))
+  ignore(self.emissive.copy(source.emissive))
+  ignore(self.normal_scale.copy(source.normal_scale))
+  ignore(self.env_map_rotation.copy(source.env_map_rotation))
+  self.blending = source.blending
+  self.blend_src = source.blend_src
+  self.blend_dst = source.blend_dst
+  self.blend_equation = source.blend_equation
+  self.blend_src_alpha = source.blend_src_alpha
+  self.blend_dst_alpha = source.blend_dst_alpha
+  self.blend_equation_alpha = source.blend_equation_alpha
+  self.stencil_write_mask = source.stencil_write_mask
+  self.stencil_func = source.stencil_func
+  self.stencil_ref = source.stencil_ref
+  self.stencil_func_mask = source.stencil_func_mask
+  self.stencil_fail = source.stencil_fail
+  self.stencil_z_fail = source.stencil_z_fail
+  self.stencil_z_pass = source.stencil_z_pass
+  self.stencil_write = source.stencil_write
+  self.clipping_planes = source.clipping_planes
+  self.precision = source.precision
+  let copied : Map[String, String] = Map([])
+  for pair in source.user_data.iter() {
+    let (key, value) = pair
+    copied.set(key, value)
+  }
+  self.user_data = copied
+  self.map = source.map
+  self.alpha_map = source.alpha_map
+  self.normal_map = source.normal_map
+  self.normal_map_type = source.normal_map_type
+  self.depth_packing = source.depth_packing
+  self.displacement_map = source.displacement_map
+  self.displacement_scale = source.displacement_scale
+  self.displacement_bias = source.displacement_bias
+  self.specular_map = source.specular_map
+  self.env_map = source.env_map
+  self.combine = source.combine
+  self.reflectivity = source.reflectivity
+  self.env_map_intensity = source.env_map_intensity
+  self.refraction_ratio = source.refraction_ratio
+  self.light_map = source.light_map
+  self.light_map_intensity = source.light_map_intensity
+  self.ao_map = source.ao_map
+  self.ao_map_intensity = source.ao_map_intensity
+  self.bump_map = source.bump_map
+  self.gradient_map = source.gradient_map
+  self.matcap = source.matcap
+  self.bump_scale = source.bump_scale
+  self.wireframe_linewidth = source.wireframe_linewidth
+  self.wireframe_linecap = source.wireframe_linecap
+  self.wireframe_linejoin = source.wireframe_linejoin
+  match self.kind {
+    Standard => self.defines = fresh_standard_defines()
+    Physical => self.defines = fresh_physical_defines()
+    Basic => ()
+    Lambert => ()
+    Toon => ()
+    Matcap => self.defines = fresh_matcap_defines()
+    Normal => ()
+    Depth => ()
+    Distance => ()
+    Phong => ()
+    Shadow => ()
+    Shader => self.defines = copied_defines(source.defines)
+    Raw => self.defines = copied_defines(source.defines)
+  }
+  self.set_anisotropy(source.anisotropy)
+  self.anisotropy_rotation = source.anisotropy_rotation
+  self.anisotropy_map = source.anisotropy_map
+  self.set_clearcoat(source.clearcoat)
+  self.clearcoat_map = source.clearcoat_map
+  self.clearcoat_roughness = source.clearcoat_roughness
+  self.clearcoat_roughness_map = source.clearcoat_roughness_map
+  ignore(self.clearcoat_normal_scale.copy(source.clearcoat_normal_scale))
+  self.clearcoat_normal_map = source.clearcoat_normal_map
+  self.set_dispersion(source.dispersion)
+  self.ior = source.ior
+  self.set_iridescence(source.iridescence)
+  self.iridescence_map = source.iridescence_map
+  self.iridescence_ior = source.iridescence_ior
+  self.iridescence_thickness_range = copied_doubles(
+    source.iridescence_thickness_range,
+  )
+  self.iridescence_thickness_map = source.iridescence_thickness_map
+  self.set_retroreflectivity(source.retroreflectivity)
+  self.set_sheen(source.sheen)
+  ignore(self.sheen_color.copy(source.sheen_color))
+  self.sheen_color_map = source.sheen_color_map
+  self.sheen_roughness = source.sheen_roughness
+  self.sheen_roughness_map = source.sheen_roughness_map
+  self.set_transmission(source.transmission)
+  self.transmission_map = source.transmission_map
+  self.thickness = source.thickness
+  self.thickness_map = source.thickness_map
+  self.attenuation_distance = source.attenuation_distance
+  ignore(self.attenuation_color.copy(source.attenuation_color))
+  self.specular_intensity = source.specular_intensity
+  self.specular_intensity_map = source.specular_intensity_map
+  ignore(self.specular_color.copy(source.specular_color))
+  ignore(self.specular.copy(source.specular))
+  self.shininess = source.shininess
+  self.specular_color_map = source.specular_color_map
+  self.emissive_map = source.emissive_map
+  self.roughness_map = source.roughness_map
+  self.metalness_map = source.metalness_map
+  self.side = source.side
+  self.shadow_side = source.shadow_side
+  self.opacity = source.opacity
+  self.set_alpha_test(source.alpha_test)
+  self.transparent = source.transparent
+  self.wireframe = source.wireframe
+  self.roughness = source.roughness
+  self.metalness = source.metalness
+  self.fog = source.fog
+  if self.kind is Shader || self.kind is Raw {
+    self.lights = source.lights
+    self.clipping = source.clipping
+    self.vertex_shader = source.vertex_shader
+    self.fragment_shader = source.fragment_shader
+    self.uniforms = copied_uniforms(source.uniforms)
+    self.uniforms_groups = copied_uniforms_groups(source.uniforms_groups)
+    self.extensions = {
+      clip_cull_distance: source.extensions.clip_cull_distance,
+      multi_draw: source.extensions.multi_draw,
+    }
+    self.default_attribute_values = copied_default_attribute_values(
+      source.default_attribute_values,
+    )
+    self.glsl_version = source.glsl_version
+    self.index0_attribute_name = source.index0_attribute_name
+    self.uniforms_need_update = source.uniforms_need_update
+  }
+  self.flat_shading = source.flat_shading
+  self.emissive_intensity = source.emissive_intensity
+  self.depth_write = source.depth_write
+  self.depth_test = source.depth_test
+  self.depth_func = source.depth_func
+  self.color_write = source.color_write
+  self.premultiplied_alpha = source.premultiplied_alpha
+  self.visible = source.visible
+  self.force_single_pass = source.force_single_pass
+  self.vertex_colors = source.vertex_colors
+  self.tone_mapped = source.tone_mapped
+  self.alpha_hash = source.alpha_hash
+  self.alpha_to_coverage = source.alpha_to_coverage
+  self.dithering = source.dithering
+  self.polygon_offset = source.polygon_offset
+  self.polygon_offset_factor = source.polygon_offset_factor
+  self.polygon_offset_units = source.polygon_offset_units
+  self.clip_shadows = source.clip_shadows
+  self.clip_intersection = source.clip_intersection
+  self.allow_override = source.allow_override
+  self.blend_alpha = source.blend_alpha
+  self
+}
+
+///|
+/// 按 `kind` 新建一份材质，再 `copy`。新材质有自己的 `id` 和 `uuid`。`type_name` 跟着 `kind`：基础是 `MeshBasicMaterial`，Lambert 是 `MeshLambertMaterial`，Standard 是 `MeshStandardMaterial`，Physical 是 `MeshPhysicalMaterial`，Toon 是 `MeshToonMaterial`，Matcap 是 `MeshMatcapMaterial`，Normal 是 `MeshNormalMaterial`，Depth 是 `MeshDepthMaterial`，Distance 是 `MeshDistanceMaterial`，Phong 是 `MeshPhongMaterial`，Shadow 是 `ShadowMaterial`，Shader 是 `ShaderMaterial`，Raw 是 `RawShaderMaterial`。`copy` 不改这三项，也不改 `is_mesh_physical_material`、`is_mesh_toon_material`、`is_mesh_matcap_material`、`is_mesh_normal_material`、`is_mesh_depth_material`、`is_mesh_distance_material`、`is_mesh_phong_material`、`is_shadow_material`、`is_shader_material` 和 `is_raw_shader_material`。`alpha_test` 穿过 `0` 时新材质的 `version` 从 `0` 加一。
+/// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
+pub fn Material::clone(self : Material) -> Material {
+  let created = match self.kind {
+    Basic => Material::basic()
+    Lambert => Material::lambert()
+    Standard => Material::standard()
+    Physical => Material::physical()
+    Toon => Material::toon()
+    Matcap => Material::matcap()
+    Normal => Material::normal()
+    Depth => Material::depth()
+    Distance => Material::distance()
+    Phong => Material::phong()
+    Shadow => Material::shadow()
+    Shader => Material::shader()
+    Raw => Material::raw()
+  }
+  created.copy(self)
+}
+
+///|
+/// 登记一个监听。同一种事件里，同一个函数只保留一次。
+/// r186: `addEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L31
+pub fn Material::add_event_listener(
+  self : Material,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  let listeners = self.listeners.get_or_init(kind, fn() { [] })
+  let mut found = false
+  for existing in listeners {
+    if physical_equal(existing, listener) {
+      found = true
+    }
+  }
+  if !found {
+    listeners.push(listener)
+  }
+}
+
+///|
+/// 同一种事件里是否已经有这个监听。
+/// r186: `hasEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L58
+pub fn Material::has_event_listener(
+  self : Material,
+  kind : String,
+  listener : () -> Unit,
+) -> Bool {
+  match self.listeners.get(kind) {
+    None => false
+    Some(listeners) => {
+      let mut found = false
+      for existing in listeners {
+        if physical_equal(existing, listener) {
+          found = true
+        }
+      }
+      found
+    }
+  }
+}
+
+///|
+/// 从一种事件里移除这个监听。没有登记时不动。
+/// r186: `removeEventListener` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L74
+pub fn Material::remove_event_listener(
+  self : Material,
+  kind : String,
+  listener : () -> Unit,
+) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let mut index = None
+      for i in 0..<listeners.length() {
+        if physical_equal(listeners[i], listener) {
+          index = Some(i)
+        }
+      }
+      match index {
+        None => ()
+        Some(index) => ignore(listeners.remove(index))
+      }
+    }
+  }
+}
+
+///|
+/// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。
+/// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
+pub fn Material::dispatch_event(self : Material, kind : String) -> Unit {
+  match self.listeners.get(kind) {
+    None => ()
+    Some(listeners) => {
+      let snapshot = listeners.copy()
+      for listener in snapshot {
+        listener()
+      }
+    }
+  }
+}
+
+///|
+/// 通知 `dispose` 监听。其它事件不动。渲染器仍不因这次调用释放资源。
+/// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1207
+pub fn Material::dispose(self : Material) -> Unit {
+  self.dispatch_event("dispose")
+}
+

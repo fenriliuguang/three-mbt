@@ -18,6 +18,10 @@ MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](
 - 改完后运行 `moon info && moon fmt`，并查看 `.mbti` 差异。
 - 运行 `moon test`。稳定结果用 `assert_eq`。
 
+## 文件划分
+
+实现按 three.js r186 的源文件切开，而不是把一个包堆进一个 `.mbt`。同一个 `moon.pkg` 目录里可以有多个 `.mbt`，不为此新开包。一个上游类或模块对应一个文件；上游本身就是一个长文件时保持一个 `.mbt`。测试跟这个边界走。生成的 `bindings` 和 `interface` 不拆。细则见 [.cursor/skills/source-layout/SKILL.md](.cursor/skills/source-layout/SKILL.md)。
+
 ## 上游链接
 
 移植 three.js 的实现文件要标注 tag `r186` 的 GitHub 链接。文件首行是 `// r186:`，公开类型和核心函数的声明前是 `/// r186:`。规则见 [.cursor/skills/upstream-links/SKILL.md](.cursor/skills/upstream-links/SKILL.md)。

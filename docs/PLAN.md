@@ -163,6 +163,7 @@ Samples live under `src/examples` because only packages inside the `source` dire
 4. Every phase has a runnable sample. The next phase starts after that sample runs.
 5. This is a semantic port. Upstream files that the port uses are listed in the module checklists under `docs/plan/`.
 6. A ported implementation file carries an `r186` blob link. The first line is `// r186:` and points at the upstream file. Each public type that maps to a class, and each core function whose upstream name is not obvious from that type, has a `/// r186:` line on the declaration. The URL is `https://github.com/mrdoob/three.js/blob/r186/<path>#L<line>`. Tests, examples, ffi, and generated bindings stay unmarked. The comment rules are in `.cursor/skills/upstream-links/SKILL.md`.
+7. Split implementation files the way r186 splits source files. One upstream class or module is one `.mbt` in the existing package directory. A file that is already one upstream unit stays one file, even when that unit is long (`GLTFLoader.js`, `BufferGeometry.js`, `Object3D.js`, `constants.js`). Do not open a new package just to shorten a file. Tests follow the same boundary. The rule is in `.cursor/skills/source-layout/SKILL.md`.
 
 
 ## Where the plan lives
