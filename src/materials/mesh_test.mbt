@@ -11356,6 +11356,60 @@ test "Material shader writes USE_SHEEN" {
 }
 
 ///|
+test "Material shader writes instancing USE_COLOR" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    @materials.program_instancing_color(
+      is_instanced_mesh=true,
+      has_instance_color=true,
+    ),
+    true,
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_fragment_shader(instancing_color=true).length(), 2059)
+  assert_eq(2059 - 2041, 18)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_vertex_shader(instancing_color=true).length(), 1637)
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing_color=true)[683:711].to_owned(),
+    "#define USE_INSTANCING_COLOR",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(instancing_color=true)[1079:1096].to_owned(),
+    "#define USE_COLOR",
+  )
+  shader.vertex_colors = true
+  assert_eq(shader.prefixed_fragment_shader(instancing_color=true).length(), 2059)
+  assert_eq(
+    shader.prefixed_fragment_shader(instancing_color=true)[1079:1096].to_owned(),
+    "#define USE_COLOR",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1626)
+  shader.vertex_colors = false
+  shader.sheen = 1.0
+  assert_eq(shader.prefixed_fragment_shader(instancing_color=true).length(), 2077)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader(instancing_color=true)[1079:1096].to_owned(),
+    "#define USE_SHEEN",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(instancing_color=true)[1097:1114].to_owned(),
+    "#define USE_COLOR",
+  )
+  shader.sheen = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_fragment_shader(instancing_color=true).length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(instancing_color=true), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

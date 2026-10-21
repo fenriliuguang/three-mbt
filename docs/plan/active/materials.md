@@ -552,6 +552,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_SHEEN` has landed. A Shader material writes nothing while `sheen` is `0` or negative. The vertex string stays `1608`. Raising `sheen` above `0` writes `#define USE_SHEEN` and a newline, `18` characters, on the fragment prefix only. The fragment string grows from `2041` to `2059`. A sheen color map keeps `USE_SHEEN_COLORMAP` after it, so the fragment string is `2086` and the vertex string stays `1664`. Setting `sheen` back to `0` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. Instancing `USE_COLOR` stays later.
 
+Instancing `USE_COLOR` has landed. A Shader material writes nothing on the fragment prefix while `vertex_colors` is off and the caller omits `instancing_color`. `program_instancing_color` can be `true` while that prefix still omits the line. Passing `instancing_color` writes `#define USE_COLOR` and a newline, `18` characters, on the fragment prefix only. The fragment string grows from `2041` to `2059`. The vertex string stays `1608`. The vertex prefix still writes `USE_INSTANCING_COLOR` instead of `USE_COLOR`, so that string is `1637`. Turning `vertex_colors` on as well keeps a single fragment `USE_COLOR`, so the fragment string stays `2059` and the vertex string is `1626`. Sheen puts `USE_SHEEN` before it, so the fragment string is `2077`. Omitting `instancing_color` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. Batching `USE_COLOR_ALPHA` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -830,3 +832,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_IRIDESCENCE` | `materials` |
 | planned | 7 | `USE_ALPHATEST` | `materials` |
 | planned | 7 | `USE_SHEEN` | `materials` |
+| planned | 7 | instancing `USE_COLOR` | `materials` |
