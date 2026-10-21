@@ -415,6 +415,7 @@ pub fn Material::program_vertex_shader(Self) -> String?
 pub fn Material::program_vertex_tangents(Self, has_tangent? : Bool) -> Bool
 pub fn Material::program_vertex_uv1s(Self) -> Bool
 pub fn Material::program_vertex_uv2s(Self) -> Bool
+pub fn Material::program_vertex_uv3s(Self) -> Bool
 pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
