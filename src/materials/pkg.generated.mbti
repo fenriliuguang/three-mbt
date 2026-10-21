@@ -310,6 +310,7 @@ pub fn Material::program_clearcoat_normal_map_uv(Self) -> String
 pub fn Material::program_clearcoat_roughness_map(Self) -> Bool
 pub fn Material::program_clearcoat_roughness_map_uv(Self) -> String
 pub fn Material::program_combine(Self) -> @constants.Combine
+pub fn Material::program_custom_program_cache_key(Self, custom_program_cache_key? : String) -> String
 pub fn Material::program_decode_video_texture(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
 pub fn Material::program_decode_video_texture_emissive(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
 pub fn Material::program_defines(Self) -> Map[String, String]

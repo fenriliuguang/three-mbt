@@ -504,6 +504,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `rendererExtensionParallelShaderCompile` has landed. Shader, Raw, and Basic start at `false`. Passing the extension returns `true`. Passing it off returns `false`. A batched mesh with the multi-draw extension does not turn parallel compile on. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `customProgramCacheKey` stays later.
 
+`customProgramCacheKey` has landed. Shader, Raw, and Basic start at `""`. Passing `custom` returns that string. Omitting it returns `""`. Parallel shader compile does not change the key. The vertex prefix stays `1608` and the fragment prefix stays `2041`. `vertexUv1s` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -758,3 +760,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `extensionClipCullDistance` | `materials` |
 | planned | 7 | `extensionMultiDraw` | `materials` |
 | planned | 7 | `rendererExtensionParallelShaderCompile` | `materials` |
+| planned | 7 | `customProgramCacheKey` | `materials` |

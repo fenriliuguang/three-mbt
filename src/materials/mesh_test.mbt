@@ -10044,6 +10044,26 @@ test "Material shader rendererExtensionParallelShaderCompile reads the renderer 
 }
 
 ///|
+test "Material shader customProgramCacheKey reads the caller key" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_custom_program_cache_key(), "")
+  assert_eq(@materials.Material::raw().program_custom_program_cache_key(), "")
+  assert_eq(@materials.Material::basic().program_custom_program_cache_key(), "")
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.program_custom_program_cache_key(custom_program_cache_key="custom"),
+    "custom",
+  )
+  assert_eq(shader.program_custom_program_cache_key(), "")
+  assert_eq(
+    shader.program_renderer_extension_parallel_shader_compile(has_extension=true),
+    true,
+  )
+  assert_eq(shader.program_custom_program_cache_key(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
