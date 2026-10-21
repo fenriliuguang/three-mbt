@@ -11591,6 +11591,49 @@ test "Material shader writes missing-normal USE_MORPHNORMALS" {
 }
 
 ///|
+test "Material shader writes lit flat_shading FLAT_SHADED" {
+  let lambert = @materials.Material::lambert()
+  lambert.flat_shading = true
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define FLAT_SHADED\n")
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "#define FLAT_SHADED\n")
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true).length(), 20)
+  lambert.wireframe = true
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
+  lambert.wireframe = false
+  lambert.anisotropy = 1.0
+  assert_eq(
+    lambert.prefixed_vertex_shader(
+      has_tangent=true,
+      has_morph_normals=true,
+      has_normal=true,
+    ),
+    "#define FLAT_SHADED\n",
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "#define FLAT_SHADED\n")
+  let basic = @materials.Material::basic()
+  basic.flat_shading = true
+  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  let phong = @materials.Material::phong()
+  phong.flat_shading = true
+  assert_eq(phong.prefixed_vertex_shader(has_normal=true).length(), 20)
+  let physical = @materials.Material::physical()
+  physical.flat_shading = true
+  assert_eq(physical.prefixed_fragment_shader(has_normal=true).length(), 20)
+  let shader = @materials.Material::shader()
+  shader.flat_shading = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1628)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2061)
+  let raw = @materials.Material::raw()
+  raw.flat_shading = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
