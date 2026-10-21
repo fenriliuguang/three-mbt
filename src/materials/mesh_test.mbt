@@ -10874,6 +10874,68 @@ test "Material shader writes USE_BATCHING_COLOR" {
 }
 
 ///|
+test "Material shader writes USE_INSTANCING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(@materials.program_instancing(is_instanced_mesh=true), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_vertex_shader(instancing=true).length(), 1631)
+  assert_eq(1631 - 1608, 23)
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing=true)[683:705].to_owned(),
+    "#define USE_INSTANCING",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, instancing=true).length(),
+    1658,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, instancing=true)[683:709]
+      .to_owned(),
+    "#define USE_BATCHING_COLOR",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, instancing=true)[710:732]
+      .to_owned(),
+    "#define USE_INSTANCING",
+  )
+  shader.fog = true
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing=true, has_fog=true).length(),
+    1647,
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing=true, has_fog=true)[683:705].to_owned(),
+    "#define USE_INSTANCING",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing=true, has_fog=true)[706:721].to_owned(),
+    "#define USE_FOG",
+  )
+  shader.fog = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(instancing=true).length(), 1665)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(instancing=true)[706:721].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(instancing=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(instancing=true), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
