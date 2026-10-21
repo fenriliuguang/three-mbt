@@ -518,6 +518,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `FOG_EXP2` has landed. A Shader material with `fog` off adds nothing, even when the scene fog is exponential. Turning `fog` on and passing only exponential fog writes `#define FOG_EXP2` and a newline, `17` characters, on both prefixes. The vertex string grows from `1608` to `1625`. The fragment string grows from `2041` to `2058`. Scene fog without the exponential flag still writes only `USE_FOG`, so those lengths stay `1624` and `2057`. Both together write `USE_FOG` then `FOG_EXP2`, `33` characters. The vertex string is `1641` and the fragment string is `2074`. A color map puts `USE_MAP` after those lines, so the vertex string is `1675` and the fragment string is `2090`. Turning `fog` back off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `ALPHA_TO_COVERAGE` stays later.
 
+`ALPHA_TO_COVERAGE` has landed. A Shader material with `alpha_to_coverage` off adds nothing. Turning it on writes `#define ALPHA_TO_COVERAGE` and a newline, `26` characters, on the fragment prefix only. The same flag drops the `16`-character `OPAQUE` line and adds one newline before the color-space chunk, so the fragment string goes from `2041` to `2052`. The vertex string stays `1608`. Scene fog still writes `USE_FOG` and does not write this line. A color map puts `USE_MAP` after it, so the fragment string is `2068` and the vertex string is `1642`. Turning the flag off returns the fragment string to `2041`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_MATCAP` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -779,3 +781,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `shaderID` | `materials` |
 | planned | 7 | `USE_FOG` | `materials` |
 | planned | 7 | `FOG_EXP2` | `materials` |
+| planned | 7 | `ALPHA_TO_COVERAGE` | `materials` |

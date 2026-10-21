@@ -6655,7 +6655,7 @@ test "Material shader writes OPAQUE" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2026)
   shader.blending = @constants.Normal
   shader.alpha_to_coverage = true
-  assert_eq(shader.prefixed_fragment_shader().length(), 2026)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2052)
   shader.alpha_to_coverage = false
   shader.dithering = true
   assert_eq(shader.prefixed_fragment_shader().length(), 2059)
@@ -10359,6 +10359,54 @@ test "Material shader writes FOG_EXP2" {
   let basic = @materials.Material::basic()
   assert_eq(basic.prefixed_vertex_shader(has_fog=true, fog_exp2=true), "")
   assert_eq(basic.prefixed_fragment_shader(has_fog=true, fog_exp2=true), "")
+}
+
+///|
+test "Material shader writes ALPHA_TO_COVERAGE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.fog = true
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true)[1079:1094].to_owned(),
+    "#define USE_FOG",
+  )
+  shader.fog = false
+  shader.alpha_to_coverage = true
+  assert_eq(shader.program_alpha_to_coverage(), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2052)
+  assert_eq(2052 - 2026, 26)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1104].to_owned(),
+    "#define ALPHA_TO_COVERAGE",
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2068)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1104].to_owned(),
+    "#define ALPHA_TO_COVERAGE",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1105:1120].to_owned(),
+    "#define USE_MAP",
+  )
+  shader.map = None
+  shader.alpha_to_coverage = false
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.alpha_to_coverage = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.alpha_to_coverage = true
+  assert_eq(basic.prefixed_vertex_shader(), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
 }
 
 ///|
