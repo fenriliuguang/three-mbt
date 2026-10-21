@@ -558,6 +558,8 @@ Batching `USE_COLOR_ALPHA` has landed. A Shader material writes nothing on the f
 
 Missing-normal `FLAT_SHADED` has landed. Lambert, Phong, Standard, and Physical with no normal and no normal map write `#define FLAT_SHADED` and a newline, `20` characters, on both prefixes. Those strings are `20` because the built-in bodies stay empty. Passing `has_normal` returns `""`. A normal map returns `""`. Wireframe returns `""`. Toon and Basic stay `""`. A Shader material stays `1608` and `2041` while `flat_shading` is off. Raw stays `92` and `61`. Missing-normal `USE_TANGENT` stays later.
 
+Missing-normal `USE_TANGENT` has landed. Lambert with `anisotropy` at `1` and a tangent attribute still writes only `#define FLAT_SHADED` while the geometry has no normal. Passing `has_normal` drops that line and writes `#define USE_TANGENT` and a newline, `20` characters, on both prefixes. Omitting the tangent attribute leaves both strings `""`. A normal map also writes `USE_TANGENT` and skips `FLAT_SHADED`. Basic stays `""`. A Shader material with the same anisotropy and tangent stays at vertex `1651` and fragment `2084`. Raw stays `92` and `61`. Missing-normal `USE_MORPHNORMALS` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -839,3 +841,4 @@ Missing-normal `FLAT_SHADED` has landed. Lambert, Phong, Standard, and Physical 
 | planned | 7 | instancing `USE_COLOR` | `materials` |
 | planned | 7 | batching `USE_COLOR_ALPHA` | `materials` |
 | planned | 7 | missing-normal `FLAT_SHADED` | `materials` |
+| planned | 7 | missing-normal `USE_TANGENT` | `materials` |

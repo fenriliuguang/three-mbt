@@ -11501,6 +11501,50 @@ test "Material shader writes missing-normal FLAT_SHADED" {
 }
 
 ///|
+test "Material shader writes missing-normal USE_TANGENT" {
+  let lambert = @materials.Material::lambert()
+  lambert.anisotropy = 1.0
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_tangent=true),
+    "#define FLAT_SHADED\n",
+  )
+  assert_eq(
+    lambert.prefixed_fragment_shader(has_tangent=true),
+    "#define FLAT_SHADED\n",
+  )
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_tangent=true, has_normal=true),
+    "#define USE_TANGENT\n",
+  )
+  assert_eq(
+    lambert.prefixed_fragment_shader(has_tangent=true, has_normal=true),
+    "#define USE_TANGENT\n",
+  )
+  assert_eq(lambert.prefixed_vertex_shader(has_tangent=true, has_normal=true).length(), 20)
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  let pixels = FixedArray::make(4, b'\xFF')
+  lambert.anisotropy = 0.0
+  lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_tangent=true),
+    "#define USE_TANGENT\n",
+  )
+  assert_eq(
+    lambert.prefixed_fragment_shader(has_tangent=true),
+    "#define USE_TANGENT\n",
+  )
+  assert_eq(@materials.Material::basic().prefixed_vertex_shader(has_tangent=true), "")
+  let shader = @materials.Material::shader()
+  shader.anisotropy = 1.0
+  assert_eq(shader.prefixed_vertex_shader(has_tangent=true).length(), 1651)
+  assert_eq(shader.prefixed_fragment_shader(has_tangent=true).length(), 2084)
+  let raw = @materials.Material::raw()
+  raw.anisotropy = 1.0
+  assert_eq(raw.prefixed_vertex_shader(has_tangent=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader(has_tangent=true).length(), 61)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
