@@ -10804,6 +10804,76 @@ test "Material shader writes USE_BATCHING" {
 }
 
 ///|
+test "Material shader writes USE_BATCHING_COLOR" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    @materials.program_batching_color(
+      is_batched_mesh=true,
+      has_colors_texture=true,
+    ),
+    true,
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_vertex_shader(batching_color=true).length(), 1635)
+  assert_eq(1635 - 1608, 27)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true)[683:709].to_owned(),
+    "#define USE_BATCHING_COLOR",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, batching_color=true).length(),
+    1656,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, batching_color=true)[683:703]
+      .to_owned(),
+    "#define USE_BATCHING",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, batching_color=true)[704:730]
+      .to_owned(),
+    "#define USE_BATCHING_COLOR",
+  )
+  shader.fog = true
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, has_fog=true).length(),
+    1651,
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, has_fog=true)[683:709]
+      .to_owned(),
+    "#define USE_BATCHING_COLOR",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true, has_fog=true)[710:725]
+      .to_owned(),
+    "#define USE_FOG",
+  )
+  shader.fog = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(batching_color=true).length(), 1669)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching_color=true)[710:725].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(batching_color=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(batching_color=true), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

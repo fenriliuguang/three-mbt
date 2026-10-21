@@ -532,6 +532,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_BATCHING` has landed. A Shader material writes nothing until the caller marks the object as a batched mesh. `program_batching` can be `true` while the prefix still omits the line. Passing `batching` writes `#define USE_BATCHING` and a newline, `21` characters, on the vertex prefix only. The vertex string grows from `1608` to `1629`. The fragment string stays `2041`. Clip-cull distance puts this line after `USE_CLIP_DISTANCE`, so the vertex string is `1703` and the fragment string stays `2041`. Scene fog puts `USE_FOG` after it, so the vertex string is `1645` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1663` and the fragment string is `2057`. Turning batching off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_BATCHING_COLOR` stays later.
 
+`USE_BATCHING_COLOR` has landed. A Shader material writes nothing until the caller marks a batched mesh that has a colors texture. `program_batching_color` can be `true` while the prefix still omits the line. Passing `batching_color` writes `#define USE_BATCHING_COLOR` and a newline, `27` characters, on the vertex prefix only. The vertex string grows from `1608` to `1635`. The fragment string stays `2041`. `USE_BATCHING` puts this line after it, so the vertex string is `1656`. Scene fog puts `USE_FOG` after it, so the vertex string is `1651` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1669` and the fragment string is `2057`. Turning the flag off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_INSTANCING` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -800,3 +802,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `CUBEUV_MAX_MIP` | `materials` |
 | planned | 7 | `USE_CLIP_DISTANCE` | `materials` |
 | planned | 7 | `USE_BATCHING` | `materials` |
+| planned | 7 | `USE_BATCHING_COLOR` | `materials` |
