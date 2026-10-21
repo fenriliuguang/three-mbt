@@ -560,6 +560,8 @@ Missing-normal `FLAT_SHADED` has landed. Lambert, Phong, Standard, and Physical 
 
 Missing-normal `USE_TANGENT` has landed. Lambert with `anisotropy` at `1` and a tangent attribute still writes only `#define FLAT_SHADED` while the geometry has no normal. Passing `has_normal` drops that line and writes `#define USE_TANGENT` and a newline, `20` characters, on both prefixes. Omitting the tangent attribute leaves both strings `""`. A normal map also writes `USE_TANGENT` and skips `FLAT_SHADED`. Basic stays `""`. A Shader material with the same anisotropy and tangent stays at vertex `1651` and fragment `2084`. Raw stays `92` and `61`. Missing-normal `USE_MORPHNORMALS` stays later.
 
+Missing-normal `USE_MORPHNORMALS` has landed. Lambert with morph normals and no geometry normal still writes only `#define FLAT_SHADED` on the vertex prefix. The fragment string is that same line and does not gain morph normals. Passing `has_normal` writes `#define USE_MORPHNORMALS` and a newline, `25` characters, on the vertex prefix only, and the fragment string returns to `""`. A tangent and `anisotropy` at `1` put `USE_TANGENT` before that line. Without `has_normal` those attributes still leave only `FLAT_SHADED`. Basic stays `""`. A Shader material stays at vertex `1633` and fragment `2041`. Raw stays `92` and `61`. Lit `flat_shading` `FLAT_SHADED` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -842,3 +844,4 @@ Missing-normal `USE_TANGENT` has landed. Lambert with `anisotropy` at `1` and a 
 | planned | 7 | batching `USE_COLOR_ALPHA` | `materials` |
 | planned | 7 | missing-normal `FLAT_SHADED` | `materials` |
 | planned | 7 | missing-normal `USE_TANGENT` | `materials` |
+| planned | 7 | missing-normal `USE_MORPHNORMALS` | `materials` |

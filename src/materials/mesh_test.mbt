@@ -11545,6 +11545,52 @@ test "Material shader writes missing-normal USE_TANGENT" {
 }
 
 ///|
+test "Material shader writes missing-normal USE_MORPHNORMALS" {
+  let lambert = @materials.Material::lambert()
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_morph_normals=true),
+    "#define FLAT_SHADED\n",
+  )
+  assert_eq(lambert.prefixed_fragment_shader(), "#define FLAT_SHADED\n")
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_morph_normals=true, has_normal=true),
+    "#define USE_MORPHNORMALS\n",
+  )
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_morph_normals=true, has_normal=true).length(),
+    25,
+  )
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
+  lambert.anisotropy = 1.0
+  assert_eq(
+    lambert.prefixed_vertex_shader(
+      has_tangent=true,
+      has_morph_normals=true,
+      has_normal=true,
+    ),
+    "#define USE_TANGENT\n#define USE_MORPHNORMALS\n",
+  )
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_tangent=true, has_morph_normals=true),
+    "#define FLAT_SHADED\n",
+  )
+  assert_eq(@materials.Material::basic().prefixed_vertex_shader(has_morph_normals=true), "")
+  assert_eq(
+    @materials.Material::phong().prefixed_vertex_shader(
+      has_morph_normals=true,
+      has_normal=true,
+    ).length(),
+    25,
+  )
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader(has_morph_normals=true).length(), 1633)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(has_morph_normals=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
