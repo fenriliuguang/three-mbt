@@ -10735,6 +10735,75 @@ test "Material shader writes USE_CLIP_DISTANCE" {
 }
 
 ///|
+test "Material shader writes USE_BATCHING" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(@materials.program_batching(is_batched_mesh=true), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_vertex_shader(batching=true).length(), 1629)
+  assert_eq(1629 - 1608, 21)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true)[683:703].to_owned(),
+    "#define USE_BATCHING",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.extensions.clip_cull_distance = true
+  assert_eq(
+    shader
+    .prefixed_vertex_shader(batching=true, has_clip_cull_distance=true)
+    .length(),
+    1703,
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, has_clip_cull_distance=true)[
+      731:756
+    ].to_owned(),
+    "#define USE_CLIP_DISTANCE",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, has_clip_cull_distance=true)[
+      757:777
+    ].to_owned(),
+    "#define USE_BATCHING",
+  )
+  shader.extensions.clip_cull_distance = false
+  shader.fog = true
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, has_fog=true).length(),
+    1645,
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, has_fog=true)[683:703].to_owned(),
+    "#define USE_BATCHING",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true, has_fog=true)[704:719].to_owned(),
+    "#define USE_FOG",
+  )
+  shader.fog = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(batching=true).length(), 1663)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(batching=true)[704:719].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(batching=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(batching=true), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
