@@ -11257,6 +11257,62 @@ test "Material shader writes USE_IRIDESCENCE" {
 }
 
 ///|
+test "Material shader writes USE_ALPHATEST" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_alpha_test(), false)
+  shader.alpha_test = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.alpha_test = 0.25
+  assert_eq(shader.program_alpha_test(), true)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2063)
+  assert_eq(2063 - 2041, 22)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_ALPHATEST",
+  )
+  shader.alpha_hash = true
+  assert_eq(shader.prefixed_fragment_shader().length(), 2085)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1630)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_ALPHATEST",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1101:1122].to_owned(),
+    "#define USE_ALPHAHASH",
+  )
+  shader.alpha_hash = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.alpha_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.prefixed_fragment_shader().length(), 2084)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1652)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1099].to_owned(),
+    "#define USE_ALPHAMAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1100:1121].to_owned(),
+    "#define USE_ALPHATEST",
+  )
+  shader.alpha_test = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2062)
+  shader.alpha_map = None
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.alpha_test = 0.25
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.alpha_test = 0.25
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
