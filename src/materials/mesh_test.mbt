@@ -11468,6 +11468,39 @@ test "Material shader writes batching USE_COLOR_ALPHA" {
 }
 
 ///|
+test "Material shader writes missing-normal FLAT_SHADED" {
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.program_flat_shading(), true)
+  assert_eq(lambert.prefixed_vertex_shader(), "#define FLAT_SHADED\n")
+  assert_eq(lambert.prefixed_fragment_shader(), "#define FLAT_SHADED\n")
+  assert_eq(lambert.prefixed_vertex_shader().length(), 20)
+  assert_eq(lambert.prefixed_fragment_shader().length(), 20)
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
+  let pixels = FixedArray::make(4, b'\xFF')
+  lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(lambert.prefixed_vertex_shader(), "")
+  assert_eq(lambert.prefixed_fragment_shader(), "")
+  lambert.normal_map = None
+  lambert.wireframe = true
+  assert_eq(lambert.prefixed_vertex_shader(), "")
+  assert_eq(lambert.prefixed_fragment_shader(), "")
+  assert_eq(@materials.Material::phong().prefixed_vertex_shader().length(), 20)
+  assert_eq(@materials.Material::standard().prefixed_fragment_shader().length(), 20)
+  assert_eq(@materials.Material::physical().prefixed_vertex_shader().length(), 20)
+  assert_eq(@materials.Material::toon().prefixed_vertex_shader(), "")
+  assert_eq(@materials.Material::basic().prefixed_vertex_shader(), "")
+  assert_eq(@materials.Material::basic().prefixed_fragment_shader(), "")
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.flat_shading = true
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
