@@ -550,6 +550,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_ALPHATEST` has landed. A Shader material writes nothing while `alpha_test` is `0` or negative. The vertex string stays `1608`. Raising `alpha_test` above `0` writes `#define USE_ALPHATEST` and a newline, `22` characters, on the fragment prefix only. The fragment string grows from `2041` to `2063`. Alpha hash puts `USE_ALPHAHASH` after it, so the fragment string is `2085` and the vertex string is `1630`. An alpha map puts `USE_ALPHAMAP` before it, so the fragment string is `2084` and the vertex string is `1652`. Setting `alpha_test` back to `0` returns the alpha-map fragment string to `2062`. A raw material stays at `61`. A Basic material stays `""`. `USE_SHEEN` stays later.
 
+`USE_SHEEN` has landed. A Shader material writes nothing while `sheen` is `0` or negative. The vertex string stays `1608`. Raising `sheen` above `0` writes `#define USE_SHEEN` and a newline, `18` characters, on the fragment prefix only. The fragment string grows from `2041` to `2059`. A sheen color map keeps `USE_SHEEN_COLORMAP` after it, so the fragment string is `2086` and the vertex string stays `1664`. Setting `sheen` back to `0` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. Instancing `USE_COLOR` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -827,3 +829,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_RETROREFLECTION` | `materials` |
 | planned | 7 | `USE_IRIDESCENCE` | `materials` |
 | planned | 7 | `USE_ALPHATEST` | `materials` |
+| planned | 7 | `USE_SHEEN` | `materials` |

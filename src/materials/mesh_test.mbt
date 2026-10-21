@@ -4375,14 +4375,14 @@ test "Material shader writes USE_SHEEN_COLORMAP" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.sheen = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1664)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2068)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2086)
   assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[683:709].to_owned(),
     "#define USE_SHEEN_COLORMAP",
   )
   assert_eq(
-    shader.prefixed_fragment_shader()[1079:1105].to_owned(),
+    shader.prefixed_fragment_shader()[1097:1123].to_owned(),
     "#define USE_SHEEN_COLORMAP",
   )
   shader.sheen = -1.0
@@ -4395,9 +4395,9 @@ test "Material shader writes USE_SHEEN_COLORMAP" {
     shader.prefixed_vertex_shader()[733:759].to_owned(),
     "#define USE_SHEEN_COLORMAP",
   )
-  assert_eq(shader.prefixed_fragment_shader().length(), 2118)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2136)
   assert_eq(
-    shader.prefixed_fragment_shader()[1079:1105].to_owned(),
+    shader.prefixed_fragment_shader()[1097:1123].to_owned(),
     "#define USE_SHEEN_COLORMAP",
   )
   let raw = @materials.Material::raw()
@@ -4420,14 +4420,14 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.sheen = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1672)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2072)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2090)
   assert_eq(1672 - 1608, 64)
   assert_eq(
     shader.prefixed_vertex_shader()[683:713].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
   assert_eq(
-    shader.prefixed_fragment_shader()[1079:1109].to_owned(),
+    shader.prefixed_fragment_shader()[1097:1127].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
   shader.sheen_color_map = Some(roughness_map)
@@ -4436,9 +4436,9 @@ test "Material shader writes USE_SHEEN_ROUGHNESSMAP" {
     shader.prefixed_vertex_shader()[710:740].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
-  assert_eq(shader.prefixed_fragment_shader().length(), 2099)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2117)
   assert_eq(
-    shader.prefixed_fragment_shader()[1106:1136].to_owned(),
+    shader.prefixed_fragment_shader()[1124:1154].to_owned(),
     "#define USE_SHEEN_ROUGHNESSMAP",
   )
   let raw = @materials.Material::raw()
@@ -5152,7 +5152,7 @@ test "Material shader writes SHEEN_COLORMAP_UV" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.sheen = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1664)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2068)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2086)
   assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[710:738].to_owned(),
@@ -5161,7 +5161,7 @@ test "Material shader writes SHEEN_COLORMAP_UV" {
   sheen_color_map.channel = 1
   shader.sheen_color_map = Some(sheen_color_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1681)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2084)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2102)
   assert_eq(1681 - 1608, 73)
   assert_eq(
     shader.prefixed_vertex_shader()[710:739].to_owned(),
@@ -5201,7 +5201,7 @@ test "Material shader writes SHEEN_ROUGHNESSMAP_UV" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.sheen = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1672)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2072)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2090)
   assert_eq(1672 - 1608, 64)
   assert_eq(
     shader.prefixed_vertex_shader()[714:746].to_owned(),
@@ -5210,7 +5210,7 @@ test "Material shader writes SHEEN_ROUGHNESSMAP_UV" {
   sheen_roughness_map.channel = 1
   shader.sheen_roughness_map = Some(sheen_roughness_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1689)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2088)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2106)
   assert_eq(1689 - 1608, 81)
   assert_eq(
     shader.prefixed_vertex_shader()[714:747].to_owned(),
@@ -11308,6 +11308,49 @@ test "Material shader writes USE_ALPHATEST" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.alpha_test = 0.25
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes USE_SHEEN" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_sheen(), false)
+  shader.sheen = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.sheen = 1.0
+  assert_eq(shader.program_sheen(), true)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2059)
+  assert_eq(2059 - 2041, 18)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1096].to_owned(),
+    "#define USE_SHEEN",
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.sheen_color_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.prefixed_fragment_shader().length(), 2086)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1664)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1096].to_owned(),
+    "#define USE_SHEEN",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1097:1123].to_owned(),
+    "#define USE_SHEEN_COLORMAP",
+  )
+  shader.sheen_color_map = None
+  shader.sheen = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.sheen = 1.0
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.sheen = 1.0
   assert_eq(basic.prefixed_fragment_shader(), "")
   assert_eq(basic.prefixed_vertex_shader(), "")
 }
