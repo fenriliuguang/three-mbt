@@ -554,6 +554,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 Instancing `USE_COLOR` has landed. A Shader material writes nothing on the fragment prefix while `vertex_colors` is off and the caller omits `instancing_color`. `program_instancing_color` can be `true` while that prefix still omits the line. Passing `instancing_color` writes `#define USE_COLOR` and a newline, `18` characters, on the fragment prefix only. The fragment string grows from `2041` to `2059`. The vertex string stays `1608`. The vertex prefix still writes `USE_INSTANCING_COLOR` instead of `USE_COLOR`, so that string is `1637`. Turning `vertex_colors` on as well keeps a single fragment `USE_COLOR`, so the fragment string stays `2059` and the vertex string is `1626`. Sheen puts `USE_SHEEN` before it, so the fragment string is `2077`. Omitting `instancing_color` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. Batching `USE_COLOR_ALPHA` stays later.
 
+Batching `USE_COLOR_ALPHA` has landed. A Shader material writes nothing on the fragment prefix while vertex alpha is off and the caller omits `batching_color`. `program_batching_color` can be `true` while that prefix still omits the line. Passing `batching_color` writes `#define USE_COLOR_ALPHA` and a newline, `24` characters, on the fragment prefix only. The fragment string grows from `2041` to `2065`. The vertex string stays `1608`. The vertex prefix still writes `USE_BATCHING_COLOR` instead of `USE_COLOR_ALPHA`, so that string is `1635`. Vertex colors with alpha keep a single fragment `USE_COLOR_ALPHA`, so the fragment string is `2083` and the vertex string is `1650`. Instancing color puts `USE_COLOR` before it, so the fragment string is `2083`. Omitting `batching_color` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. Missing-normal `FLAT_SHADED` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -833,3 +835,4 @@ Instancing `USE_COLOR` has landed. A Shader material writes nothing on the fragm
 | planned | 7 | `USE_ALPHATEST` | `materials` |
 | planned | 7 | `USE_SHEEN` | `materials` |
 | planned | 7 | instancing `USE_COLOR` | `materials` |
+| planned | 7 | batching `USE_COLOR_ALPHA` | `materials` |
