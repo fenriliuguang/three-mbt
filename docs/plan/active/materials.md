@@ -524,6 +524,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `CUBEUV_TEXEL_WIDTH` has landed. A Shader material adds nothing until the caller passes a cube-UV height. A matcap still writes only `USE_MATCAP`. Height `256` writes `#define CUBEUV_TEXEL_WIDTH 0.002976190476190476` and a newline, `48` characters, on the fragment prefix only. The fragment string grows from `2041` to `2089`. The vertex string stays `1608`. Height `512` writes `0.0026041666666666665` and the fragment string is `2090`. An env map puts the line after `ENVMAP_BLENDING_MULTIPLY`, so the fragment string is `2197` and the vertex string stays `1658`. Omitting the height leaves the env-map fragment string at `2149`. A raw material stays at `61`. A Basic material stays `""`. `CUBEUV_TEXEL_HEIGHT` stays later.
 
+`CUBEUV_TEXEL_HEIGHT` has landed. The same cube-UV height writes `#define CUBEUV_TEXEL_HEIGHT` after the width line. Height `256` is `0.00390625`, `39` characters with the newline, so the fragment string is `2128`. Height `512` is `0.001953125` and the fragment string is `2130`. Height `1` is `1` and the fragment string is `2119`. The vertex string stays `1608`. An env map keeps the line after the width line, so the fragment string is `2236` and the vertex string stays `1658`. Omitting the height leaves the fragment string at `2041` and the env-map fragment string at `2149`. A raw material stays at `61`. A Basic material stays `""`. `CUBEUV_MAX_MIP` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -788,3 +790,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `ALPHA_TO_COVERAGE` | `materials` |
 | planned | 7 | `USE_MATCAP` | `materials` |
 | planned | 7 | `CUBEUV_TEXEL_WIDTH` | `materials` |
+| planned | 7 | `CUBEUV_TEXEL_HEIGHT` | `materials` |

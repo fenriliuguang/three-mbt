@@ -10474,7 +10474,7 @@ test "Material shader writes CUBEUV_TEXEL_WIDTH" {
   )
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
-    2108,
+    2147,
   )
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1098:1145]
@@ -10485,9 +10485,9 @@ test "Material shader writes CUBEUV_TEXEL_WIDTH" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1608)
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
-    2089,
+    2128,
   )
-  assert_eq(2089 - 2041, 48)
+  assert_eq(2128 - 2041, 87)
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1079:1126]
       .to_owned(),
@@ -10495,7 +10495,7 @@ test "Material shader writes CUBEUV_TEXEL_WIDTH" {
   )
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(512)).length(),
-    2090,
+    2130,
   )
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(512))[1079:1127]
@@ -10512,7 +10512,7 @@ test "Material shader writes CUBEUV_TEXEL_WIDTH" {
   assert_eq(shader.prefixed_vertex_shader().length(), 1658)
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
-    2197,
+    2236,
   )
   assert_eq(
     shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1187:1234]
@@ -10526,6 +10526,67 @@ test "Material shader writes CUBEUV_TEXEL_WIDTH" {
   )
   let basic = @materials.Material::basic()
   assert_eq(basic.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)), "")
+}
+
+///|
+test "Material shader writes CUBEUV_TEXEL_HEIGHT" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
+    2128,
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1079:1126]
+      .to_owned(),
+    "#define CUBEUV_TEXEL_WIDTH 0.002976190476190476",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1127:1165]
+      .to_owned(),
+    "#define CUBEUV_TEXEL_HEIGHT 0.00390625",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(512)).length(),
+    2130,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(512))[1128:1167]
+      .to_owned(),
+    "#define CUBEUV_TEXEL_HEIGHT 0.001953125",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(1)).length(),
+    2119,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(1))[1127:1156]
+      .to_owned(),
+    "#define CUBEUV_TEXEL_HEIGHT 1",
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  let env_map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.env_map = Some(env_map)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2149)
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
+    2236,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(env_map_cube_uv_height=Some(256))[1235:1273]
+      .to_owned(),
+    "#define CUBEUV_TEXEL_HEIGHT 0.00390625",
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1658)
+  let raw = @materials.Material::raw()
+  assert_eq(
+    raw.prefixed_fragment_shader(env_map_cube_uv_height=Some(256)).length(),
+    61,
+  )
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_fragment_shader(env_map_cube_uv_height=Some(1)), "")
 }
 
 ///|
