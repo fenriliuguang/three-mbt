@@ -11080,6 +11080,54 @@ test "Material shader writes USE_INSTANCING_MORPH" {
 }
 
 ///|
+test "Material shader writes USE_PACKED_NORMALMAP" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1030).length(), 2041)
+  assert_eq(shader.program_packed_normal_map(1030), false)
+  let pixels = FixedArray::make(4, b'\xFF')
+  shader.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1023).length(), 2098)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
+  assert_eq(shader.program_packed_normal_map(1030), true)
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1030).length(), 2127)
+  assert_eq(2127 - 2098, 29)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1689)
+  assert_eq(
+    shader.prefixed_fragment_shader(normal_map_format=1030)[1101:1135].to_owned(),
+    "#define USE_NORMALMAP_TANGENTSPACE",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(normal_map_format=1030)[1136:1164].to_owned(),
+    "#define USE_PACKED_NORMALMAP",
+  )
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=37490).length(), 2127)
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=36285).length(), 2127)
+  shader.normal_map_type = @constants.ObjectSpace
+  assert_eq(shader.program_packed_normal_map(1030), false)
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1030).length(), 2097)
+  shader.normal_map_type = @constants.TangentSpace
+  let emissive_pixels = FixedArray::make(4, b'\xFF')
+  shader.emissive_map = Some(@textures.Texture::from_rgba8(1, 1, emissive_pixels))
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1030).length(), 2151)
+  assert_eq(
+    shader.prefixed_fragment_shader(normal_map_format=1030)[1165:1188].to_owned(),
+    "#define USE_EMISSIVEMAP",
+  )
+  shader.normal_map = None
+  assert_eq(shader.prefixed_fragment_shader(normal_map_format=1030).length(), 2065)
+  let raw = @materials.Material::raw()
+  raw.normal_map = Some(@textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\xFF')))
+  assert_eq(raw.prefixed_fragment_shader(normal_map_format=1030).length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.normal_map = Some(@textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\xFF')))
+  assert_eq(basic.prefixed_fragment_shader(normal_map_format=1030), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

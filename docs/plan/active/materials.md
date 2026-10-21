@@ -540,6 +540,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_INSTANCING_MORPH` has landed. A Shader material writes nothing until the caller marks an instanced mesh that has a `morphTexture`. `program_instancing_morph` can be `true` while the prefix still omits the line. Passing `instancing_morph` writes `#define USE_INSTANCING_MORPH` and a newline, `29` characters, on the vertex prefix only. The vertex string grows from `1608` to `1637`. The fragment string stays `2041`. `USE_INSTANCING_COLOR` puts this line after it, so the vertex string is `1666`. Scene fog puts `USE_FOG` after it, so the vertex string is `1653` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1671` and the fragment string is `2057`. Turning the flag off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_PACKED_NORMALMAP` stays later.
 
+`USE_PACKED_NORMALMAP` has landed. A Shader material writes nothing until it has a tangent-space normal map and the caller passes a packed RG format. Format `1030` without a map leaves both prefixes at `1608` and `2041`. A tangent-space normal map with format `1023` still writes only `USE_NORMALMAP` and `USE_NORMALMAP_TANGENTSPACE`, so the vertex string is `1689` and the fragment string is `2098`. Format `1030`, `37490`, or `36285` then writes `#define USE_PACKED_NORMALMAP` and a newline, `29` characters, on the fragment prefix only. The fragment string is `2127`. The vertex string stays `1689`. Object space leaves the fragment string at `2097`. An emissive map puts `USE_EMISSIVEMAP` after it, so the fragment string is `2151`. Clearing the normal map leaves the emissive fragment string at `2065`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_DISPERSION` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -812,3 +814,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_INSTANCING` | `materials` |
 | planned | 7 | `USE_INSTANCING_COLOR` | `materials` |
 | planned | 7 | `USE_INSTANCING_MORPH` | `materials` |
+| planned | 7 | `USE_PACKED_NORMALMAP` | `materials` |
