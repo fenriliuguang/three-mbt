@@ -110,6 +110,7 @@ pub fn LineBasicMaterial::dispatch_event(Self, String) -> Unit
 pub fn LineBasicMaterial::dispose(Self) -> Unit
 pub fn LineBasicMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
+pub fn LineBasicMaterial::program_shader_id(Self) -> String?
 pub fn LineBasicMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn LineBasicMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn LineBasicMaterial::set_needs_update(Self, Bool) -> Unit
@@ -126,6 +127,7 @@ pub fn LineDashedMaterial::copy(Self, Self) -> Self
 pub fn LineDashedMaterial::dispose(Self) -> Unit
 pub fn LineDashedMaterial::keeps_distance(Self, Double) -> Bool
 pub fn LineDashedMaterial::new(hex? : Int, scale? : Double, dash_size? : Double, gap_size? : Double) -> Self
+pub fn LineDashedMaterial::program_shader_id(Self) -> String?
 
 pub(all) struct Material {
   color : @math.Color
@@ -385,6 +387,7 @@ pub fn Material::program_retroreflection(Self) -> Bool
 pub fn Material::program_reversed_depth_buffer(Self, reversed_depth_buffer? : Bool) -> Bool
 pub fn Material::program_roughness_map(Self) -> Bool
 pub fn Material::program_roughness_map_uv(Self) -> String
+pub fn Material::program_shader_id(Self) -> String?
 pub fn Material::program_shadow_map_enabled(Self, shadow_map_enabled? : Bool, has_shadows? : Bool) -> Bool
 pub fn Material::program_shadow_map_type(Self, shadow_map_type? : Int) -> Int
 pub fn Material::program_sheen(Self) -> Bool
@@ -530,6 +533,7 @@ pub fn PointsMaterial::dispatch_event(Self, String) -> Unit
 pub fn PointsMaterial::dispose(Self) -> Unit
 pub fn PointsMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
+pub fn PointsMaterial::program_shader_id(Self) -> String?
 pub fn PointsMaterial::program_size_attenuation(Self) -> Bool
 pub fn PointsMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::set_alpha_test(Self, Double) -> Unit
@@ -631,6 +635,7 @@ pub fn SpriteMaterial::dispatch_event(Self, String) -> Unit
 pub fn SpriteMaterial::dispose(Self) -> Unit
 pub fn SpriteMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
+pub fn SpriteMaterial::program_shader_id(Self) -> String?
 pub fn SpriteMaterial::program_size_attenuation(Self) -> Bool
 pub fn SpriteMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit

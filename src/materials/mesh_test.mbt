@@ -10179,6 +10179,49 @@ test "Material shader vertexUv3s reads channel 3" {
 }
 
 ///|
+test "Material shader shaderID reads the builtin id" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.program_shader_id(), None)
+  assert_eq(@materials.Material::raw().program_shader_id(), None)
+  assert_eq(@materials.Material::basic().program_shader_id(), Some("basic"))
+  assert_eq(@materials.Material::lambert().program_shader_id(), Some("lambert"))
+  assert_eq(@materials.Material::phong().program_shader_id(), Some("phong"))
+  assert_eq(@materials.Material::toon().program_shader_id(), Some("toon"))
+  assert_eq(@materials.Material::standard().program_shader_id(), Some("physical"))
+  assert_eq(@materials.Material::physical().program_shader_id(), Some("physical"))
+  assert_eq(@materials.Material::matcap().program_shader_id(), Some("matcap"))
+  assert_eq(@materials.Material::normal().program_shader_id(), Some("normal"))
+  assert_eq(@materials.Material::depth().program_shader_id(), Some("depth"))
+  assert_eq(@materials.Material::distance().program_shader_id(), Some("distance"))
+  assert_eq(@materials.Material::shadow().program_shader_id(), Some("shadow"))
+  assert_eq(@materials.PointsMaterial::new().program_shader_id(), Some("points"))
+  assert_eq(@materials.SpriteMaterial::new().program_shader_id(), Some("sprite"))
+  assert_eq(
+    @materials.LineBasicMaterial::new().program_shader_id(),
+    Some("basic"),
+  )
+  assert_eq(
+    @materials.LineDashedMaterial::new().program_shader_id(),
+    Some("dashed"),
+  )
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.name = "renamed"
+  assert_eq(shader.shader_type(), "ShaderMaterial")
+  assert_eq(shader.program_shader_id(), None)
+  let basic = @materials.Material::basic()
+  basic.name = "renamed"
+  assert_eq(basic.shader_type(), "MeshBasicMaterial")
+  assert_eq(basic.program_shader_id(), Some("basic"))
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  map.channel = 3
+  shader.map = Some(map)
+  assert_eq(shader.program_vertex_uv3s(), true)
+  assert_eq(shader.program_shader_id(), None)
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

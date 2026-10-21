@@ -512,6 +512,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `vertexUv3s` has landed. Shader, Raw, and Basic start at `false`. A color map on channel `0` stays `false`. Channel `1` stays `false` while `vertexUv1s` is `true`. Channel `2` stays `false` while `vertexUv2s` is `true`. Channel `4` stays `false`. Channel `3` returns `true`. Clearing the map returns `false`. An anisotropy map on channel `3` stays `false` until `anisotropy` is above `0`. A custom program cache key does not turn it on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while no channel-`3` map is active. `shaderID` stays later.
 
+`shaderID` has landed. Shader and Raw stay at `None`. Basic is `basic`, Lambert is `lambert`, Phong is `phong`, Toon is `toon`, and Standard and Physical are both `physical`. Matcap is `matcap`, Normal is `normal`, Depth is `depth`, Distance is `distance`, and Shadow is `shadow`. Points is `points`, Sprite is `sprite`, LineBasic is `basic`, and LineDashed is `dashed`. Renaming Shader or Basic leaves the id unchanged. A channel-`3` color map turns `vertexUv3s` on and leaves the Shader id empty. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the name is still empty. `USE_FOG` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -770,3 +772,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `vertexUv1s` | `materials` |
 | planned | 7 | `vertexUv2s` | `materials` |
 | planned | 7 | `vertexUv3s` | `materials` |
+| planned | 7 | `shaderID` | `materials` |
