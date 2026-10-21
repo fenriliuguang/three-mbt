@@ -11128,6 +11128,49 @@ test "Material shader writes USE_PACKED_NORMALMAP" {
 }
 
 ///|
+test "Material shader writes USE_DISPERSION" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_dispersion(), false)
+  shader.dispersion = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.dispersion = 0.25
+  assert_eq(shader.program_dispersion(), true)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2064)
+  assert_eq(2064 - 2041, 23)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1101].to_owned(),
+    "#define USE_DISPERSION",
+  )
+  shader.clearcoat = 1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2086)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1100].to_owned(),
+    "#define USE_CLEARCOAT",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1101:1123].to_owned(),
+    "#define USE_DISPERSION",
+  )
+  shader.dispersion = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2063)
+  shader.clearcoat = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.dispersion = 0.25
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.dispersion = 0.25
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

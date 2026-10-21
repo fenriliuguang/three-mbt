@@ -542,6 +542,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_PACKED_NORMALMAP` has landed. A Shader material writes nothing until it has a tangent-space normal map and the caller passes a packed RG format. Format `1030` without a map leaves both prefixes at `1608` and `2041`. A tangent-space normal map with format `1023` still writes only `USE_NORMALMAP` and `USE_NORMALMAP_TANGENTSPACE`, so the vertex string is `1689` and the fragment string is `2098`. Format `1030`, `37490`, or `36285` then writes `#define USE_PACKED_NORMALMAP` and a newline, `29` characters, on the fragment prefix only. The fragment string is `2127`. The vertex string stays `1689`. Object space leaves the fragment string at `2097`. An emissive map puts `USE_EMISSIVEMAP` after it, so the fragment string is `2151`. Clearing the normal map leaves the emissive fragment string at `2065`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_DISPERSION` stays later.
 
+`USE_DISPERSION` has landed. A Shader material writes nothing while `dispersion` is `0` or negative. The vertex string stays `1608`. Raising `dispersion` above `0` writes `#define USE_DISPERSION` and a newline, `23` characters, on the fragment prefix only. The fragment string grows from `2041` to `2064`. Clearcoat puts `USE_CLEARCOAT` before it, so the fragment string is `2086` and the vertex string stays `1608`. Setting `dispersion` back to `0` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. `USE_RETROREFLECTION` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -815,3 +817,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_INSTANCING_COLOR` | `materials` |
 | planned | 7 | `USE_INSTANCING_MORPH` | `materials` |
 | planned | 7 | `USE_PACKED_NORMALMAP` | `materials` |
+| planned | 7 | `USE_DISPERSION` | `materials` |
