@@ -1,14 +1,6 @@
 // r186: `LineBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineBasicMaterial.js#L15
 
 ///|
-/// 程序参数里的内置着色器标识。直线材质是 `basic`。
-/// r186: `shaderIDs` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L28
-/// r186: `shaderID` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L191
-pub fn LineBasicMaterial::program_shader_id(self : LineBasicMaterial) -> String? {
-  builtin_shader_id(self.type_name)
-}
-
-///|
 /// 线段和折线。WebGPU 的线宽是 1 像素，因此没有 `linewidth`。
 /// 颜色贴图默认空。线段着色器仍按材质颜色绘制，不采样这张贴图。
 /// `side` 默认正面。背面和双面一并存储。`copy` 沿用源值。线段绘制仍不按这个面剔除。

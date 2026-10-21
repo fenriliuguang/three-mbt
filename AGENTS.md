@@ -1,13 +1,13 @@
 # three-mbt
 
-MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](docs/PLAN.md)。已完成、活跃中、待实现分在 `docs/plan/done/`、`docs/plan/active/`、`docs/plan/later/`。当前下一刀写在 `docs/plan/active/materials.md` 最后一段末尾。
+MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](docs/PLAN.md)。已完成、活跃中、待实现分在 `docs/plan/done/`、`docs/plan/active/`、`docs/plan/later/`。当前没有排下一刀。`docs/plan/active/materials.md` 只记录 WebGL 程序路径已经删掉。
 
 ## 边界
 
 - 场景图包（`math`、`core`、`cameras`、`scenes`、`objects`、`geometries`、`materials`、`lights`、`textures`、`constants`）不得 import `bindings` 或 `platform`。
 - 只有 `platform` 和 `renderer/webgpu` 接触 `wasi:webgpu`。
 - 只有应用壳和 `platform` 接触 `wasi-gfx` surface。
-- 不实现 WebGL、WebXR、音频。
+- 不实现 WebGL、WebXR、音频。宿主没有 WebGL。不移植 `src/renderers/webgl`、`src/renderers/shaders`、GLSL 前缀或 `WebGLPrograms`。细则见 [.cursor/skills/no-webgl/SKILL.md](.cursor/skills/no-webgl/SKILL.md)。
 - `bindings` 里的生成文件不手改。
 
 ## 工具

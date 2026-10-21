@@ -35,7 +35,7 @@ TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S %Z'
 
 ## 这一刀是什么
 
-本仓库一次只做 [docs/plan/active/materials.md](../../../docs/plan/active/materials.md) 里还没落地的下一小块。名字在该文件 `## Behavior` 最后一段末尾，句子以 “X stays later” 结束。不要从 `docs/plan/done/` 或 `docs/plan/later/` 里挑下一刀。提交和推送按 [direct-to-main](../direct-to-main/SKILL.md)：在 `main` 上 `git push origin main`，不开 Pull Request。不跑宿主窗口验收。
+本仓库一次只做 [docs/plan/active/materials.md](../../../docs/plan/active/materials.md) 里还没落地的下一小块。名字在该文件 `## Behavior` 最后一段末尾，句子以 “X stays later” 结束。最后一段没有这句，或这句点名 WebGL、GLSL 前缀、`WebGLProgram`、`WebGLPrograms`、`ShaderLib`、`src/renderers/shaders`，就不要开工。这些路径按 [no-webgl](../no-webgl/SKILL.md) 留在上游。不要从 `docs/plan/done/` 或 `docs/plan/later/` 里挑下一刀。提交和推送按 [direct-to-main](../direct-to-main/SKILL.md)：在 `main` 上 `git push origin main`，不开 Pull Request。不跑宿主窗口验收。
 
 测试、格式和 `moon info` 仍按仓库规则做完再推送。到点时已经开始的这一刀，也按这个标准收尾；收不了尾就停。
 

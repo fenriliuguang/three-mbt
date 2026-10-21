@@ -5,44 +5,13 @@ import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/textures",
-  "moonbitlang/core/ref",
 }
 
 // Values
-pub fn max_precision(String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
-
-pub fn program_batching(is_batched_mesh? : Bool) -> Bool
-
-pub fn program_batching_color(is_batched_mesh? : Bool, has_colors_texture? : Bool) -> Bool
-
-pub fn program_cache_key(shader_id? : String?, custom_vertex_shader_id? : String, custom_fragment_shader_id? : String, defines? : Array[(String, String)], is_raw? : Bool, precision? : String, output_color_space? : String, renderer_output_color_space? : String, env_map_mode? : String, env_map_cube_uv_height? : String, map_uv? : String, alpha_map_uv? : String, light_map_uv? : String, ao_map_uv? : String, bump_map_uv? : String, normal_map_uv? : String, displacement_map_uv? : String, emissive_map_uv? : String, metalness_map_uv? : String, roughness_map_uv? : String, anisotropy_map_uv? : String, clearcoat_map_uv? : String, clearcoat_normal_map_uv? : String, clearcoat_roughness_map_uv? : String, iridescence_map_uv? : String, iridescence_thickness_map_uv? : String, sheen_color_map_uv? : String, sheen_roughness_map_uv? : String, specular_map_uv? : String, specular_color_map_uv? : String, specular_intensity_map_uv? : String, transmission_map_uv? : String, thickness_map_uv? : String, combine? : String, fog_exp2? : String, size_attenuation? : String, morph_targets_count? : String, morph_attribute_count? : String, num_sun_lights? : String, num_dir_lights? : String, num_point_lights? : String, num_spot_lights? : String, num_spot_light_maps? : String, num_hemi_lights? : String, num_rect_area_lights? : String, num_sun_light_shadows? : String, num_dir_light_shadows? : String, num_point_light_shadows? : String, num_spot_light_shadows? : String, num_spot_light_shadows_with_maps? : String, num_light_probes? : String, shadow_map_type? : String, tone_mapping? : String, num_clipping_planes? : String, num_clip_intersection? : String, depth_packing? : String, custom_program_cache_key? : String, instancing? : Bool, instancing_color? : Bool, instancing_morph? : Bool, matcap? : Bool, env_map? : Bool, normal_map_object_space? : Bool, normal_map_tangent_space? : Bool, clearcoat? : Bool, iridescence? : Bool, alpha_test? : Bool, vertex_colors? : Bool, vertex_alphas? : Bool, vertex_uv1s? : Bool, vertex_uv2s? : Bool, vertex_uv3s? : Bool, vertex_tangents? : Bool, anisotropy? : Bool, alpha_hash? : Bool, batching? : Bool, dispersion? : Bool, retroreflection? : Bool, batching_color? : Bool, gradient_map? : Bool, packed_normal_map? : Bool, vertex_normals? : Bool, fog? : Bool, use_fog? : Bool, flat_shading? : Bool, logarithmic_depth_buffer? : Bool, reversed_depth_buffer? : Bool, skinning? : Bool, morph_targets? : Bool, morph_normals? : Bool, morph_colors? : Bool, premultiplied_alpha? : Bool, shadow_map_enabled? : Bool, double_sided? : Bool, flip_sided? : Bool, use_depth_packing? : Bool, dithering? : Bool, transmission? : Bool, sheen? : Bool, is_opaque? : Bool, points_uvs? : Bool, decode_video_texture? : Bool, decode_video_texture_emissive? : Bool, alpha_to_coverage? : Bool, light_probe_grids? : Bool, has_position_attribute? : Bool) -> String
-
-pub fn program_instancing(is_instanced_mesh? : Bool) -> Bool
-
-pub fn program_instancing_color(is_instanced_mesh? : Bool, has_instance_color? : Bool) -> Bool
-
-pub fn program_instancing_morph(is_instanced_mesh? : Bool, has_morph_texture? : Bool) -> Bool
-
-pub fn program_output_color_space(String, String, has_render_target? : Bool, is_xr_render_target? : Bool, target_color_space? : String) -> String
-
-pub fn program_uniforms(String, Map[String, Double], Map[String, Map[String, Double]]) -> Map[String, Double]
-
-pub fn replace_clipping_plane_nums(String, num_clipping_planes? : Int, num_clip_intersection? : Int) -> String
-
-pub fn replace_light_nums(String, num_sun_lights? : Int, num_dir_lights? : Int, num_spot_lights? : Int, num_spot_light_maps? : Int, num_rect_area_lights? : Int, num_point_lights? : Int, num_hemi_lights? : Int, num_sun_light_shadows? : Int, num_dir_light_shadows? : Int, num_spot_light_shadows_with_maps? : Int, num_spot_light_shadows? : Int, num_point_light_shadows? : Int) -> String
-
-pub fn resolve_includes(String, Map[String, String]) -> String
-
-pub fn unroll_loops(String) -> String
 
 // Errors
 
 // Types and methods
-pub struct CachedProgram {
-  cache_key : String
-  used_times : @ref.Ref[Int]
-}
-
 pub(all) enum GlslVersion {
   GLSL1
   GLSL3
@@ -110,7 +79,6 @@ pub fn LineBasicMaterial::dispatch_event(Self, String) -> Unit
 pub fn LineBasicMaterial::dispose(Self) -> Unit
 pub fn LineBasicMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn LineBasicMaterial::new(hex? : Int) -> Self
-pub fn LineBasicMaterial::program_shader_id(Self) -> String?
 pub fn LineBasicMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn LineBasicMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn LineBasicMaterial::set_needs_update(Self, Bool) -> Unit
@@ -127,7 +95,6 @@ pub fn LineDashedMaterial::copy(Self, Self) -> Self
 pub fn LineDashedMaterial::dispose(Self) -> Unit
 pub fn LineDashedMaterial::keeps_distance(Self, Double) -> Bool
 pub fn LineDashedMaterial::new(hex? : Int, scale? : Double, dash_size? : Double, gap_size? : Double) -> Self
-pub fn LineDashedMaterial::program_shader_id(Self) -> String?
 
 pub(all) struct Material {
   color : @math.Color
@@ -290,135 +257,6 @@ pub fn Material::matcap(hex? : Int, roughness? : Double, metalness? : Double) ->
 pub fn Material::normal(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::phong(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::physical(hex? : Int, roughness? : Double, metalness? : Double) -> Self
-pub fn Material::prefixed_fragment_shader(Self, has_tangent? : Bool, has_vertex_alpha? : Bool, has_points_uv? : Bool, shadow_map_enabled? : Bool, shadow_map_pcf? : Bool, shadow_map_vsm? : Bool, num_light_probes? : Int, num_light_probe_grids? : Int, decode_video_texture? : Bool, decode_video_texture_emissive? : Bool, logarithmic_depth_buffer? : Bool, reversed_depth_buffer? : Bool, tone_mapping? : @constants.ToneMapping, output_srgb? : Bool, depth_packing? : Int, has_fog? : Bool, fog_exp2? : Bool, env_map_cube_uv_height? : Int?, normal_map_format? : Int, instancing_color? : Bool, batching_color? : Bool, has_normal? : Bool) -> String
-pub fn Material::prefixed_vertex_shader(Self, has_tangent? : Bool, has_normal? : Bool, has_vertex_alpha? : Bool, has_points_uv? : Bool, has_skinning? : Bool, has_morph_targets? : Bool, has_morph_normals? : Bool, has_morph_colors? : Bool, morph_targets_count? : Int, morph_texture_stride? : Int, shadow_map_enabled? : Bool, shadow_map_pcf? : Bool, shadow_map_vsm? : Bool, size_attenuation? : Bool, num_light_probes? : Int, logarithmic_depth_buffer? : Bool, reversed_depth_buffer? : Bool, has_fog? : Bool, fog_exp2? : Bool, has_clip_cull_distance? : Bool, batching? : Bool, batching_color? : Bool, instancing? : Bool, instancing_color? : Bool, instancing_morph? : Bool) -> String
-pub fn Material::program_alpha_hash(Self) -> Bool
-pub fn Material::program_alpha_map(Self) -> Bool
-pub fn Material::program_alpha_map_uv(Self) -> String
-pub fn Material::program_alpha_test(Self) -> Bool
-pub fn Material::program_alpha_to_coverage(Self) -> Bool
-pub fn Material::program_anisotropy(Self) -> Bool
-pub fn Material::program_anisotropy_map(Self) -> Bool
-pub fn Material::program_anisotropy_map_uv(Self) -> String
-pub fn Material::program_ao_map(Self) -> Bool
-pub fn Material::program_ao_map_uv(Self) -> String
-pub fn Material::program_bump_map(Self) -> Bool
-pub fn Material::program_bump_map_uv(Self) -> String
-pub fn Material::program_clearcoat(Self) -> Bool
-pub fn Material::program_clearcoat_map(Self) -> Bool
-pub fn Material::program_clearcoat_map_uv(Self) -> String
-pub fn Material::program_clearcoat_normal_map(Self) -> Bool
-pub fn Material::program_clearcoat_normal_map_uv(Self) -> String
-pub fn Material::program_clearcoat_roughness_map(Self) -> Bool
-pub fn Material::program_clearcoat_roughness_map_uv(Self) -> String
-pub fn Material::program_combine(Self) -> @constants.Combine
-pub fn Material::program_custom_program_cache_key(Self, custom_program_cache_key? : String) -> String
-pub fn Material::program_decode_video_texture(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
-pub fn Material::program_decode_video_texture_emissive(Self, video_texture? : Bool, srgb_transfer? : Bool) -> Bool
-pub fn Material::program_defines(Self) -> Map[String, String]
-pub fn Material::program_depth_packing(Self) -> Int
-pub fn Material::program_dispersion(Self) -> Bool
-pub fn Material::program_displacement_map(Self) -> Bool
-pub fn Material::program_displacement_map_uv(Self) -> String
-pub fn Material::program_dithering(Self) -> Bool
-pub fn Material::program_double_sided(Self) -> Bool
-pub fn Material::program_emissive_map(Self) -> Bool
-pub fn Material::program_emissive_map_uv(Self) -> String
-pub fn Material::program_env_map(Self, has_scene_environment? : Bool) -> Bool
-pub fn Material::program_env_map_cube_uv_height(Self, Int, scene_environment_height? : Int, has_scene_environment? : Bool) -> Int?
-pub fn Material::program_env_map_mode(Self, Int, has_scene_environment? : Bool) -> Int?
-pub fn Material::program_extension_clip_cull_distance(Self, has_extension? : Bool) -> Bool
-pub fn Material::program_extension_multi_draw(Self, has_extension? : Bool, is_batched_mesh? : Bool) -> Bool
-pub fn Material::program_flat_shading(Self, has_normal? : Bool) -> Bool
-pub fn Material::program_flip_sided(Self) -> Bool
-pub fn Material::program_fog(Self, has_fog? : Bool) -> Bool
-pub fn Material::program_fog_exp2(Self, has_fog? : Bool, fog_exp2? : Bool) -> Bool
-pub fn Material::program_fragment_shader(Self) -> String?
-pub fn Material::program_glsl_version(Self) -> GlslVersion?
-pub fn Material::program_gradient_map(Self) -> Bool
-pub fn Material::program_has_position_attribute(Self, has_position? : Bool) -> Bool
-pub fn Material::program_index0_attribute_name(Self) -> String?
-pub fn Material::program_iridescence(Self) -> Bool
-pub fn Material::program_iridescence_map(Self) -> Bool
-pub fn Material::program_iridescence_map_uv(Self) -> String
-pub fn Material::program_iridescence_thickness_map(Self) -> Bool
-pub fn Material::program_iridescence_thickness_map_uv(Self) -> String
-pub fn Material::program_is_raw_shader_material(Self) -> Bool
-pub fn Material::program_light_map(Self) -> Bool
-pub fn Material::program_light_map_uv(Self) -> String
-pub fn Material::program_logarithmic_depth_buffer(Self, logarithmic_depth_buffer? : Bool) -> Bool
-pub fn Material::program_map(Self) -> Bool
-pub fn Material::program_map_uv(Self) -> String
-pub fn Material::program_matcap(Self) -> Bool
-pub fn Material::program_metalness_map(Self) -> Bool
-pub fn Material::program_metalness_map_uv(Self) -> String
-pub fn Material::program_morph_colors(Self, has_morph_colors? : Bool) -> Bool
-pub fn Material::program_morph_normals(Self, has_morph_normals? : Bool) -> Bool
-pub fn Material::program_morph_targets(Self, has_morph_targets? : Bool) -> Bool
-pub fn Material::program_morph_targets_count(Self, position_count? : Int?, normal_count? : Int?, color_count? : Int?) -> Int
-pub fn Material::program_morph_texture_stride(Self, has_position_morph? : Bool, has_normal_morph? : Bool, has_color_morph? : Bool) -> Int
-pub fn Material::program_normal_map(Self) -> Bool
-pub fn Material::program_normal_map_object_space(Self) -> Bool
-pub fn Material::program_normal_map_tangent_space(Self) -> Bool
-pub fn Material::program_normal_map_uv(Self) -> String
-pub fn Material::program_num_clip_intersection(Self, num_clip_intersection? : Int) -> Int
-pub fn Material::program_num_clipping_planes(Self, num_clipping_planes? : Int) -> Int
-pub fn Material::program_num_dir_light_shadows(Self, num_dir_light_shadows? : Int) -> Int
-pub fn Material::program_num_dir_lights(Self, num_dir_lights? : Int) -> Int
-pub fn Material::program_num_hemi_lights(Self, num_hemi_lights? : Int) -> Int
-pub fn Material::program_num_light_probe_grids(Self, num_light_probe_grids? : Int) -> Int
-pub fn Material::program_num_light_probes(Self, num_light_probes? : Int) -> Int
-pub fn Material::program_num_point_light_shadows(Self, num_point_light_shadows? : Int) -> Int
-pub fn Material::program_num_point_lights(Self, num_point_lights? : Int) -> Int
-pub fn Material::program_num_rect_area_lights(Self, num_rect_area_lights? : Int) -> Int
-pub fn Material::program_num_spot_light_maps(Self, num_spot_light_maps? : Int) -> Int
-pub fn Material::program_num_spot_light_shadows(Self, num_spot_light_shadows? : Int) -> Int
-pub fn Material::program_num_spot_light_shadows_with_maps(Self, num_spot_light_shadows_with_maps? : Int) -> Int
-pub fn Material::program_num_spot_lights(Self, num_spot_lights? : Int) -> Int
-pub fn Material::program_num_sun_light_shadows(Self, num_sun_light_shadows? : Int) -> Int
-pub fn Material::program_num_sun_lights(Self, num_sun_lights? : Int) -> Int
-pub fn Material::program_opaque(Self) -> Bool
-pub fn Material::program_packed_normal_map(Self, Int) -> Bool
-pub fn Material::program_points_uvs(Self, has_points_uv? : Bool) -> Bool
-pub fn Material::program_precision(Self, String, vertex_highp? : Bool, fragment_highp? : Bool, vertex_mediump? : Bool, fragment_mediump? : Bool) -> String
-pub fn Material::program_premultiplied_alpha(Self) -> Bool
-pub fn Material::program_renderer_extension_parallel_shader_compile(Self, has_extension? : Bool) -> Bool
-pub fn Material::program_retroreflection(Self) -> Bool
-pub fn Material::program_reversed_depth_buffer(Self, reversed_depth_buffer? : Bool) -> Bool
-pub fn Material::program_roughness_map(Self) -> Bool
-pub fn Material::program_roughness_map_uv(Self) -> String
-pub fn Material::program_shader_id(Self) -> String?
-pub fn Material::program_shadow_map_enabled(Self, shadow_map_enabled? : Bool, has_shadows? : Bool) -> Bool
-pub fn Material::program_shadow_map_type(Self, shadow_map_type? : Int) -> Int
-pub fn Material::program_sheen(Self) -> Bool
-pub fn Material::program_sheen_color_map(Self) -> Bool
-pub fn Material::program_sheen_color_map_uv(Self) -> String
-pub fn Material::program_sheen_roughness_map(Self) -> Bool
-pub fn Material::program_sheen_roughness_map_uv(Self) -> String
-pub fn Material::program_size_attenuation(Self) -> Bool
-pub fn Material::program_skinning(Self, has_skinning? : Bool) -> Bool
-pub fn Material::program_specular_color_map(Self) -> Bool
-pub fn Material::program_specular_color_map_uv(Self) -> String
-pub fn Material::program_specular_intensity_map(Self) -> Bool
-pub fn Material::program_specular_intensity_map_uv(Self) -> String
-pub fn Material::program_specular_map(Self) -> Bool
-pub fn Material::program_specular_map_uv(Self) -> String
-pub fn Material::program_thickness_map(Self) -> Bool
-pub fn Material::program_thickness_map_uv(Self) -> String
-pub fn Material::program_tone_mapping(Self, tone_mapping? : @constants.ToneMapping, has_render_target? : Bool) -> @constants.ToneMapping
-pub fn Material::program_transmission(Self) -> Bool
-pub fn Material::program_transmission_map(Self) -> Bool
-pub fn Material::program_transmission_map_uv(Self) -> String
-pub fn Material::program_use_depth_packing(Self) -> Bool
-pub fn Material::program_use_fog(Self) -> Bool
-pub fn Material::program_vertex_alphas(Self, has_vertex_alpha? : Bool) -> Bool
-pub fn Material::program_vertex_colors(Self) -> Bool
-pub fn Material::program_vertex_normals(Self, has_normal? : Bool) -> Bool
-pub fn Material::program_vertex_shader(Self) -> String?
-pub fn Material::program_vertex_tangents(Self, has_tangent? : Bool) -> Bool
-pub fn Material::program_vertex_uv1s(Self) -> Bool
-pub fn Material::program_vertex_uv2s(Self) -> Bool
-pub fn Material::program_vertex_uv3s(Self) -> Bool
 pub fn Material::raw(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn Material::set_alpha_test(Self, Double) -> Unit
@@ -431,8 +269,6 @@ pub fn Material::set_retroreflectivity(Self, Double) -> Unit
 pub fn Material::set_sheen(Self, Double) -> Unit
 pub fn Material::set_transmission(Self, Double) -> Unit
 pub fn Material::shader(hex? : Int, roughness? : Double, metalness? : Double) -> Self
-pub fn Material::shader_name(Self) -> String
-pub fn Material::shader_type(Self) -> String
 pub fn Material::shading(Self) -> @constants.Shading
 pub fn Material::shadow(hex? : Int, roughness? : Double, metalness? : Double) -> Self
 pub fn Material::standard(hex? : Int, roughness? : Double, metalness? : Double) -> Self
@@ -533,42 +369,13 @@ pub fn PointsMaterial::dispatch_event(Self, String) -> Unit
 pub fn PointsMaterial::dispose(Self) -> Unit
 pub fn PointsMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn PointsMaterial::new(hex? : Int, size? : Double, size_attenuation? : Bool) -> Self
-pub fn PointsMaterial::program_shader_id(Self) -> String?
-pub fn PointsMaterial::program_size_attenuation(Self) -> Bool
 pub fn PointsMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn PointsMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn PointsMaterial::set_needs_update(Self, Bool) -> Unit
 
-pub struct ProgramCache {
-  programs : Array[CachedProgram]
-  by_key : Map[String, CachedProgram]
-}
-pub fn ProgramCache::acquire(Self, String) -> CachedProgram
-pub fn ProgramCache::new() -> Self
-pub fn ProgramCache::release(Self, CachedProgram) -> Unit
-
-pub struct ShaderCache {
-  shader_cache : Map[String, ShaderStage]
-  material_cache : Map[Int, Array[ShaderStage]]
-}
-pub fn ShaderCache::custom_fragment_shader_id(Self, Material) -> Int?
-pub fn ShaderCache::custom_vertex_shader_id(Self, Material) -> Int?
-pub fn ShaderCache::dispose(Self) -> Unit
-pub fn ShaderCache::get_fragment_shader_stage(Self, Material) -> ShaderStage
-pub fn ShaderCache::get_vertex_shader_stage(Self, Material) -> ShaderStage
-pub fn ShaderCache::new() -> Self
-pub fn ShaderCache::release_shader_cache(Self, Int) -> Unit
-pub fn ShaderCache::update(Self, Int, String, String) -> Unit
-
 pub(all) struct ShaderExtensions {
   mut clip_cull_distance : Bool
   mut multi_draw : Bool
-}
-
-pub struct ShaderStage {
-  id : Int
-  code : String
-  used_times : @ref.Ref[Int]
 }
 
 pub(all) struct SpriteMaterial {
@@ -635,8 +442,6 @@ pub fn SpriteMaterial::dispatch_event(Self, String) -> Unit
 pub fn SpriteMaterial::dispose(Self) -> Unit
 pub fn SpriteMaterial::has_event_listener(Self, String, () -> Unit) -> Bool
 pub fn SpriteMaterial::new(rotation? : Double, size_attenuation? : Bool, hex? : Int, opacity? : Double, transparent? : Bool, fog? : Bool) -> Self
-pub fn SpriteMaterial::program_shader_id(Self) -> String?
-pub fn SpriteMaterial::program_size_attenuation(Self) -> Bool
 pub fn SpriteMaterial::remove_event_listener(Self, String, () -> Unit) -> Unit
 pub fn SpriteMaterial::set_alpha_test(Self, Double) -> Unit
 pub fn SpriteMaterial::set_needs_update(Self, Bool) -> Unit

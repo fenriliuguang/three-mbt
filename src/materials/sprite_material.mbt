@@ -1,21 +1,6 @@
 // r186: `SpriteMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/SpriteMaterial.js#L18
 
 ///|
-/// 程序参数里的尺寸衰减标记。精灵材质默认打开。
-/// r186: `sizeAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L326
-pub fn SpriteMaterial::program_size_attenuation(self : SpriteMaterial) -> Bool {
-  self.size_attenuation
-}
-
-///|
-/// 程序参数里的内置着色器标识。精灵材质是 `sprite`。
-/// r186: `shaderIDs` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L28
-/// r186: `shaderID` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L191
-pub fn SpriteMaterial::program_shader_id(self : SpriteMaterial) -> String? {
-  builtin_shader_id(self.type_name)
-}
-
-///|
 /// 精灵材质。射线读取 `rotation` 和 `size_attenuation`。
 /// 颜色默认白，贴图和透明贴图默认空。透明度默认打开，不透明度默认 `1`，雾默认打开。
 /// `side` 默认正面。背面和双面一并存储。`copy` 沿用源值。渲染器仍不画精灵。

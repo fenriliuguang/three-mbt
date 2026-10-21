@@ -1,21 +1,6 @@
 // r186: `PointsMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/PointsMaterial.js#L29
 
 ///|
-/// 程序参数里的尺寸衰减标记。点材质默认打开。关闭后点大小不随距离缩小。
-/// r186: `sizeAttenuation` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L326
-pub fn PointsMaterial::program_size_attenuation(self : PointsMaterial) -> Bool {
-  self.size_attenuation
-}
-
-///|
-/// 程序参数里的内置着色器标识。点材质是 `points`。
-/// r186: `shaderIDs` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L28
-/// r186: `shaderID` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L191
-pub fn PointsMaterial::program_shader_id(self : PointsMaterial) -> String? {
-  builtin_shader_id(self.type_name)
-}
-
-///|
 /// 点精灵。`size` 是像素，`size_attenuation` 为真时按透视缩小，对齐 r186 `PointsMaterial`。
 /// 颜色贴图和透明贴图默认空。点着色器仍按材质颜色绘制，不采样这两张贴图。
 /// `side` 默认正面。背面和双面一并存储。`copy` 沿用源值。点绘制仍不按这个面剔除。

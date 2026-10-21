@@ -164,6 +164,7 @@ Samples live under `src/examples` because only packages inside the `source` dire
 5. This is a semantic port. Upstream files that the port uses are listed in the module checklists under `docs/plan/`.
 6. A ported implementation file carries an `r186` blob link. The first line is `// r186:` and points at the upstream file. Each public type that maps to a class, and each core function whose upstream name is not obvious from that type, has a `/// r186:` line on the declaration. The URL is `https://github.com/mrdoob/three.js/blob/r186/<path>#L<line>`. Tests, examples, ffi, and generated bindings stay unmarked. The comment rules are in `.cursor/skills/upstream-links/SKILL.md`.
 7. Split implementation files the way r186 splits source files. One upstream class or module is one `.mbt` in the existing package directory. A file that is already one upstream unit stays one file, even when that unit is long (`GLTFLoader.js`, `BufferGeometry.js`, `Object3D.js`, `constants.js`). Do not open a new package just to shorten a file. Tests follow the same boundary. The rule is in `.cursor/skills/source-layout/SKILL.md`.
+8. Do not port WebGL. The host is `wasi:webgpu` only. `WebGLRenderer`, `WebGLBackend`, `src/renderers/webgl`, `src/renderers/shaders`, GLSL prefixes, and `WebGLPrograms` stay upstream. A comment may name a GLSL chunk when a WGSL or CPU formula took its numbers from there. `WebGLCoordinateSystem` stays as the NDC constant and is not a backend. The rule is in `.cursor/skills/no-webgl/SKILL.md`.
 
 
 ## Where the plan lives
@@ -176,9 +177,9 @@ Samples live under `src/examples` because only packages inside the `source` dire
 | [active](plan/active/) | 活跃中 | The slice being ported now |
 | [later](plan/later/) | 待实现 | Decided, not started |
 
-A module can appear in more than one directory. `materials` has landed shading in `done`, the `WebGLPrograms` parameter port in `active`, and environment maps plus `ShaderLib` in `later`.
+A module can appear in more than one directory. `materials` has landed shading in `done`. The `WebGLPrograms` prefix port was removed and stays out of scope. Environment maps stay in `later`. `ShaderLib` stays upstream with the rest of the GLSL sources.
 
-The next slice is the name at the end of the last paragraph under `## Behavior` in [plan/active/materials.md](plan/active/materials.md). That sentence ends with “X stays later”. Append the new paragraph there, then add its checklist row. Do not take the next slice from `done` or `later`.
+The next slice is the name at the end of the last paragraph under `## Behavior` in [plan/active/materials.md](plan/active/materials.md), when that sentence ends with “X stays later” and X is work on the WebGPU path. The current materials note records that the WebGL program path was removed. Do not resume it. Do not take the next slice from `done` or `later`.
 
 ### Done
 
@@ -215,13 +216,13 @@ The next slice is the name at the end of the last paragraph under `## Behavior` 
 
 ## Phases
 
-Phase 0 through phase 6 have landed. The notes for each module are in `docs/plan/done/`. Phase 7 is the open scene work: what has landed is in `done`, the shader-parameter port is in `active`, and the items still waiting are in `later`.
+Phase 0 through phase 6 have landed. The notes for each module are in `docs/plan/done/`. Phase 7 is the open scene work: what has landed is in `done`, and the items still waiting are in `later`. The WebGL shader-parameter port was removed from `active`.
 
 Out of scope, and not in `later`:
 
 | status | item | packages |
 |---|---|---|
-| excluded | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `shaders/`, `webxr/`, `audio/` | None |
+| excluded | `src/renderers/webgl`, `webgl-fallback`, `WebGLRenderer.js`, `WebGLProgram.js`, `WebGLPrograms.js`, `WebGLShaderCache.js`, `shaders/`, `ShaderLib`, `webxr/`, `audio/` | None |
 
 ## Risks
 

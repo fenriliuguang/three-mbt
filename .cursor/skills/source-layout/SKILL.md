@@ -11,7 +11,8 @@ three.js 一个类一个文件。这里同样：一个上游源文件对应同�
 
 ## 怎么拆
 
-- 文件名用上游类名的 snake_case。`MeshStandardMaterial` 写成 `mesh_standard_material.mbt`，`WebGLProgram` 写成 `webgl_program.mbt`。
+- 文件名用上游类名的 snake_case。`MeshStandardMaterial` 写成 `mesh_standard_material.mbt`，`AnimationMixer` 写成 `animation_mixer.mbt`。
+- 不建 `webgl_` 文件。WebGL 和 GLSL 不移植，见 [no-webgl](../no-webgl/SKILL.md)。
 - 公开类型、它的构造和只服务于这个类型的方法放进这个文件。同一包的其它文件可以直接调用，不需要把符号再导出一次。
 - 几个类型共用的私有函数跟它的上游文件走。上游没有单独文件时，放在第一个调用方那个文件里。
 - `using` 在整个包里声明一次。拆出去的文件直接用这些短名字，不要再写一份，重复声明会报类型重复。

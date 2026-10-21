@@ -1,14 +1,6 @@
 // r186: `LineDashedMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/LineDashedMaterial.js#L19
 
 ///|
-/// 程序参数里的内置着色器标识。虚线材质是 `dashed`。
-/// r186: `shaderIDs` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L28
-/// r186: `shaderID` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgl/WebGLPrograms.js#L191
-pub fn LineDashedMaterial::program_shader_id(self : LineDashedMaterial) -> String? {
-  builtin_shader_id(self.type_name)
-}
-
-///|
 /// 虚线材质。线段字段放在内嵌的 `line` 上。
 /// `scale` 默认 `1`，`dash_size` 默认 `3`，`gap_size` 默认 `1`。
 /// `type_name` 对应上游 `type`，固定是 `LineDashedMaterial`。`copy` 不改目标上的这个名字。内嵌线段仍是 `LineBasicMaterial`。线段绘制仍不读这个名字。
@@ -72,7 +64,7 @@ pub fn LineDashedMaterial::dispose(self : LineDashedMaterial) -> Unit {
 }
 
 ///|
-/// 没有同名上游方法。距离先乘 `scale`，再按 GLSL `mod` 对 `dash_size + gap_size` 取余。
+/// 没有同名上游方法。距离先乘 `scale`，再对 `dash_size + gap_size` 取余。
 /// 余数大于 `dash_size` 时落在间隔里，返回 false。周期为 0 时中止。
 /// 着色器仍画实线。
 /// r186: `vLineDistance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderLib/linedashed.glsl.js#L17

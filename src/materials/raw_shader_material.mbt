@@ -1,7 +1,7 @@
 // r186: `RawShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L12
 
 ///|
-/// 不自动加上内置 uniform 和 attribute 的自定义着色器。`is_shader_material` 与 `is_raw_shader_material` 都为真，`type_name` 是 `RawShaderMaterial`，`kind` 是 `Raw`。其余默认值与 `Material::shader` 相同：颜色白，`fog`、`lights`、`clipping` 关闭，默认顶点着色器和片元着色器，`uniforms` 空表，`uniforms_groups` 空数组，`linewidth` 为 `1`，`force_single_pass` 打开，`extensions` 两个开关关闭，`default_attribute_values` 有 `color` `[1, 1, 1]`、`uv` `[0, 0]` 和 `uv1` `[0, 0]`，`glsl_version` 与 `index0_attribute_name` 为空，`uniforms_need_update` 关闭。`copy` 不改这两个标记、`type_name` 和 `kind`。渲染器仍按 Basic 着色，仍不编译这两串着色器。`prefixed_vertex_shader` 不加 `#version 300 es`，不加顶点 GLSL3 改写，也不加内置 uniform 和 attribute。`prefixed_fragment_shader` 不加这行版本，不加 GLSL3 宏，也不加内置 uniform。
+/// 不自动加上内置 uniform 和 attribute 的自定义着色器。`is_shader_material` 与 `is_raw_shader_material` 都为真，`type_name` 是 `RawShaderMaterial`，`kind` 是 `Raw`。其余默认值与 `Material::shader` 相同：颜色白，`fog`、`lights`、`clipping` 关闭，默认顶点着色器和片元着色器，`uniforms` 空表，`uniforms_groups` 空数组，`linewidth` 为 `1`，`force_single_pass` 打开，`extensions` 两个开关关闭，`default_attribute_values` 有 `color` `[1, 1, 1]`、`uv` `[0, 0]` 和 `uv1` `[0, 0]`，`glsl_version` 与 `index0_attribute_name` 为空，`uniforms_need_update` 关闭。`copy` 不改这两个标记、`type_name` 和 `kind`。渲染器仍按 Basic 着色，仍不编译这两串着色器。
 /// r186: `RawShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L12
 /// r186: `isRawShaderMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L34
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/RawShaderMaterial.js#L36
