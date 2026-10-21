@@ -10410,6 +10410,56 @@ test "Material shader writes ALPHA_TO_COVERAGE" {
 }
 
 ///|
+test "Material shader writes USE_MATCAP" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.alpha_to_coverage = true
+  assert_eq(shader.prefixed_fragment_shader().length(), 2052)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1104].to_owned(),
+    "#define ALPHA_TO_COVERAGE",
+  )
+  shader.alpha_to_coverage = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let matcap = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.matcap = Some(matcap)
+  assert_eq(shader.program_matcap(), true)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2060)
+  assert_eq(2060 - 2041, 19)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1097].to_owned(),
+    "#define USE_MATCAP",
+  )
+  let map_pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, map_pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2076)
+  assert_eq(shader.prefixed_fragment_shader()[1079:1094].to_owned(), "#define USE_MAP")
+  assert_eq(
+    shader.prefixed_fragment_shader()[1095:1113].to_owned(),
+    "#define USE_MATCAP",
+  )
+  shader.matcap = None
+  assert_eq(shader.program_matcap(), false)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  shader.map = None
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.matcap = Some(matcap)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.matcap = Some(matcap)
+  assert_eq(basic.prefixed_vertex_shader(), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(@materials.Material::matcap().prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()

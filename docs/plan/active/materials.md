@@ -520,6 +520,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `ALPHA_TO_COVERAGE` has landed. A Shader material with `alpha_to_coverage` off adds nothing. Turning it on writes `#define ALPHA_TO_COVERAGE` and a newline, `26` characters, on the fragment prefix only. The same flag drops the `16`-character `OPAQUE` line and adds one newline before the color-space chunk, so the fragment string goes from `2041` to `2052`. The vertex string stays `1608`. Scene fog still writes `USE_FOG` and does not write this line. A color map puts `USE_MAP` after it, so the fragment string is `2068` and the vertex string is `1642`. Turning the flag off returns the fragment string to `2041`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_MATCAP` stays later.
 
+`USE_MATCAP` has landed. A Shader material with no matcap adds nothing. `alpha_to_coverage` still writes only `ALPHA_TO_COVERAGE`. Setting a 1×1 matcap writes `#define USE_MATCAP` and a newline, `19` characters, on the fragment prefix only. The fragment string grows from `2041` to `2060`. The vertex string stays `1608`. A color map puts `USE_MAP` before that line, so the fragment string is `2076` and the vertex string is `1642`. Clearing the matcap leaves the map lengths at `2057` and `1642`. A raw material stays at `92` and `61`. A Basic material and a Matcap material stay `""`. `CUBEUV_TEXEL_WIDTH` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -782,3 +784,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_FOG` | `materials` |
 | planned | 7 | `FOG_EXP2` | `materials` |
 | planned | 7 | `ALPHA_TO_COVERAGE` | `materials` |
+| planned | 7 | `USE_MATCAP` | `materials` |
