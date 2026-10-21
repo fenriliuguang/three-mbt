@@ -5559,7 +5559,8 @@ test "Material shader writes HAS_NORMAL" {
   let raw = @materials.Material::raw()
   assert_eq(raw.prefixed_vertex_shader(has_normal=true).length(), 92)
   let basic = @materials.Material::basic()
-  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
+  assert_eq(basic.prefixed_fragment_shader(has_normal=true), "")
 }
 
 ///|
@@ -11475,7 +11476,7 @@ test "Material shader writes missing-normal FLAT_SHADED" {
   assert_eq(lambert.prefixed_fragment_shader(), "#define FLAT_SHADED\n")
   assert_eq(lambert.prefixed_vertex_shader().length(), 20)
   assert_eq(lambert.prefixed_fragment_shader().length(), 20)
-  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
   assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
   let pixels = FixedArray::make(4, b'\xFF')
   lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
@@ -11514,14 +11515,14 @@ test "Material shader writes missing-normal USE_TANGENT" {
   )
   assert_eq(
     lambert.prefixed_vertex_shader(has_tangent=true, has_normal=true),
-    "#define USE_TANGENT\n",
+    "#define USE_TANGENT\n#define HAS_NORMAL\n",
   )
   assert_eq(
     lambert.prefixed_fragment_shader(has_tangent=true, has_normal=true),
     "#define USE_TANGENT\n",
   )
-  assert_eq(lambert.prefixed_vertex_shader(has_tangent=true, has_normal=true).length(), 20)
-  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_vertex_shader(has_tangent=true, has_normal=true).length(), 39)
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
   let pixels = FixedArray::make(4, b'\xFF')
   lambert.anisotropy = 0.0
   lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
@@ -11554,11 +11555,11 @@ test "Material shader writes missing-normal USE_MORPHNORMALS" {
   assert_eq(lambert.prefixed_fragment_shader(), "#define FLAT_SHADED\n")
   assert_eq(
     lambert.prefixed_vertex_shader(has_morph_normals=true, has_normal=true),
-    "#define USE_MORPHNORMALS\n",
+    "#define HAS_NORMAL\n#define USE_MORPHNORMALS\n",
   )
   assert_eq(
     lambert.prefixed_vertex_shader(has_morph_normals=true, has_normal=true).length(),
-    25,
+    44,
   )
   assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
   lambert.anisotropy = 1.0
@@ -11568,7 +11569,7 @@ test "Material shader writes missing-normal USE_MORPHNORMALS" {
       has_morph_normals=true,
       has_normal=true,
     ),
-    "#define USE_TANGENT\n#define USE_MORPHNORMALS\n",
+    "#define USE_TANGENT\n#define HAS_NORMAL\n#define USE_MORPHNORMALS\n",
   )
   assert_eq(
     lambert.prefixed_vertex_shader(has_tangent=true, has_morph_normals=true),
@@ -11580,7 +11581,7 @@ test "Material shader writes missing-normal USE_MORPHNORMALS" {
       has_morph_normals=true,
       has_normal=true,
     ).length(),
-    25,
+    44,
   )
   let shader = @materials.Material::shader()
   assert_eq(shader.prefixed_vertex_shader(has_morph_normals=true).length(), 1633)
@@ -11594,11 +11595,14 @@ test "Material shader writes missing-normal USE_MORPHNORMALS" {
 test "Material shader writes lit flat_shading FLAT_SHADED" {
   let lambert = @materials.Material::lambert()
   lambert.flat_shading = true
-  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define FLAT_SHADED\n")
+  assert_eq(
+    lambert.prefixed_vertex_shader(has_normal=true),
+    "#define HAS_NORMAL\n#define FLAT_SHADED\n",
+  )
   assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "#define FLAT_SHADED\n")
-  assert_eq(lambert.prefixed_vertex_shader(has_normal=true).length(), 20)
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true).length(), 39)
   lambert.wireframe = true
-  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
   assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
   lambert.wireframe = false
   lambert.anisotropy = 1.0
@@ -11608,18 +11612,18 @@ test "Material shader writes lit flat_shading FLAT_SHADED" {
       has_morph_normals=true,
       has_normal=true,
     ),
-    "#define FLAT_SHADED\n",
+    "#define HAS_NORMAL\n#define FLAT_SHADED\n",
   )
   let pixels = FixedArray::make(4, b'\xFF')
   lambert.normal_map = Some(@textures.Texture::from_rgba8(1, 1, pixels))
   assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "#define FLAT_SHADED\n")
   let basic = @materials.Material::basic()
   basic.flat_shading = true
-  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "")
+  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
   assert_eq(basic.prefixed_fragment_shader(), "")
   let phong = @materials.Material::phong()
   phong.flat_shading = true
-  assert_eq(phong.prefixed_vertex_shader(has_normal=true).length(), 20)
+  assert_eq(phong.prefixed_vertex_shader(has_normal=true).length(), 39)
   let physical = @materials.Material::physical()
   physical.flat_shading = true
   assert_eq(physical.prefixed_fragment_shader(has_normal=true).length(), 20)
@@ -11631,6 +11635,28 @@ test "Material shader writes lit flat_shading FLAT_SHADED" {
   raw.flat_shading = true
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   assert_eq(raw.prefixed_fragment_shader().length(), 61)
+}
+
+///|
+test "Material shader writes builtin HAS_NORMAL" {
+  let lambert = @materials.Material::lambert()
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
+  assert_eq(lambert.prefixed_vertex_shader(has_normal=true).length(), 19)
+  assert_eq(lambert.prefixed_fragment_shader(has_normal=true), "")
+  assert_eq(lambert.prefixed_vertex_shader(), "#define FLAT_SHADED\n")
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(has_normal=true), "#define HAS_NORMAL\n")
+  assert_eq(basic.prefixed_fragment_shader(has_normal=true), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+  let toon = @materials.Material::toon()
+  assert_eq(toon.prefixed_vertex_shader(has_normal=true).length(), 19)
+  assert_eq(toon.prefixed_fragment_shader(has_normal=true), "")
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader(has_normal=true).length(), 1627)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  assert_eq(raw.prefixed_vertex_shader(has_normal=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader(has_normal=true).length(), 61)
 }
 
 ///|

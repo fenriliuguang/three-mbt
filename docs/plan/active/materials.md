@@ -564,6 +564,8 @@ Missing-normal `USE_MORPHNORMALS` has landed. Lambert with morph normals and no 
 
 Lit `flat_shading` `FLAT_SHADED` has landed. Lambert, Phong, and Physical with `flat_shading` on write `#define FLAT_SHADED` and a newline, `20` characters, on both prefixes even when the geometry has a normal. A normal map does not remove it. Wireframe returns `""`. Tangent and morph normals stay off while the flag is on, so the vertex string remains that one line. Basic stays `""`. A Shader material with the flag on stays at vertex `1628` and fragment `2061`. Raw stays `92` and `61`. Builtin `HAS_NORMAL` stays later.
 
+Builtin `HAS_NORMAL` has landed. A geometry normal writes `#define HAS_NORMAL` and a newline, `19` characters, on the vertex prefix of Lambert, Basic, and Toon. The fragment prefix does not gain that line. Lambert without the flag still writes only `FLAT_SHADED` until `has_normal` is passed. Basic without `has_normal` stays `""`. A Shader material stays at vertex `1627` and fragment `2041`. Raw stays `92` and `61`. Builtin `USE_COLOR` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -848,3 +850,4 @@ Lit `flat_shading` `FLAT_SHADED` has landed. Lambert, Phong, and Physical with `
 | planned | 7 | missing-normal `USE_TANGENT` | `materials` |
 | planned | 7 | missing-normal `USE_MORPHNORMALS` | `materials` |
 | planned | 7 | lit `flat_shading` `FLAT_SHADED` | `materials` |
+| planned | 7 | builtin `HAS_NORMAL` | `materials` |
