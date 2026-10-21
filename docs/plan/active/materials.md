@@ -508,6 +508,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `vertexUv1s` has landed. Shader, Raw, and Basic start at `false`. A color map on channel `0` stays `false`. Channel `2` stays `false`. Channel `1` returns `true`. Clearing the map returns `false`. An anisotropy map on channel `1` stays `false` until `anisotropy` is above `0`. A custom program cache key does not turn it on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while no channel-`1` map is active. `vertexUv2s` stays later.
 
+`vertexUv2s` has landed. Shader, Raw, and Basic start at `false`. A color map on channel `0` stays `false`. Channel `1` stays `false` while `vertexUv1s` is `true`. Channel `3` stays `false`. Channel `2` returns `true`. Clearing the map returns `false`. An anisotropy map on channel `2` stays `false` until `anisotropy` is above `0`. A custom program cache key does not turn it on. The vertex prefix stays `1608` and the fragment prefix stays `2041` while no channel-`2` map is active. `vertexUv3s` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -764,3 +766,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `rendererExtensionParallelShaderCompile` | `materials` |
 | planned | 7 | `customProgramCacheKey` | `materials` |
 | planned | 7 | `vertexUv1s` | `materials` |
+| planned | 7 | `vertexUv2s` | `materials` |
