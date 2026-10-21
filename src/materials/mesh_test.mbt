@@ -10279,6 +10279,89 @@ test "Material shader writes USE_FOG" {
 }
 
 ///|
+test "Material shader writes FOG_EXP2" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true).length(),
+    1608,
+  )
+  shader.fog = true
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1624)
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(shader.prefixed_vertex_shader(fog_exp2=true).length(), 1625)
+  assert_eq(shader.prefixed_fragment_shader(fog_exp2=true).length(), 2058)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true).length(),
+    1641,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true).length(),
+    2074,
+  )
+  assert_eq(1641 - 1608, 33)
+  assert_eq(1625 - 1608, 17)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true)[683:698].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true)[699:715].to_owned(),
+    "#define FOG_EXP2",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true)[1079:1094]
+      .to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true)[1095:1111]
+      .to_owned(),
+    "#define FOG_EXP2",
+  )
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true).length(),
+    1675,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true).length(),
+    2090,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true)[716:731].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true)[1112:1127]
+      .to_owned(),
+    "#define USE_MAP",
+  )
+  shader.fog = false
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true, fog_exp2=true).length(),
+    1642,
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true, fog_exp2=true).length(),
+    2057,
+  )
+  let raw = @materials.Material::raw()
+  raw.fog = true
+  assert_eq(raw.prefixed_vertex_shader(has_fog=true, fog_exp2=true).length(), 92)
+  assert_eq(
+    raw.prefixed_fragment_shader(has_fog=true, fog_exp2=true).length(),
+    61,
+  )
+  let basic = @materials.Material::basic()
+  assert_eq(basic.prefixed_vertex_shader(has_fog=true, fog_exp2=true), "")
+  assert_eq(basic.prefixed_fragment_shader(has_fog=true, fog_exp2=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
