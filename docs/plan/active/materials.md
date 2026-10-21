@@ -514,6 +514,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `shaderID` has landed. Shader and Raw stay at `None`. Basic is `basic`, Lambert is `lambert`, Phong is `phong`, Toon is `toon`, and Standard and Physical are both `physical`. Matcap is `matcap`, Normal is `normal`, Depth is `depth`, Distance is `distance`, and Shadow is `shadow`. Points is `points`, Sprite is `sprite`, LineBasic is `basic`, and LineDashed is `dashed`. Renaming Shader or Basic leaves the id unchanged. A channel-`3` color map turns `vertexUv3s` on and leaves the Shader id empty. The vertex prefix stays `1608` and the fragment prefix stays `2041` while the name is still empty. `USE_FOG` stays later.
 
+`USE_FOG` has landed. A Shader material with `fog` off adds nothing, even when the scene has fog. Turning `fog` on without scene fog adds nothing. Both together write `#define USE_FOG` and a newline, `16` characters, on both prefixes. The vertex string grows from `1608` to `1624`. The fragment string grows from `2041` to `2057`. A color map puts `USE_MAP` after that line, so the vertex string is `1658` and the fragment string is `2073`. Turning `fog` back off leaves the map lengths at `1642` and `2057`. `fogExp2` does not add `FOG_EXP2`. A raw material stays at `92` and `61`. A Basic material stays `""`. `FOG_EXP2` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -773,3 +775,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `vertexUv2s` | `materials` |
 | planned | 7 | `vertexUv3s` | `materials` |
 | planned | 7 | `shaderID` | `materials` |
+| planned | 7 | `USE_FOG` | `materials` |

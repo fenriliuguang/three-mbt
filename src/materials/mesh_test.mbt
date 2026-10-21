@@ -10222,6 +10222,63 @@ test "Material shader shaderID reads the builtin id" {
 }
 
 ///|
+test "Material shader writes USE_FOG" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2041)
+  shader.fog = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1624)
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(1624 - 1608, 16)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true)[683:698].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true)[1079:1094].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(shader.program_fog_exp2(has_fog=true, fog_exp2=true), true)
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1624)
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1658)
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2073)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true)[683:698].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_fog=true)[699:714].to_owned(),
+    "#define USE_MAP",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true)[1079:1094].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true)[1095:1110].to_owned(),
+    "#define USE_MAP",
+  )
+  shader.fog = false
+  assert_eq(shader.prefixed_vertex_shader(has_fog=true).length(), 1642)
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  let raw = @materials.Material::raw()
+  raw.fog = true
+  assert_eq(raw.prefixed_vertex_shader(has_fog=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader(has_fog=true).length(), 61)
+  let basic = @materials.Material::basic()
+  assert_eq(basic.program_use_fog(), true)
+  assert_eq(basic.prefixed_vertex_shader(has_fog=true), "")
+  assert_eq(basic.prefixed_fragment_shader(has_fog=true), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
