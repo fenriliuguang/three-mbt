@@ -528,6 +528,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `CUBEUV_MAX_MIP` has landed. The same cube-UV height writes `#define CUBEUV_MAX_MIP` after the height line, with the mip count and `.0`. Height `256` is `6.0`, `27` characters with the newline, so the fragment string is `2155`. Height `512` is `7.0` and the fragment string is `2157`. Height `1` is `-2.0` and the fragment string is `2147`. The vertex string stays `1608`. An env map keeps the line after the height line, so the fragment string is `2263` and the vertex string stays `1658`. Omitting the height leaves the fragment string at `2041` and the env-map fragment string at `2149`. A raw material stays at `61`. A Basic material stays `""`. `USE_CLIP_DISTANCE` stays later.
 
+`USE_CLIP_DISTANCE` has landed. A Shader material writes nothing until the caller marks the clip-cull extension available and the material turns `clip_cull_distance` on. The caller flag alone leaves the vertex string at `1608`. The material flag alone writes the existing `48`-character extension line, so the vertex string is `1656`, and does not write this define. Both together write `#define USE_CLIP_DISTANCE` and a newline, `26` characters, on the vertex prefix only. The vertex string is `1682`. The fragment string stays `2041`. Scene fog puts `USE_FOG` after that line, so the vertex string is `1698` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1716` and the fragment string is `2057`. Turning the material flag off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_BATCHING` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -794,3 +796,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `CUBEUV_TEXEL_WIDTH` | `materials` |
 | planned | 7 | `CUBEUV_TEXEL_HEIGHT` | `materials` |
 | planned | 7 | `CUBEUV_MAX_MIP` | `materials` |
+| planned | 7 | `USE_CLIP_DISTANCE` | `materials` |

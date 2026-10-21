@@ -10652,6 +10652,89 @@ test "Material shader writes CUBEUV_MAX_MIP" {
 }
 
 ///|
+test "Material shader writes USE_CLIP_DISTANCE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true).length(),
+    1608,
+  )
+  assert_eq(
+    shader.program_extension_clip_cull_distance(has_extension=true),
+    false,
+  )
+  shader.extensions.clip_cull_distance = true
+  assert_eq(shader.prefixed_vertex_shader().length(), 1656)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(
+    shader.program_extension_clip_cull_distance(has_extension=true),
+    true,
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true).length(),
+    1682,
+  )
+  assert_eq(1682 - 1656, 26)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true)[731:756].to_owned(),
+    "#define USE_CLIP_DISTANCE",
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  shader.fog = true
+  assert_eq(
+    shader
+    .prefixed_vertex_shader(has_clip_cull_distance=true, has_fog=true)
+    .length(),
+    1698,
+  )
+  assert_eq(shader.prefixed_fragment_shader(has_fog=true).length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true, has_fog=true)[
+      731:756
+    ].to_owned(),
+    "#define USE_CLIP_DISTANCE",
+  )
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true, has_fog=true)[
+      757:772
+    ].to_owned(),
+    "#define USE_FOG",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader(has_fog=true)[1079:1094].to_owned(),
+    "#define USE_FOG",
+  )
+  shader.fog = false
+  let pixels = FixedArray::make(4, b'\xFF')
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  shader.map = Some(map)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true).length(),
+    1716,
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true)[757:772].to_owned(),
+    "#define USE_MAP",
+  )
+  shader.extensions.clip_cull_distance = false
+  assert_eq(
+    shader.prefixed_vertex_shader(has_clip_cull_distance=true).length(),
+    1642,
+  )
+  assert_eq(shader.prefixed_fragment_shader().length(), 2057)
+  let raw = @materials.Material::raw()
+  raw.extensions.clip_cull_distance = true
+  assert_eq(raw.prefixed_vertex_shader(has_clip_cull_distance=true).length(), 92)
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  let basic = @materials.Material::basic()
+  basic.extensions.clip_cull_distance = true
+  assert_eq(basic.prefixed_vertex_shader(has_clip_cull_distance=true), "")
+  assert_eq(basic.prefixed_fragment_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
