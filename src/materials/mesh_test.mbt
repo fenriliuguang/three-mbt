@@ -3975,14 +3975,14 @@ test "Material shader writes USE_IRIDESCENCEMAP" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.iridescence = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1664)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2068)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2092)
   assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[683:709].to_owned(),
     "#define USE_IRIDESCENCEMAP",
   )
   assert_eq(
-    shader.prefixed_fragment_shader()[1079:1105].to_owned(),
+    shader.prefixed_fragment_shader()[1103:1129].to_owned(),
     "#define USE_IRIDESCENCEMAP",
   )
   shader.iridescence = -1.0
@@ -4015,14 +4015,14 @@ test "Material shader writes USE_IRIDESCENCE_THICKNESSMAP" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.iridescence = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1684)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2078)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2102)
   assert_eq(1684 - 1608, 76)
   assert_eq(
     shader.prefixed_vertex_shader()[683:719].to_owned(),
     "#define USE_IRIDESCENCE_THICKNESSMAP",
   )
   assert_eq(
-    shader.prefixed_fragment_shader()[1079:1115].to_owned(),
+    shader.prefixed_fragment_shader()[1103:1139].to_owned(),
     "#define USE_IRIDESCENCE_THICKNESSMAP",
   )
   shader.iridescence_map = Some(thickness_map)
@@ -5055,7 +5055,7 @@ test "Material shader writes IRIDESCENCEMAP_UV" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.iridescence = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1664)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2068)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2092)
   assert_eq(1664 - 1608, 56)
   assert_eq(
     shader.prefixed_vertex_shader()[710:738].to_owned(),
@@ -5064,7 +5064,7 @@ test "Material shader writes IRIDESCENCEMAP_UV" {
   iridescence_map.channel = 1
   shader.iridescence_map = Some(iridescence_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1681)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2084)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2108)
   assert_eq(1681 - 1608, 73)
   assert_eq(
     shader.prefixed_vertex_shader()[710:739].to_owned(),
@@ -5104,7 +5104,7 @@ test "Material shader writes IRIDESCENCE_THICKNESSMAP_UV" {
   assert_eq(shader.prefixed_fragment_shader().length(), 2041)
   shader.iridescence = 1.0
   assert_eq(shader.prefixed_vertex_shader().length(), 1684)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2078)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2102)
   assert_eq(1684 - 1608, 76)
   assert_eq(
     shader.prefixed_vertex_shader()[720:758].to_owned(),
@@ -5113,7 +5113,7 @@ test "Material shader writes IRIDESCENCE_THICKNESSMAP_UV" {
   thickness_map.channel = 1
   shader.iridescence_thickness_map = Some(thickness_map)
   assert_eq(shader.prefixed_vertex_shader().length(), 1701)
-  assert_eq(shader.prefixed_fragment_shader().length(), 2094)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2118)
   assert_eq(1701 - 1608, 93)
   assert_eq(
     shader.prefixed_vertex_shader()[720:759].to_owned(),
@@ -11209,6 +11209,49 @@ test "Material shader writes USE_RETROREFLECTION" {
   assert_eq(raw.prefixed_vertex_shader().length(), 92)
   let basic = @materials.Material::basic()
   basic.retroreflectivity = 0.25
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
+test "Material shader writes USE_IRIDESCENCE" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_iridescence(), false)
+  shader.iridescence = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.iridescence = 1.0
+  assert_eq(shader.program_iridescence(), true)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2065)
+  assert_eq(2065 - 2041, 24)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1102].to_owned(),
+    "#define USE_IRIDESCENCE",
+  )
+  shader.retroreflectivity = 0.25
+  assert_eq(shader.prefixed_fragment_shader().length(), 2093)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1106].to_owned(),
+    "#define USE_RETROREFLECTION",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1107:1130].to_owned(),
+    "#define USE_IRIDESCENCE",
+  )
+  shader.iridescence = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2069)
+  shader.retroreflectivity = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.iridescence = 1.0
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.iridescence = 1.0
   assert_eq(basic.prefixed_fragment_shader(), "")
   assert_eq(basic.prefixed_vertex_shader(), "")
 }

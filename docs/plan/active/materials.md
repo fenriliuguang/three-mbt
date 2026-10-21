@@ -546,6 +546,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_RETROREFLECTION` has landed. A Shader material writes nothing while `retroreflectivity` is `0` or negative. The vertex string stays `1608`. Raising `retroreflectivity` above `0` writes `#define USE_RETROREFLECTION` and a newline, `28` characters, on the fragment prefix only. The fragment string grows from `2041` to `2069`. Dispersion puts `USE_DISPERSION` before it, so the fragment string is `2092` and the vertex string stays `1608`. Setting `retroreflectivity` back to `0` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. `USE_IRIDESCENCE` stays later.
 
+`USE_IRIDESCENCE` has landed. A Shader material writes nothing while `iridescence` is `0` or negative. The vertex string stays `1608`. Raising `iridescence` above `0` writes `#define USE_IRIDESCENCE` and a newline, `24` characters, on the fragment prefix only. The fragment string grows from `2041` to `2065`. Retroreflection puts `USE_RETROREFLECTION` before it, so the fragment string is `2093` and the vertex string stays `1608`. An iridescence map keeps `USE_IRIDESCENCEMAP` after it, so the fragment string is `2092` and the vertex string stays `1664`. Setting `iridescence` back to `0` returns the fragment string to `2041`. A raw material stays at `61`. A Basic material stays `""`. `USE_ALPHATEST` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -821,3 +823,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_PACKED_NORMALMAP` | `materials` |
 | planned | 7 | `USE_DISPERSION` | `materials` |
 | planned | 7 | `USE_RETROREFLECTION` | `materials` |
+| planned | 7 | `USE_IRIDESCENCE` | `materials` |
