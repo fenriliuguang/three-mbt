@@ -536,6 +536,8 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 
 `USE_INSTANCING` has landed. A Shader material writes nothing until the caller marks the object as an instanced mesh. `program_instancing` can be `true` while the prefix still omits the line. Passing `instancing` writes `#define USE_INSTANCING` and a newline, `23` characters, on the vertex prefix only. The vertex string grows from `1608` to `1631`. The fragment string stays `2041`. `USE_BATCHING_COLOR` puts this line after it, so the vertex string is `1658`. Scene fog puts `USE_FOG` after it, so the vertex string is `1647` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1665` and the fragment string is `2057`. Turning instancing off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_INSTANCING_COLOR` stays later.
 
+`USE_INSTANCING_COLOR` has landed. A Shader material writes nothing until the caller marks an instanced mesh that has `instanceColor`. `program_instancing_color` can be `true` while the prefix still omits the line. Passing `instancing_color` writes `#define USE_INSTANCING_COLOR` and a newline, `29` characters, on the vertex prefix only. The vertex string grows from `1608` to `1637`. The fragment string stays `2041`. `USE_INSTANCING` puts this line after it, so the vertex string is `1660`. Scene fog puts `USE_FOG` after it, so the vertex string is `1653` and the fragment string is `2057`. A color map puts `USE_MAP` after it and also writes the `18`-character `MAP_UV` line, so the vertex string is `1671` and the fragment string is `2057`. Turning the flag off leaves the map lengths at `1642` and `2057`. A raw material stays at `92` and `61`. A Basic material stays `""`. `USE_INSTANCING_MORPH` stays later.
+
 ## Checklist
 
 | status | phase | item | packages |
@@ -806,3 +808,4 @@ The trailing newline of `prefixFragment` has landed. Every non-raw Shader fragme
 | planned | 7 | `USE_BATCHING` | `materials` |
 | planned | 7 | `USE_BATCHING_COLOR` | `materials` |
 | planned | 7 | `USE_INSTANCING` | `materials` |
+| planned | 7 | `USE_INSTANCING_COLOR` | `materials` |
