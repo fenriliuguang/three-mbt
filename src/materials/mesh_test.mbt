@@ -11171,6 +11171,49 @@ test "Material shader writes USE_DISPERSION" {
 }
 
 ///|
+test "Material shader writes USE_RETROREFLECTION" {
+  let shader = @materials.Material::shader()
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.program_retroreflection(), false)
+  shader.retroreflectivity = -1.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  shader.retroreflectivity = 0.25
+  assert_eq(shader.program_retroreflection(), true)
+  assert_eq(shader.prefixed_fragment_shader().length(), 2069)
+  assert_eq(2069 - 2041, 28)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1106].to_owned(),
+    "#define USE_RETROREFLECTION",
+  )
+  shader.dispersion = 0.25
+  assert_eq(shader.prefixed_fragment_shader().length(), 2092)
+  assert_eq(shader.prefixed_vertex_shader().length(), 1608)
+  assert_eq(
+    shader.prefixed_fragment_shader()[1079:1101].to_owned(),
+    "#define USE_DISPERSION",
+  )
+  assert_eq(
+    shader.prefixed_fragment_shader()[1102:1129].to_owned(),
+    "#define USE_RETROREFLECTION",
+  )
+  shader.retroreflectivity = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2064)
+  shader.dispersion = 0.0
+  assert_eq(shader.prefixed_fragment_shader().length(), 2041)
+  let raw = @materials.Material::raw()
+  raw.retroreflectivity = 0.25
+  assert_eq(raw.prefixed_fragment_shader().length(), 61)
+  assert_eq(raw.prefixed_vertex_shader().length(), 92)
+  let basic = @materials.Material::basic()
+  basic.retroreflectivity = 0.25
+  assert_eq(basic.prefixed_fragment_shader(), "")
+  assert_eq(basic.prefixed_vertex_shader(), "")
+}
+
+///|
 test "Material shader prefixes fragment uniforms" {
   let shader = @materials.Material::shader()
   let raw = @materials.Material::raw()
