@@ -1,7 +1,11 @@
 ///|
 test "InstancedMesh.setMorphAt stores base influence and weights" {
   let geometry = @core.BufferGeometry::new()
-  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
   assert_eq(mesh.morph_texture is None, true)
   let source = @objects.Mesh::new(geometry, @materials.Material::basic())
   source.morph_target_influences = Some([0.25, 0.5])
@@ -43,7 +47,11 @@ test "InstancedMesh.setMorphAt stores base influence and weights" {
 ///|
 test "InstancedMesh.getMorphAt reads weights and skips the base" {
   let geometry = @core.BufferGeometry::new()
-  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
   let source = @objects.Mesh::new(geometry, @materials.Material::basic())
   source.morph_target_influences = Some([0.25, 0.5])
   ignore(mesh.set_morph_at(1, source))
@@ -148,7 +156,11 @@ test "InstancedMesh.copy clones the morph buffer" {
 ///|
 test "InstancedMesh.dispose clears the morph buffer" {
   let geometry = @core.BufferGeometry::new()
-  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
   let weights = @objects.Mesh::new(geometry, @materials.Material::basic())
   weights.morph_target_influences = Some([0.25, 0.5])
   ignore(mesh.set_morph_at(1, weights))
@@ -187,7 +199,11 @@ test "InstancedMesh.updateMorphTargets leaves the morph buffer alone" {
   let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
   tall.name = "tall"
   geometry.morph_attributes.set("position", [wide, tall])
-  let mesh = @objects.InstancedMesh::new(geometry, @materials.Material::basic(), 2)
+  let mesh = @objects.InstancedMesh::new(
+    geometry,
+    @materials.Material::basic(),
+    2,
+  )
   mesh.update_morph_targets()
   assert_eq(mesh.morph_texture is None, true)
   assert_eq(mesh.instances.count, 2)

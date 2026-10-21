@@ -12,7 +12,7 @@ pub(all) struct LineSegments {
   mut material : @materials.LineBasicMaterial
   mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
-  mut morph_target_dictionary : Map[String, Int]?
+  mut morph_target_dictionary : Map[String, Int32]?
 }
 
 ///|
@@ -50,7 +50,7 @@ pub extend LineSegments with @core.AsNode::{to_node}
 pub fn LineSegments::copy(
   self : LineSegments,
   source : LineSegments,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> LineSegments {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
@@ -65,7 +65,7 @@ pub fn LineSegments::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn LineSegments::clone(
   self : LineSegments,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> LineSegments {
   LineSegments::new(self.geometry, self.material).copy(self, recursive~)
 }
@@ -87,7 +87,7 @@ pub fn LineSegments::update_morph_targets(self : LineSegments) -> Unit {
     None => ()
     Some(attributes) => {
       let influences : Array[Double] = []
-      let dictionary : Map[String, Int] = Map([])
+      let dictionary : Map[String, Int32] = Map([])
       let mut index = 0
       while index < attributes.length() {
         let attribute = attributes[index]
@@ -110,7 +110,9 @@ pub fn LineSegments::update_morph_targets(self : LineSegments) -> Unit {
 /// 按成对顶点累计长度，写入 `lineDistance`。每段的起点沿用上一段的终点距离，第一段从 `0` 起。
 /// 几何体带索引时上游只警告，这里不改属性。
 /// r186: `computeLineDistances` https://github.com/mrdoob/three.js/blob/r186/src/objects/LineSegments.js#L39
-pub fn LineSegments::compute_line_distances(self : LineSegments) -> LineSegments {
+pub fn LineSegments::compute_line_distances(
+  self : LineSegments,
+) -> LineSegments {
   if self.geometry.index is Some(_) {
     return self
   }
@@ -133,11 +135,7 @@ pub fn LineSegments::compute_line_distances(self : LineSegments) -> LineSegments
       y=position.get_y(next),
       z=position.get_z(next),
     )
-    let segment_start = if index == 0 {
-      0.0
-    } else {
-      distances[index - 1]
-    }
+    let segment_start = if index == 0 { 0.0 } else { distances[index - 1] }
     distances.push(segment_start)
     distances.push(segment_start + start.distance_to(end))
     index = index + 2
@@ -204,10 +202,9 @@ pub fn LineSegments::set_fog(self : LineSegments, enabled : Bool) -> Unit {
 pub fn LineSegments::set_transparent(
   self : LineSegments,
   enabled : Bool,
-  opacity? : Double = 1.0,
+  opacity~ : Double = 1.0,
 ) -> Unit {
   self.material.transparent = enabled
   self.material.opacity = opacity
   self.refresh()
 }
-

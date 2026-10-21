@@ -7,13 +7,13 @@ using @core {type Object3D, type NodeKind, type LightKind, type LightState}
 fn make_light(
   kind : NodeKind,
   light_kind : LightKind,
-  hex : Int,
+  hex : Int32,
   intensity : Double,
-  distance? : Double = 0.0,
-  decay? : Double = 2.0,
-  angle? : Double = 0.0,
-  penumbra? : Double = 0.0,
-  ground? : Int = 0xFFFFFF,
+  distance~ : Double = 0.0,
+  decay~ : Double = 2.0,
+  angle~ : Double = 0.0,
+  penumbra~ : Double = 0.0,
+  ground~ : Int32 = 0xFFFFFF,
 ) -> Object3D {
   let node = Object3D::new(kind~)
   node.light = Some(LightState::{
@@ -40,8 +40,8 @@ pub(all) struct AmbientLight {
 
 ///|
 pub fn AmbientLight::new(
-  hex? : Int = 0xFFFFFF,
-  intensity? : Double = 1.0,
+  hex~ : Int32 = 0xFFFFFF,
+  intensity~ : Double = 1.0,
 ) -> AmbientLight {
   { node: make_light(@core.AmbientLight, @core.Ambient, hex, intensity), }
 }
@@ -53,4 +53,3 @@ pub impl @core.AsNode for AmbientLight with fn to_node(self) {
 
 ///|
 pub extend AmbientLight with @core.AsNode::{to_node}
-

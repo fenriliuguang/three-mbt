@@ -102,8 +102,22 @@ pub fn Matrix4::copy_position(self : Matrix4, m : Matrix4) -> Matrix4 {
 pub fn Matrix4::set_from_matrix3(self : Matrix4, m : Matrix3) -> Matrix4 {
   let me = m.elements
   self.set(
-    me[0], me[3], me[6], 0.0, me[1], me[4], me[7], 0.0, me[2], me[5], me[8],
-    0.0, 0.0, 0.0, 0.0, 1.0,
+    me[0],
+    me[3],
+    me[6],
+    0.0,
+    me[1],
+    me[4],
+    me[7],
+    0.0,
+    me[2],
+    me[5],
+    me[8],
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
   )
 }
 
@@ -138,8 +152,22 @@ pub fn Matrix4::make_basis(
   z_axis : Vector3,
 ) -> Matrix4 {
   self.set(
-    x_axis.x, y_axis.x, z_axis.x, 0.0, x_axis.y, y_axis.y, z_axis.y, 0.0,
-    x_axis.z, y_axis.z, z_axis.z, 0.0, 0.0, 0.0, 0.0, 1.0,
+    x_axis.x,
+    y_axis.x,
+    z_axis.x,
+    0.0,
+    x_axis.y,
+    y_axis.y,
+    z_axis.y,
+    0.0,
+    x_axis.z,
+    y_axis.z,
+    z_axis.z,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
   )
 }
 
@@ -161,7 +189,24 @@ pub fn Matrix4::make_translation(
 pub fn Matrix4::make_rotation_x(self : Matrix4, theta : Double) -> Matrix4 {
   let c = @std.cos(theta)
   let s = @std.sin(theta)
-  self.set(1.0, 0.0, 0.0, 0.0, 0.0, c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0)
+  self.set(
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    c,
+    -s,
+    0.0,
+    0.0,
+    s,
+    c,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+  )
 }
 
 ///|
@@ -170,7 +215,24 @@ pub fn Matrix4::make_rotation_x(self : Matrix4, theta : Double) -> Matrix4 {
 pub fn Matrix4::make_rotation_y(self : Matrix4, theta : Double) -> Matrix4 {
   let c = @std.cos(theta)
   let s = @std.sin(theta)
-  self.set(c, 0.0, s, 0.0, 0.0, 1.0, 0.0, 0.0, -s, 0.0, c, 0.0, 0.0, 0.0, 0.0, 1.0)
+  self.set(
+    c,
+    0.0,
+    s,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    -s,
+    0.0,
+    c,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+  )
 }
 
 ///|
@@ -179,7 +241,24 @@ pub fn Matrix4::make_rotation_y(self : Matrix4, theta : Double) -> Matrix4 {
 pub fn Matrix4::make_rotation_z(self : Matrix4, theta : Double) -> Matrix4 {
   let c = @std.cos(theta)
   let s = @std.sin(theta)
-  self.set(c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  self.set(
+    c,
+    -s,
+    0.0,
+    0.0,
+    s,
+    c,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+  )
 }
 
 ///|
@@ -227,7 +306,9 @@ pub fn Matrix4::make_scale(
   y : Double,
   z : Double,
 ) -> Matrix4 {
-  self.set(x, 0.0, 0.0, 0.0, 0.0, y, 0.0, 0.0, 0.0, 0.0, z, 0.0, 0.0, 0.0, 0.0, 1.0)
+  self.set(
+    x, 0.0, 0.0, 0.0, 0.0, y, 0.0, 0.0, 0.0, 0.0, z, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
 }
 
 ///|
@@ -242,7 +323,9 @@ pub fn Matrix4::make_shear(
   zx : Double,
   zy : Double,
 ) -> Matrix4 {
-  self.set(1.0, yx, zx, 0.0, xy, 1.0, zy, 0.0, xz, yz, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  self.set(
+    1.0, yx, zx, 0.0, xy, 1.0, zy, 0.0, xz, yz, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
 }
 
 ///|
@@ -485,7 +568,7 @@ pub fn Matrix4::determinant(self : Matrix4) -> Double {
 }
 
 ///|
-fn column_length(m : Matrix4, column : Int) -> Double {
+fn column_length(m : Matrix4, column : Int32) -> Double {
   let e = m.elements
   let i = column * 4
   (e[i] * e[i] + e[i + 1] * e[i + 1] + e[i + 2] * e[i + 2]).sqrt()
@@ -821,7 +904,7 @@ pub fn Matrix4::make_perspective(
   near : Double,
   far : Double,
   coordinate_system? : @constants.CoordinateSystem,
-  reversed_depth? : Bool = false,
+  reversed_depth~ : Bool = false,
 ) -> Matrix4 {
   let coordinate_system = match coordinate_system {
     None => @constants.WebGPU
@@ -879,7 +962,7 @@ pub fn Matrix4::make_orthographic(
   near : Double,
   far : Double,
   coordinate_system? : @constants.CoordinateSystem,
-  reversed_depth? : Bool = false,
+  reversed_depth~ : Bool = false,
 ) -> Matrix4 {
   let coordinate_system = match coordinate_system {
     None => @constants.WebGPU
@@ -944,7 +1027,7 @@ pub fn Matrix4::equals(self : Matrix4, matrix : Matrix4) -> Bool {
 pub fn Matrix4::from_array(
   self : Matrix4,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Matrix4 {
   let te = self.elements
   for i in 0..<16 {
@@ -959,7 +1042,7 @@ pub fn Matrix4::from_array(
 pub fn Matrix4::to_array(
   self : Matrix4,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []

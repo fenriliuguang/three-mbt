@@ -35,8 +35,8 @@ pub(all) struct RenderItem {
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
   instances : @core.InstanceData?
-  group_start : Int
-  group_count : Int
+  group_start : Int32
+  group_count : Int32
 }
 
 ///|
@@ -71,8 +71,8 @@ fn push_binding_item(
   items : Array[RenderItem],
   node : Object3D,
   binding : @core.MeshBinding,
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
 ) -> Unit {
   items.push({
     node,
@@ -112,8 +112,8 @@ fn push_group_item(
   node : Object3D,
   binding : @core.MeshBinding,
   draw : @core.MaterialDraw,
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
 ) -> Unit {
   items.push({
     node,
@@ -148,7 +148,7 @@ fn push_group_item(
 }
 
 ///|
-fn draw_limit(geometry : BufferGeometry, wire : Bool) -> Int? {
+fn draw_limit(geometry : BufferGeometry, wire : Bool) -> Int32? {
   let source = match geometry.index {
     Some(index) => Some(index.count)
     None =>
@@ -159,19 +159,23 @@ fn draw_limit(geometry : BufferGeometry, wire : Bool) -> Int? {
   }
   match source {
     None => None
-    Some(count) => if wire { Some((count / 3) * 6) } else { Some(count) }
+    Some(count) => if wire { Some(count / 3 * 6) } else { Some(count) }
   }
 }
 
 ///|
-fn scaled_bound(value : Double, factor : Int) -> Double {
+fn scaled_bound(value : Double, factor : Int32) -> Double {
   if value.is_nan() || value <= 0.0 {
     0.0
   } else if value.is_inf() {
     1.0 / 0.0
   } else {
     let scaled = value * factor.to_double()
-    if scaled.is_nan() || scaled <= 0.0 { 0.0 } else { scaled }
+    if scaled.is_nan() || scaled <= 0.0 {
+      0.0
+    } else {
+      scaled
+    }
   }
 }
 
@@ -181,10 +185,10 @@ fn scaled_bound(value : Double, factor : Int) -> Double {
 /// r186: `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
 pub fn resolve_draw(
   geometry : BufferGeometry,
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
   wire : Bool,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   match draw_limit(geometry, wire) {
     None => None
     Some(limit) => {
@@ -229,10 +233,10 @@ pub fn resolve_draw(
 ///|
 fn resolved_span(
   geometry : BufferGeometry,
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
   queue : MeshQueue,
-) -> (Int, Int)? {
+) -> (Int32, Int32)? {
   resolve_draw(geometry, group_start, group_count, queue is MeshQueue::Wire)
 }
 
@@ -249,14 +253,15 @@ fn append_mesh(
   match binding.group_draws {
     None =>
       if kept_for_queue(
-        binding.visible,
-        binding.transparent,
-        binding.wireframe,
-        queue,
-      ) {
+          binding.visible,
+          binding.transparent,
+          binding.wireframe,
+          queue,
+        ) {
         match resolved_span(binding.geometry, 0, -1, queue) {
           None => ()
-          Some((start, count)) => push_binding_item(items, node, binding, start, count)
+          Some((start, count)) =>
+            push_binding_item(items, node, binding, start, count)
         }
       }
     Some(draws) =>
@@ -264,12 +269,13 @@ fn append_mesh(
         if group.material_index >= 0 && group.material_index < draws.length() {
           let draw = draws[group.material_index]
           if kept_for_queue(
-            draw.visible,
-            draw.transparent,
-            draw.wireframe,
-            queue,
-          ) {
-            match resolved_span(binding.geometry, group.start, group.count, queue) {
+              draw.visible,
+              draw.transparent,
+              draw.wireframe,
+              queue,
+            ) {
+            match
+              resolved_span(binding.geometry, group.start, group.count, queue) {
               None => ()
               Some((start, count)) =>
                 push_group_item(items, node, binding, draw, start, count)
@@ -398,7 +404,7 @@ pub fn collect_wireframe(
 ///|
 /// 每个三角形展开成三条边：`a b`、`b c`、`c a`。不成三角形的尾部丢掉。
 /// r186: `getWireframeIndex` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Geometries.js#L42
-pub fn wireframe_line_indices(geometry : BufferGeometry) -> Array[Int] {
+pub fn wireframe_line_indices(geometry : BufferGeometry) -> Array[Int32] {
   let lines = []
   match geometry.index {
     Some(index) => {
@@ -456,8 +462,8 @@ pub(all) struct PrimitiveItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
-  draw_start : Int
-  draw_count : Int
+  draw_start : Int32
+  draw_count : Int32
 }
 
 ///|
@@ -478,8 +484,8 @@ fn emit_primitive(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied_alpha : Bool,
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
 ) -> Unit {
   match resolve_draw(geometry, group_start, group_count, false) {
     None => ()
@@ -633,16 +639,16 @@ pub fn collect_transparent_primitives(
 priv struct DepthItem {
   item : RenderItem
   depth : Double
-  render_order : Int
-  order : Int
+  render_order : Int32
+  order : Int32
 }
 
 ///|
 priv struct PrimitiveDepth {
   item : PrimitiveItem
   depth : Double
-  render_order : Int
-  order : Int
+  render_order : Int32
+  order : Int32
 }
 
 ///|
@@ -896,10 +902,12 @@ fn cull_sphere(node : Object3D, geometry : BufferGeometry) -> @math.Sphere? {
     Some(mesh) =>
       match mesh.instances {
         Some(instances) =>
-          Some(match instances.bounding_sphere {
-            Some(sphere) => sphere
-            None => instances.compute_bounding_sphere(mesh.geometry)
-          })
+          Some(
+            match instances.bounding_sphere {
+              Some(sphere) => sphere
+              None => instances.compute_bounding_sphere(mesh.geometry)
+            },
+          )
         None => geometry_bounding_sphere(geometry)
       }
     None => geometry_bounding_sphere(geometry)

@@ -18,7 +18,7 @@ pub fn Line3::new(start? : Vector3, end? : Vector3) -> Line3 {
     None => Vector3::new()
     Some(end) => end.clone()
   }
-  { start, end }
+  { start, end, }
 }
 
 ///|

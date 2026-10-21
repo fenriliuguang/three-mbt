@@ -103,7 +103,10 @@ test "LineLoop.computeLineDistances follows the open line" {
       ),
     ),
   )
-  let closed = @objects.LineLoop::new(geometry, @materials.LineBasicMaterial::new())
+  let closed = @objects.LineLoop::new(
+    geometry,
+    @materials.LineBasicMaterial::new(),
+  )
   let computed = closed.compute_line_distances()
   assert_eq(physical_equal(computed, closed), true)
   match geometry.get_attribute("lineDistance") {
@@ -123,7 +126,10 @@ test "LineLoop.computeLineDistances follows the open line" {
     ),
   )
   ignore(indexed.set_index_array([0, 1]))
-  let skipped = @objects.LineLoop::new(indexed, @materials.LineBasicMaterial::new())
+  let skipped = @objects.LineLoop::new(
+    indexed,
+    @materials.LineBasicMaterial::new(),
+  )
   ignore(skipped.compute_line_distances())
   match indexed.get_attribute("lineDistance") {
     None => ()
@@ -143,7 +149,10 @@ test "LineLoop.updateMorphTargets indexes named targets" {
   let tall = @core.BufferAttribute::new([0.0, 3.0, 0.0], 3)
   tall.name = "tall"
   geometry.morph_attributes.set("position", [wide, tall])
-  let closed = @objects.LineLoop::new(geometry, @materials.LineBasicMaterial::new())
+  let closed = @objects.LineLoop::new(
+    geometry,
+    @materials.LineBasicMaterial::new(),
+  )
   match closed.morph_target_influences {
     None => assert_eq(false, true)
     Some(weights) => {
@@ -221,7 +230,10 @@ test "LineLoop raycast closes the last vertex to the first" {
   )
   raycaster.params.line.threshold = 0.0
   assert_eq(raycaster.intersect_object(open.node).length(), 0)
-  let closed = @objects.LineLoop::new(geometry, @materials.LineBasicMaterial::new())
+  let closed = @objects.LineLoop::new(
+    geometry,
+    @materials.LineBasicMaterial::new(),
+  )
   closed.node.update_matrix_world()
   let hits = raycaster.intersect_object(closed.node)
   assert_eq(hits.length(), 1)
@@ -234,4 +246,3 @@ test "LineLoop raycast closes the last vertex to the first" {
     Some(index) => assert_eq(index, 2)
   }
 }
-

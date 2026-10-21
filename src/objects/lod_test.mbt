@@ -230,4 +230,3 @@ test "LOD.update shows the level for the camera distance" {
   assert_eq(mid.visible, false)
   assert_eq(far.visible, false)
 }
-

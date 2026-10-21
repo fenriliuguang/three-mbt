@@ -11,9 +11,9 @@ pub(all) struct Vector3 {
 
 ///|
 pub fn Vector3::new(
-  x? : Double = 0.0,
-  y? : Double = 0.0,
-  z? : Double = 0.0,
+  x~ : Double = 0.0,
+  y~ : Double = 0.0,
+  z~ : Double = 0.0,
 ) -> Vector3 {
   { x, y, z, }
 }
@@ -66,7 +66,7 @@ pub fn Vector3::set_z(self : Vector3, z : Double) -> Vector3 {
 /// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L161
 pub fn Vector3::set_component(
   self : Vector3,
-  index : Int,
+  index : Int32,
   value : Double,
 ) -> Vector3 {
   match index {
@@ -81,7 +81,7 @@ pub fn Vector3::set_component(
 ///|
 /// 0 是 x，1 是 y，2 是 z。其他下标中止。
 /// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L182
-pub fn Vector3::get_component(self : Vector3, index : Int) -> Double {
+pub fn Vector3::get_component(self : Vector3, index : Int32) -> Double {
   match index {
     0 => self.x
     1 => self.y
@@ -394,7 +394,7 @@ pub fn Vector3::clamp_length(
 ) -> Vector3 {
   let length = self.length()
   let divisor = if length == 0.0 { 1.0 } else { length }
-  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min~, max~))
 }
 
 ///|
@@ -629,7 +629,7 @@ pub fn Vector3::set_from_matrix_scale(self : Vector3, m : Matrix4) -> Vector3 {
 pub fn Vector3::set_from_matrix_column(
   self : Vector3,
   m : Matrix4,
-  index : Int,
+  index : Int32,
 ) -> Vector3 {
   let e = m.elements
   let offset = index * 4
@@ -644,7 +644,7 @@ pub fn Vector3::set_from_matrix_column(
 pub fn Vector3::set_from_matrix3_column(
   self : Vector3,
   m : Matrix3,
-  index : Int,
+  index : Int32,
 ) -> Vector3 {
   let e = m.elements
   let offset = index * 3
@@ -685,7 +685,7 @@ pub fn Vector3::equals(self : Vector3, v : Vector3) -> Bool {
 pub fn Vector3::from_array(
   self : Vector3,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Vector3 {
   self.x = array[offset]
   self.y = array[offset + 1]
@@ -699,7 +699,7 @@ pub fn Vector3::from_array(
 pub fn Vector3::to_array(
   self : Vector3,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []

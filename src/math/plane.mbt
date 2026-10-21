@@ -9,7 +9,7 @@ pub(all) struct Plane {
 }
 
 ///|
-pub fn Plane::new(normal? : Vector3, constant? : Double = 0.0) -> Plane {
+pub fn Plane::new(normal? : Vector3, constant~ : Double = 0.0) -> Plane {
   let normal = match normal {
     None => Vector3::new(x=1.0, y=0.0, z=0.0)
     Some(normal) => normal.clone()
@@ -81,11 +81,7 @@ pub fn Plane::set_from_coplanar_points(
 ///|
 /// 拷贝法线并写入常数。之后改来源法线不影响这里。
 /// r186: `set` https://github.com/mrdoob/three.js/blob/r186/src/math/Plane.js#L56
-pub fn Plane::set(
-  self : Plane,
-  normal : Vector3,
-  constant : Double,
-) -> Plane {
+pub fn Plane::set(self : Plane, normal : Vector3, constant : Double) -> Plane {
   ignore(self.normal.copy(normal))
   self.constant = constant
   self
@@ -126,7 +122,7 @@ pub fn Plane::intersect_line(
   self : Plane,
   line : Line3,
   target : Vector3,
-  clamp_to_line? : Bool = true,
+  clamp_to_line~ : Bool = true,
 ) -> Vector3? {
   let direction = line.delta(Vector3::new())
   let denominator = self.normal.dot(direction)

@@ -18,7 +18,7 @@ pub fn Ray::new(origin? : Vector3, direction? : Vector3) -> Ray {
     None => Vector3::new(z=-1.0)
     Some(direction) => direction.clone()
   }
-  { origin, direction }
+  { origin, direction, }
 }
 
 ///|
@@ -76,7 +76,9 @@ pub fn Ray::closest_point_to_point(
   if direction_distance < 0.0 {
     target.copy(self.origin)
   } else {
-    target.copy(self.origin).add_scaled_vector(self.direction, direction_distance)
+    target
+    .copy(self.origin)
+    .add_scaled_vector(self.direction, direction_distance)
   }
 }
 
@@ -181,8 +183,7 @@ pub fn Ray::distance_sq_to_segment(
   }
   match point_on_segment {
     None => ()
-    Some(point) =>
-      ignore(point.copy(seg_center).add_scaled_vector(seg_dir, s1))
+    Some(point) => ignore(point.copy(seg_center).add_scaled_vector(seg_dir, s1))
   }
   sqr_dist
 }
@@ -479,8 +480,7 @@ pub fn Ray::intersect_triangle(
     if u < 0.0 || v < 0.0 || w < 0.0 {
       return None
     }
-  } else if (u < 0.0 || v < 0.0 || w < 0.0) &&
-    (u > 0.0 || v > 0.0 || w > 0.0) {
+  } else if (u < 0.0 || v < 0.0 || w < 0.0) && (u > 0.0 || v > 0.0 || w > 0.0) {
     return None
   }
   let det = u + v + w

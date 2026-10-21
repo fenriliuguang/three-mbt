@@ -34,4 +34,3 @@ test "grayscale mix uses dyadic weights" {
   assert_eq(wgsl.contains("vertex_index"), true)
   assert_eq(wgsl.contains("0.5 - y * 0.5"), true)
 }
-

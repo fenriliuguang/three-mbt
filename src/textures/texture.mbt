@@ -11,8 +11,8 @@
 /// 这种纹理 `flip_y` 为 false：画面顶在纹理的 v = 0。
 /// r186: `Texture` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L32
 pub(all) struct Texture {
-  mut width : Int
-  mut height : Int
+  mut width : Int32
+  mut height : Int32
   data : FixedArray[Byte]
   mut wrap_s : @constants.Wrapping
   mut wrap_t : @constants.Wrapping
@@ -21,12 +21,12 @@ pub(all) struct Texture {
   mut flip_y : Bool
   mut needs_update : Bool
   attachment : Bool
-  mut version : Int
-  mut channel : Int
+  mut version : Int32
+  mut channel : Int32
 }
 
 ///|
-fn write_rgba(dst : FixedArray[Byte], offset : Int, hex : Int) -> Unit {
+fn write_rgba(dst : FixedArray[Byte], offset : Int32, hex : Int32) -> Unit {
   dst[offset] = ((hex >> 16) & 255).to_byte()
   dst[offset + 1] = ((hex >> 8) & 255).to_byte()
   dst[offset + 2] = (hex & 255).to_byte()
@@ -36,8 +36,8 @@ fn write_rgba(dst : FixedArray[Byte], offset : Int, hex : Int) -> Unit {
 ///|
 /// 用紧排的 `rgba8` 字节建纹理。长度必须是 `width * height * 4`。
 pub fn Texture::from_rgba8(
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   data : FixedArray[Byte],
 ) -> Texture {
   if width < 1 || height < 1 || data.length() != width * height * 4 {
@@ -61,7 +61,7 @@ pub fn Texture::from_rgba8(
 
 ///|
 /// 颜色目标用的空纹理。尺寸至少是 1×1，CPU 侧不保存整张图。
-pub fn Texture::attachment(width : Int, height : Int) -> Texture {
+pub fn Texture::attachment(width : Int32, height : Int32) -> Texture {
   {
     width: if width < 1 {
       1
@@ -90,11 +90,11 @@ pub fn Texture::attachment(width : Int, height : Int) -> Texture {
 /// 棋盘格。`cell` 是一格的像素边长，`(x / cell + y / cell)` 为偶数时用 `first`。
 /// `first` 和 `second` 是 `0xRRGGBB`，按字节原样写入，不做 sRGB 转换。
 pub fn Texture::checker(
-  width~ : Int,
-  height~ : Int,
-  cell~ : Int,
-  first~ : Int,
-  second~ : Int,
+  width~ : Int32,
+  height~ : Int32,
+  cell~ : Int32,
+  first~ : Int32,
+  second~ : Int32,
 ) -> Texture {
   let safe_cell = if cell < 1 { 1 } else { cell }
   let data = FixedArray::make(width * height * 4, b'\x00')
@@ -135,4 +135,3 @@ pub fn Texture::rgba8(self : Texture) -> FixedArray[Byte] {
   }
   dst
 }
-

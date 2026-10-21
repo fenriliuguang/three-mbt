@@ -25,7 +25,7 @@ pub(all) struct GetMappedRangeError {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct Gpu(Int) derive(Show, Eq)
+pub(all) struct Gpu(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -35,7 +35,7 @@ pub fn Gpu::drop(self : Gpu) -> Unit {
 }
 
 ///|
-pub(all) struct GpuAdapter(Int) derive(Show, Eq)
+pub(all) struct GpuAdapter(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -45,7 +45,7 @@ pub fn GpuAdapter::drop(self : GpuAdapter) -> Unit {
 }
 
 ///|
-pub(all) struct GpuAdapterInfo(Int) derive(Show, Eq)
+pub(all) struct GpuAdapterInfo(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -62,7 +62,7 @@ pub(all) enum GpuAddressMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuAddressMode::ordinal(self : GpuAddressMode) -> Int {
+pub fn GpuAddressMode::ordinal(self : GpuAddressMode) -> Int32 {
   match self {
     CLAMP_TO_EDGE => 0
     REPEAT => 1
@@ -71,7 +71,7 @@ pub fn GpuAddressMode::ordinal(self : GpuAddressMode) -> Int {
 }
 
 ///|
-pub fn GpuAddressMode::from(self : Int) -> GpuAddressMode {
+pub fn GpuAddressMode::from(self : Int32) -> GpuAddressMode {
   match self {
     0 => CLAMP_TO_EDGE
     1 => REPEAT
@@ -81,7 +81,7 @@ pub fn GpuAddressMode::from(self : Int) -> GpuAddressMode {
 }
 
 ///|
-pub(all) struct GpuBindGroup(Int) derive(Show, Eq)
+pub(all) struct GpuBindGroup(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -91,7 +91,7 @@ pub fn GpuBindGroup::drop(self : GpuBindGroup) -> Unit {
 }
 
 ///|
-pub(all) struct GpuBindGroupLayout(Int) derive(Show, Eq)
+pub(all) struct GpuBindGroupLayout(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -122,7 +122,7 @@ pub(all) enum GpuBlendFactor {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuBlendFactor::ordinal(self : GpuBlendFactor) -> Int {
+pub fn GpuBlendFactor::ordinal(self : GpuBlendFactor) -> Int32 {
   match self {
     ZERO => 0
     ONE => 1
@@ -145,7 +145,7 @@ pub fn GpuBlendFactor::ordinal(self : GpuBlendFactor) -> Int {
 }
 
 ///|
-pub fn GpuBlendFactor::from(self : Int) -> GpuBlendFactor {
+pub fn GpuBlendFactor::from(self : Int32) -> GpuBlendFactor {
   match self {
     0 => ZERO
     1 => ONE
@@ -178,7 +178,7 @@ pub(all) enum GpuBlendOperation {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuBlendOperation::ordinal(self : GpuBlendOperation) -> Int {
+pub fn GpuBlendOperation::ordinal(self : GpuBlendOperation) -> Int32 {
   match self {
     ADD => 0
     SUBTRACT => 1
@@ -189,7 +189,7 @@ pub fn GpuBlendOperation::ordinal(self : GpuBlendOperation) -> Int {
 }
 
 ///|
-pub fn GpuBlendOperation::from(self : Int) -> GpuBlendOperation {
+pub fn GpuBlendOperation::from(self : Int32) -> GpuBlendOperation {
   match self {
     0 => ADD
     1 => SUBTRACT
@@ -214,7 +214,7 @@ pub(all) struct GpuBlendState {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuBuffer(Int) derive(Show, Eq)
+pub(all) struct GpuBuffer(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -231,7 +231,7 @@ pub(all) enum GpuBufferBindingType {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuBufferBindingType::ordinal(self : GpuBufferBindingType) -> Int {
+pub fn GpuBufferBindingType::ordinal(self : GpuBufferBindingType) -> Int32 {
   match self {
     UNIFORM => 0
     STORAGE => 1
@@ -240,7 +240,7 @@ pub fn GpuBufferBindingType::ordinal(self : GpuBufferBindingType) -> Int {
 }
 
 ///|
-pub fn GpuBufferBindingType::from(self : Int) -> GpuBufferBindingType {
+pub fn GpuBufferBindingType::from(self : Int32) -> GpuBufferBindingType {
   match self {
     0 => UNIFORM
     1 => STORAGE
@@ -257,7 +257,7 @@ pub(all) enum GpuBufferMapState {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuBufferMapState::ordinal(self : GpuBufferMapState) -> Int {
+pub fn GpuBufferMapState::ordinal(self : GpuBufferMapState) -> Int32 {
   match self {
     UNMAPPED => 0
     PENDING => 1
@@ -266,7 +266,7 @@ pub fn GpuBufferMapState::ordinal(self : GpuBufferMapState) -> Int {
 }
 
 ///|
-pub fn GpuBufferMapState::from(self : Int) -> GpuBufferMapState {
+pub fn GpuBufferMapState::from(self : Int32) -> GpuBufferMapState {
   match self {
     0 => UNMAPPED
     1 => PENDING
@@ -276,7 +276,7 @@ pub fn GpuBufferMapState::from(self : Int) -> GpuBufferMapState {
 }
 
 ///|
-pub(all) struct GpuBufferUsage(UInt) derive(Show, Eq)
+pub(all) struct GpuBufferUsage(UInt32) derive(Show, Eq)
 
 ///|
 pub fn GpuBufferUsage::default() -> GpuBufferUsage {
@@ -298,7 +298,7 @@ pub(all) enum GpuBufferUsageFlag {
 }
 
 ///|
-fn GpuBufferUsageFlag::value(self : GpuBufferUsageFlag) -> UInt {
+fn GpuBufferUsageFlag::value(self : GpuBufferUsageFlag) -> UInt32 {
   match self {
     MAP_READ => 1U << 0
     MAP_WRITE => 1U << 1
@@ -344,7 +344,7 @@ pub(all) enum GpuCanvasAlphaMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuCanvasAlphaMode::ordinal(self : GpuCanvasAlphaMode) -> Int {
+pub fn GpuCanvasAlphaMode::ordinal(self : GpuCanvasAlphaMode) -> Int32 {
   match self {
     OPAQUE => 0
     PREMULTIPLIED => 1
@@ -352,7 +352,7 @@ pub fn GpuCanvasAlphaMode::ordinal(self : GpuCanvasAlphaMode) -> Int {
 }
 
 ///|
-pub fn GpuCanvasAlphaMode::from(self : Int) -> GpuCanvasAlphaMode {
+pub fn GpuCanvasAlphaMode::from(self : Int32) -> GpuCanvasAlphaMode {
   match self {
     0 => OPAQUE
     1 => PREMULTIPLIED
@@ -361,7 +361,7 @@ pub fn GpuCanvasAlphaMode::from(self : Int) -> GpuCanvasAlphaMode {
 }
 
 ///|
-pub(all) struct GpuCanvasContext(Int) derive(Show, Eq)
+pub(all) struct GpuCanvasContext(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -379,7 +379,7 @@ pub(all) enum GpuCanvasToneMappingMode {
 ///|
 pub fn GpuCanvasToneMappingMode::ordinal(
   self : GpuCanvasToneMappingMode,
-) -> Int {
+) -> Int32 {
   match self {
     STANDARD => 0
     EXTENDED => 1
@@ -387,7 +387,7 @@ pub fn GpuCanvasToneMappingMode::ordinal(
 }
 
 ///|
-pub fn GpuCanvasToneMappingMode::from(self : Int) -> GpuCanvasToneMappingMode {
+pub fn GpuCanvasToneMappingMode::from(self : Int32) -> GpuCanvasToneMappingMode {
   match self {
     0 => STANDARD
     1 => EXTENDED
@@ -461,7 +461,7 @@ pub fn GpuColorWrite::is_set(self : Self, other : GpuColorWriteFlag) -> Bool {
 }
 
 ///|
-pub(all) struct GpuCommandBuffer(Int) derive(Show, Eq)
+pub(all) struct GpuCommandBuffer(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -476,7 +476,7 @@ pub(all) struct GpuCommandBufferDescriptor {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuCommandEncoder(Int) derive(Show, Eq)
+pub(all) struct GpuCommandEncoder(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -503,7 +503,7 @@ pub(all) enum GpuCompareFunction {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuCompareFunction::ordinal(self : GpuCompareFunction) -> Int {
+pub fn GpuCompareFunction::ordinal(self : GpuCompareFunction) -> Int32 {
   match self {
     NEVER => 0
     LESS => 1
@@ -517,7 +517,7 @@ pub fn GpuCompareFunction::ordinal(self : GpuCompareFunction) -> Int {
 }
 
 ///|
-pub fn GpuCompareFunction::from(self : Int) -> GpuCompareFunction {
+pub fn GpuCompareFunction::from(self : Int32) -> GpuCompareFunction {
   match self {
     0 => NEVER
     1 => LESS
@@ -532,7 +532,7 @@ pub fn GpuCompareFunction::from(self : Int) -> GpuCompareFunction {
 }
 
 ///|
-pub(all) struct GpuCompilationInfo(Int) derive(Show, Eq)
+pub(all) struct GpuCompilationInfo(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -542,7 +542,7 @@ pub fn GpuCompilationInfo::drop(self : GpuCompilationInfo) -> Unit {
 }
 
 ///|
-pub(all) struct GpuCompilationMessage(Int) derive(Show, Eq)
+pub(all) struct GpuCompilationMessage(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -561,7 +561,7 @@ pub(all) enum GpuCompilationMessageType {
 ///|
 pub fn GpuCompilationMessageType::ordinal(
   self : GpuCompilationMessageType,
-) -> Int {
+) -> Int32 {
   match self {
     ERROR => 0
     WARNING => 1
@@ -570,7 +570,9 @@ pub fn GpuCompilationMessageType::ordinal(
 }
 
 ///|
-pub fn GpuCompilationMessageType::from(self : Int) -> GpuCompilationMessageType {
+pub fn GpuCompilationMessageType::from(
+  self : Int32,
+) -> GpuCompilationMessageType {
   match self {
     0 => ERROR
     1 => WARNING
@@ -580,7 +582,7 @@ pub fn GpuCompilationMessageType::from(self : Int) -> GpuCompilationMessageType 
 }
 
 ///|
-pub(all) struct GpuComputePassEncoder(Int) derive(Show, Eq)
+pub(all) struct GpuComputePassEncoder(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -590,7 +592,7 @@ pub fn GpuComputePassEncoder::drop(self : GpuComputePassEncoder) -> Unit {
 }
 
 ///|
-pub(all) struct GpuComputePipeline(Int) derive(Show, Eq)
+pub(all) struct GpuComputePipeline(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -607,7 +609,7 @@ pub(all) enum GpuCullMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuCullMode::ordinal(self : GpuCullMode) -> Int {
+pub fn GpuCullMode::ordinal(self : GpuCullMode) -> Int32 {
   match self {
     NONE => 0
     FRONT => 1
@@ -616,7 +618,7 @@ pub fn GpuCullMode::ordinal(self : GpuCullMode) -> Int {
 }
 
 ///|
-pub fn GpuCullMode::from(self : Int) -> GpuCullMode {
+pub fn GpuCullMode::from(self : Int32) -> GpuCullMode {
   match self {
     0 => NONE
     1 => FRONT
@@ -626,7 +628,7 @@ pub fn GpuCullMode::from(self : Int) -> GpuCullMode {
 }
 
 ///|
-pub(all) struct GpuDevice(Int) derive(Show, Eq)
+pub(all) struct GpuDevice(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -636,7 +638,7 @@ pub fn GpuDevice::drop(self : GpuDevice) -> Unit {
 }
 
 ///|
-pub(all) struct GpuDeviceLostInfo(Int) derive(Show, Eq)
+pub(all) struct GpuDeviceLostInfo(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -652,7 +654,7 @@ pub(all) enum GpuDeviceLostReason {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuDeviceLostReason::ordinal(self : GpuDeviceLostReason) -> Int {
+pub fn GpuDeviceLostReason::ordinal(self : GpuDeviceLostReason) -> Int32 {
   match self {
     UNKNOWN => 0
     DESTROYED => 1
@@ -660,7 +662,7 @@ pub fn GpuDeviceLostReason::ordinal(self : GpuDeviceLostReason) -> Int {
 }
 
 ///|
-pub fn GpuDeviceLostReason::from(self : Int) -> GpuDeviceLostReason {
+pub fn GpuDeviceLostReason::from(self : Int32) -> GpuDeviceLostReason {
   match self {
     0 => UNKNOWN
     1 => DESTROYED
@@ -670,7 +672,7 @@ pub fn GpuDeviceLostReason::from(self : Int) -> GpuDeviceLostReason {
 
 ///|
 pub(all) suberror GpuError {
-  GpuError(Int)
+  GpuError(Int32)
 } derive(Show, Eq)
 
 ///|
@@ -688,7 +690,7 @@ pub(all) suberror GpuErrorFilter {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuErrorFilter::ordinal(self : GpuErrorFilter) -> Int {
+pub fn GpuErrorFilter::ordinal(self : GpuErrorFilter) -> Int32 {
   match self {
     VALIDATION => 0
     OUT_OF_MEMORY => 1
@@ -697,7 +699,7 @@ pub fn GpuErrorFilter::ordinal(self : GpuErrorFilter) -> Int {
 }
 
 ///|
-pub fn GpuErrorFilter::from(self : Int) -> GpuErrorFilter {
+pub fn GpuErrorFilter::from(self : Int32) -> GpuErrorFilter {
   match self {
     0 => VALIDATION
     1 => OUT_OF_MEMORY
@@ -740,7 +742,7 @@ pub(all) enum GpuFeatureName {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuFeatureName::ordinal(self : GpuFeatureName) -> Int {
+pub fn GpuFeatureName::ordinal(self : GpuFeatureName) -> Int32 {
   match self {
     CORE_FEATURES_AND_LIMITS => 0
     DEPTH_CLIP_CONTROL => 1
@@ -768,7 +770,7 @@ pub fn GpuFeatureName::ordinal(self : GpuFeatureName) -> Int {
 }
 
 ///|
-pub fn GpuFeatureName::from(self : Int) -> GpuFeatureName {
+pub fn GpuFeatureName::from(self : Int32) -> GpuFeatureName {
   match self {
     0 => CORE_FEATURES_AND_LIMITS
     1 => DEPTH_CLIP_CONTROL
@@ -803,7 +805,7 @@ pub(all) enum GpuFilterMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuFilterMode::ordinal(self : GpuFilterMode) -> Int {
+pub fn GpuFilterMode::ordinal(self : GpuFilterMode) -> Int32 {
   match self {
     NEAREST => 0
     LINEAR => 1
@@ -811,7 +813,7 @@ pub fn GpuFilterMode::ordinal(self : GpuFilterMode) -> Int {
 }
 
 ///|
-pub fn GpuFilterMode::from(self : Int) -> GpuFilterMode {
+pub fn GpuFilterMode::from(self : Int32) -> GpuFilterMode {
   match self {
     0 => NEAREST
     1 => LINEAR
@@ -826,7 +828,7 @@ pub(all) enum GpuFrontFace {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuFrontFace::ordinal(self : GpuFrontFace) -> Int {
+pub fn GpuFrontFace::ordinal(self : GpuFrontFace) -> Int32 {
   match self {
     CCW => 0
     CW => 1
@@ -834,7 +836,7 @@ pub fn GpuFrontFace::ordinal(self : GpuFrontFace) -> Int {
 }
 
 ///|
-pub fn GpuFrontFace::from(self : Int) -> GpuFrontFace {
+pub fn GpuFrontFace::from(self : Int32) -> GpuFrontFace {
   match self {
     0 => CCW
     1 => CW
@@ -849,7 +851,7 @@ pub(all) enum GpuIndexFormat {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuIndexFormat::ordinal(self : GpuIndexFormat) -> Int {
+pub fn GpuIndexFormat::ordinal(self : GpuIndexFormat) -> Int32 {
   match self {
     UINT16 => 0
     UINT32 => 1
@@ -857,7 +859,7 @@ pub fn GpuIndexFormat::ordinal(self : GpuIndexFormat) -> Int {
 }
 
 ///|
-pub fn GpuIndexFormat::from(self : Int) -> GpuIndexFormat {
+pub fn GpuIndexFormat::from(self : Int32) -> GpuIndexFormat {
   match self {
     0 => UINT16
     1 => UINT32
@@ -867,9 +869,9 @@ pub fn GpuIndexFormat::from(self : Int) -> GpuIndexFormat {
 
 ///|
 pub(all) struct GpuExtent3D {
-  width : UInt
-  height : UInt?
-  depth_or_array_layers : UInt?
+  width : UInt32
+  height : UInt32?
+  depth_or_array_layers : UInt32?
 } derive(Show, Eq)
 
 ///|
@@ -879,7 +881,7 @@ pub(all) enum GpuLoadOp {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuLoadOp::ordinal(self : GpuLoadOp) -> Int {
+pub fn GpuLoadOp::ordinal(self : GpuLoadOp) -> Int32 {
   match self {
     LOAD => 0
     CLEAR => 1
@@ -887,7 +889,7 @@ pub fn GpuLoadOp::ordinal(self : GpuLoadOp) -> Int {
 }
 
 ///|
-pub fn GpuLoadOp::from(self : Int) -> GpuLoadOp {
+pub fn GpuLoadOp::from(self : Int32) -> GpuLoadOp {
   match self {
     0 => LOAD
     1 => CLEAR
@@ -942,7 +944,7 @@ pub(all) enum GpuMipmapFilterMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuMipmapFilterMode::ordinal(self : GpuMipmapFilterMode) -> Int {
+pub fn GpuMipmapFilterMode::ordinal(self : GpuMipmapFilterMode) -> Int32 {
   match self {
     NEAREST => 0
     LINEAR => 1
@@ -950,7 +952,7 @@ pub fn GpuMipmapFilterMode::ordinal(self : GpuMipmapFilterMode) -> Int {
 }
 
 ///|
-pub fn GpuMipmapFilterMode::from(self : Int) -> GpuMipmapFilterMode {
+pub fn GpuMipmapFilterMode::from(self : Int32) -> GpuMipmapFilterMode {
   match self {
     0 => NEAREST
     1 => LINEAR
@@ -960,9 +962,9 @@ pub fn GpuMipmapFilterMode::from(self : Int) -> GpuMipmapFilterMode {
 
 ///|
 pub(all) struct GpuOrigin3D {
-  x : UInt?
-  y : UInt?
-  z : UInt?
+  x : UInt32?
+  y : UInt32?
+  z : UInt32?
 } derive(Show, Eq)
 
 ///|
@@ -972,7 +974,7 @@ pub(all) suberror GpuPipelineErrorReason {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuPipelineErrorReason::ordinal(self : GpuPipelineErrorReason) -> Int {
+pub fn GpuPipelineErrorReason::ordinal(self : GpuPipelineErrorReason) -> Int32 {
   match self {
     VALIDATION => 0
     INTERNAL => 1
@@ -980,7 +982,7 @@ pub fn GpuPipelineErrorReason::ordinal(self : GpuPipelineErrorReason) -> Int {
 }
 
 ///|
-pub fn GpuPipelineErrorReason::from(self : Int) -> GpuPipelineErrorReason {
+pub fn GpuPipelineErrorReason::from(self : Int32) -> GpuPipelineErrorReason {
   match self {
     0 => VALIDATION
     1 => INTERNAL
@@ -1000,7 +1002,7 @@ pub(all) struct CreatePipelineError {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuPipelineLayout(Int) derive(Show, Eq)
+pub(all) struct GpuPipelineLayout(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1022,7 +1024,7 @@ pub(all) enum GpuPowerPreference {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuPowerPreference::ordinal(self : GpuPowerPreference) -> Int {
+pub fn GpuPowerPreference::ordinal(self : GpuPowerPreference) -> Int32 {
   match self {
     LOW_POWER => 0
     HIGH_PERFORMANCE => 1
@@ -1030,7 +1032,7 @@ pub fn GpuPowerPreference::ordinal(self : GpuPowerPreference) -> Int {
 }
 
 ///|
-pub fn GpuPowerPreference::from(self : Int) -> GpuPowerPreference {
+pub fn GpuPowerPreference::from(self : Int32) -> GpuPowerPreference {
   match self {
     0 => LOW_POWER
     1 => HIGH_PERFORMANCE
@@ -1048,7 +1050,7 @@ pub(all) enum GpuPrimitiveTopology {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuPrimitiveTopology::ordinal(self : GpuPrimitiveTopology) -> Int {
+pub fn GpuPrimitiveTopology::ordinal(self : GpuPrimitiveTopology) -> Int32 {
   match self {
     POINT_LIST => 0
     LINE_LIST => 1
@@ -1059,7 +1061,7 @@ pub fn GpuPrimitiveTopology::ordinal(self : GpuPrimitiveTopology) -> Int {
 }
 
 ///|
-pub fn GpuPrimitiveTopology::from(self : Int) -> GpuPrimitiveTopology {
+pub fn GpuPrimitiveTopology::from(self : Int32) -> GpuPrimitiveTopology {
   match self {
     0 => POINT_LIST
     1 => LINE_LIST
@@ -1080,7 +1082,7 @@ pub(all) struct GpuPrimitiveState {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuQuerySet(Int) derive(Show, Eq)
+pub(all) struct GpuQuerySet(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1096,7 +1098,7 @@ pub(all) enum GpuQueryType {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuQueryType::ordinal(self : GpuQueryType) -> Int {
+pub fn GpuQueryType::ordinal(self : GpuQueryType) -> Int32 {
   match self {
     OCCLUSION => 0
     TIMESTAMP => 1
@@ -1104,7 +1106,7 @@ pub fn GpuQueryType::ordinal(self : GpuQueryType) -> Int {
 }
 
 ///|
-pub fn GpuQueryType::from(self : Int) -> GpuQueryType {
+pub fn GpuQueryType::from(self : Int32) -> GpuQueryType {
   match self {
     0 => OCCLUSION
     1 => TIMESTAMP
@@ -1113,7 +1115,7 @@ pub fn GpuQueryType::from(self : Int) -> GpuQueryType {
 }
 
 ///|
-pub(all) struct GpuQueue(Int) derive(Show, Eq)
+pub(all) struct GpuQueue(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1128,7 +1130,7 @@ pub(all) struct GpuQueueDescriptor {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuRenderBundle(Int) derive(Show, Eq)
+pub(all) struct GpuRenderBundle(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1143,7 +1145,7 @@ pub(all) struct GpuRenderBundleDescriptor {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuRenderBundleEncoder(Int) derive(Show, Eq)
+pub(all) struct GpuRenderBundleEncoder(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1153,7 +1155,7 @@ pub fn GpuRenderBundleEncoder::drop(self : GpuRenderBundleEncoder) -> Unit {
 }
 
 ///|
-pub(all) struct GpuRenderPassEncoder(Int) derive(Show, Eq)
+pub(all) struct GpuRenderPassEncoder(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1163,7 +1165,7 @@ pub fn GpuRenderPassEncoder::drop(self : GpuRenderPassEncoder) -> Unit {
 }
 
 ///|
-pub(all) struct GpuRenderPipeline(Int) derive(Show, Eq)
+pub(all) struct GpuRenderPipeline(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1181,7 +1183,7 @@ pub(all) struct GpuRequestAdapterOptions {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuSampler(Int) derive(Show, Eq)
+pub(all) struct GpuSampler(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1198,7 +1200,7 @@ pub(all) enum GpuSamplerBindingType {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuSamplerBindingType::ordinal(self : GpuSamplerBindingType) -> Int {
+pub fn GpuSamplerBindingType::ordinal(self : GpuSamplerBindingType) -> Int32 {
   match self {
     FILTERING => 0
     NON_FILTERING => 1
@@ -1207,7 +1209,7 @@ pub fn GpuSamplerBindingType::ordinal(self : GpuSamplerBindingType) -> Int {
 }
 
 ///|
-pub fn GpuSamplerBindingType::from(self : Int) -> GpuSamplerBindingType {
+pub fn GpuSamplerBindingType::from(self : Int32) -> GpuSamplerBindingType {
   match self {
     0 => FILTERING
     1 => NON_FILTERING
@@ -1232,12 +1234,12 @@ pub(all) struct GpuSamplerDescriptor {
   lod_min_clamp : Float?
   lod_max_clamp : Float?
   compare : GpuCompareFunction?
-  max_anisotropy : UInt?
+  max_anisotropy : UInt32?
   label : String?
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuShaderModule(Int) derive(Show, Eq)
+pub(all) struct GpuShaderModule(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1310,8 +1312,8 @@ pub fn GpuShaderStage::is_set(self : Self, other : GpuShaderStageFlag) -> Bool {
 ///|
 pub(all) struct GpuComputePassTimestampWrites {
   query_set : GpuQuerySet
-  beginning_of_pass_write_index : UInt?
-  end_of_pass_write_index : UInt?
+  beginning_of_pass_write_index : UInt32?
+  end_of_pass_write_index : UInt32?
 } derive(Show, Eq)
 
 ///|
@@ -1322,30 +1324,30 @@ pub(all) struct GpuComputePassDescriptor {
 
 ///|
 pub(all) struct GpuMultisampleState {
-  count : UInt?
-  mask : UInt?
+  count : UInt32?
+  mask : UInt32?
   alpha_to_coverage_enabled : Bool?
 } derive(Show, Eq)
 
 ///|
 pub(all) struct GpuPipelineLayoutDescriptor {
   bind_group_layouts : Array[GpuBindGroupLayout?]
-  immediate_size : UInt?
+  immediate_size : UInt32?
   label : String?
 } derive(Show, Eq)
 
 ///|
 pub(all) struct GpuQuerySetDescriptor {
   type_ : GpuQueryType
-  count : UInt
+  count : UInt32
   label : String?
 } derive(Show, Eq)
 
 ///|
 pub(all) struct GpuRenderPassTimestampWrites {
   query_set : GpuQuerySet
-  beginning_of_pass_write_index : UInt?
-  end_of_pass_write_index : UInt?
+  beginning_of_pass_write_index : UInt32?
+  end_of_pass_write_index : UInt32?
 } derive(Show, Eq)
 
 ///|
@@ -1383,7 +1385,7 @@ pub(all) enum GpuStencilOperation {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuStencilOperation::ordinal(self : GpuStencilOperation) -> Int {
+pub fn GpuStencilOperation::ordinal(self : GpuStencilOperation) -> Int32 {
   match self {
     KEEP => 0
     ZERO => 1
@@ -1397,7 +1399,7 @@ pub fn GpuStencilOperation::ordinal(self : GpuStencilOperation) -> Int {
 }
 
 ///|
-pub fn GpuStencilOperation::from(self : Int) -> GpuStencilOperation {
+pub fn GpuStencilOperation::from(self : Int32) -> GpuStencilOperation {
   match self {
     0 => KEEP
     1 => ZERO
@@ -1427,7 +1429,9 @@ pub(all) enum GpuStorageTextureAccess {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuStorageTextureAccess::ordinal(self : GpuStorageTextureAccess) -> Int {
+pub fn GpuStorageTextureAccess::ordinal(
+  self : GpuStorageTextureAccess,
+) -> Int32 {
   match self {
     WRITE_ONLY => 0
     READ_ONLY => 1
@@ -1436,7 +1440,7 @@ pub fn GpuStorageTextureAccess::ordinal(self : GpuStorageTextureAccess) -> Int {
 }
 
 ///|
-pub fn GpuStorageTextureAccess::from(self : Int) -> GpuStorageTextureAccess {
+pub fn GpuStorageTextureAccess::from(self : Int32) -> GpuStorageTextureAccess {
   match self {
     0 => WRITE_ONLY
     1 => READ_ONLY
@@ -1452,7 +1456,7 @@ pub(all) enum GpuStoreOp {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuStoreOp::ordinal(self : GpuStoreOp) -> Int {
+pub fn GpuStoreOp::ordinal(self : GpuStoreOp) -> Int32 {
   match self {
     STORE => 0
     DISCARD => 1
@@ -1460,7 +1464,7 @@ pub fn GpuStoreOp::ordinal(self : GpuStoreOp) -> Int {
 }
 
 ///|
-pub fn GpuStoreOp::from(self : Int) -> GpuStoreOp {
+pub fn GpuStoreOp::from(self : Int32) -> GpuStoreOp {
   match self {
     0 => STORE
     1 => DISCARD
@@ -1469,7 +1473,7 @@ pub fn GpuStoreOp::from(self : Int) -> GpuStoreOp {
 }
 
 ///|
-pub(all) struct GpuSupportedFeatures(Int) derive(Show, Eq)
+pub(all) struct GpuSupportedFeatures(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1479,7 +1483,7 @@ pub fn GpuSupportedFeatures::drop(self : GpuSupportedFeatures) -> Unit {
 }
 
 ///|
-pub(all) struct GpuSupportedLimits(Int) derive(Show, Eq)
+pub(all) struct GpuSupportedLimits(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1492,19 +1496,19 @@ pub fn GpuSupportedLimits::drop(self : GpuSupportedLimits) -> Unit {
 pub(all) struct GpuTexelCopyBufferInfo {
   buffer : GpuBuffer
   offset : UInt64?
-  bytes_per_row : UInt?
-  rows_per_image : UInt?
+  bytes_per_row : UInt32?
+  rows_per_image : UInt32?
 } derive(Show, Eq)
 
 ///|
 pub(all) struct GpuTexelCopyBufferLayout {
   offset : UInt64?
-  bytes_per_row : UInt?
-  rows_per_image : UInt?
+  bytes_per_row : UInt32?
+  rows_per_image : UInt32?
 } derive(Show, Eq)
 
 ///|
-pub(all) struct GpuTexture(Int) derive(Show, Eq)
+pub(all) struct GpuTexture(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -1521,7 +1525,7 @@ pub(all) enum GpuTextureAspect {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuTextureAspect::ordinal(self : GpuTextureAspect) -> Int {
+pub fn GpuTextureAspect::ordinal(self : GpuTextureAspect) -> Int32 {
   match self {
     ALL => 0
     STENCIL_ONLY => 1
@@ -1530,7 +1534,7 @@ pub fn GpuTextureAspect::ordinal(self : GpuTextureAspect) -> Int {
 }
 
 ///|
-pub fn GpuTextureAspect::from(self : Int) -> GpuTextureAspect {
+pub fn GpuTextureAspect::from(self : Int32) -> GpuTextureAspect {
   match self {
     0 => ALL
     1 => STENCIL_ONLY
@@ -1542,7 +1546,7 @@ pub fn GpuTextureAspect::from(self : Int) -> GpuTextureAspect {
 ///|
 pub(all) struct GpuTexelCopyTextureInfo {
   texture : GpuTexture
-  mip_level : UInt?
+  mip_level : UInt32?
   origin : GpuOrigin3D?
   aspect : GpuTextureAspect?
 } derive(Show, Eq)
@@ -1555,7 +1559,7 @@ pub(all) enum GpuTextureDimension {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuTextureDimension::ordinal(self : GpuTextureDimension) -> Int {
+pub fn GpuTextureDimension::ordinal(self : GpuTextureDimension) -> Int32 {
   match self {
     D1 => 0
     D2 => 1
@@ -1564,7 +1568,7 @@ pub fn GpuTextureDimension::ordinal(self : GpuTextureDimension) -> Int {
 }
 
 ///|
-pub fn GpuTextureDimension::from(self : Int) -> GpuTextureDimension {
+pub fn GpuTextureDimension::from(self : Int32) -> GpuTextureDimension {
   match self {
     0 => D1
     1 => D2
@@ -1679,7 +1683,7 @@ pub(all) enum GpuTextureFormat {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuTextureFormat::ordinal(self : GpuTextureFormat) -> Int {
+pub fn GpuTextureFormat::ordinal(self : GpuTextureFormat) -> Int32 {
   match self {
     R8UNORM => 0
     R8SNORM => 1
@@ -1786,7 +1790,7 @@ pub fn GpuTextureFormat::ordinal(self : GpuTextureFormat) -> Int {
 }
 
 ///|
-pub fn GpuTextureFormat::from(self : Int) -> GpuTextureFormat {
+pub fn GpuTextureFormat::from(self : Int32) -> GpuTextureFormat {
   match self {
     0 => R8UNORM
     1 => R8SNORM
@@ -1907,9 +1911,9 @@ pub(all) struct GpuDepthStencilState {
   depth_compare : GpuCompareFunction?
   stencil_front : GpuStencilFaceState?
   stencil_back : GpuStencilFaceState?
-  stencil_read_mask : UInt?
-  stencil_write_mask : UInt?
-  depth_bias : Int?
+  stencil_read_mask : UInt32?
+  stencil_write_mask : UInt32?
+  depth_bias : Int32?
   depth_bias_slope_scale : Float?
   depth_bias_clamp : Float?
 } derive(Show, Eq)
@@ -1920,7 +1924,7 @@ pub(all) struct GpuRenderBundleEncoderDescriptor {
   stencil_read_only : Bool?
   color_formats : Array[GpuTextureFormat?]
   depth_stencil_format : GpuTextureFormat?
-  sample_count : UInt?
+  sample_count : UInt32?
   label : String?
 } derive(Show, Eq)
 
@@ -1934,7 +1938,7 @@ pub(all) enum GpuTextureSampleType {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuTextureSampleType::ordinal(self : GpuTextureSampleType) -> Int {
+pub fn GpuTextureSampleType::ordinal(self : GpuTextureSampleType) -> Int32 {
   match self {
     FLOAT => 0
     UNFILTERABLE_FLOAT => 1
@@ -1945,7 +1949,7 @@ pub fn GpuTextureSampleType::ordinal(self : GpuTextureSampleType) -> Int {
 }
 
 ///|
-pub fn GpuTextureSampleType::from(self : Int) -> GpuTextureSampleType {
+pub fn GpuTextureSampleType::from(self : Int32) -> GpuTextureSampleType {
   match self {
     0 => FLOAT
     1 => UNFILTERABLE_FLOAT
@@ -2014,7 +2018,7 @@ pub fn GpuTextureUsage::is_set(
 }
 
 ///|
-pub(all) struct GpuTextureView(Int) derive(Show, Eq)
+pub(all) struct GpuTextureView(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -2034,7 +2038,7 @@ pub(all) enum GpuBindingResource {
 
 ///|
 pub(all) struct GpuBindGroupEntry {
-  binding : UInt
+  binding : UInt32
   resource : GpuBindingResource
 } derive(Show, Eq)
 
@@ -2048,7 +2052,7 @@ pub(all) struct GpuBindGroupDescriptor {
 ///|
 pub(all) struct GpuRenderPassColorAttachment {
   view : GpuTextureView
-  depth_slice : UInt?
+  depth_slice : UInt32?
   resolve_target : GpuTextureView?
   clear_value : GpuColor?
   load_op : GpuLoadOp
@@ -2062,7 +2066,7 @@ pub(all) struct GpuRenderPassDepthStencilAttachment {
   depth_load_op : GpuLoadOp?
   depth_store_op : GpuStoreOp?
   depth_read_only : Bool?
-  stencil_clear_value : UInt?
+  stencil_clear_value : UInt32?
   stencil_load_op : GpuLoadOp?
   stencil_store_op : GpuStoreOp?
   stencil_read_only : Bool?
@@ -2089,7 +2093,9 @@ pub(all) enum GpuTextureViewDimension {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuTextureViewDimension::ordinal(self : GpuTextureViewDimension) -> Int {
+pub fn GpuTextureViewDimension::ordinal(
+  self : GpuTextureViewDimension,
+) -> Int32 {
   match self {
     D1 => 0
     D2 => 1
@@ -2101,7 +2107,7 @@ pub fn GpuTextureViewDimension::ordinal(self : GpuTextureViewDimension) -> Int {
 }
 
 ///|
-pub fn GpuTextureViewDimension::from(self : Int) -> GpuTextureViewDimension {
+pub fn GpuTextureViewDimension::from(self : Int32) -> GpuTextureViewDimension {
   match self {
     0 => D1
     1 => D2
@@ -2129,7 +2135,7 @@ pub(all) struct GpuTextureBindingLayout {
 
 ///|
 pub(all) struct GpuBindGroupLayoutEntry {
-  binding : UInt
+  binding : UInt32
   visibility : GpuShaderStage
   buffer : GpuBufferBindingLayout?
   sampler : GpuSamplerBindingLayout?
@@ -2146,8 +2152,8 @@ pub(all) struct GpuBindGroupLayoutDescriptor {
 ///|
 pub(all) struct GpuTextureDescriptor {
   size : GpuExtent3D
-  mip_level_count : UInt?
-  sample_count : UInt?
+  mip_level_count : UInt32?
+  sample_count : UInt32?
   dimension : GpuTextureDimension?
   format : GpuTextureFormat
   usage : GpuTextureUsage
@@ -2162,17 +2168,17 @@ pub(all) struct GpuTextureViewDescriptor {
   dimension : GpuTextureViewDimension?
   usage : GpuTextureUsage?
   aspect : GpuTextureAspect?
-  base_mip_level : UInt?
-  mip_level_count : UInt?
-  base_array_layer : UInt?
-  array_layer_count : UInt?
+  base_mip_level : UInt32?
+  mip_level_count : UInt32?
+  base_array_layer : UInt32?
+  array_layer_count : UInt32?
   swizzle : String?
   label : String?
 } derive(Show, Eq)
 
 ///|
 pub(all) suberror GpuUncapturedErrorEvent {
-  GpuUncapturedErrorEvent(Int)
+  GpuUncapturedErrorEvent(Int32)
 } derive(Show, Eq)
 
 ///|
@@ -2228,7 +2234,7 @@ pub(all) enum GpuVertexFormat {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuVertexFormat::ordinal(self : GpuVertexFormat) -> Int {
+pub fn GpuVertexFormat::ordinal(self : GpuVertexFormat) -> Int32 {
   match self {
     UINT8 => 0
     UINT8X2 => 1
@@ -2275,7 +2281,7 @@ pub fn GpuVertexFormat::ordinal(self : GpuVertexFormat) -> Int {
 }
 
 ///|
-pub fn GpuVertexFormat::from(self : Int) -> GpuVertexFormat {
+pub fn GpuVertexFormat::from(self : Int32) -> GpuVertexFormat {
   match self {
     0 => UINT8
     1 => UINT8X2
@@ -2326,7 +2332,7 @@ pub fn GpuVertexFormat::from(self : Int) -> GpuVertexFormat {
 pub(all) struct GpuVertexAttribute {
   format : GpuVertexFormat
   offset : UInt64
-  shader_location : UInt
+  shader_location : UInt32
 } derive(Show, Eq)
 
 ///|
@@ -2336,7 +2342,7 @@ pub(all) enum GpuVertexStepMode {
 } derive(Show, Eq)
 
 ///|
-pub fn GpuVertexStepMode::ordinal(self : GpuVertexStepMode) -> Int {
+pub fn GpuVertexStepMode::ordinal(self : GpuVertexStepMode) -> Int32 {
   match self {
     VERTEX => 0
     INSTANCE => 1
@@ -2344,7 +2350,7 @@ pub fn GpuVertexStepMode::ordinal(self : GpuVertexStepMode) -> Int {
 }
 
 ///|
-pub fn GpuVertexStepMode::from(self : Int) -> GpuVertexStepMode {
+pub fn GpuVertexStepMode::from(self : Int32) -> GpuVertexStepMode {
   match self {
     0 => VERTEX
     1 => INSTANCE
@@ -2390,7 +2396,7 @@ pub(all) enum PredefinedColorSpace {
 } derive(Show, Eq)
 
 ///|
-pub fn PredefinedColorSpace::ordinal(self : PredefinedColorSpace) -> Int {
+pub fn PredefinedColorSpace::ordinal(self : PredefinedColorSpace) -> Int32 {
   match self {
     SRGB => 0
     DISPLAY_P3 => 1
@@ -2398,7 +2404,7 @@ pub fn PredefinedColorSpace::ordinal(self : PredefinedColorSpace) -> Int {
 }
 
 ///|
-pub fn PredefinedColorSpace::from(self : Int) -> PredefinedColorSpace {
+pub fn PredefinedColorSpace::from(self : Int32) -> PredefinedColorSpace {
   match self {
     0 => SRGB
     1 => DISPLAY_P3
@@ -2429,7 +2435,7 @@ pub(all) struct GpuCanvasConfigurationOwned {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct RecordGpuPipelineConstantValue(Int) derive(Show, Eq)
+pub(all) struct RecordGpuPipelineConstantValue(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -2482,7 +2488,7 @@ pub(all) struct GpuRenderPipelineDescriptor {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct RecordOptionGpuSize64(Int) derive(Show, Eq)
+pub(all) struct RecordOptionGpuSize64(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -2534,7 +2540,7 @@ pub(all) struct UnmapError {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct WgslLanguageFeatures(Int) derive(Show, Eq)
+pub(all) struct WgslLanguageFeatures(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -2559,7 +2565,7 @@ pub async fn Gpu::request_adapter(
   self : Gpu,
   options : GpuRequestAdapterOptions?,
 ) -> GpuAdapter? {
-  let lower_ptr : Int = mbt_ffi_malloc(28)
+  let lower_ptr : Int32 = mbt_ffi_malloc(28)
   defer mbt_ffi_free(lower_ptr)
 
   let Gpu(handle) = self
@@ -2689,7 +2695,7 @@ pub async fn Gpu::request_adapter(
 ///|
 pub fn Gpu::get_preferred_canvas_format(self : Gpu) -> GpuTextureFormat {
   let Gpu(handle) = self
-  let result : Int = wasmImportMethodGpuGetPreferredCanvasFormat(handle)
+  let result : Int32 = wasmImportMethodGpuGetPreferredCanvasFormat(handle)
   let ret = GpuTextureFormat::from(result)
   return ret
 }
@@ -2697,7 +2703,7 @@ pub fn Gpu::get_preferred_canvas_format(self : Gpu) -> GpuTextureFormat {
 ///|
 pub fn Gpu::wgsl_language_features(self : Gpu) -> WgslLanguageFeatures {
   let Gpu(handle) = self
-  let result : Int = wasmImportMethodGpuWgslLanguageFeatures(handle)
+  let result : Int32 = wasmImportMethodGpuWgslLanguageFeatures(handle)
   let ret = WgslLanguageFeatures::WgslLanguageFeatures(result)
   return ret
 }
@@ -2705,7 +2711,7 @@ pub fn Gpu::wgsl_language_features(self : Gpu) -> WgslLanguageFeatures {
 ///|
 pub fn GpuAdapter::features(self : GpuAdapter) -> GpuSupportedFeatures {
   let GpuAdapter(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterFeatures(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterFeatures(handle)
   let ret = GpuSupportedFeatures::GpuSupportedFeatures(result)
   return ret
 }
@@ -2713,7 +2719,7 @@ pub fn GpuAdapter::features(self : GpuAdapter) -> GpuSupportedFeatures {
 ///|
 pub fn GpuAdapter::limits(self : GpuAdapter) -> GpuSupportedLimits {
   let GpuAdapter(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterLimits(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterLimits(handle)
   let ret = GpuSupportedLimits::GpuSupportedLimits(result)
   return ret
 }
@@ -2721,7 +2727,7 @@ pub fn GpuAdapter::limits(self : GpuAdapter) -> GpuSupportedLimits {
 ///|
 pub fn GpuAdapter::info(self : GpuAdapter) -> GpuAdapterInfo {
   let GpuAdapter(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterInfo(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterInfo(handle)
   let ret = GpuAdapterInfo::GpuAdapterInfo(result)
   return ret
 }
@@ -2731,7 +2737,7 @@ pub async fn GpuAdapter::request_device(
   self : GpuAdapter,
   descriptor : GpuDeviceDescriptor?,
 ) -> Result[GpuDevice, RequestDeviceError] {
-  let lower_ptr : Int = mbt_ffi_malloc(56)
+  let lower_ptr : Int32 = mbt_ffi_malloc(56)
   defer mbt_ffi_free(lower_ptr)
 
   let GpuAdapter(handle) = self
@@ -3011,17 +3017,17 @@ pub fn GpuAdapterInfo::description(self : GpuAdapterInfo) -> String {
 }
 
 ///|
-pub fn GpuAdapterInfo::subgroup_min_size(self : GpuAdapterInfo) -> UInt {
+pub fn GpuAdapterInfo::subgroup_min_size(self : GpuAdapterInfo) -> UInt32 {
   let GpuAdapterInfo(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterInfoSubgroupMinSize(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterInfoSubgroupMinSize(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn GpuAdapterInfo::subgroup_max_size(self : GpuAdapterInfo) -> UInt {
+pub fn GpuAdapterInfo::subgroup_max_size(self : GpuAdapterInfo) -> UInt32 {
   let GpuAdapterInfo(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterInfoSubgroupMaxSize(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterInfoSubgroupMaxSize(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -3029,7 +3035,7 @@ pub fn GpuAdapterInfo::subgroup_max_size(self : GpuAdapterInfo) -> UInt {
 ///|
 pub fn GpuAdapterInfo::is_fallback_adapter(self : GpuAdapterInfo) -> Bool {
   let GpuAdapterInfo(handle) = self
-  let result : Int = wasmImportMethodGpuAdapterInfoIsFallbackAdapter(handle)
+  let result : Int32 = wasmImportMethodGpuAdapterInfoIsFallbackAdapter(handle)
   let ret = result != 0
   return ret
 }
@@ -3096,7 +3102,7 @@ pub fn GpuBuffer::size(self : GpuBuffer) -> UInt64 {
 ///|
 pub fn GpuBuffer::usage(self : GpuBuffer) -> GpuBufferUsage {
   let GpuBuffer(handle) = self
-  let result : Int = wasmImportMethodGpuBufferUsage(handle)
+  let result : Int32 = wasmImportMethodGpuBufferUsage(handle)
   let ret = GpuBufferUsage(result.reinterpret_as_uint())
   return ret
 }
@@ -3104,7 +3110,7 @@ pub fn GpuBuffer::usage(self : GpuBuffer) -> GpuBufferUsage {
 ///|
 pub fn GpuBuffer::map_state(self : GpuBuffer) -> GpuBufferMapState {
   let GpuBuffer(handle) = self
-  let result : Int = wasmImportMethodGpuBufferMapState(handle)
+  let result : Int32 = wasmImportMethodGpuBufferMapState(handle)
   let ret = GpuBufferMapState::from(result)
   return ret
 }
@@ -3116,7 +3122,7 @@ pub async fn GpuBuffer::map_async(
   offset : UInt64?,
   size : UInt64?,
 ) -> Result[Unit, MapAsyncError] {
-  let lower_ptr : Int = mbt_ffi_malloc(40)
+  let lower_ptr : Int32 = mbt_ffi_malloc(40)
   defer mbt_ffi_free(lower_ptr)
 
   let GpuBuffer(handle) = self
@@ -3366,7 +3372,7 @@ pub fn GpuCanvasContext::configure(
   self : GpuCanvasContext,
   configuration : GpuCanvasConfiguration,
 ) -> Unit {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuCanvasContext(handle) = self
 
@@ -3547,7 +3553,7 @@ pub fn GpuCanvasContext::get_current_texture(
   self : GpuCanvasContext,
 ) -> GpuTexture {
   let GpuCanvasContext(handle) = self
-  let result : Int = wasmImportMethodGpuCanvasContextGetCurrentTexture(handle)
+  let result : Int32 = wasmImportMethodGpuCanvasContextGetCurrentTexture(handle)
   let ret = GpuTexture::GpuTexture(result)
   return ret
 }
@@ -3584,7 +3590,7 @@ pub fn GpuCommandEncoder::begin_render_pass(
   self : GpuCommandEncoder,
   descriptor : GpuRenderPassDescriptor,
 ) -> GpuRenderPassEncoder {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
   let return_area = mbt_ffi_malloc(120)
 
   let GpuCommandEncoder(handle) = self
@@ -3884,7 +3890,7 @@ pub fn GpuCommandEncoder::begin_render_pass(
       ()
     }
   }
-  let result : Int = wasmImportMethodGpuCommandEncoderBeginRenderPass(
+  let result : Int32 = wasmImportMethodGpuCommandEncoderBeginRenderPass(
     return_area,
   )
   let ret = GpuRenderPassEncoder::GpuRenderPassEncoder(result)
@@ -3900,7 +3906,7 @@ pub fn GpuCommandEncoder::begin_compute_pass(
   self : GpuCommandEncoder,
   descriptor : GpuComputePassDescriptor?,
 ) -> GpuComputePassEncoder {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuCommandEncoder(handle) = self
 
@@ -3955,7 +3961,7 @@ pub fn GpuCommandEncoder::begin_compute_pass(
       )
     }
   }
-  let result : Int = wasmImportMethodGpuCommandEncoderBeginComputePass(
+  let result : Int32 = wasmImportMethodGpuCommandEncoderBeginComputePass(
     handle, lowered22, lowered23, lowered24, lowered25, lowered26, lowered27, lowered28,
     lowered29, lowered30, lowered31,
   )
@@ -4594,8 +4600,8 @@ pub fn GpuCommandEncoder::clear_buffer(
 pub fn GpuCommandEncoder::resolve_query_set(
   self : GpuCommandEncoder,
   query_set : GpuQuerySet,
-  first_query : UInt,
-  query_count : UInt,
+  first_query : UInt32,
+  query_count : UInt32,
   destination : GpuBuffer,
   destination_offset : UInt64,
 ) -> Unit {
@@ -4619,7 +4625,7 @@ pub fn GpuCommandEncoder::finish(
   self : GpuCommandEncoder,
   descriptor : GpuCommandBufferDescriptor?,
 ) -> GpuCommandBuffer {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuCommandEncoder(handle) = self
 
@@ -4639,7 +4645,7 @@ pub fn GpuCommandEncoder::finish(
       (1, lowered, lowered3, lowered4)
     }
   }
-  let result : Int = wasmImportMethodGpuCommandEncoderFinish(
+  let result : Int32 = wasmImportMethodGpuCommandEncoderFinish(
     handle, lowered5, lowered6, lowered7, lowered8,
   )
   let ret = GpuCommandBuffer::GpuCommandBuffer(result)
@@ -4757,7 +4763,7 @@ pub fn GpuCompilationMessage::type_(
   self : GpuCompilationMessage,
 ) -> GpuCompilationMessageType {
   let GpuCompilationMessage(handle) = self
-  let result : Int = wasmImportMethodGpuCompilationMessageType(handle)
+  let result : Int32 = wasmImportMethodGpuCompilationMessageType(handle)
   let ret = GpuCompilationMessageType::from(result)
   return ret
 }
@@ -4808,9 +4814,9 @@ pub fn GpuComputePassEncoder::set_pipeline(
 ///|
 pub fn GpuComputePassEncoder::dispatch_workgroups(
   self : GpuComputePassEncoder,
-  workgroup_count_x : UInt,
-  workgroup_count_y : UInt?,
-  workgroup_count_z : UInt?,
+  workgroup_count_x : UInt32,
+  workgroup_count_y : UInt32?,
+  workgroup_count_z : UInt32?,
 ) -> Unit {
   let GpuComputePassEncoder(handle) = self
 
@@ -4925,13 +4931,13 @@ pub fn GpuComputePassEncoder::insert_debug_marker(
 ///|
 pub fn GpuComputePassEncoder::set_bind_group(
   self : GpuComputePassEncoder,
-  index : UInt,
+  index : UInt32,
   bind_group : GpuBindGroup?,
-  dynamic_offsets_data : Array[UInt]?,
+  dynamic_offsets_data : Array[UInt32]?,
   dynamic_offsets_data_start : UInt64?,
-  dynamic_offsets_data_length : UInt?,
+  dynamic_offsets_data_length : UInt32?,
 ) -> Result[Unit, SetBindGroupError] {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuComputePassEncoder(handle) = self
 
@@ -4949,7 +4955,7 @@ pub fn GpuComputePassEncoder::set_bind_group(
     Some(payload4) => {
       let address = mbt_ffi_malloc(payload4.length() * 4)
       for index5 = 0; index5 < payload4.length(); index5 = index5 + 1 {
-        let iter_elem : UInt = payload4[index5]
+        let iter_elem : UInt32 = payload4[index5]
         let iter_base = address + index5 * 4
         mbt_ffi_store32(iter_base + 0, iter_elem.reinterpret_as_int())
       }
@@ -5011,7 +5017,7 @@ pub fn GpuComputePassEncoder::set_bind_group(
 ///|
 pub fn GpuComputePassEncoder::set_immediates(
   self : GpuComputePassEncoder,
-  range_offset : UInt,
+  range_offset : UInt32,
   data : FixedArray[Byte],
   data_offset : UInt64?,
   data_size : UInt64?,
@@ -5072,10 +5078,10 @@ pub fn GpuComputePipeline::set_label(
 ///|
 pub fn GpuComputePipeline::get_bind_group_layout(
   self : GpuComputePipeline,
-  index : UInt,
+  index : UInt32,
 ) -> GpuBindGroupLayout {
   let GpuComputePipeline(handle) = self
-  let result : Int = wasmImportMethodGpuComputePipelineGetBindGroupLayout(
+  let result : Int32 = wasmImportMethodGpuComputePipelineGetBindGroupLayout(
     handle,
     index.reinterpret_as_int(),
   )
@@ -5086,7 +5092,7 @@ pub fn GpuComputePipeline::get_bind_group_layout(
 ///|
 pub fn GpuDevice::features(self : GpuDevice) -> GpuSupportedFeatures {
   let GpuDevice(handle) = self
-  let result : Int = wasmImportMethodGpuDeviceFeatures(handle)
+  let result : Int32 = wasmImportMethodGpuDeviceFeatures(handle)
   let ret = GpuSupportedFeatures::GpuSupportedFeatures(result)
   return ret
 }
@@ -5094,7 +5100,7 @@ pub fn GpuDevice::features(self : GpuDevice) -> GpuSupportedFeatures {
 ///|
 pub fn GpuDevice::limits(self : GpuDevice) -> GpuSupportedLimits {
   let GpuDevice(handle) = self
-  let result : Int = wasmImportMethodGpuDeviceLimits(handle)
+  let result : Int32 = wasmImportMethodGpuDeviceLimits(handle)
   let ret = GpuSupportedLimits::GpuSupportedLimits(result)
   return ret
 }
@@ -5102,7 +5108,7 @@ pub fn GpuDevice::limits(self : GpuDevice) -> GpuSupportedLimits {
 ///|
 pub fn GpuDevice::adapter_info(self : GpuDevice) -> GpuAdapterInfo {
   let GpuDevice(handle) = self
-  let result : Int = wasmImportMethodGpuDeviceAdapterInfo(handle)
+  let result : Int32 = wasmImportMethodGpuDeviceAdapterInfo(handle)
   let ret = GpuAdapterInfo::GpuAdapterInfo(result)
   return ret
 }
@@ -5110,7 +5116,7 @@ pub fn GpuDevice::adapter_info(self : GpuDevice) -> GpuAdapterInfo {
 ///|
 pub fn GpuDevice::queue(self : GpuDevice) -> GpuQueue {
   let GpuDevice(handle) = self
-  let result : Int = wasmImportMethodGpuDeviceQueue(handle)
+  let result : Int32 = wasmImportMethodGpuDeviceQueue(handle)
   let ret = GpuQueue::GpuQueue(result)
   return ret
 }
@@ -5126,7 +5132,7 @@ pub fn GpuDevice::create_buffer(
   self : GpuDevice,
   descriptor : GpuBufferDescriptor,
 ) -> GpuBuffer {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -5146,7 +5152,7 @@ pub fn GpuDevice::create_buffer(
       (1, ptr, payload3.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateBuffer(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateBuffer(
     handle,
     descriptor.size.reinterpret_as_int64(),
     flag.reinterpret_as_int(),
@@ -5167,7 +5173,7 @@ pub fn GpuDevice::create_texture(
   self : GpuDevice,
   descriptor : GpuTextureDescriptor,
 ) -> GpuTexture {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
   let return_area = mbt_ffi_malloc(72)
 
   let GpuDevice(handle) = self
@@ -5303,7 +5309,7 @@ pub fn GpuDevice::create_texture(
       ()
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateTexture(return_area)
+  let result : Int32 = wasmImportMethodGpuDeviceCreateTexture(return_area)
   let ret = GpuTexture::GpuTexture(result)
   mbt_ffi_free(return_area)
 
@@ -5316,7 +5322,7 @@ pub fn GpuDevice::create_sampler(
   self : GpuDevice,
   descriptor : GpuSamplerDescriptor?,
 ) -> GpuSampler {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
   let return_area = mbt_ffi_malloc(56)
 
   let GpuDevice(handle) = self
@@ -5492,7 +5498,7 @@ pub fn GpuDevice::create_sampler(
       ()
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateSampler(return_area)
+  let result : Int32 = wasmImportMethodGpuDeviceCreateSampler(return_area)
   let ret = GpuSampler::GpuSampler(result)
   mbt_ffi_free(return_area)
 
@@ -5505,7 +5511,7 @@ pub fn GpuDevice::create_bind_group_layout(
   self : GpuDevice,
   descriptor : GpuBindGroupLayoutDescriptor,
 ) -> GpuBindGroupLayout {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -5708,7 +5714,7 @@ pub fn GpuDevice::create_bind_group_layout(
       (1, ptr, payload26.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateBindGroupLayout(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateBindGroupLayout(
     handle,
     address,
     descriptor.entries.length(),
@@ -5728,7 +5734,7 @@ pub fn GpuDevice::create_pipeline_layout(
   self : GpuDevice,
   descriptor : GpuPipelineLayoutDescriptor,
 ) -> GpuPipelineLayout {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -5770,7 +5776,7 @@ pub fn GpuDevice::create_pipeline_layout(
       (1, ptr, payload6.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreatePipelineLayout(
+  let result : Int32 = wasmImportMethodGpuDeviceCreatePipelineLayout(
     handle,
     address,
     descriptor.bind_group_layouts.length(),
@@ -5792,7 +5798,7 @@ pub fn GpuDevice::create_bind_group(
   self : GpuDevice,
   descriptor : GpuBindGroupDescriptor,
 ) -> GpuBindGroup {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -5885,7 +5891,7 @@ pub fn GpuDevice::create_bind_group(
       (1, ptr, payload15.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateBindGroup(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateBindGroup(
     handle,
     handle0,
     address,
@@ -5906,7 +5912,7 @@ pub fn GpuDevice::create_shader_module(
   self : GpuDevice,
   descriptor : GpuShaderModuleDescriptor,
 ) -> GpuShaderModule {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -5969,7 +5975,7 @@ pub fn GpuDevice::create_shader_module(
       (1, ptr11, payload10.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateShaderModule(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateShaderModule(
     handle,
     ptr,
     descriptor.code.length(),
@@ -5992,7 +5998,7 @@ pub fn GpuDevice::create_compute_pipeline(
   self : GpuDevice,
   descriptor : GpuComputePipelineDescriptor,
 ) -> GpuComputePipeline {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -6035,7 +6041,7 @@ pub fn GpuDevice::create_compute_pipeline(
       (1, ptr16, payload15.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateComputePipeline(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateComputePipeline(
     handle, handle0, lowered, lowered2, lowered3, lowered7, lowered8, lowered12,
     lowered13, lowered17, lowered18, lowered19,
   )
@@ -6050,7 +6056,7 @@ pub fn GpuDevice::create_render_pipeline(
   self : GpuDevice,
   descriptor : GpuRenderPipelineDescriptor,
 ) -> GpuRenderPipeline {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
   let return_area = mbt_ffi_malloc(200)
 
   let GpuDevice(handle) = self
@@ -6776,7 +6782,9 @@ pub fn GpuDevice::create_render_pipeline(
       ()
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateRenderPipeline(return_area)
+  let result : Int32 = wasmImportMethodGpuDeviceCreateRenderPipeline(
+    return_area,
+  )
   let ret = GpuRenderPipeline::GpuRenderPipeline(result)
   mbt_ffi_free(return_area)
 
@@ -6789,7 +6797,7 @@ pub async fn GpuDevice::create_compute_pipeline_async(
   self : GpuDevice,
   descriptor : GpuComputePipelineDescriptor,
 ) -> Result[GpuComputePipeline, CreatePipelineError] {
-  let lower_ptr : Int = mbt_ffi_malloc(48)
+  let lower_ptr : Int32 = mbt_ffi_malloc(48)
   defer mbt_ffi_free(lower_ptr)
 
   let GpuDevice(handle) = self
@@ -6956,7 +6964,7 @@ pub async fn GpuDevice::create_render_pipeline_async(
   self : GpuDevice,
   descriptor : GpuRenderPipelineDescriptor,
 ) -> Result[GpuRenderPipeline, CreatePipelineError] {
-  let lower_ptr : Int = mbt_ffi_malloc(200)
+  let lower_ptr : Int32 = mbt_ffi_malloc(200)
   defer mbt_ffi_free(lower_ptr)
 
   let GpuDevice(handle) = self
@@ -7850,7 +7858,7 @@ pub fn GpuDevice::create_command_encoder(
   self : GpuDevice,
   descriptor : GpuCommandEncoderDescriptor?,
 ) -> GpuCommandEncoder {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -7870,7 +7878,7 @@ pub fn GpuDevice::create_command_encoder(
       (1, lowered, lowered3, lowered4)
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateCommandEncoder(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateCommandEncoder(
     handle, lowered5, lowered6, lowered7, lowered8,
   )
   let ret = GpuCommandEncoder::GpuCommandEncoder(result)
@@ -7884,7 +7892,7 @@ pub fn GpuDevice::create_render_bundle_encoder(
   self : GpuDevice,
   descriptor : GpuRenderBundleEncoderDescriptor,
 ) -> GpuRenderBundleEncoder {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -7937,7 +7945,7 @@ pub fn GpuDevice::create_render_bundle_encoder(
       (1, ptr, payload17.length())
     }
   }
-  let result : Int = wasmImportMethodGpuDeviceCreateRenderBundleEncoder(
+  let result : Int32 = wasmImportMethodGpuDeviceCreateRenderBundleEncoder(
     handle,
     lowered,
     lowered1,
@@ -7965,7 +7973,7 @@ pub fn GpuDevice::create_query_set(
   self : GpuDevice,
   descriptor : GpuQuerySetDescriptor,
 ) -> Result[GpuQuerySet, CreateQuerySetError] {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuDevice(handle) = self
 
@@ -8043,7 +8051,7 @@ pub fn GpuDevice::lost(
 ) -> @async-core.Future[GpuDeviceLostInfo] {
   let GpuDevice(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodGpuDeviceLost(lower_arg)
+  let result : Int32 = wasmImportMethodGpuDeviceLost(lower_arg)
   let result0 = wasmWasiWebgpuWebgpu030Rc2MethodGpuDeviceLostFuture0FutureLift(
     result,
   )
@@ -8125,7 +8133,7 @@ pub fn GpuDevice::on_uncaptured_error(
 ) -> @async-core.Stream[GpuError] {
   let GpuDevice(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodGpuDeviceOnUncapturedError(lower_arg)
+  let result : Int32 = wasmImportMethodGpuDeviceOnUncapturedError(lower_arg)
   let result0 = wasmWasiWebgpuWebgpu030Rc2MethodGpuDeviceOnUncapturedErrorStream0StreamLift(
     result,
   )
@@ -8138,7 +8146,7 @@ pub fn GpuDeviceLostInfo::reason(
   self : GpuDeviceLostInfo,
 ) -> GpuDeviceLostReason {
   let GpuDeviceLostInfo(handle) = self
-  let result : Int = wasmImportMethodGpuDeviceLostInfoReason(handle)
+  let result : Int32 = wasmImportMethodGpuDeviceLostInfoReason(handle)
   let ret = GpuDeviceLostReason::from(result)
   return ret
 }
@@ -8176,7 +8184,7 @@ pub fn GpuError::message(self : GpuError) -> String {
 ///|
 pub fn GpuError::kind(self : GpuError) -> GpuErrorKind {
   let GpuError(handle) = self
-  let result : Int = wasmImportMethodGpuErrorKind(handle)
+  let result : Int32 = wasmImportMethodGpuErrorKind(handle)
 
   let lifted = match result {
     0 => GpuErrorKind::ValidationError
@@ -8224,15 +8232,15 @@ pub fn GpuQuerySet::destroy(self : GpuQuerySet) -> Unit {
 ///|
 pub fn GpuQuerySet::type_(self : GpuQuerySet) -> GpuQueryType {
   let GpuQuerySet(handle) = self
-  let result : Int = wasmImportMethodGpuQuerySetType(handle)
+  let result : Int32 = wasmImportMethodGpuQuerySetType(handle)
   let ret = GpuQueryType::from(result)
   return ret
 }
 
 ///|
-pub fn GpuQuerySet::count(self : GpuQuerySet) -> UInt {
+pub fn GpuQuerySet::count(self : GpuQuerySet) -> UInt32 {
   let GpuQuerySet(handle) = self
-  let result : Int = wasmImportMethodGpuQuerySetCount(handle)
+  let result : Int32 = wasmImportMethodGpuQuerySetCount(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -8590,7 +8598,7 @@ pub fn GpuRenderBundleEncoder::finish(
   self : GpuRenderBundleEncoder,
   descriptor : GpuRenderBundleDescriptor?,
 ) -> GpuRenderBundle {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuRenderBundleEncoder(handle) = self
 
@@ -8610,7 +8618,7 @@ pub fn GpuRenderBundleEncoder::finish(
       (1, lowered, lowered3, lowered4)
     }
   }
-  let result : Int = wasmImportMethodGpuRenderBundleEncoderFinish(
+  let result : Int32 = wasmImportMethodGpuRenderBundleEncoderFinish(
     handle, lowered5, lowered6, lowered7, lowered8,
   )
   let ret = GpuRenderBundle::GpuRenderBundle(result)
@@ -8689,13 +8697,13 @@ pub fn GpuRenderBundleEncoder::insert_debug_marker(
 ///|
 pub fn GpuRenderBundleEncoder::set_bind_group(
   self : GpuRenderBundleEncoder,
-  index : UInt,
+  index : UInt32,
   bind_group : GpuBindGroup?,
-  dynamic_offsets_data : Array[UInt]?,
+  dynamic_offsets_data : Array[UInt32]?,
   dynamic_offsets_data_start : UInt64?,
-  dynamic_offsets_data_length : UInt?,
+  dynamic_offsets_data_length : UInt32?,
 ) -> Result[Unit, SetBindGroupError] {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuRenderBundleEncoder(handle) = self
 
@@ -8713,7 +8721,7 @@ pub fn GpuRenderBundleEncoder::set_bind_group(
     Some(payload4) => {
       let address = mbt_ffi_malloc(payload4.length() * 4)
       for index5 = 0; index5 < payload4.length(); index5 = index5 + 1 {
-        let iter_elem : UInt = payload4[index5]
+        let iter_elem : UInt32 = payload4[index5]
         let iter_base = address + index5 * 4
         mbt_ffi_store32(iter_base + 0, iter_elem.reinterpret_as_int())
       }
@@ -8775,7 +8783,7 @@ pub fn GpuRenderBundleEncoder::set_bind_group(
 ///|
 pub fn GpuRenderBundleEncoder::set_immediates(
   self : GpuRenderBundleEncoder,
-  range_offset : UInt,
+  range_offset : UInt32,
   data : FixedArray[Byte],
   data_offset : UInt64?,
   data_size : UInt64?,
@@ -8852,7 +8860,7 @@ pub fn GpuRenderBundleEncoder::set_index_buffer(
 ///|
 pub fn GpuRenderBundleEncoder::set_vertex_buffer(
   self : GpuRenderBundleEncoder,
-  slot : UInt,
+  slot : UInt32,
   buffer : GpuBuffer?,
   offset : UInt64?,
   size : UInt64?,
@@ -8892,10 +8900,10 @@ pub fn GpuRenderBundleEncoder::set_vertex_buffer(
 ///|
 pub fn GpuRenderBundleEncoder::draw(
   self : GpuRenderBundleEncoder,
-  vertex_count : UInt,
-  instance_count : UInt?,
-  first_vertex : UInt?,
-  first_instance : UInt?,
+  vertex_count : UInt32,
+  instance_count : UInt32?,
+  first_vertex : UInt32?,
+  first_instance : UInt32?,
 ) -> Unit {
   let GpuRenderBundleEncoder(handle) = self
 
@@ -8928,11 +8936,11 @@ pub fn GpuRenderBundleEncoder::draw(
 ///|
 pub fn GpuRenderBundleEncoder::draw_indexed(
   self : GpuRenderBundleEncoder,
-  index_count : UInt,
-  instance_count : UInt?,
-  first_index : UInt?,
-  base_vertex : Int?,
-  first_instance : UInt?,
+  index_count : UInt32,
+  instance_count : UInt32?,
+  first_index : UInt32?,
+  base_vertex : Int32?,
+  first_instance : UInt32?,
 ) -> Unit {
   let GpuRenderBundleEncoder(handle) = self
 
@@ -9020,10 +9028,10 @@ pub fn GpuRenderPassEncoder::set_viewport(
 ///|
 pub fn GpuRenderPassEncoder::set_scissor_rect(
   self : GpuRenderPassEncoder,
-  x : UInt,
-  y : UInt,
-  width : UInt,
-  height : UInt,
+  x : UInt32,
+  y : UInt32,
+  width : UInt32,
+  height : UInt32,
 ) -> Unit {
   let GpuRenderPassEncoder(handle) = self
   wasmImportMethodGpuRenderPassEncoderSetScissorRect(
@@ -9053,7 +9061,7 @@ pub fn GpuRenderPassEncoder::set_blend_constant(
 ///|
 pub fn GpuRenderPassEncoder::set_stencil_reference(
   self : GpuRenderPassEncoder,
-  reference : UInt,
+  reference : UInt32,
 ) -> Unit {
   let GpuRenderPassEncoder(handle) = self
   wasmImportMethodGpuRenderPassEncoderSetStencilReference(
@@ -9065,7 +9073,7 @@ pub fn GpuRenderPassEncoder::set_stencil_reference(
 ///|
 pub fn GpuRenderPassEncoder::begin_occlusion_query(
   self : GpuRenderPassEncoder,
-  query_index : UInt,
+  query_index : UInt32,
 ) -> Unit {
   let GpuRenderPassEncoder(handle) = self
   wasmImportMethodGpuRenderPassEncoderBeginOcclusionQuery(
@@ -9181,13 +9189,13 @@ pub fn GpuRenderPassEncoder::insert_debug_marker(
 ///|
 pub fn GpuRenderPassEncoder::set_bind_group(
   self : GpuRenderPassEncoder,
-  index : UInt,
+  index : UInt32,
   bind_group : GpuBindGroup?,
-  dynamic_offsets_data : Array[UInt]?,
+  dynamic_offsets_data : Array[UInt32]?,
   dynamic_offsets_data_start : UInt64?,
-  dynamic_offsets_data_length : UInt?,
+  dynamic_offsets_data_length : UInt32?,
 ) -> Result[Unit, SetBindGroupError] {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let GpuRenderPassEncoder(handle) = self
 
@@ -9205,7 +9213,7 @@ pub fn GpuRenderPassEncoder::set_bind_group(
     Some(payload4) => {
       let address = mbt_ffi_malloc(payload4.length() * 4)
       for index5 = 0; index5 < payload4.length(); index5 = index5 + 1 {
-        let iter_elem : UInt = payload4[index5]
+        let iter_elem : UInt32 = payload4[index5]
         let iter_base = address + index5 * 4
         mbt_ffi_store32(iter_base + 0, iter_elem.reinterpret_as_int())
       }
@@ -9267,7 +9275,7 @@ pub fn GpuRenderPassEncoder::set_bind_group(
 ///|
 pub fn GpuRenderPassEncoder::set_immediates(
   self : GpuRenderPassEncoder,
-  range_offset : UInt,
+  range_offset : UInt32,
   data : FixedArray[Byte],
   data_offset : UInt64?,
   data_size : UInt64?,
@@ -9344,7 +9352,7 @@ pub fn GpuRenderPassEncoder::set_index_buffer(
 ///|
 pub fn GpuRenderPassEncoder::set_vertex_buffer(
   self : GpuRenderPassEncoder,
-  slot : UInt,
+  slot : UInt32,
   buffer : GpuBuffer?,
   offset : UInt64?,
   size : UInt64?,
@@ -9384,10 +9392,10 @@ pub fn GpuRenderPassEncoder::set_vertex_buffer(
 ///|
 pub fn GpuRenderPassEncoder::draw(
   self : GpuRenderPassEncoder,
-  vertex_count : UInt,
-  instance_count : UInt?,
-  first_vertex : UInt?,
-  first_instance : UInt?,
+  vertex_count : UInt32,
+  instance_count : UInt32?,
+  first_vertex : UInt32?,
+  first_instance : UInt32?,
 ) -> Unit {
   let GpuRenderPassEncoder(handle) = self
 
@@ -9420,11 +9428,11 @@ pub fn GpuRenderPassEncoder::draw(
 ///|
 pub fn GpuRenderPassEncoder::draw_indexed(
   self : GpuRenderPassEncoder,
-  index_count : UInt,
-  instance_count : UInt?,
-  first_index : UInt?,
-  base_vertex : Int?,
-  first_instance : UInt?,
+  index_count : UInt32,
+  instance_count : UInt32?,
+  first_index : UInt32?,
+  base_vertex : Int32?,
+  first_instance : UInt32?,
 ) -> Unit {
   let GpuRenderPassEncoder(handle) = self
 
@@ -9523,10 +9531,10 @@ pub fn GpuRenderPipeline::set_label(
 ///|
 pub fn GpuRenderPipeline::get_bind_group_layout(
   self : GpuRenderPipeline,
-  index : UInt,
+  index : UInt32,
 ) -> GpuBindGroupLayout {
   let GpuRenderPipeline(handle) = self
-  let result : Int = wasmImportMethodGpuRenderPipelineGetBindGroupLayout(
+  let result : Int32 = wasmImportMethodGpuRenderPipelineGetBindGroupLayout(
     handle,
     index.reinterpret_as_int(),
   )
@@ -9617,7 +9625,7 @@ pub fn GpuSupportedFeatures::has(
   let GpuSupportedFeatures(handle) = self
 
   let ptr = mbt_ffi_str2ptr(value)
-  let result : Int = wasmImportMethodGpuSupportedFeaturesHas(
+  let result : Int32 = wasmImportMethodGpuSupportedFeaturesHas(
     handle,
     ptr,
     value.length(),
@@ -9630,9 +9638,9 @@ pub fn GpuSupportedFeatures::has(
 ///|
 pub fn GpuSupportedLimits::max_texture_dimension1_d(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxTextureDimension1D(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxTextureDimension1D(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9642,9 +9650,9 @@ pub fn GpuSupportedLimits::max_texture_dimension1_d(
 ///|
 pub fn GpuSupportedLimits::max_texture_dimension2_d(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxTextureDimension2D(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxTextureDimension2D(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9654,9 +9662,9 @@ pub fn GpuSupportedLimits::max_texture_dimension2_d(
 ///|
 pub fn GpuSupportedLimits::max_texture_dimension3_d(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxTextureDimension3D(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxTextureDimension3D(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9666,9 +9674,9 @@ pub fn GpuSupportedLimits::max_texture_dimension3_d(
 ///|
 pub fn GpuSupportedLimits::max_texture_array_layers(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxTextureArrayLayers(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxTextureArrayLayers(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9676,9 +9684,9 @@ pub fn GpuSupportedLimits::max_texture_array_layers(
 }
 
 ///|
-pub fn GpuSupportedLimits::max_bind_groups(self : GpuSupportedLimits) -> UInt {
+pub fn GpuSupportedLimits::max_bind_groups(self : GpuSupportedLimits) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxBindGroups(handle)
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxBindGroups(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -9686,9 +9694,9 @@ pub fn GpuSupportedLimits::max_bind_groups(self : GpuSupportedLimits) -> UInt {
 ///|
 pub fn GpuSupportedLimits::max_bind_groups_plus_vertex_buffers(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxBindGroupsPlusVertexBuffers(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxBindGroupsPlusVertexBuffers(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9698,9 +9706,11 @@ pub fn GpuSupportedLimits::max_bind_groups_plus_vertex_buffers(
 ///|
 pub fn GpuSupportedLimits::max_immediate_size(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxImmediateSize(handle)
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxImmediateSize(
+    handle,
+  )
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -9708,9 +9718,9 @@ pub fn GpuSupportedLimits::max_immediate_size(
 ///|
 pub fn GpuSupportedLimits::max_bindings_per_bind_group(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxBindingsPerBindGroup(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxBindingsPerBindGroup(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9720,9 +9730,9 @@ pub fn GpuSupportedLimits::max_bindings_per_bind_group(
 ///|
 pub fn GpuSupportedLimits::max_dynamic_uniform_buffers_per_pipeline_layout(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxDynamicUniformBuffersPerPipelineLayout(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxDynamicUniformBuffersPerPipelineLayout(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9732,9 +9742,9 @@ pub fn GpuSupportedLimits::max_dynamic_uniform_buffers_per_pipeline_layout(
 ///|
 pub fn GpuSupportedLimits::max_dynamic_storage_buffers_per_pipeline_layout(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxDynamicStorageBuffersPerPipelineLayout(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxDynamicStorageBuffersPerPipelineLayout(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9744,9 +9754,9 @@ pub fn GpuSupportedLimits::max_dynamic_storage_buffers_per_pipeline_layout(
 ///|
 pub fn GpuSupportedLimits::max_sampled_textures_per_shader_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxSampledTexturesPerShaderStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxSampledTexturesPerShaderStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9756,9 +9766,9 @@ pub fn GpuSupportedLimits::max_sampled_textures_per_shader_stage(
 ///|
 pub fn GpuSupportedLimits::max_samplers_per_shader_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxSamplersPerShaderStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxSamplersPerShaderStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9768,9 +9778,9 @@ pub fn GpuSupportedLimits::max_samplers_per_shader_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_buffers_per_shader_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersPerShaderStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersPerShaderStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9780,9 +9790,9 @@ pub fn GpuSupportedLimits::max_storage_buffers_per_shader_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_buffers_in_vertex_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersInVertexStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersInVertexStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9792,9 +9802,9 @@ pub fn GpuSupportedLimits::max_storage_buffers_in_vertex_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_buffers_in_fragment_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersInFragmentStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageBuffersInFragmentStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9804,9 +9814,9 @@ pub fn GpuSupportedLimits::max_storage_buffers_in_fragment_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_textures_per_shader_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesPerShaderStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesPerShaderStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9816,9 +9826,9 @@ pub fn GpuSupportedLimits::max_storage_textures_per_shader_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_textures_in_vertex_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesInVertexStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesInVertexStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9828,9 +9838,9 @@ pub fn GpuSupportedLimits::max_storage_textures_in_vertex_stage(
 ///|
 pub fn GpuSupportedLimits::max_storage_textures_in_fragment_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesInFragmentStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxStorageTexturesInFragmentStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9840,9 +9850,9 @@ pub fn GpuSupportedLimits::max_storage_textures_in_fragment_stage(
 ///|
 pub fn GpuSupportedLimits::max_uniform_buffers_per_shader_stage(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxUniformBuffersPerShaderStage(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxUniformBuffersPerShaderStage(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9876,9 +9886,9 @@ pub fn GpuSupportedLimits::max_storage_buffer_binding_size(
 ///|
 pub fn GpuSupportedLimits::min_uniform_buffer_offset_alignment(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMinUniformBufferOffsetAlignment(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMinUniformBufferOffsetAlignment(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9888,9 +9898,9 @@ pub fn GpuSupportedLimits::min_uniform_buffer_offset_alignment(
 ///|
 pub fn GpuSupportedLimits::min_storage_buffer_offset_alignment(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMinStorageBufferOffsetAlignment(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMinStorageBufferOffsetAlignment(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9900,9 +9910,11 @@ pub fn GpuSupportedLimits::min_storage_buffer_offset_alignment(
 ///|
 pub fn GpuSupportedLimits::max_vertex_buffers(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxVertexBuffers(handle)
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxVertexBuffers(
+    handle,
+  )
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -9918,9 +9930,9 @@ pub fn GpuSupportedLimits::max_buffer_size(self : GpuSupportedLimits) -> UInt64 
 ///|
 pub fn GpuSupportedLimits::max_vertex_attributes(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxVertexAttributes(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxVertexAttributes(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9930,9 +9942,9 @@ pub fn GpuSupportedLimits::max_vertex_attributes(
 ///|
 pub fn GpuSupportedLimits::max_vertex_buffer_array_stride(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxVertexBufferArrayStride(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxVertexBufferArrayStride(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9942,9 +9954,9 @@ pub fn GpuSupportedLimits::max_vertex_buffer_array_stride(
 ///|
 pub fn GpuSupportedLimits::max_inter_stage_shader_variables(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxInterStageShaderVariables(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxInterStageShaderVariables(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9954,9 +9966,9 @@ pub fn GpuSupportedLimits::max_inter_stage_shader_variables(
 ///|
 pub fn GpuSupportedLimits::max_color_attachments(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxColorAttachments(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxColorAttachments(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9966,9 +9978,9 @@ pub fn GpuSupportedLimits::max_color_attachments(
 ///|
 pub fn GpuSupportedLimits::max_color_attachment_bytes_per_sample(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxColorAttachmentBytesPerSample(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxColorAttachmentBytesPerSample(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9978,9 +9990,9 @@ pub fn GpuSupportedLimits::max_color_attachment_bytes_per_sample(
 ///|
 pub fn GpuSupportedLimits::max_compute_workgroup_storage_size(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupStorageSize(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupStorageSize(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -9990,9 +10002,9 @@ pub fn GpuSupportedLimits::max_compute_workgroup_storage_size(
 ///|
 pub fn GpuSupportedLimits::max_compute_invocations_per_workgroup(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeInvocationsPerWorkgroup(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeInvocationsPerWorkgroup(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -10002,9 +10014,9 @@ pub fn GpuSupportedLimits::max_compute_invocations_per_workgroup(
 ///|
 pub fn GpuSupportedLimits::max_compute_workgroup_size_x(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeX(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeX(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -10014,9 +10026,9 @@ pub fn GpuSupportedLimits::max_compute_workgroup_size_x(
 ///|
 pub fn GpuSupportedLimits::max_compute_workgroup_size_y(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeY(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeY(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -10026,9 +10038,9 @@ pub fn GpuSupportedLimits::max_compute_workgroup_size_y(
 ///|
 pub fn GpuSupportedLimits::max_compute_workgroup_size_z(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeZ(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupSizeZ(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -10038,9 +10050,9 @@ pub fn GpuSupportedLimits::max_compute_workgroup_size_z(
 ///|
 pub fn GpuSupportedLimits::max_compute_workgroups_per_dimension(
   self : GpuSupportedLimits,
-) -> UInt {
+) -> UInt32 {
   let GpuSupportedLimits(handle) = self
-  let result : Int = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupsPerDimension(
+  let result : Int32 = wasmImportMethodGpuSupportedLimitsMaxComputeWorkgroupsPerDimension(
     handle,
   )
   let ret = result.reinterpret_as_uint()
@@ -10052,7 +10064,7 @@ pub fn GpuTexture::create_view(
   self : GpuTexture,
   descriptor : GpuTextureViewDescriptor?,
 ) -> GpuTextureView {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
   let return_area = mbt_ffi_malloc(72)
 
   let GpuTexture(handle) = self
@@ -10221,7 +10233,7 @@ pub fn GpuTexture::create_view(
       ()
     }
   }
-  let result : Int = wasmImportMethodGpuTextureCreateView(return_area)
+  let result : Int32 = wasmImportMethodGpuTextureCreateView(return_area)
   let ret = GpuTextureView::GpuTextureView(result)
   mbt_ffi_free(return_area)
 
@@ -10236,41 +10248,41 @@ pub fn GpuTexture::destroy(self : GpuTexture) -> Unit {
 }
 
 ///|
-pub fn GpuTexture::width(self : GpuTexture) -> UInt {
+pub fn GpuTexture::width(self : GpuTexture) -> UInt32 {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureWidth(handle)
+  let result : Int32 = wasmImportMethodGpuTextureWidth(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn GpuTexture::height(self : GpuTexture) -> UInt {
+pub fn GpuTexture::height(self : GpuTexture) -> UInt32 {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureHeight(handle)
+  let result : Int32 = wasmImportMethodGpuTextureHeight(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn GpuTexture::depth_or_array_layers(self : GpuTexture) -> UInt {
+pub fn GpuTexture::depth_or_array_layers(self : GpuTexture) -> UInt32 {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureDepthOrArrayLayers(handle)
+  let result : Int32 = wasmImportMethodGpuTextureDepthOrArrayLayers(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn GpuTexture::mip_level_count(self : GpuTexture) -> UInt {
+pub fn GpuTexture::mip_level_count(self : GpuTexture) -> UInt32 {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureMipLevelCount(handle)
+  let result : Int32 = wasmImportMethodGpuTextureMipLevelCount(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn GpuTexture::sample_count(self : GpuTexture) -> UInt {
+pub fn GpuTexture::sample_count(self : GpuTexture) -> UInt32 {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureSampleCount(handle)
+  let result : Int32 = wasmImportMethodGpuTextureSampleCount(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -10278,7 +10290,7 @@ pub fn GpuTexture::sample_count(self : GpuTexture) -> UInt {
 ///|
 pub fn GpuTexture::dimension(self : GpuTexture) -> GpuTextureDimension {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureDimension(handle)
+  let result : Int32 = wasmImportMethodGpuTextureDimension(handle)
   let ret = GpuTextureDimension::from(result)
   return ret
 }
@@ -10286,7 +10298,7 @@ pub fn GpuTexture::dimension(self : GpuTexture) -> GpuTextureDimension {
 ///|
 pub fn GpuTexture::format(self : GpuTexture) -> GpuTextureFormat {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureFormat(handle)
+  let result : Int32 = wasmImportMethodGpuTextureFormat(handle)
   let ret = GpuTextureFormat::from(result)
   return ret
 }
@@ -10294,7 +10306,7 @@ pub fn GpuTexture::format(self : GpuTexture) -> GpuTextureFormat {
 ///|
 pub fn GpuTexture::usage(self : GpuTexture) -> GpuTextureUsage {
   let GpuTexture(handle) = self
-  let result : Int = wasmImportMethodGpuTextureUsage(handle)
+  let result : Int32 = wasmImportMethodGpuTextureUsage(handle)
   let ret = GpuTextureUsage(result.to_byte())
   return ret
 }
@@ -10374,14 +10386,14 @@ pub fn GpuUncapturedErrorEvent::error(
   self : GpuUncapturedErrorEvent,
 ) -> GpuError {
   let GpuUncapturedErrorEvent(handle) = self
-  let result : Int = wasmImportMethodGpuUncapturedErrorEventError(handle)
+  let result : Int32 = wasmImportMethodGpuUncapturedErrorEventError(handle)
   let ret = GpuError::GpuError(result)
   return ret
 }
 
 ///|
 pub fn RecordGpuPipelineConstantValue::record_gpu_pipeline_constant_value() -> RecordGpuPipelineConstantValue {
-  let result : Int = wasmImportConstructorRecordGpuPipelineConstantValue()
+  let result : Int32 = wasmImportConstructorRecordGpuPipelineConstantValue()
   let ret = RecordGpuPipelineConstantValue::RecordGpuPipelineConstantValue(
     result,
   )
@@ -10441,7 +10453,7 @@ pub fn RecordGpuPipelineConstantValue::has(
   let RecordGpuPipelineConstantValue(handle) = self
 
   let ptr = mbt_ffi_str2ptr(key)
-  let result : Int = wasmImportMethodRecordGpuPipelineConstantValueHas(
+  let result : Int32 = wasmImportMethodRecordGpuPipelineConstantValueHas(
     handle,
     ptr,
     key.length(),
@@ -10539,7 +10551,7 @@ pub fn RecordGpuPipelineConstantValue::entries(
 
 ///|
 pub fn RecordOptionGpuSize64::record_option_gpu_size64() -> RecordOptionGpuSize64 {
-  let result : Int = wasmImportConstructorRecordOptionGpuSize64()
+  let result : Int32 = wasmImportConstructorRecordOptionGpuSize64()
   let ret = RecordOptionGpuSize64::RecordOptionGpuSize64(result)
   return ret
 }
@@ -10612,7 +10624,7 @@ pub fn RecordOptionGpuSize64::has(
   let RecordOptionGpuSize64(handle) = self
 
   let ptr = mbt_ffi_str2ptr(key)
-  let result : Int = wasmImportMethodRecordOptionGpuSize64Has(
+  let result : Int32 = wasmImportMethodRecordOptionGpuSize64Has(
     handle,
     ptr,
     key.length(),
@@ -10724,7 +10736,7 @@ pub fn WgslLanguageFeatures::has(
   let WgslLanguageFeatures(handle) = self
 
   let ptr = mbt_ffi_str2ptr(value)
-  let result : Int = wasmImportMethodWgslLanguageFeaturesHas(
+  let result : Int32 = wasmImportMethodWgslLanguageFeaturesHas(
     handle,
     ptr,
     value.length(),
@@ -10736,7 +10748,7 @@ pub fn WgslLanguageFeatures::has(
 
 ///|
 pub fn get_gpu() -> Gpu {
-  let result : Int = wasmImportGetGpu()
+  let result : Int32 = wasmImportGetGpu()
   let ret = Gpu::Gpu(result)
   return ret
 }

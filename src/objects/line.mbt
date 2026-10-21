@@ -11,7 +11,7 @@ pub(all) struct Line {
   mut material : @materials.LineBasicMaterial
   mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
-  mut morph_target_dictionary : Map[String, Int]?
+  mut morph_target_dictionary : Map[String, Int32]?
 }
 
 ///|
@@ -45,11 +45,7 @@ pub extend Line with @core.AsNode::{to_node}
 /// 复制变换、几何体和材质。几何体与材质沿用源对象。
 /// 形变权重和名字表留在目标上，不从源对象复制。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Line.js#L103
-pub fn Line::copy(
-  self : Line,
-  source : Line,
-  recursive? : Bool = true,
-) -> Line {
+pub fn Line::copy(self : Line, source : Line, recursive~ : Bool = true) -> Line {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
@@ -61,7 +57,7 @@ pub fn Line::copy(
 ///|
 /// 新建一条折线再复制。three.js 没有单独的 `Line.clone`，用的是 `Object3D.clone`。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn Line::clone(self : Line, recursive? : Bool = true) -> Line {
+pub fn Line::clone(self : Line, recursive~ : Bool = true) -> Line {
   Line::new(self.geometry, self.material).copy(self, recursive~)
 }
 
@@ -81,7 +77,7 @@ pub fn Line::update_morph_targets(self : Line) -> Unit {
     None => ()
     Some(attributes) => {
       let influences : Array[Double] = []
-      let dictionary : Map[String, Int] = Map([])
+      let dictionary : Map[String, Int32] = Map([])
       let mut index = 0
       while index < attributes.length() {
         let attribute = attributes[index]
@@ -191,10 +187,9 @@ pub fn Line::set_fog(self : Line, enabled : Bool) -> Unit {
 pub fn Line::set_transparent(
   self : Line,
   enabled : Bool,
-  opacity? : Double = 1.0,
+  opacity~ : Double = 1.0,
 ) -> Unit {
   self.material.transparent = enabled
   self.material.opacity = opacity
   self.refresh()
 }
-

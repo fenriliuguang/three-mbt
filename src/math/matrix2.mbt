@@ -52,7 +52,7 @@ pub fn Matrix2::identity(self : Matrix2) -> Matrix2 {
 pub fn Matrix2::from_array(
   self : Matrix2,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Matrix2 {
   let te = self.elements
   for i in 0..<4 {

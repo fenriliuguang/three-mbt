@@ -11,11 +11,11 @@ pub(all) struct Cylindrical {
 
 ///|
 pub fn Cylindrical::new(
-  radius? : Double = 1.0,
-  theta? : Double = 0.0,
-  y? : Double = 0.0,
+  radius~ : Double = 1.0,
+  theta~ : Double = 0.0,
+  y~ : Double = 0.0,
 ) -> Cylindrical {
-  { radius, theta, y }
+  { radius, theta, y, }
 }
 
 ///|
@@ -36,7 +36,10 @@ pub fn Cylindrical::set(
 ///|
 /// 复制另一组柱坐标。来源不改。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/math/Cylindrical.js#L66
-pub fn Cylindrical::copy(self : Cylindrical, other : Cylindrical) -> Cylindrical {
+pub fn Cylindrical::copy(
+  self : Cylindrical,
+  other : Cylindrical,
+) -> Cylindrical {
   self.radius = other.radius
   self.theta = other.theta
   self.y = other.y

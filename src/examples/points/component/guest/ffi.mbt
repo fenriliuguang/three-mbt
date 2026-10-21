@@ -1,6 +1,6 @@
 ///|
 #doc(hidden)
-pub fn wasmExportStart() -> Int {
+pub fn wasmExportStart() -> Int32 {
   @async-core.with_waitableset(async fn() {
     @async-core.with_task_group(async fn(background_group) {
       start(background_group)
@@ -20,6 +20,10 @@ fn start_task_return() -> Unit {
 
 ///|
 #doc(hidden)
-pub fn wasmExportAsyncStart(event_raw : Int, waitable : Int, code : Int) -> Int {
+pub fn wasmExportAsyncStart(
+  event_raw : Int32,
+  waitable : Int32,
+  code : Int32,
+) -> Int32 {
   @async-core.cb(event_raw, waitable, code)
 }

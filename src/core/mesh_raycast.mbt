@@ -7,7 +7,7 @@ fn Object3D::raycast_mesh(
   self : Object3D,
   raycaster : Raycaster,
   intersects : Array[Intersection],
-  instance_id? : Int? = None,
+  instance_id~ : Int32? = None,
 ) -> Unit {
   let mesh = match self.mesh {
     None => return
@@ -44,10 +44,7 @@ fn Object3D::raycast_mesh(
   ignore(ray.copy(raycaster.ray).apply_matrix4(inverse))
   match geometry.bounding_box {
     None => ()
-    Some(box) =>
-      if !ray.intersects_box(box) {
-        return
-      }
+    Some(box) => if !ray.intersects_box(box) { return }
   }
   self.raycast_triangles(raycaster, intersects, ray, mesh.side, instance_id~)
 }
@@ -59,7 +56,7 @@ fn Object3D::raycast_triangles(
   intersects : Array[Intersection],
   ray : @math.Ray,
   side : @constants.Side,
-  instance_id? : Int? = None,
+  instance_id~ : Int32? = None,
 ) -> Unit {
   self.raycast_triangles_with(
     raycaster,
@@ -81,8 +78,8 @@ pub fn Object3D::raycast_triangles_with(
   intersects : Array[Intersection],
   ray : @math.Ray,
   side : @constants.Side,
-  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
-  instance_id? : Int? = None,
+  read_vertex : (Int32, @math.Vector3) -> @math.Vector3,
+  instance_id~ : Int32? = None,
 ) -> Unit {
   let (geometry, group_sides) = match self.mesh {
     None => return
@@ -184,12 +181,12 @@ fn Object3D::raycast_group_triangles(
   raycaster : Raycaster,
   intersects : Array[Intersection],
   ray : @math.Ray,
-  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
+  read_vertex : (Int32, @math.Vector3) -> @math.Vector3,
   geometry : BufferGeometry,
   index : BufferAttribute?,
-  limit : Int,
+  limit : Int32,
   sides : Array[@constants.Side],
-  instance_id? : Int? = None,
+  instance_id~ : Int32? = None,
 ) -> Unit {
   let mut group_index = 0
   while group_index < geometry.groups.length() {
@@ -237,12 +234,12 @@ fn Object3D::raycast_group_triangles(
 
 ///|
 fn group_draw_range(
-  group_start : Int,
-  group_count : Int,
+  group_start : Int32,
+  group_count : Int32,
   draw_start : Double,
   draw_count : Double,
-  limit : Int,
-) -> (Int, Int) {
+  limit : Int32,
+) -> (Int32, Int32) {
   let drawn_start = double_index(draw_start, limit)
   let drawn_end = double_index(draw_start + draw_count, limit)
   let mut start = group_start
@@ -270,13 +267,13 @@ fn Object3D::push_triangle(
   intersects : Array[Intersection],
   ray : @math.Ray,
   side : @constants.Side,
-  a : Int,
-  b : Int,
-  c : Int,
-  face_index : Int,
-  read_vertex : (Int, @math.Vector3) -> @math.Vector3,
-  material_index? : Int = 0,
-  instance_id? : Int? = None,
+  a : Int32,
+  b : Int32,
+  c : Int32,
+  face_index : Int32,
+  read_vertex : (Int32, @math.Vector3) -> @math.Vector3,
+  material_index~ : Int32 = 0,
+  instance_id~ : Int32? = None,
 ) -> Unit {
   let point = @math.Vector3::new()
   let corner_a = @math.Vector3::new()
@@ -293,7 +290,9 @@ fn Object3D::push_triangle(
   match hit {
     None => ()
     Some(point) => {
-      let world = @math.Vector3::new().copy(point).apply_matrix4(self.matrix_world)
+      let world = @math.Vector3::new()
+        .copy(point)
+        .apply_matrix4(self.matrix_world)
       let distance = raycaster.ray.origin.distance_to(world)
       if distance >= raycaster.near && distance <= raycaster.far {
         let normal = @math.Vector3::new()
@@ -332,9 +331,9 @@ fn Object3D::push_triangle(
 fn interpolated_uv(
   mesh : MeshBinding?,
   name : String,
-  a : Int,
-  b : Int,
-  c : Int,
+  a : Int32,
+  b : Int32,
+  c : Int32,
   barycoord : @math.Vector3?,
 ) -> @math.Vector2? {
   match barycoord {
@@ -347,7 +346,13 @@ fn interpolated_uv(
             None => None
             Some(attribute) =>
               Some(
-                attribute.interpolate_vector2(a, b, c, bary, @math.Vector2::new()),
+                attribute.interpolate_vector2(
+                  a,
+                  b,
+                  c,
+                  bary,
+                  @math.Vector2::new(),
+                ),
               )
           }
       }
@@ -357,9 +362,9 @@ fn interpolated_uv(
 ///|
 fn interpolated_normal(
   mesh : MeshBinding?,
-  a : Int,
-  b : Int,
-  c : Int,
+  a : Int32,
+  b : Int32,
+  c : Int32,
   barycoord : @math.Vector3?,
   ray : @math.Ray,
 ) -> @math.Vector3? {
@@ -390,7 +395,11 @@ fn interpolated_normal(
 }
 
 ///|
-fn triangle_bounds(count : Int, start : Double, span : Double) -> (Int, Int) {
+fn triangle_bounds(
+  count : Int32,
+  start : Double,
+  span : Double,
+) -> (Int32, Int32) {
   let start_index = double_index(start, count)
   let end_index = double_index(start + span, count)
   if end_index < start_index {
@@ -401,7 +410,7 @@ fn triangle_bounds(count : Int, start : Double, span : Double) -> (Int, Int) {
 }
 
 ///|
-fn double_index(value : Double, limit : Int) -> Int {
+fn double_index(value : Double, limit : Int32) -> Int32 {
   if value.is_nan() || value <= 0.0 {
     0
   } else if value.is_inf() {

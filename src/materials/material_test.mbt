@@ -226,9 +226,15 @@ test "Material blendSrc defaults to source alpha" {
   assert_eq(basic.material.blend_src.to_int(), 204)
   basic.material.blend_src = @constants.BlendFactor::One
   let lambert = @materials.MeshLambertMaterial::new()
-  assert_eq(lambert.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(
+    lambert.material.blend_src is @constants.BlendFactor::SrcAlpha,
+    true,
+  )
   let standard = @materials.MeshStandardMaterial::new()
-  assert_eq(standard.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(
+    standard.material.blend_src is @constants.BlendFactor::SrcAlpha,
+    true,
+  )
   standard.material.blend_src = @constants.BlendFactor::Zero
   let other = @materials.Material::basic()
   assert_eq(other.blend_src is @constants.BlendFactor::SrcAlpha, true)
@@ -236,7 +242,10 @@ test "Material blendSrc defaults to source alpha" {
   assert_eq(basic.material.blend_src.to_int(), 201)
   assert_eq(standard.material.blend_src is @constants.BlendFactor::Zero, true)
   assert_eq(standard.material.blend_src.to_int(), 200)
-  assert_eq(lambert.material.blend_src is @constants.BlendFactor::SrcAlpha, true)
+  assert_eq(
+    lambert.material.blend_src is @constants.BlendFactor::SrcAlpha,
+    true,
+  )
   assert_eq(@constants.BlendFactor::SrcColor.to_int(), 202)
   assert_eq(@constants.BlendFactor::OneMinusSrcColor.to_int(), 203)
   assert_eq(@constants.BlendFactor::OneMinusSrcAlpha.to_int(), 205)
@@ -286,21 +295,39 @@ test "Material blendDst defaults to one minus source alpha" {
 ///|
 test "Material blendEquation defaults to add" {
   let basic = @materials.MeshBasicMaterial::new()
-  assert_eq(basic.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(
+    basic.material.blend_equation is @constants.BlendEquation::Add,
+    true,
+  )
   assert_eq(basic.material.blend_equation.to_int(), 100)
   basic.material.blend_equation = @constants.BlendEquation::Subtract
   let lambert = @materials.MeshLambertMaterial::new()
-  assert_eq(lambert.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(
+    lambert.material.blend_equation is @constants.BlendEquation::Add,
+    true,
+  )
   let standard = @materials.MeshStandardMaterial::new()
-  assert_eq(standard.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(
+    standard.material.blend_equation is @constants.BlendEquation::Add,
+    true,
+  )
   standard.material.blend_equation = @constants.BlendEquation::Max
   let other = @materials.Material::basic()
   assert_eq(other.blend_equation is @constants.BlendEquation::Add, true)
-  assert_eq(basic.material.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(
+    basic.material.blend_equation is @constants.BlendEquation::Subtract,
+    true,
+  )
   assert_eq(basic.material.blend_equation.to_int(), 101)
-  assert_eq(standard.material.blend_equation is @constants.BlendEquation::Max, true)
+  assert_eq(
+    standard.material.blend_equation is @constants.BlendEquation::Max,
+    true,
+  )
   assert_eq(standard.material.blend_equation.to_int(), 104)
-  assert_eq(lambert.material.blend_equation is @constants.BlendEquation::Add, true)
+  assert_eq(
+    lambert.material.blend_equation is @constants.BlendEquation::Add,
+    true,
+  )
   assert_eq(@constants.BlendEquation::ReverseSubtract.to_int(), 102)
   assert_eq(@constants.BlendEquation::Min.to_int(), 103)
 }
@@ -424,9 +451,15 @@ test "Material stencilFunc defaults to Always" {
   assert_eq(basic.material.stencil_func.to_int(), 519)
   basic.material.stencil_func = @constants.StencilFunc::Never
   let lambert = @materials.MeshLambertMaterial::new()
-  assert_eq(lambert.material.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(
+    lambert.material.stencil_func is @constants.StencilFunc::Always,
+    true,
+  )
   let standard = @materials.MeshStandardMaterial::new()
-  assert_eq(standard.material.stencil_func is @constants.StencilFunc::Always, true)
+  assert_eq(
+    standard.material.stencil_func is @constants.StencilFunc::Always,
+    true,
+  )
   standard.material.stencil_func = @constants.StencilFunc::Equal
   let other = @materials.Material::basic()
   assert_eq(other.stencil_func is @constants.StencilFunc::Always, true)
@@ -504,7 +537,10 @@ test "Material stencilZFail defaults to Keep" {
   let lambert = @materials.MeshLambertMaterial::new()
   assert_eq(lambert.material.stencil_z_fail is @constants.StencilOp::Keep, true)
   let standard = @materials.MeshStandardMaterial::new()
-  assert_eq(standard.material.stencil_z_fail is @constants.StencilOp::Keep, true)
+  assert_eq(
+    standard.material.stencil_z_fail is @constants.StencilOp::Keep,
+    true,
+  )
   standard.material.stencil_z_fail = @constants.StencilOp::Replace
   let other = @materials.Material::basic()
   assert_eq(other.stencil_z_fail is @constants.StencilOp::Keep, true)
@@ -522,7 +558,10 @@ test "Material stencilZPass defaults to Keep" {
   let lambert = @materials.MeshLambertMaterial::new()
   assert_eq(lambert.material.stencil_z_pass is @constants.StencilOp::Keep, true)
   let standard = @materials.MeshStandardMaterial::new()
-  assert_eq(standard.material.stencil_z_pass is @constants.StencilOp::Keep, true)
+  assert_eq(
+    standard.material.stencil_z_pass is @constants.StencilOp::Keep,
+    true,
+  )
   standard.material.stencil_z_pass = @constants.StencilOp::Replace
   let other = @materials.Material::basic()
   assert_eq(other.stencil_z_pass is @constants.StencilOp::Keep, true)
@@ -595,7 +634,8 @@ test "Material precision defaults to empty" {
   }
   match standard.material.precision {
     None => abort("standard precision")
-    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+    Some(precision) =>
+      assert_eq(precision is @constants.Precision::Mediump, true)
   }
   assert_eq(lambert.material.precision is None, true)
 }
@@ -901,7 +941,7 @@ test "Material clone keeps kind and takes a new id" {
 ///|
 test "Material addEventListener keeps one copy of a listener" {
   let material = @materials.Material::basic()
-  let listener = fn() {}
+  let listener = fn() {  }
   material.add_event_listener("dispose", listener)
   material.add_event_listener("dispose", listener)
   match material.listeners.get("dispose") {
@@ -930,8 +970,8 @@ test "Material addEventListener keeps one copy of a listener" {
 ///|
 test "Material hasEventListener reports a registered listener" {
   let material = @materials.Material::basic()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), true)
@@ -946,8 +986,8 @@ test "Material hasEventListener reports a registered listener" {
 ///|
 test "Material removeEventListener drops a registered listener" {
   let material = @materials.Material::basic()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   material.remove_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)
@@ -1029,7 +1069,10 @@ test "Material normalMapType defaults to tangent space and copies" {
   assert_eq(basic.normal_map_type.to_int(), 0)
   assert_eq(basic.normal_map_type is @constants.TangentSpace, true)
   let lambert = @materials.Material::lambert()
-  assert_eq(lambert.normal_map_type.to_int(), @constants.TANGENT_SPACE_NORMAL_MAP)
+  assert_eq(
+    lambert.normal_map_type.to_int(),
+    @constants.TANGENT_SPACE_NORMAL_MAP,
+  )
   lambert.normal_map_type = @constants.ObjectSpace
   let other = @materials.Material::lambert()
   assert_eq(other.normal_map_type.to_int(), 0)
@@ -1038,7 +1081,10 @@ test "Material normalMapType defaults to tangent space and copies" {
   assert_eq(destination.normal_map_type.to_int(), 1)
   assert_eq(destination.normal_map_type is @constants.ObjectSpace, true)
   destination.normal_map_type = @constants.TangentSpace
-  assert_eq(lambert.normal_map_type.to_int(), @constants.OBJECT_SPACE_NORMAL_MAP)
+  assert_eq(
+    lambert.normal_map_type.to_int(),
+    @constants.OBJECT_SPACE_NORMAL_MAP,
+  )
   let standard = @materials.Material::standard()
   assert_eq(standard.normal_map_type.to_int(), 0)
 }
@@ -1460,7 +1506,10 @@ test "Material wireframeLinecap defaults to round and copies" {
   assert_eq(other.wireframe_linecap is @materials.WireframeCap::Round, true)
   let destination = @materials.Material::basic()
   ignore(destination.copy(lambert))
-  assert_eq(destination.wireframe_linecap is @materials.WireframeCap::Bevel, true)
+  assert_eq(
+    destination.wireframe_linecap is @materials.WireframeCap::Bevel,
+    true,
+  )
   destination.wireframe_linecap = @materials.WireframeCap::Miter
   assert_eq(lambert.wireframe_linecap is @materials.WireframeCap::Bevel, true)
   let standard = @materials.Material::standard()
@@ -1478,11 +1527,17 @@ test "Material wireframeLinejoin defaults to round and copies" {
   assert_eq(other.wireframe_linejoin is @materials.WireframeJoin::Round, true)
   let destination = @materials.Material::basic()
   ignore(destination.copy(lambert))
-  assert_eq(destination.wireframe_linejoin is @materials.WireframeJoin::Bevel, true)
+  assert_eq(
+    destination.wireframe_linejoin is @materials.WireframeJoin::Bevel,
+    true,
+  )
   destination.wireframe_linejoin = @materials.WireframeJoin::Miter
   assert_eq(lambert.wireframe_linejoin is @materials.WireframeJoin::Bevel, true)
   let standard = @materials.Material::standard()
-  assert_eq(standard.wireframe_linejoin is @materials.WireframeJoin::Round, true)
+  assert_eq(
+    standard.wireframe_linejoin is @materials.WireframeJoin::Round,
+    true,
+  )
 }
 
 ///|
@@ -2428,7 +2483,11 @@ test "Material physical sets isMeshPhysicalMaterial and keeps it on copy" {
   assert_eq(lambert.is_mesh_physical_material, false)
   assert_eq(standard.is_mesh_physical_material, false)
   assert_eq(standard.type_name, "MeshStandardMaterial")
-  let physical = @materials.Material::physical(hex=0xFF0000, roughness=0.25, metalness=0.5)
+  let physical = @materials.Material::physical(
+    hex=0xFF0000,
+    roughness=0.25,
+    metalness=0.5,
+  )
   assert_eq(physical.is_mesh_physical_material, true)
   assert_eq(physical.type_name, "MeshPhysicalMaterial")
   assert_eq(physical.kind is @materials.MaterialKind::Physical, true)
@@ -3061,4 +3120,3 @@ test "Material shadow sets isShadowMaterial and keeps defines on copy" {
   assert_eq(cloned.transparent, true)
   assert_eq(cloned.id == shadow.id, false)
 }
-

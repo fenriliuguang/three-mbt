@@ -9,7 +9,7 @@ pub(all) struct RenderTarget {
 }
 
 ///|
-pub fn RenderTarget::new(width : Int, height : Int) -> RenderTarget {
+pub fn RenderTarget::new(width : Int32, height : Int32) -> RenderTarget {
   { texture: Texture::attachment(width, height), }
 }
 
@@ -17,8 +17,8 @@ pub fn RenderTarget::new(width : Int, height : Int) -> RenderTarget {
 /// 改颜色目标的宽高。相同尺寸不增加版本。小于 1 的边记为 1。
 pub fn RenderTarget::set_size(
   self : RenderTarget,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
 ) -> Unit {
   let next_width = if width < 1 { 1 } else { width }
   let next_height = if height < 1 { 1 } else { height }
@@ -29,4 +29,3 @@ pub fn RenderTarget::set_size(
   self.texture.height = next_height
   self.texture.version = self.texture.version + 1
 }
-

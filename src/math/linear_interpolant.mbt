@@ -12,7 +12,7 @@ pub(all) struct LinearInterpolant {
 pub fn LinearInterpolant::new(
   parameter_positions : Array[Double],
   sample_values : Array[Double],
-  sample_size : Int,
+  sample_size : Int32,
   result_buffer? : Array[Double],
 ) -> LinearInterpolant {
   let interpolant = match result_buffer {
@@ -33,7 +33,7 @@ pub fn LinearInterpolant::new(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/LinearInterpolant.js#L24
 pub fn LinearInterpolant::interpolate(
   self : LinearInterpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,

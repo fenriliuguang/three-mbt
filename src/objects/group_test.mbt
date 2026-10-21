@@ -56,8 +56,8 @@ test "mesh raycast uses a material array and geometry groups" {
       "position",
       @core.BufferAttribute::new(
         [
-          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
-          0.0, 5.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0, 0.0,
+          5.0, 1.0, 0.0,
         ],
         3,
       ),
@@ -145,4 +145,3 @@ test "mesh raycast uses a material array and geometry groups" {
     Some(face) => assert_eq(face.material_index, 0)
   }
 }
-

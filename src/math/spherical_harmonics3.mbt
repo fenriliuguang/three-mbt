@@ -38,7 +38,9 @@ pub fn SphericalHarmonics3::set(
 ///|
 /// 把九个系数都写成零。
 /// r186: `zero` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L65
-pub fn SphericalHarmonics3::zero(self : SphericalHarmonics3) -> SphericalHarmonics3 {
+pub fn SphericalHarmonics3::zero(
+  self : SphericalHarmonics3,
+) -> SphericalHarmonics3 {
   for i in 0..<9 {
     ignore(self.coefficients[i].set(0.0, 0.0, 0.0))
   }
@@ -59,16 +61,16 @@ pub fn SphericalHarmonics3::get_at(
   let coeff = self.coefficients
   ignore(
     target
-      .copy(coeff[0])
-      .multiply_scalar(0.282095)
-      .add_scaled_vector(coeff[1], 0.488603 * y)
-      .add_scaled_vector(coeff[2], 0.488603 * z)
-      .add_scaled_vector(coeff[3], 0.488603 * x)
-      .add_scaled_vector(coeff[4], 1.092548 * (x * y))
-      .add_scaled_vector(coeff[5], 1.092548 * (y * z))
-      .add_scaled_vector(coeff[6], 0.315392 * (3.0 * z * z - 1.0))
-      .add_scaled_vector(coeff[7], 1.092548 * (x * z))
-      .add_scaled_vector(coeff[8], 0.546274 * (x * x - y * y)),
+    .copy(coeff[0])
+    .multiply_scalar(0.282095)
+    .add_scaled_vector(coeff[1], 0.488603 * y)
+    .add_scaled_vector(coeff[2], 0.488603 * z)
+    .add_scaled_vector(coeff[3], 0.488603 * x)
+    .add_scaled_vector(coeff[4], 1.092548 * (x * y))
+    .add_scaled_vector(coeff[5], 1.092548 * (y * z))
+    .add_scaled_vector(coeff[6], 0.315392 * (3.0 * z * z - 1.0))
+    .add_scaled_vector(coeff[7], 1.092548 * (x * z))
+    .add_scaled_vector(coeff[8], 0.546274 * (x * x - y * y)),
   )
   target
 }
@@ -87,16 +89,16 @@ pub fn SphericalHarmonics3::get_irradiance_at(
   let coeff = self.coefficients
   ignore(
     target
-      .copy(coeff[0])
-      .multiply_scalar(0.886227)
-      .add_scaled_vector(coeff[1], 2.0 * 0.511664 * y)
-      .add_scaled_vector(coeff[2], 2.0 * 0.511664 * z)
-      .add_scaled_vector(coeff[3], 2.0 * 0.511664 * x)
-      .add_scaled_vector(coeff[4], 2.0 * 0.429043 * x * y)
-      .add_scaled_vector(coeff[5], 2.0 * 0.429043 * y * z)
-      .add_scaled_vector(coeff[6], 0.743125 * z * z - 0.247708)
-      .add_scaled_vector(coeff[7], 2.0 * 0.429043 * x * z)
-      .add_scaled_vector(coeff[8], 0.429043 * (x * x - y * y)),
+    .copy(coeff[0])
+    .multiply_scalar(0.886227)
+    .add_scaled_vector(coeff[1], 2.0 * 0.511664 * y)
+    .add_scaled_vector(coeff[2], 2.0 * 0.511664 * z)
+    .add_scaled_vector(coeff[3], 2.0 * 0.511664 * x)
+    .add_scaled_vector(coeff[4], 2.0 * 0.429043 * x * y)
+    .add_scaled_vector(coeff[5], 2.0 * 0.429043 * y * z)
+    .add_scaled_vector(coeff[6], 0.743125 * z * z - 0.247708)
+    .add_scaled_vector(coeff[7], 2.0 * 0.429043 * x * z)
+    .add_scaled_vector(coeff[8], 0.429043 * (x * x - y * y)),
   )
   target
 }
@@ -183,7 +185,9 @@ pub fn SphericalHarmonics3::copy(
 ///|
 /// 复制出一组新的球谐。原对象之后再改，不影响副本。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/math/SphericalHarmonics3.js#L261
-pub fn SphericalHarmonics3::clone(self : SphericalHarmonics3) -> SphericalHarmonics3 {
+pub fn SphericalHarmonics3::clone(
+  self : SphericalHarmonics3,
+) -> SphericalHarmonics3 {
   SphericalHarmonics3::new().copy(self)
 }
 
@@ -193,7 +197,7 @@ pub fn SphericalHarmonics3::clone(self : SphericalHarmonics3) -> SphericalHarmon
 pub fn SphericalHarmonics3::from_array(
   self : SphericalHarmonics3,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> SphericalHarmonics3 {
   for i in 0..<9 {
     ignore(self.coefficients[i].from_array(array, offset=offset + i * 3))
@@ -207,7 +211,7 @@ pub fn SphericalHarmonics3::from_array(
 pub fn SphericalHarmonics3::to_array(
   self : SphericalHarmonics3,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let mut target = match array {
     None => []

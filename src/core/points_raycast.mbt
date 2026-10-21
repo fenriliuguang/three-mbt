@@ -104,9 +104,9 @@ fn Object3D::scan_points(
   position : BufferAttribute,
   index : BufferAttribute?,
   threshold_sq : Double,
-  start : Int,
-  end : Int,
-  material_index : Int?,
+  start : Int32,
+  end : Int32,
+  material_index : Int32?,
 ) -> Unit {
   match index {
     Some(index) => {
@@ -114,14 +114,7 @@ fn Object3D::scan_points(
       while i < end {
         let vertex = index.get_x(i).to_int()
         self.push_point(
-          raycaster,
-          intersects,
-          ray,
-          position,
-          threshold_sq,
-          vertex,
-          vertex,
-          material_index,
+          raycaster, intersects, ray, position, threshold_sq, vertex, vertex, material_index,
         )
         i = i + 1
       }
@@ -130,14 +123,7 @@ fn Object3D::scan_points(
       let mut i = start
       while i < end {
         self.push_point(
-          raycaster,
-          intersects,
-          ray,
-          position,
-          threshold_sq,
-          i,
-          i,
-          material_index,
+          raycaster, intersects, ray, position, threshold_sq, i, i, material_index,
         )
         i = i + 1
       }
@@ -153,9 +139,9 @@ fn Object3D::push_point(
   ray : @math.Ray,
   position : BufferAttribute,
   threshold_sq : Double,
-  vertex : Int,
-  index : Int,
-  material_index : Int?,
+  vertex : Int32,
+  index : Int32,
+  material_index : Int32?,
 ) -> Unit {
   let point = @math.Vector3::new()
   ignore(position.copy_to_vector3(vertex, point))

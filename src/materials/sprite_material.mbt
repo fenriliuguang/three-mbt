@@ -102,10 +102,10 @@ pub(all) struct SpriteMaterial {
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
   mut blend_equation_alpha : @constants.BlendEquation?
-  mut stencil_write_mask : Int
+  mut stencil_write_mask : Int32
   mut stencil_func : @constants.StencilFunc
-  mut stencil_ref : Int
-  mut stencil_func_mask : Int
+  mut stencil_ref : Int32
+  mut stencil_func_mask : Int32
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
@@ -113,8 +113,8 @@ pub(all) struct SpriteMaterial {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
-  mut version : Int
-  id : Int
+  mut version : Int32
+  id : Int32
   mut uuid : String
   mut name : String
   type_name : String
@@ -123,12 +123,12 @@ pub(all) struct SpriteMaterial {
 
 ///|
 pub fn SpriteMaterial::new(
-  rotation? : Double = 0.0,
-  size_attenuation? : Bool = true,
-  hex? : Int = 0xFFFFFF,
-  opacity? : Double = 1.0,
-  transparent? : Bool = true,
-  fog? : Bool = true,
+  rotation~ : Double = 0.0,
+  size_attenuation~ : Bool = true,
+  hex~ : Int32 = 0xFFFFFF,
+  opacity~ : Double = 1.0,
+  transparent~ : Bool = true,
+  fog~ : Bool = true,
 ) -> SpriteMaterial {
   {
     color: @math.Color::new().set_hex(hex),
@@ -333,7 +333,10 @@ pub fn SpriteMaterial::remove_event_listener(
 ///|
 /// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。渲染器仍不画精灵。
 /// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
-pub fn SpriteMaterial::dispatch_event(self : SpriteMaterial, kind : String) -> Unit {
+pub fn SpriteMaterial::dispatch_event(
+  self : SpriteMaterial,
+  kind : String,
+) -> Unit {
   match self.listeners.get(kind) {
     None => ()
     Some(listeners) => {
@@ -367,7 +370,10 @@ pub fn SpriteMaterial::set_needs_update(
 ///|
 /// 写入 `alpha_test`。新值和旧值是否大于 `0` 发生变化时，把 `version` 加一。
 /// r186: `alphaTest` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L495
-pub fn SpriteMaterial::set_alpha_test(self : SpriteMaterial, value : Double) -> Unit {
+pub fn SpriteMaterial::set_alpha_test(
+  self : SpriteMaterial,
+  value : Double,
+) -> Unit {
   if (self.alpha_test > 0.0) != (value > 0.0) {
     self.version = self.version + 1
   }

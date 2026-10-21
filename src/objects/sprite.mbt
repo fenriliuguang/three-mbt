@@ -11,7 +11,7 @@ pub(all) struct Sprite {
   mut material : @materials.SpriteMaterial
   center : @math.Vector2
   geometry : BufferGeometry
-  mut count : Int
+  mut count : Int32
 }
 
 ///|
@@ -40,7 +40,7 @@ pub extend Sprite with @core.AsNode::{to_node}
 pub fn Sprite::copy(
   self : Sprite,
   source : Sprite,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> Sprite {
   ignore(self.node.copy(source.node, recursive~))
   ignore(self.center.copy(source.center))
@@ -52,7 +52,7 @@ pub fn Sprite::copy(
 ///|
 /// 新建一只精灵再复制。three.js 没有单独的 `Sprite.clone`，用的是 `Object3D.clone`。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn Sprite::clone(self : Sprite, recursive? : Bool = true) -> Sprite {
+pub fn Sprite::clone(self : Sprite, recursive~ : Bool = true) -> Sprite {
   Sprite::new(self.material).copy(self, recursive~)
 }
 
@@ -97,4 +97,3 @@ pub fn Sprite::intersects_frustum_array(
   }
   false
 }
-

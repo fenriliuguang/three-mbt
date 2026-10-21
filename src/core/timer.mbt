@@ -13,7 +13,7 @@ pub(all) struct Timer {
 }
 
 ///|
-pub fn Timer::new(start_time? : Double = 0.0) -> Timer {
+pub fn Timer::new(start_time~ : Double = 0.0) -> Timer {
   {
     previous_time: 0.0,
     current_time: 0.0,

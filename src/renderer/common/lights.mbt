@@ -12,7 +12,7 @@ pub(all) struct ShadowFrame {
   bias : Double
   normal_bias : Double
   radius : Double
-  map_size : Int
+  map_size : Int32
 }
 
 ///|
@@ -140,7 +140,7 @@ fn light_direction(node : @core.Object3D, light : LightState) -> @math.Vector3 {
 pub fn collect_lights(
   root : @core.Object3D,
   camera? : @core.Object3D,
-  reversed_depth? : Bool = false,
+  reversed_depth~ : Bool = false,
 ) -> LightFrame {
   let accum = {
     ambient: @math.Vector3::new(),

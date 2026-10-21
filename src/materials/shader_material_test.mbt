@@ -201,8 +201,7 @@ test "Material shader stores the default vertex shader" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
   let phong = @materials.Material::phong()
-  let expected =
-    "\nvoid main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}\n"
+  let expected = "\nvoid main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}\n"
   assert_eq(shader.vertex_shader, expected)
   assert_eq(basic.vertex_shader, "")
   assert_eq(phong.vertex_shader, "")
@@ -230,8 +229,7 @@ test "Material shader stores the default fragment shader" {
   let shader = @materials.Material::shader()
   let basic = @materials.Material::basic()
   let phong = @materials.Material::phong()
-  let expected =
-    "\nvoid main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}\n"
+  let expected = "\nvoid main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}\n"
   assert_eq(shader.fragment_shader, expected)
   assert_eq(basic.fragment_shader, "")
   assert_eq(phong.fragment_shader, "")

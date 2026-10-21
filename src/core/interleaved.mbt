@@ -14,20 +14,20 @@
 pub(all) struct InterleavedBuffer {
   uuid : String
   mut array : Array[Double]
-  mut stride : Int
-  mut count : Int
-  mut usage : Int
+  mut stride : Int32
+  mut count : Int32
+  mut usage : Int32
   update_ranges : Array[UpdateRange]
-  mut version : Int
+  mut version : Int32
   mut on_upload_callback : (() -> Unit)?
-  mut mesh_per_attribute : Int
+  mut mesh_per_attribute : Int32
 }
 
 ///|
 pub fn InterleavedBuffer::new(
   array : Array[Double],
-  stride : Int,
-  mesh_per_attribute? : Int = 1,
+  stride : Int32,
+  mesh_per_attribute~ : Int32 = 1,
 ) -> InterleavedBuffer {
   {
     uuid: @math.generate_uuid(),
@@ -59,7 +59,7 @@ pub fn InterleavedBuffer::set_needs_update(
 /// r186: `setUsage` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L113
 pub fn InterleavedBuffer::set_usage(
   self : InterleavedBuffer,
-  value : Int,
+  value : Int32,
 ) -> InterleavedBuffer {
   self.usage = value
   self
@@ -70,10 +70,10 @@ pub fn InterleavedBuffer::set_usage(
 /// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L127
 pub fn InterleavedBuffer::add_update_range(
   self : InterleavedBuffer,
-  start : Int,
-  count : Int,
+  start : Int32,
+  count : Int32,
 ) -> Unit {
-  self.update_ranges.push({ start, count })
+  self.update_ranges.push({ start, count, })
 }
 
 ///|
@@ -103,9 +103,9 @@ pub fn InterleavedBuffer::copy(
 /// r186: `copyAt` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L169
 pub fn InterleavedBuffer::copy_at(
   self : InterleavedBuffer,
-  index1 : Int,
+  index1 : Int32,
   buffer : InterleavedBuffer,
-  index2 : Int,
+  index2 : Int32,
 ) -> InterleavedBuffer {
   let mut destination = index1 * self.stride
   let mut source = index2 * buffer.stride
@@ -125,7 +125,7 @@ pub fn InterleavedBuffer::copy_at(
 pub fn InterleavedBuffer::set(
   self : InterleavedBuffer,
   value : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> InterleavedBuffer {
   if offset < 0 || offset + value.length() > self.array.length() {
     abort("InterleavedBuffer.set source does not fit")
@@ -161,10 +161,10 @@ pub fn InterleavedBuffer::on_upload(
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBuffer.js#L256
 pub(all) struct InterleavedJson {
   uuid : String
-  stride : Int
-  usage : Int
+  stride : Int32
+  usage : Int32
   array : Array[Double]
-  mesh_per_attribute : Int?
+  mesh_per_attribute : Int32?
   is_instanced_interleaved_buffer : Bool?
 }
 
@@ -184,6 +184,10 @@ pub fn InterleavedBuffer::to_json(self : InterleavedBuffer) -> InterleavedJson {
     } else {
       None
     },
-    is_instanced_interleaved_buffer: if instanced { Some(true) } else { None },
+    is_instanced_interleaved_buffer: if instanced {
+      Some(true)
+    } else {
+      None
+    },
   }
 }

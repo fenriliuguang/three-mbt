@@ -21,7 +21,7 @@ pub(all) struct InstancedMesh {
 pub fn InstancedMesh::new(
   geometry : BufferGeometry,
   material : @materials.Material,
-  count : Int,
+  count : Int32,
 ) -> InstancedMesh {
   let node = Object3D::new(kind=@core.Mesh)
   node.frustum_culled = false
@@ -126,7 +126,7 @@ pub fn InstancedMesh::set_fog(self : InstancedMesh, enabled : Bool) -> Unit {
 pub fn InstancedMesh::set_transparent(
   self : InstancedMesh,
   enabled : Bool,
-  opacity? : Double = 1.0,
+  opacity~ : Double = 1.0,
 ) -> Unit {
   self.material.transparent = enabled
   self.material.opacity = opacity
@@ -144,7 +144,7 @@ pub fn InstancedMesh::set_map(
 
 ///|
 /// 把绘制个数限制在矩阵容量以内。
-pub fn InstancedMesh::set_count(self : InstancedMesh, count : Int) -> Unit {
+pub fn InstancedMesh::set_count(self : InstancedMesh, count : Int32) -> Unit {
   let capacity = self.instances.matrices.count
   self.instances.count = if count < 0 {
     0
@@ -159,7 +159,7 @@ pub fn InstancedMesh::set_count(self : InstancedMesh, count : Int) -> Unit {
 /// r186: `setMatrixAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L104
 pub fn InstancedMesh::set_matrix_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   matrix : @math.Matrix4,
 ) -> Unit {
   write_matrix(self.instances.matrices, index, matrix)
@@ -169,7 +169,7 @@ pub fn InstancedMesh::set_matrix_at(
 ///|
 pub fn InstancedMesh::get_matrix_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   target : @math.Matrix4,
 ) -> @math.Matrix4 {
   read_matrix(self.instances.matrices, index, target)
@@ -180,7 +180,7 @@ pub fn InstancedMesh::get_matrix_at(
 /// 第一次调用时分配白色 `rgb`。写入的是颜色里已经存好的线性分量。
 pub fn InstancedMesh::set_color_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   color : @math.Color,
 ) -> Unit {
   let colors = match self.instances.colors {
@@ -206,7 +206,7 @@ pub fn InstancedMesh::set_color_at(
 ///|
 pub fn InstancedMesh::get_color_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   target : @math.Color,
 ) -> @math.Color {
   match self.instances.colors {
@@ -229,7 +229,7 @@ pub fn InstancedMesh::get_color_at(
 /// r186: `DataTexture` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
 pub fn InstancedMesh::set_morph_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   object : Mesh,
 ) -> InstancedMesh {
   let influences = match object.morph_target_influences {
@@ -280,7 +280,7 @@ pub fn InstancedMesh::set_morph_at(
 /// r186: `getMorphAt` https://github.com/mrdoob/three.js/blob/r186/src/objects/InstancedMesh.js#L240
 pub fn InstancedMesh::get_morph_at(
   self : InstancedMesh,
-  index : Int,
+  index : Int32,
   object : Mesh,
 ) -> Unit {
   let influences = match object.morph_target_influences {
@@ -308,7 +308,7 @@ pub fn InstancedMesh::get_morph_at(
 pub fn InstancedMesh::copy(
   self : InstancedMesh,
   source : InstancedMesh,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> InstancedMesh {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
@@ -357,7 +357,7 @@ pub fn InstancedMesh::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn InstancedMesh::clone(
   self : InstancedMesh,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> InstancedMesh {
   InstancedMesh::new(
     self.geometry,
@@ -476,9 +476,7 @@ fn sprite_geometry() -> BufferGeometry {
         geometry.set_attribute(
           "position",
           BufferAttribute::new(
-            [
-              -0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0,
-            ],
+            [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0],
             3,
           ),
         ),
@@ -486,10 +484,7 @@ fn sprite_geometry() -> BufferGeometry {
       ignore(
         geometry.set_attribute(
           "uv",
-          BufferAttribute::new(
-            [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0],
-            2,
-          ),
+          BufferAttribute::new([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0], 2),
         ),
       )
       ignore(geometry.set_index_array([0, 1, 2, 0, 2, 3]))
@@ -498,4 +493,3 @@ fn sprite_geometry() -> BufferGeometry {
     }
   }
 }
-

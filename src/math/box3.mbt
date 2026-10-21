@@ -389,9 +389,33 @@ pub fn Box3::intersects_triangle(self : Box3, triangle : Triangle) -> Bool {
   let f1 = Vector3::new().sub_vectors(v2, v1)
   let f2 = Vector3::new().sub_vectors(v0, v2)
   let edges = [
-    0.0, -f0.z, f0.y, 0.0, -f1.z, f1.y, 0.0, -f2.z, f2.y, f0.z, 0.0, -f0.x,
-    f1.z, 0.0, -f1.x, f2.z, 0.0, -f2.x, -f0.y, f0.x, 0.0, -f1.y, f1.x, 0.0,
-    -f2.y, f2.x, 0.0,
+    0.0,
+    -f0.z,
+    f0.y,
+    0.0,
+    -f1.z,
+    f1.y,
+    0.0,
+    -f2.z,
+    f2.y,
+    f0.z,
+    0.0,
+    -f0.x,
+    f1.z,
+    0.0,
+    -f1.x,
+    f2.z,
+    0.0,
+    -f2.x,
+    -f0.y,
+    f0.x,
+    0.0,
+    -f1.y,
+    f1.x,
+    0.0,
+    -f2.y,
+    f2.x,
+    0.0,
   ]
   if sat_for_axes(edges, v0, v1, v2, extents) == false {
     return false

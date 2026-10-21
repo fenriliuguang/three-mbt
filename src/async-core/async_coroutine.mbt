@@ -22,7 +22,7 @@ priv enum State {
 
 ///|
 struct Coroutine {
-  coro_id : Int
+  coro_id : Int32
   waitable_set : WaitableSet
   mut state : State
   mut shielded : Bool
@@ -177,7 +177,7 @@ fn Coroutine::check_error(coro : Coroutine) -> Unit raise {
 ///|
 pub async fn[X] protect_from_cancel(
   f : async () -> X,
-  resume_on_cancel? : Bool = false,
+  resume_on_cancel~ : Bool = false,
 ) -> X {
   guard scheduler.curr_coro is Some(coro)
   if coro.shielded {

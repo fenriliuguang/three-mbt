@@ -15,7 +15,7 @@ MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](
 - 包按目录划分，每个目录有一个 `moon.pkg`。模块元数据在根目录 `moon.mod`，`source = "src"`，导入路径不含 `src`。
 - 黑盒测试文件以 `_test.mbt` 结尾，白盒测试以 `_wbtest.mbt` 结尾。
 - 代码按 `///|` 分块。
-- 改完后运行 `moon info && moon fmt`，并查看 `.mbti` 差异。
+- 改完后运行 `moon info && moon fmt`，并查看 `.mbti` 差异。`moon fmt` 会把 `Int` / `UInt` 写成 `Int32` / `UInt32`，把带默认值的 `label? : T = ...` 写成 `label~ : T = ...`。没有默认值的 `label? : T` 仍表示 `T?`。这几处只是当前工具链的写法，类型不变，`.mbti` 仍打印原来的别名。格式化过一次之后，再跑 `moon fmt` 不应再改文件。
 - 运行 `moon test`。稳定结果用 `assert_eq`。
 
 ## 文件划分

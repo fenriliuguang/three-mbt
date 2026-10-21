@@ -6,13 +6,13 @@
 pub(all) struct FrustumArray {
   mut coordinate_system : @constants.CoordinateSystem
   frustums : Array[Frustum]
-  mut count : Int
+  mut count : Int32
 }
 
 ///|
 /// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/math/FrustumArray.js#L17
 pub fn FrustumArray::new() -> FrustumArray {
-  { coordinate_system: @constants.WebGL, frustums: [], count: 0 }
+  { coordinate_system: @constants.WebGL, frustums: [], count: 0, }
 }
 
 ///|

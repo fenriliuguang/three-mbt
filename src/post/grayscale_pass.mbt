@@ -29,7 +29,7 @@ pub(all) struct GrayscalePass {
 }
 
 ///|
-pub fn GrayscalePass::new(amount? : Double = 1.0) -> GrayscalePass {
+pub fn GrayscalePass::new(amount~ : Double = 1.0) -> GrayscalePass {
   { amount: clamp_amount(amount), }
 }
 
@@ -56,7 +56,7 @@ pub fn grayscale(
 }
 
 ///|
-fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
+fn write_f32(dst : FixedArray[Byte], offset : Int32, value : Double) -> Unit {
   let bytes = Float::from_double(value).to_le_bytes()
   let mut index = 0
   while index < 4 {
@@ -113,4 +113,3 @@ pub fn grayscale_wgsl() -> String {
     #|}
   code
 }
-

@@ -12,7 +12,7 @@ pub(all) struct ContextConfiguration {
 } derive(Show, Eq)
 
 ///|
-pub(all) struct Context(Int) derive(Show, Eq)
+pub(all) struct Context(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -24,7 +24,7 @@ pub fn Context::drop(self : Context) -> Unit {
 ///|
 pub fn Context::context(surface : @surface.Surface) -> Context {
   let @surface.Surface(handle) = surface
-  let result : Int = wasmImportConstructorContext(handle)
+  let result : Int32 = wasmImportConstructorContext(handle)
   let ret = Context::Context(result)
   return ret
 }
@@ -34,7 +34,7 @@ pub fn Context::configure(
   self : Context,
   configuration : ContextConfiguration,
 ) -> Unit {
-  let cleanup_list : Array[Int] = []
+  let cleanup_list : Array[Int32] = []
 
   let Context(handle) = self
 
@@ -115,7 +115,7 @@ pub fn Context::unconfigure(self : Context) -> Unit {
 ///|
 pub fn Context::get_current_texture(self : Context) -> @webgpu.GpuTexture {
   let Context(handle) = self
-  let result : Int = wasmImportMethodContextGetCurrentTexture(handle)
+  let result : Int32 = wasmImportMethodContextGetCurrentTexture(handle)
   let ret = @webgpu.GpuTexture::GpuTexture(result)
   return ret
 }

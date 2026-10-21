@@ -57,7 +57,7 @@ pub fn Frustum::set_from_projection_matrix(
   self : Frustum,
   m : Matrix4,
   coordinate_system? : @constants.CoordinateSystem,
-  reversed_depth? : Bool = false,
+  reversed_depth~ : Bool = false,
 ) -> Frustum {
   let coordinate_system = match coordinate_system {
     None => @constants.WebGPU

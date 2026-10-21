@@ -9,34 +9,34 @@ pub(all) suberror GltfError {
 ///|
 priv struct Bin {
   bytes : Bytes
-  limit : Int
+  limit : Int32
 }
 
 ///|
 priv struct View {
-  buffer : Int
-  offset : Int
-  byte_length : Int
-  stride : Int
+  buffer : Int32
+  offset : Int32
+  byte_length : Int32
+  stride : Int32
 }
 
 ///|
 priv struct SparseRef {
-  count : Int
-  index_view : Int
-  index_offset : Int
-  index_type : Int
-  value_view : Int
-  value_offset : Int
+  count : Int32
+  index_view : Int32
+  index_offset : Int32
+  index_type : Int32
+  value_view : Int32
+  value_offset : Int32
 }
 
 ///|
 priv struct Acc {
-  view : Int
-  offset : Int
-  count : Int
-  components : Int
-  component_type : Int
+  view : Int32
+  offset : Int32
+  count : Int32
+  components : Int32
+  component_type : Int32
   normalized : Bool
   sparse : SparseRef?
 }
@@ -73,15 +73,15 @@ priv struct Prim {
   targets : Array[MorphTarget]
   mesh_weights : Array[Double]
   baked : @core.BufferGeometry
-  joints : Array[Int]?
+  joints : Array[Int32]?
   weights : Array[Double]?
 }
 
 ///|
 priv struct NodeDesc {
   name : String
-  children : Array[Int]
-  mesh : Int?
+  children : Array[Int32]
+  mesh : Int32?
   tx : Double
   ty : Double
   tz : Double
@@ -93,10 +93,10 @@ priv struct NodeDesc {
   sy : Double
   sz : Double
   matrix : Array[Double]?
-  camera : Int?
-  light : Int?
+  camera : Int32?
+  light : Int32?
   weights : Array[Double]?
-  skin : Int?
+  skin : Int32?
 }
 
 ///|
@@ -137,7 +137,7 @@ pub(all) struct Gltf {
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
 /// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。`JOINTS_2` 和 `WEIGHTS_2` 只在第二组成对出现后再加四个，缺第二组时忽略第三组。`JOINTS_3` 和 `WEIGHTS_3` 只在第三组成对出现后再加四个，缺第三组时忽略第四组。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
-pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
+pub fn parse(text : String, bin~ : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
   check_version(root)
   let bins = load_buffers(root, bin)
@@ -170,7 +170,7 @@ pub fn parse(text : String, bin? : Bytes = b"") -> Gltf raise GltfError {
 ///|
 priv struct SceneRoots {
   name : String
-  indices : Array[Int]
+  indices : Array[Int32]
 }
 
 ///|
@@ -223,7 +223,7 @@ fn as_doubles(value : Json) -> Array[Double] raise GltfError {
 }
 
 ///|
-fn as_ints(value : Json) -> Array[Int] raise GltfError {
+fn as_ints(value : Json) -> Array[Int32] raise GltfError {
   let nums = as_doubles(value)
   let out = []
   let mut i = 0
@@ -366,7 +366,7 @@ fn load_views(root : Map[String, Json]) -> Array[View] raise GltfError {
 }
 
 ///|
-fn component_count(kind : String) -> Int raise GltfError {
+fn component_count(kind : String) -> Int32 raise GltfError {
   match kind {
     "SCALAR" => 1
     "VEC2" => 2
@@ -407,7 +407,7 @@ fn load_accessors(root : Map[String, Json]) -> Array[Acc] raise GltfError {
 }
 
 ///|
-fn component_width(component_type : Int) -> Int raise GltfError {
+fn component_width(component_type : Int32) -> Int32 raise GltfError {
   match component_type {
     5120 => 1
     5121 => 1
@@ -564,8 +564,8 @@ fn load_materials(root : Map[String, Json]) -> Array[Mat] raise GltfError {
 ///|
 fn read_component(
   bin : Bin,
-  offset : Int,
-  component_type : Int,
+  offset : Int32,
+  component_type : Int32,
 ) -> Double raise GltfError {
   let width = component_width(component_type)
   if offset < 0 || offset + width > bin.limit {
@@ -609,7 +609,7 @@ fn read_component(
 }
 
 ///|
-fn normalize(raw : Double, component_type : Int) -> Double {
+fn normalize(raw : Double, component_type : Int32) -> Double {
   match component_type {
     5120 => {
       let n = raw / 127.0
@@ -651,7 +651,7 @@ fn read_acc(
 }
 
 ///|
-fn zero_values(count : Int) -> Array[Double] {
+fn zero_values(count : Int32) -> Array[Double] {
   let out = []
   let mut index = 0
   while index < count {
@@ -777,7 +777,7 @@ fn apply_sparse(
 }
 
 ///|
-fn sparse_view(views : Array[View], index : Int) -> View raise GltfError {
+fn sparse_view(views : Array[View], index : Int32) -> View raise GltfError {
   if index < 0 || index >= views.length() {
     raise GltfError::Invalid("bufferView index")
   }
@@ -831,8 +831,8 @@ fn read_values(
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],
-  index : Int,
-  components : Int,
+  index : Int32,
+  components : Int32,
 ) -> Array[Double] raise GltfError {
   if index < 0 || index >= accs.length() {
     raise GltfError::Invalid("accessor index")
@@ -845,7 +845,7 @@ fn read_values(
 }
 
 ///|
-fn color_width(accs : Array[Acc], index : Int) -> Int raise GltfError {
+fn color_width(accs : Array[Acc], index : Int32) -> Int32 raise GltfError {
   if index < 0 || index >= accs.length() {
     raise GltfError::Invalid("accessor index")
   }
@@ -861,7 +861,7 @@ fn read_color(
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],
-  index : Int,
+  index : Int32,
 ) -> Array[Double] raise GltfError {
   read_values(bins, views, accs, index, color_width(accs, index))
 }
@@ -871,7 +871,7 @@ fn put_attribute(
   geometry : @core.BufferGeometry,
   name : String,
   values : Array[Double],
-  item_size : Int,
+  item_size : Int32,
 ) -> Unit {
   ignore(
     geometry.set_attribute(name, @core.BufferAttribute::new(values, item_size)),
@@ -1115,7 +1115,7 @@ fn geometry_for(
 fn resolve_weights(
   mesh_weights : Array[Double],
   node_weights : Array[Double]?,
-  count : Int,
+  count : Int32,
 ) -> Array[Double] {
   let out = []
   let mut index = 0
@@ -1585,7 +1585,7 @@ fn extension_block(
 }
 
 ///|
-fn node_light(obj : Map[String, Json]) -> Int? raise GltfError {
+fn node_light(obj : Map[String, Json]) -> Int32? raise GltfError {
   match extension_block(obj, "KHR_lights_punctual") {
     None => None
     Some(block) =>
@@ -1602,7 +1602,7 @@ fn node_light(obj : Map[String, Json]) -> Int? raise GltfError {
 /// r186: `_loadLight` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L695
 fn load_punctual(
   obj : Map[String, Json],
-  index : Int,
+  index : Int32,
 ) -> Punctual raise GltfError {
   let kind = match opt_string(obj, "type", "") {
     "directional" => Directional
@@ -1718,15 +1718,15 @@ fn light_object(light : Punctual) -> @core.Object3D {
 
 ///|
 priv struct SkinDef {
-  joints : Array[Int]
+  joints : Array[Int32]
   inverses : Array[@math.Matrix4]
 }
 
 ///|
 priv struct PendingSkin {
   node : @core.Object3D
-  skin : Int
-  joints : Array[Int]
+  skin : Int32
+  joints : Array[Int32]
   weights : Array[Double]
 }
 
@@ -1781,7 +1781,7 @@ fn load_skin(
 }
 
 ///|
-fn matrix_from(values : Array[Double], offset : Int) -> @math.Matrix4 {
+fn matrix_from(values : Array[Double], offset : Int32) -> @math.Matrix4 {
   let m = @math.Matrix4::new()
   let mut i = 0
   while i < 16 {
@@ -1792,7 +1792,7 @@ fn matrix_from(values : Array[Double], offset : Int) -> @math.Matrix4 {
 }
 
 ///|
-fn identity_matrices(count : Int) -> Array[@math.Matrix4] {
+fn identity_matrices(count : Int32) -> Array[@math.Matrix4] {
   let out = []
   let mut index = 0
   while index < count {
@@ -1812,7 +1812,7 @@ fn read_skin_attributes(
   views : Array[View],
   accs : Array[Acc],
   geometry : @core.BufferGeometry,
-) -> (Array[Int]?, Array[Double]?) raise GltfError {
+) -> (Array[Int32]?, Array[Double]?) raise GltfError {
   match (attrs.get("JOINTS_0"), attrs.get("WEIGHTS_0")) {
     (Some(joints), Some(weights)) => {
       let joint_index = as_f64(joints).to_int()
@@ -1875,7 +1875,7 @@ fn read_skin_attributes(
 }
 
 ///|
-fn accessor_at(accs : Array[Acc], index : Int) -> Acc raise GltfError {
+fn accessor_at(accs : Array[Acc], index : Int32) -> Acc raise GltfError {
   if index < 0 || index >= accs.length() {
     raise GltfError::Invalid("accessor index")
   }
@@ -1887,9 +1887,9 @@ fn read_joints(
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],
-  index : Int,
+  index : Int32,
   name : String,
-) -> Array[Int] raise GltfError {
+) -> Array[Int32] raise GltfError {
   let acc = accessor_at(accs, index)
   if acc.normalized ||
     (acc.component_type != 5121 && acc.component_type != 5123) {
@@ -1910,7 +1910,7 @@ fn read_weights(
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],
-  index : Int,
+  index : Int32,
   name : String,
 ) -> Array[Double] raise GltfError {
   let acc = accessor_at(accs, index)
@@ -1926,7 +1926,7 @@ fn read_weights(
 ///|
 fn check_skin_joints(
   skins : Array[SkinDef],
-  node_count : Int,
+  node_count : Int32,
 ) -> Unit raise GltfError {
   let mut i = 0
   while i < skins.length() {
@@ -1948,7 +1948,7 @@ fn check_skin_joints(
 fn remember_skin(
   pending : Array[PendingSkin],
   node : @core.Object3D,
-  skin : Int,
+  skin : Int32,
   prim : Prim,
 ) -> Unit {
   match prim.joints {
@@ -1993,7 +1993,7 @@ fn bind_skin(
   node : @core.Object3D,
   joints : Array[@core.Object3D],
   inverses : Array[@math.Matrix4],
-  indices : Array[Int],
+  indices : Array[Int32],
   weights : Array[Double],
 ) -> Unit {
   match node.mesh {
@@ -2026,7 +2026,7 @@ fn bind_skin(
 /// r186: `normalizeSkinWeights` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L262
 fn normalized_skin_weights(
   weights : Array[Double],
-  count : Int,
+  count : Int32,
 ) -> Array[Double] {
   let out = weights.copy()
   let stride = if count <= 0 {
@@ -2072,11 +2072,11 @@ fn normalized_skin_weights(
 
 ///|
 fn append_ints(
-  base : Array[Int],
-  extra : Array[Int],
-  count : Int,
-  width : Int,
-) -> Array[Int] {
+  base : Array[Int32],
+  extra : Array[Int32],
+  count : Int32,
+  width : Int32,
+) -> Array[Int32] {
   let out = []
   let mut vertex = 0
   while vertex < count {
@@ -2099,8 +2099,8 @@ fn append_ints(
 fn append_doubles(
   base : Array[Double],
   extra : Array[Double],
-  count : Int,
-  width : Int,
+  count : Int32,
+  width : Int32,
 ) -> Array[Double] {
   let out = []
   let mut vertex = 0
@@ -2236,7 +2236,7 @@ fn link_children(
 }
 
 ///|
-fn unreferenced(nodes : Array[NodeDesc]) -> Array[Int] {
+fn unreferenced(nodes : Array[NodeDesc]) -> Array[Int32] {
   let used = []
   let mut i = 0
   while i < nodes.length() {
@@ -2305,7 +2305,7 @@ fn core_targets(targets : Array[MorphTarget]) -> Array[@core.MorphTarget] {
 }
 
 ///|
-fn morph_count(node : @core.Object3D) -> Int? {
+fn morph_count(node : @core.Object3D) -> Int32? {
   match node.morph {
     Some(state) => Some(state.targets.length())
     None => {
@@ -2335,7 +2335,7 @@ fn weights_track(
   accs : Array[Acc],
   samplers : Array[Map[String, Json]],
   channel : Map[String, Json],
-  count : Int,
+  count : Int32,
 ) -> @animation.KeyframeTrack raise GltfError {
   let sampler_index = match channel.get("sampler") {
     None => raise GltfError::Invalid("animation sampler")
@@ -2412,7 +2412,7 @@ fn animation_interpolation(name : String) -> SamplerInterp raise GltfError {
 /// r186: `loadAnimation` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L4124
 fn load_animation(
   obj : Map[String, Json],
-  index : Int,
+  index : Int32,
   bins : Array[Bin],
   views : Array[View],
   accs : Array[Acc],

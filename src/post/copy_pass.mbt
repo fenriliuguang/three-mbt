@@ -8,7 +8,7 @@ pub(all) struct CopyPass {
 }
 
 ///|
-pub fn CopyPass::new(opacity? : Double = 1.0) -> CopyPass {
+pub fn CopyPass::new(opacity~ : Double = 1.0) -> CopyPass {
   { opacity, }
 }
 
@@ -76,4 +76,3 @@ pub fn copy_wgsl() -> String {
     #|}
   code
 }
-

@@ -1,10 +1,10 @@
 // r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 
 ///|
-let next_geometry_id : Ref[Int] = Ref::Ref(0)
+let next_geometry_id : Ref[Int32] = Ref::Ref(0)
 
 ///|
-fn fresh_geometry_id() -> Int {
+fn fresh_geometry_id() -> Int32 {
   let id = next_geometry_id.val
   next_geometry_id.val = id + 1
   id
@@ -14,9 +14,9 @@ fn fresh_geometry_id() -> Int {
 /// `BufferGeometry` 的一组索引。`material_index` 对应 r186 的 group materialIndex。
 /// r186: `BufferGeometry` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L48
 pub(all) struct GeometryGroup {
-  start : Int
-  count : Int
-  material_index : Int
+  start : Int32
+  count : Int32
+  material_index : Int32
 }
 
 ///|
@@ -42,7 +42,7 @@ pub(all) struct DrawRange {
 /// r186: `userData` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L196
 /// r186: `_transformed` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L209
 pub(all) struct BufferGeometry {
-  id : Int
+  id : Int32
   uuid : String
   mut name : String
   mut type_name : String
@@ -50,8 +50,8 @@ pub(all) struct BufferGeometry {
   attributes : Map[String, BufferAttribute]
   mut index : BufferAttribute?
   mut indirect : BufferAttribute?
-  mut indirect_offset : Int
-  mut indirect_offsets : Array[Int]?
+  mut indirect_offset : Int32
+  mut indirect_offsets : Array[Int32]?
   morph_attributes : Map[String, Array[BufferAttribute]]
   mut morph_targets_relative : Bool
   mut user_data : Map[String, String]
@@ -60,7 +60,7 @@ pub(all) struct BufferGeometry {
   draw_range : DrawRange
   mut bounding_box : @math.Box3?
   mut bounding_sphere : @math.Sphere?
-  mut version : Int
+  mut version : Int32
   listeners : Map[String, Array[() -> Unit]]
 }
 
@@ -82,7 +82,7 @@ pub fn BufferGeometry::new() -> BufferGeometry {
     user_data: Map([]),
     transformed: false,
     groups: [],
-    draw_range: { start: 0.0, count: 1.0 / 0.0 },
+    draw_range: { start: 0.0, count: 1.0 / 0.0, },
     bounding_box: None,
     bounding_sphere: None,
     version: 0,
@@ -122,7 +122,10 @@ pub fn BufferGeometry::delete_attribute(
 ///|
 /// 这个名字上有没有属性。索引不算属性。
 /// r186: `hasAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L321
-pub fn BufferGeometry::has_attribute(self : BufferGeometry, name : String) -> Bool {
+pub fn BufferGeometry::has_attribute(
+  self : BufferGeometry,
+  name : String,
+) -> Bool {
   self.attributes.contains(name)
 }
 
@@ -145,7 +148,7 @@ pub fn BufferGeometry::set_index(
 ///|
 pub fn BufferGeometry::set_index_array(
   self : BufferGeometry,
-  indices : Array[Int],
+  indices : Array[Int32],
 ) -> BufferGeometry {
   self.set_index(BufferAttribute::from_ints(indices, 1))
 }
@@ -156,7 +159,7 @@ pub fn BufferGeometry::set_index_array(
 pub fn BufferGeometry::set_indirect(
   self : BufferGeometry,
   indirect : BufferAttribute,
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> BufferGeometry {
   self.indirect = Some(indirect)
   self.indirect_offset = offset
@@ -170,7 +173,7 @@ pub fn BufferGeometry::set_indirect(
 pub fn BufferGeometry::set_indirect_offsets(
   self : BufferGeometry,
   indirect : BufferAttribute,
-  offsets : Array[Int],
+  offsets : Array[Int32],
 ) -> BufferGeometry {
   self.indirect = Some(indirect)
   self.indirect_offsets = Some(offsets.copy())
@@ -187,9 +190,9 @@ pub fn BufferGeometry::get_indirect(self : BufferGeometry) -> BufferAttribute? {
 ///|
 pub fn BufferGeometry::add_group(
   self : BufferGeometry,
-  start : Int,
-  count : Int,
-  material_index? : Int = 0,
+  start : Int32,
+  count : Int32,
+  material_index~ : Int32 = 0,
 ) -> Unit {
   self.groups.push({ start, count, material_index, })
 }
@@ -474,7 +477,11 @@ pub fn BufferGeometry::compute_bounding_sphere(self : BufferGeometry) -> Unit {
         )
         index = index + 1
       }
-      max_radius_sq = self.morph_radius_sq(position, sphere.center, max_radius_sq)
+      max_radius_sq = self.morph_radius_sq(
+        position,
+        sphere.center,
+        max_radius_sq,
+      )
       sphere.radius = max_radius_sq.sqrt()
     }
     _ => self.bounding_sphere = None
@@ -515,9 +522,9 @@ fn BufferGeometry::morph_radius_sq(
 fn accumulate_tangent_triangle(
   position : BufferAttribute,
   uv : BufferAttribute,
-  a : Int,
-  b : Int,
-  c : Int,
+  a : Int32,
+  b : Int32,
+  c : Int32,
   tan1 : Array[@math.Vector3],
   tan2 : Array[@math.Vector3],
 ) -> Unit {
@@ -565,7 +572,7 @@ fn write_tangent_vertex(
   tangent : BufferAttribute,
   tan1 : Array[@math.Vector3],
   tan2 : Array[@math.Vector3],
-  vertex : Int,
+  vertex : Int32,
 ) -> Unit {
   let n = @math.Vector3::new()
   ignore(normal.copy_to_vector3(vertex, n))
@@ -581,7 +588,7 @@ fn write_tangent_vertex(
 ///|
 fn BufferGeometry::tangent_attribute(
   self : BufferGeometry,
-  vertex_count : Int,
+  vertex_count : Int32,
 ) -> BufferAttribute {
   match self.get_attribute("tangent") {
     Some(existing) =>
@@ -597,7 +604,7 @@ fn BufferGeometry::tangent_attribute(
 ///|
 fn BufferGeometry::replace_tangent_attribute(
   self : BufferGeometry,
-  vertex_count : Int,
+  vertex_count : Int32,
 ) -> BufferAttribute {
   let values = []
   let mut index = 0
@@ -614,12 +621,13 @@ fn BufferGeometry::replace_tangent_attribute(
 /// 为带索引、位置、法线和 uv 的几何体计算切线。缺任一属性时不改动。
 /// r186: `computeTangents` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L837
 pub fn BufferGeometry::compute_tangents(self : BufferGeometry) -> Unit {
-  match (
-    self.index,
-    self.get_attribute("position"),
-    self.get_attribute("normal"),
-    self.get_attribute("uv"),
-  ) {
+  match
+    (
+      self.index,
+      self.get_attribute("position"),
+      self.get_attribute("normal"),
+      self.get_attribute("uv"),
+    ) {
     (Some(index), Some(position), Some(normal), Some(uv)) => {
       let tangent = self.tangent_attribute(position.count)
       let tan1 = []
@@ -631,7 +639,7 @@ pub fn BufferGeometry::compute_tangents(self : BufferGeometry) -> Unit {
         vertex = vertex + 1
       }
       let groups : Array[GeometryGroup] = if self.groups.length() == 0 {
-        [{ start: 0, count: index.count, material_index: 0 }]
+        [{ start: 0, count: index.count, material_index: 0, }]
       } else {
         self.groups
       }
@@ -756,7 +764,7 @@ fn assign_triangle_soup_normals(
 ///|
 fn BufferGeometry::fresh_normal_attribute(
   self : BufferGeometry,
-  vertex_count : Int,
+  vertex_count : Int32,
 ) -> BufferAttribute {
   let values = []
   let mut index = 0
@@ -804,7 +812,8 @@ pub fn BufferGeometry::compute_vertex_normals(self : BufferGeometry) -> Unit {
 /// r186: `normalizeNormals` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferGeometry.js#L1101
 pub fn BufferGeometry::normalize_normals(self : BufferGeometry) -> Unit {
   match self.get_attribute("normal") {
-    None => abort("BufferGeometry.normalize_normals requires a normal attribute")
+    None =>
+      abort("BufferGeometry.normalize_normals requires a normal attribute")
     Some(normals) => {
       let vector = @math.Vector3::new()
       let mut index = 0
@@ -834,7 +843,11 @@ fn expand_indexed_attribute(
     }
     cursor = cursor + 1
   }
-  BufferAttribute::new(values, attribute.item_size, normalized=attribute.normalized)
+  BufferAttribute::new(
+    values,
+    attribute.item_size,
+    normalized=attribute.normalized,
+  )
 }
 
 ///|
@@ -848,7 +861,10 @@ pub fn BufferGeometry::to_non_indexed(self : BufferGeometry) -> BufferGeometry {
       for pair in self.attributes.iter() {
         let (name, attribute) = pair
         ignore(
-          geometry.set_attribute(name, expand_indexed_attribute(attribute, index)),
+          geometry.set_attribute(
+            name,
+            expand_indexed_attribute(attribute, index),
+          ),
         )
       }
       for pair in self.morph_attributes.iter() {
@@ -951,11 +967,7 @@ pub fn BufferGeometry::to_json(self : BufferGeometry) -> GeometryJson {
       has_morph = true
     }
   }
-  let morph_json = if has_morph {
-    Some(morph_attributes)
-  } else {
-    None
-  }
+  let morph_json = if has_morph { Some(morph_attributes) } else { None }
   let morph_relative = if has_morph {
     Some(self.morph_targets_relative)
   } else {
@@ -1025,7 +1037,11 @@ pub fn BufferGeometry::copy(
   let mut group_index = 0
   while group_index < source.groups.length() {
     let group = source.groups[group_index]
-    self.add_group(group.start, group.count, material_index=group.material_index)
+    self.add_group(
+      group.start,
+      group.count,
+      material_index=group.material_index,
+    )
     group_index = group_index + 1
   }
   match source.bounding_box {

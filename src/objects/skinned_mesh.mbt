@@ -110,12 +110,14 @@ pub fn SkinnedMesh::normalize_skin_weights(self : SkinnedMesh) -> Unit {
 /// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L290
 pub fn SkinnedMesh::update_matrix_world(
   self : SkinnedMesh,
-  force? : Bool = false,
+  force~ : Bool = false,
 ) -> Unit {
   self.mesh.node.update_matrix_world(force~)
   match self.bind_mode {
     @constants.Attached =>
-      ignore(self.bind_matrix_inverse.copy(self.mesh.node.matrix_world).invert())
+      ignore(
+        self.bind_matrix_inverse.copy(self.mesh.node.matrix_world).invert(),
+      )
     @constants.Detached =>
       ignore(self.bind_matrix_inverse.copy(self.bind_matrix).invert())
   }
@@ -127,7 +129,7 @@ pub fn SkinnedMesh::update_matrix_world(
 /// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
 pub fn SkinnedMesh::apply_bone_transform(
   self : SkinnedMesh,
-  index : Int,
+  index : Int32,
   target : @math.Vector3,
 ) -> @math.Vector3 {
   let skeleton = match self.skeleton {
@@ -136,11 +138,13 @@ pub fn SkinnedMesh::apply_bone_transform(
   }
   let geometry = self.mesh.geometry
   let skin_index = match geometry.get_attribute("skinIndex") {
-    None => abort("SkinnedMesh.applyBoneTransform requires a skinIndex attribute")
+    None =>
+      abort("SkinnedMesh.applyBoneTransform requires a skinIndex attribute")
     Some(attribute) => attribute
   }
   let skin_weight = match geometry.get_attribute("skinWeight") {
-    None => abort("SkinnedMesh.applyBoneTransform requires a skinWeight attribute")
+    None =>
+      abort("SkinnedMesh.applyBoneTransform requires a skinWeight attribute")
     Some(attribute) => attribute
   }
   let base = @math.Vector4::new(x=target.x, y=target.y, z=target.z, w=1.0)
@@ -173,11 +177,7 @@ pub fn SkinnedMesh::apply_bone_transform(
       ignore(transformed.copy(base).apply_matrix4(bone_matrix))
       ignore(
         target.add_scaled_vector(
-          @math.Vector3::new(
-            x=transformed.x,
-            y=transformed.y,
-            z=transformed.z,
-          ),
+          @math.Vector3::new(x=transformed.x, y=transformed.y, z=transformed.z),
           weight,
         ),
       )
@@ -195,7 +195,7 @@ pub fn SkinnedMesh::apply_bone_transform(
 /// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
 pub fn SkinnedMesh::apply_bone_transform_vector4(
   self : SkinnedMesh,
-  index : Int,
+  index : Int32,
   target : @math.Vector4,
 ) -> @math.Vector4 {
   let skeleton = match self.skeleton {
@@ -204,11 +204,13 @@ pub fn SkinnedMesh::apply_bone_transform_vector4(
   }
   let geometry = self.mesh.geometry
   let skin_index = match geometry.get_attribute("skinIndex") {
-    None => abort("SkinnedMesh.applyBoneTransform requires a skinIndex attribute")
+    None =>
+      abort("SkinnedMesh.applyBoneTransform requires a skinIndex attribute")
     Some(attribute) => attribute
   }
   let skin_weight = match geometry.get_attribute("skinWeight") {
-    None => abort("SkinnedMesh.applyBoneTransform requires a skinWeight attribute")
+    None =>
+      abort("SkinnedMesh.applyBoneTransform requires a skinWeight attribute")
     Some(attribute) => attribute
   }
   let base = target.clone()
@@ -251,7 +253,7 @@ pub fn SkinnedMesh::apply_bone_transform_vector4(
 /// r186: `getVertexPosition` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L213
 pub fn SkinnedMesh::get_vertex_position(
   self : SkinnedMesh,
-  index : Int,
+  index : Int32,
   target : @math.Vector3,
 ) -> @math.Vector3 {
   ignore(self.mesh.node.get_vertex_position(index, target))
@@ -264,7 +266,8 @@ pub fn SkinnedMesh::get_vertex_position(
 /// r186: `computeBoundingBox` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L109
 pub fn SkinnedMesh::compute_bounding_box(self : SkinnedMesh) -> @math.Box3 {
   let position = match self.mesh.geometry.get_attribute("position") {
-    None => abort("SkinnedMesh.computeBoundingBox requires a position attribute")
+    None =>
+      abort("SkinnedMesh.computeBoundingBox requires a position attribute")
     Some(position) => position
   }
   let box = match self.bounding_box {
@@ -292,7 +295,8 @@ pub fn SkinnedMesh::compute_bounding_box(self : SkinnedMesh) -> @math.Box3 {
 /// r186: `computeBoundingSphere` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L138
 pub fn SkinnedMesh::compute_bounding_sphere(self : SkinnedMesh) -> @math.Sphere {
   let position = match self.mesh.geometry.get_attribute("position") {
-    None => abort("SkinnedMesh.computeBoundingSphere requires a position attribute")
+    None =>
+      abort("SkinnedMesh.computeBoundingSphere requires a position attribute")
     Some(position) => position
   }
   let sphere = match self.bounding_sphere {
@@ -321,7 +325,7 @@ pub fn SkinnedMesh::compute_bounding_sphere(self : SkinnedMesh) -> @math.Sphere 
 pub fn SkinnedMesh::copy(
   self : SkinnedMesh,
   source : SkinnedMesh,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> SkinnedMesh {
   ignore(self.mesh.copy(source.mesh, recursive~))
   self.bind_mode = source.bind_mode
@@ -344,9 +348,12 @@ pub fn SkinnedMesh::copy(
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
 pub fn SkinnedMesh::clone(
   self : SkinnedMesh,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> SkinnedMesh {
-  SkinnedMesh::new(self.mesh.geometry, self.mesh.material).copy(self, recursive~)
+  SkinnedMesh::new(self.mesh.geometry, self.mesh.material).copy(
+    self,
+    recursive~,
+  )
 }
 
 ///|
@@ -374,9 +381,7 @@ pub fn SkinnedMesh::raycast(
     None => self.compute_bounding_sphere()
   }
   let world_sphere = @math.Sphere::new()
-  ignore(
-    world_sphere.copy(sphere).apply_matrix4(self.mesh.node.matrix_world),
-  )
+  ignore(world_sphere.copy(sphere).apply_matrix4(self.mesh.node.matrix_world))
   if !raycaster.ray.intersects_sphere(world_sphere) {
     return
   }
@@ -386,10 +391,7 @@ pub fn SkinnedMesh::raycast(
   ignore(ray.copy(raycaster.ray).apply_matrix4(inverse))
   match self.bounding_box {
     None => ()
-    Some(box) =>
-      if !ray.intersects_box(box) {
-        return
-      }
+    Some(box) => if !ray.intersects_box(box) { return }
   }
   self.mesh.node.raycast_triangles_with(
     raycaster,
@@ -399,4 +401,3 @@ pub fn SkinnedMesh::raycast(
     fn(index, target) { self.get_vertex_position(index, target) },
   )
 }
-

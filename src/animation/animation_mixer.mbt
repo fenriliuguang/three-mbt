@@ -219,7 +219,7 @@ fn clip_time(action : AnimationAction) -> Double {
 ///|
 fn read_key(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
 ) -> (Double, Double, Double, Double) {
   let base = index * track.value_size
   let x = track.values[base]
@@ -252,7 +252,7 @@ fn slerp_key(
 ///|
 fn spline_or_key(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
 ) -> (Double, Double, Double, Double) {
   if track.cubic_spline {
     spline_vertex(track, index)
@@ -264,7 +264,7 @@ fn spline_or_key(
 ///|
 fn spline_vertex(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
 ) -> (Double, Double, Double, Double) {
   let stride = track.value_size
   let base = index * stride * 3 + stride
@@ -280,7 +280,7 @@ fn spline_vertex(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L2156
 fn gltf_cubic(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
   time : Double,
 ) -> (Double, Double, Double, Double) {
   let t0 = track.times[index]
@@ -299,7 +299,7 @@ fn gltf_cubic(
   let stride = track.value_size
   let offset0 = index * stride * 3
   let offset1 = offset0 + stride * 3
-  fn component(i : Int) -> Double {
+  fn component(i : Int32) -> Double {
     let p0 = track.values[offset0 + i + stride]
     let m0 = track.values[offset0 + i + stride * 2] * td
     let p1 = track.values[offset1 + i + stride]
@@ -375,7 +375,7 @@ fn sample_track(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L120
 fn smooth_vector(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
   p : Double,
 ) -> (Double, Double, Double, Double)? {
   let t0 = track.times[index]
@@ -597,7 +597,7 @@ fn sample_values(track : KeyframeTrack, time : Double) -> Array[Double] {
 }
 
 ///|
-fn key_vector(track : KeyframeTrack, index : Int) -> Array[Double] {
+fn key_vector(track : KeyframeTrack, index : Int32) -> Array[Double] {
   let out = []
   let mut component = 0
   while component < track.value_size {
@@ -608,7 +608,7 @@ fn key_vector(track : KeyframeTrack, index : Int) -> Array[Double] {
 }
 
 ///|
-fn keyed(track : KeyframeTrack, index : Int, component : Int) -> Double {
+fn keyed(track : KeyframeTrack, index : Int32, component : Int32) -> Double {
   let stride = track.value_size
   let base = if track.cubic_spline {
     index * stride * 3 + stride
@@ -621,7 +621,7 @@ fn keyed(track : KeyframeTrack, index : Int, component : Int) -> Double {
 ///|
 fn cubic_vector(
   track : KeyframeTrack,
-  index : Int,
+  index : Int32,
   time : Double,
 ) -> Array[Double] {
   let t0 = track.times[index]
@@ -654,7 +654,7 @@ fn cubic_vector(
 }
 
 ///|
-fn node_name(name : String, suffix : Int) -> String {
+fn node_name(name : String, suffix : Int32) -> String {
   name[:name.length() - suffix].to_owned()
 }
 

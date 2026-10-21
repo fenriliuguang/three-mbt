@@ -23,7 +23,7 @@ pub fn Triangle::new(a? : Vector3, b? : Vector3, c? : Vector3) -> Triangle {
     None => Vector3::new()
     Some(c) => c.clone()
   }
-  { a, b, c }
+  { a, b, c, }
 }
 
 ///|
@@ -153,9 +153,9 @@ pub fn Triangle::set(
 pub fn Triangle::set_from_points_and_indices(
   self : Triangle,
   points : Array[Vector3],
-  i0 : Int,
-  i1 : Int,
-  i2 : Int,
+  i0 : Int32,
+  i1 : Int32,
+  i2 : Int32,
 ) -> Triangle {
   self.set(points[i0], points[i1], points[i2])
 }
@@ -297,9 +297,9 @@ pub fn Triangle::closest_point_to_point(
     return target.copy(a).add_scaled_vector(vac, w)
   }
   let va = d3 * d6 - d5 * d4
-  if va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0 {
+  if va <= 0.0 && d4 - d3 >= 0.0 && d5 - d6 >= 0.0 {
     let vbc = Vector3::new().sub_vectors(c, b)
-    let w = (d4 - d3) / ((d4 - d3) + (d5 - d6))
+    let w = (d4 - d3) / (d4 - d3 + (d5 - d6))
     return target.copy(b).add_scaled_vector(vbc, w)
   }
   let denom = 1.0 / (va + vb + vc)

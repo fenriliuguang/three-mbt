@@ -1,10 +1,10 @@
 // r186: `Material` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L19
 
 ///|
-let next_material_id : Ref[Int] = Ref::Ref(0)
+let next_material_id : Ref[Int32] = Ref::Ref(0)
 
 ///|
-fn fresh_material_id() -> Int {
+fn fresh_material_id() -> Int32 {
   let id = next_material_id.val
   next_material_id.val = id + 1
   id
@@ -311,10 +311,10 @@ pub(all) struct Material {
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
   mut blend_equation_alpha : @constants.BlendEquation?
-  mut stencil_write_mask : Int
+  mut stencil_write_mask : Int32
   mut stencil_func : @constants.StencilFunc
-  mut stencil_ref : Int
-  mut stencil_func_mask : Int
+  mut stencil_ref : Int32
+  mut stencil_func_mask : Int32
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
@@ -322,8 +322,8 @@ pub(all) struct Material {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
-  mut version : Int
-  id : Int
+  mut version : Int32
+  id : Int32
   mut uuid : String
   mut name : String
   type_name : String
@@ -857,4 +857,3 @@ pub fn Material::dispatch_event(self : Material, kind : String) -> Unit {
 pub fn Material::dispose(self : Material) -> Unit {
   self.dispatch_event("dispose")
 }
-

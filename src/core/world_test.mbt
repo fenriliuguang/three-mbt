@@ -641,7 +641,12 @@ test "deleteAttribute removes one named attribute" {
 test "hasAttribute reports a named attribute" {
   let geometry = @core.BufferGeometry::new()
   assert_eq(geometry.has_attribute("position"), false)
-  ignore(geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)))
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
+  )
   ignore(geometry.set_index_array([0]))
   assert_eq(geometry.has_attribute("position"), true)
   assert_eq(geometry.has_attribute("normal"), false)
@@ -660,7 +665,10 @@ test "clearGroups drops every draw group" {
   assert_eq(geometry.groups[1].start, 3)
   assert_eq(geometry.groups[1].count, 6)
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
   )
   geometry.clear_groups()
   assert_eq(geometry.groups.length(), 0)
@@ -701,7 +709,9 @@ test "applyMatrix3 transforms item sizes 2 and 3" {
   assert_eq(uvs.get_x(0), 1.25)
   assert_eq(uvs.get_y(0), 2.5)
   let positions = @core.BufferAttribute::new([1.0, 1.0, 1.0], 3)
-  let scale = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
+  let scale = @math.Matrix3::new().set(
+    2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0,
+  )
   ignore(positions.apply_matrix3(scale))
   assert_eq(positions.get_x(0), 2.0)
   assert_eq(positions.get_y(0), 3.0)
@@ -715,7 +725,9 @@ test "applyMatrix3 transforms item sizes 2 and 3" {
 ///|
 test "applyNormalMatrix rotates and normalizes each vertex" {
   let normals = @core.BufferAttribute::new([2.0, 0.0, 0.0, 0.0, 3.0, 0.0], 3)
-  let turn = @math.Matrix3::new().set(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  let turn = @math.Matrix3::new().set(
+    0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
   let written = normals.apply_normal_matrix(turn)
   assert_eq(physical_equal(written, normals), true)
   assert_eq(normals.get_x(0), 0.0)
@@ -746,10 +758,27 @@ test "transformDirection ignores translation and normalizes scale" {
 ///|
 test "applyMatrix4 transforms position, normal, and tangent" {
   let geometry = @core.BufferGeometry::new()
-  ignore(geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)))
-  ignore(geometry.set_attribute("normal", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)))
-  ignore(geometry.set_attribute("tangent", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)))
-  ignore(geometry.set_attribute("uv", @core.BufferAttribute::new([0.25, 0.5], 2)))
+  ignore(
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "normal",
+      @core.BufferAttribute::new([1.0, 1.0, 0.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute(
+      "tangent",
+      @core.BufferAttribute::new([1.0, 1.0, 0.0], 3),
+    ),
+  )
+  ignore(
+    geometry.set_attribute("uv", @core.BufferAttribute::new([0.25, 0.5], 2)),
+  )
   geometry.compute_bounding_box()
   geometry.compute_bounding_sphere()
   let scale = @math.Matrix4::new().make_scale(2.0, 1.0, 1.0)
@@ -807,7 +836,10 @@ test "applyMatrix4 transforms position, normal, and tangent" {
 test "applyQuaternion yaws a position a right angle around Y" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0], 3),
+    ),
   )
   let half = 0.7071067811865476
   let q = @math.Quaternion::new().set_from_axis_angle(
@@ -834,7 +866,10 @@ test "applyQuaternion yaws a position a right angle around Y" {
 test "rotateX turns a position a right angle around X" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([0.0, 1.0, 0.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 1.0, 0.0], 3),
+    ),
   )
   let written = geometry.rotate_x(@std.PI / 2.0)
   assert_eq(physical_equal(written, geometry), true)
@@ -852,7 +887,10 @@ test "rotateX turns a position a right angle around X" {
 test "rotateY turns a position a right angle around Y" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0], 3),
+    ),
   )
   let written = geometry.rotate_y(@std.PI / 2.0)
   assert_eq(physical_equal(written, geometry), true)
@@ -870,7 +908,10 @@ test "rotateY turns a position a right angle around Y" {
 test "rotateZ turns a position a right angle around Z" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0], 3),
+    ),
   )
   let written = geometry.rotate_z(@std.PI / 2.0)
   assert_eq(physical_equal(written, geometry), true)
@@ -888,7 +929,10 @@ test "rotateZ turns a position a right angle around Z" {
 test "translate moves a position by an offset" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
   )
   let written = geometry.translate(10.0, 0.0, 0.0)
   assert_eq(physical_equal(written, geometry), true)
@@ -906,7 +950,10 @@ test "translate moves a position by an offset" {
 test "scale multiplies a position" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
   )
   let written = geometry.scale(2.0, 1.0, 1.0)
   assert_eq(physical_equal(written, geometry), true)
@@ -924,7 +971,10 @@ test "scale multiplies a position" {
 test "lookAt turns local +Z toward the target" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 1.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 1.0], 3),
+    ),
   )
   let written = geometry.look_at(@math.Vector3::new(x=1.0))
   assert_eq(physical_equal(written, geometry), true)
@@ -985,7 +1035,10 @@ test "setFromPoints writes a position attribute" {
   }
   let existing = @core.BufferGeometry::new()
   ignore(
-    existing.set_attribute("position", @core.BufferAttribute::new([9.0, 9.0, 9.0], 3)),
+    existing.set_attribute(
+      "position",
+      @core.BufferAttribute::new([9.0, 9.0, 9.0], 3),
+    ),
   )
   ignore(existing.set_from_points(points))
   match existing.get_attribute("position") {
@@ -1061,7 +1114,10 @@ test "computeTangents writes a +X tangent for an xy triangle" {
   }
   let bare = @core.BufferGeometry::new()
   ignore(
-    bare.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 0.0], 3)),
+    bare.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
   )
   bare.compute_tangents()
   assert_eq(bare.has_attribute("tangent"), false)
@@ -1112,7 +1168,9 @@ test "computeVertexNormals points an xy triangle along +Z" {
     }
   }
   let soup = @core.BufferGeometry::new()
-  ignore(soup.set_attribute("position", @core.BufferAttribute::new(positions, 3)))
+  ignore(
+    soup.set_attribute("position", @core.BufferAttribute::new(positions, 3)),
+  )
   soup.compute_vertex_normals()
   match soup.get_attribute("normal") {
     None => assert_eq(false, true)
@@ -1170,12 +1228,18 @@ test "toNonIndexed expands vertices in index order" {
 test "toJSON records attributes, index, groups, and the bounding sphere" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
   )
   ignore(geometry.set_index_array([0]))
   geometry.add_group(0, 3, material_index=1)
   geometry.bounding_sphere = Some(
-    @math.Sphere::new(center=@math.Vector3::new(x=1.0, y=2.0, z=3.0), radius=4.0),
+    @math.Sphere::new(
+      center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+      radius=4.0,
+    ),
   )
   let data = geometry.to_json()
   assert_eq(data.version, 4.7)
@@ -1212,7 +1276,11 @@ test "toJSON records attributes, index, groups, and the bounding sphere" {
 
 ///|
 test "toJSON copies item size, values, and normalized" {
-  let attribute = @core.BufferAttribute::new([1.0, 2.0, 3.0], 3, normalized=true)
+  let attribute = @core.BufferAttribute::new(
+    [1.0, 2.0, 3.0],
+    3,
+    normalized=true,
+  )
   let data = attribute.to_json()
   assert_eq(data.item_size, 3)
   assert_eq(data.normalized, true)
@@ -1251,7 +1319,10 @@ test "clone makes an independent attribute" {
 ///|
 test "copyAt copies one vertex" {
   let source = @core.BufferAttribute::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
-  let destination = @core.BufferAttribute::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let destination = @core.BufferAttribute::new(
+    [0.0, 0.0, 0.0, 9.0, 9.0, 9.0],
+    3,
+  )
   let written = destination.copy_at(1, source, 0)
   assert_eq(physical_equal(written, destination), true)
   assert_eq(destination.get_x(0), 0.0)
@@ -1410,7 +1481,7 @@ test "onUpload stores a callback that runs once" {
 ///|
 test "addEventListener keeps one copy of a listener" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
-  let listener = fn() {}
+  let listener = fn() {  }
   attribute.add_event_listener("dispose", listener)
   attribute.add_event_listener("dispose", listener)
   match attribute.listeners.get("dispose") {
@@ -1422,7 +1493,7 @@ test "addEventListener keeps one copy of a listener" {
 ///|
 test "hasEventListener reports a registered listener" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
-  let listener = fn() {}
+  let listener = fn() {  }
   assert_eq(attribute.has_event_listener("dispose", listener), false)
   attribute.add_event_listener("dispose", listener)
   assert_eq(attribute.has_event_listener("dispose", listener), true)
@@ -1431,7 +1502,7 @@ test "hasEventListener reports a registered listener" {
 ///|
 test "removeEventListener drops a registered listener" {
   let attribute = @core.BufferAttribute::new([1.0], 1)
-  let listener = fn() {}
+  let listener = fn() {  }
   attribute.add_event_listener("dispose", listener)
   attribute.remove_event_listener("dispose", listener)
   assert_eq(attribute.has_event_listener("dispose", listener), false)
@@ -1461,12 +1532,18 @@ test "dispose runs only dispose listeners" {
 test "copy replaces a geometry with independent data" {
   let source = @core.BufferGeometry::new()
   ignore(
-    source.set_attribute("position", @core.BufferAttribute::new([1.0, 2.0, 3.0], 3)),
+    source.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+    ),
   )
   ignore(source.set_index_array([0]))
   source.add_group(0, 3, material_index=1)
   source.bounding_sphere = Some(
-    @math.Sphere::new(center=@math.Vector3::new(x=1.0, y=2.0, z=3.0), radius=4.0),
+    @math.Sphere::new(
+      center=@math.Vector3::new(x=1.0, y=2.0, z=3.0),
+      radius=4.0,
+    ),
   )
   source.set_draw_range(2.0, 4.0)
   let destination = @core.BufferGeometry::new()
@@ -1542,7 +1619,7 @@ test "clone copies tangent, groups, and draw range" {
 ///|
 test "addEventListener keeps one copy of a geometry listener" {
   let geometry = @core.BufferGeometry::new()
-  let listener = fn() {}
+  let listener = fn() {  }
   geometry.add_event_listener("dispose", listener)
   geometry.add_event_listener("dispose", listener)
   match geometry.listeners.get("dispose") {
@@ -1554,7 +1631,7 @@ test "addEventListener keeps one copy of a geometry listener" {
 ///|
 test "hasEventListener reports a registered geometry listener" {
   let geometry = @core.BufferGeometry::new()
-  let listener = fn() {}
+  let listener = fn() {  }
   assert_eq(geometry.has_event_listener("dispose", listener), false)
   geometry.add_event_listener("dispose", listener)
   assert_eq(geometry.has_event_listener("dispose", listener), true)
@@ -1563,7 +1640,7 @@ test "hasEventListener reports a registered geometry listener" {
 ///|
 test "removeEventListener drops a registered geometry listener" {
   let geometry = @core.BufferGeometry::new()
-  let listener = fn() {}
+  let listener = fn() {  }
   geometry.add_event_listener("dispose", listener)
   geometry.remove_event_listener("dispose", listener)
   assert_eq(geometry.has_event_listener("dispose", listener), false)
@@ -1712,15 +1789,13 @@ test "morphAttributes copy a position target" {
     None => ()
     Some(_) => assert_eq(false, true)
   }
-  source.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([1.0, 2.0, 3.0], 3)],
-  )
+  source.morph_attributes.set("position", [
+    @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+  ])
   let destination = @core.BufferGeometry::new()
-  destination.morph_attributes.set(
-    "normal",
-    [@core.BufferAttribute::new([9.0, 9.0, 9.0], 3)],
-  )
+  destination.morph_attributes.set("normal", [
+    @core.BufferAttribute::new([9.0, 9.0, 9.0], 3),
+  ])
   ignore(destination.copy(source))
   match destination.morph_attributes.get("normal") {
     None => ()
@@ -1858,12 +1933,14 @@ test "applyMatrix4 marks position, normal, and tangent for update" {
 test "computeBoundingBox includes morph positions" {
   let absolute = @core.BufferGeometry::new()
   ignore(
-    absolute.set_attribute("position", @core.BufferAttribute::new([0.0, 0.0, 0.0], 3)),
+    absolute.set_attribute(
+      "position",
+      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    ),
   )
-  absolute.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
-  )
+  absolute.morph_attributes.set("position", [
+    @core.BufferAttribute::new([2.0, 0.0, 0.0], 3),
+  ])
   absolute.compute_bounding_box()
   match absolute.bounding_box {
     None => assert_eq(false, true)
@@ -1874,12 +1951,14 @@ test "computeBoundingBox includes morph positions" {
   }
   let relative = @core.BufferGeometry::new()
   ignore(
-    relative.set_attribute("position", @core.BufferAttribute::new([1.0, 0.0, 0.0], 3)),
+    relative.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 0.0, 0.0], 3),
+    ),
   )
-  relative.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
-  )
+  relative.morph_attributes.set("position", [
+    @core.BufferAttribute::new([2.0, 0.0, 0.0], 3),
+  ])
   relative.morph_targets_relative = true
   relative.compute_bounding_box()
   match relative.bounding_box {
@@ -1892,15 +1971,15 @@ test "computeBoundingBox includes morph positions" {
 test "computeBoundingSphere includes morph positions" {
   let geometry = @core.BufferGeometry::new()
   ignore(
-    geometry.set_attribute("position", @core.BufferAttribute::new([1.0, 1.0, 0.0], 3)),
+    geometry.set_attribute(
+      "position",
+      @core.BufferAttribute::new([1.0, 1.0, 0.0], 3),
+    ),
   )
-  geometry.morph_attributes.set(
-    "position",
-    [
-      @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
-      @core.BufferAttribute::new([2.0, 2.0, 0.0], 3),
-    ],
-  )
+  geometry.morph_attributes.set("position", [
+    @core.BufferAttribute::new([0.0, 0.0, 0.0], 3),
+    @core.BufferAttribute::new([2.0, 2.0, 0.0], 3),
+  ])
   geometry.compute_bounding_sphere()
   match geometry.bounding_sphere {
     None => assert_eq(false, true)
@@ -1912,10 +1991,9 @@ test "computeBoundingSphere includes morph positions" {
 test "toNonIndexed expands morph attributes" {
   let geometry = @core.BufferGeometry::new()
   ignore(geometry.set_index_array([0, 2, 1]))
-  geometry.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([4.0, 5.0, 6.0], 1)],
-  )
+  geometry.morph_attributes.set("position", [
+    @core.BufferAttribute::new([4.0, 5.0, 6.0], 1),
+  ])
   geometry.morph_targets_relative = true
   let expanded = geometry.to_non_indexed()
   assert_eq(expanded.morph_targets_relative, true)
@@ -1942,10 +2020,9 @@ test "toJSON writes morph attributes" {
     Some(_) => assert_eq(false, true)
   }
   let geometry = @core.BufferGeometry::new()
-  geometry.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([1.0, 2.0, 3.0], 3)],
-  )
+  geometry.morph_attributes.set("position", [
+    @core.BufferAttribute::new([1.0, 2.0, 3.0], 3),
+  ])
   geometry.morph_targets_relative = true
   let data = geometry.to_json()
   match data.morph_targets_relative {
@@ -2158,7 +2235,10 @@ test "copy replaces an interleaved buffer" {
 ///|
 test "copyAt writes one interleaved vertex" {
   let source = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
-  let destination = @core.InterleavedBuffer::new([0.0, 0.0, 0.0, 9.0, 9.0, 9.0], 3)
+  let destination = @core.InterleavedBuffer::new(
+    [0.0, 0.0, 0.0, 9.0, 9.0, 9.0],
+    3,
+  )
   let written = destination.copy_at(1, source, 0)
   assert_eq(physical_equal(written, destination), true)
   assert_eq(destination.array[0], 0.0)
@@ -2376,7 +2456,9 @@ test "applyMatrix4 translates each interleaved vertex" {
 test "applyNormalMatrix rotates and normalizes each interleaved vertex" {
   let buffer = @core.InterleavedBuffer::new([2.0, 0.0, 0.0, 0.0, 3.0, 0.0], 3)
   let attribute = @core.InterleavedBufferAttribute::new(buffer, 3, 0)
-  let turn = @math.Matrix3::new().set(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  let turn = @math.Matrix3::new().set(
+    0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
   let written = attribute.apply_normal_matrix(turn)
   assert_eq(physical_equal(written, attribute), true)
   assert_eq(attribute.get_x(0), 0.0)
@@ -2421,7 +2503,12 @@ test "setComponent writes an interleaved component by index" {
 ///|
 test "clone de-interleaves an attribute" {
   let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
-  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1, normalized=true)
+  let attribute = @core.InterleavedBufferAttribute::new(
+    buffer,
+    2,
+    1,
+    normalized=true,
+  )
   let cloned = attribute.clone()
   assert_eq(cloned.item_size, 2)
   assert_eq(cloned.normalized, true)
@@ -2437,7 +2524,12 @@ test "clone de-interleaves an attribute" {
 ///|
 test "toJSON de-interleaves an attribute" {
   let buffer = @core.InterleavedBuffer::new([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 3)
-  let attribute = @core.InterleavedBufferAttribute::new(buffer, 2, 1, normalized=true)
+  let attribute = @core.InterleavedBufferAttribute::new(
+    buffer,
+    2,
+    1,
+    normalized=true,
+  )
   let data = attribute.to_json()
   assert_eq(data.item_size, 2)
   assert_eq(data.normalized, true)
@@ -2520,7 +2612,7 @@ test "Raycaster defaults to a ray down negative z" {
   assert_eq(raycaster.far > 0.0, true)
   let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let aimed = @core.Raycaster::new(
-    origin=origin,
+    origin~,
     direction=@math.Vector3::new(y=1.0),
     near=0.5,
     far=10.0,
@@ -2552,14 +2644,7 @@ test "set replaces the ray origin and direction" {
 ///|
 test "setFromCamera aims an orthographic ray through NDC" {
   let camera = @core.Object3D::new(kind=@core.OrthographicCamera)
-  let state = @core.CameraState::orthographic(
-    -2.0,
-    2.0,
-    1.0,
-    -1.0,
-    0.1,
-    10.0,
-  )
+  let state = @core.CameraState::orthographic(-2.0, 2.0, 1.0, -1.0, 0.1, 10.0)
   state.update_projection()
   camera.camera = Some(state)
   camera.update_matrix_world()
@@ -2736,8 +2821,11 @@ test "toJSON writes meshPerAttribute when an interleaved repeat count is not one
     None => ()
     Some(_) => assert_eq(false, true)
   }
-  let data = @core.InterleavedBuffer::new([1.0, 2.0, 3.0], 3, mesh_per_attribute=2)
-    .to_json()
+  let data = @core.InterleavedBuffer::new(
+    [1.0, 2.0, 3.0],
+    3,
+    mesh_per_attribute=2,
+  ).to_json()
   match data.mesh_per_attribute {
     None => assert_eq(false, true)
     Some(count) => assert_eq(count, 2)

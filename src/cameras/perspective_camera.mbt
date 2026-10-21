@@ -15,10 +15,10 @@ pub(all) struct PerspectiveCamera {
 
 ///|
 pub fn PerspectiveCamera::new(
-  fov? : Double = 50.0,
-  aspect? : Double = 1.0,
-  near? : Double = 0.1,
-  far? : Double = 2000.0,
+  fov~ : Double = 50.0,
+  aspect~ : Double = 1.0,
+  near~ : Double = 0.1,
+  far~ : Double = 2000.0,
 ) -> PerspectiveCamera {
   let node = Object3D::new(kind=@core.PerspectiveCamera)
   let camera = CameraState::perspective(fov, aspect, near, far)
@@ -262,4 +262,3 @@ pub fn PerspectiveCamera::view_size(
   self.view_bounds(distance, min_target, max_target)
   target.set(max_target.x - min_target.x, max_target.y - min_target.y)
 }
-

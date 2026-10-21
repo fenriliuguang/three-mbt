@@ -1,6 +1,6 @@
 ///|
 pub struct Sink[X] {
-  priv write : async (ArrayView[X]) -> Int
+  priv write : async (ArrayView[X]) -> Int32
   priv close : async () -> Unit
   priv is_open : () -> Bool
   priv has_cleanup : () -> Bool
@@ -8,7 +8,7 @@ pub struct Sink[X] {
 }
 
 ///|
-let sink_write_window_size : Int = 64
+let sink_write_window_size : Int32 = 64
 
 ///|
 /// The write callback must either raise before consuming any value or return
@@ -17,7 +17,7 @@ let sink_write_window_size : Int = 64
 /// The close callback must be idempotent.
 #internal(wit_bindgen, "generated binding code only")
 pub fn[X] Sink::from_callbacks(
-  write : async (ArrayView[X]) -> Int,
+  write : async (ArrayView[X]) -> Int32,
   close : async () -> Unit,
   is_open : () -> Bool,
   cleanup : ((X) -> Unit)?,
@@ -30,7 +30,7 @@ pub fn[X] Sink::from_callbacks(
 ///
 /// Consumption includes values accepted by the peer and values recursively
 /// cleaned after the peer closes. Check `is_open()` to distinguish those cases.
-pub async fn[X] Sink::write(self : Sink[X], data : ArrayView[X]) -> Int {
+pub async fn[X] Sink::write(self : Sink[X], data : ArrayView[X]) -> Int32 {
   if data.length() == 0 {
     return 0
   }
@@ -56,7 +56,7 @@ pub async fn[X] Sink::write(self : Sink[X], data : ArrayView[X]) -> Int {
 /// This is the byte-stream counterpart of `write(ArrayView[T])`. MoonBit keeps
 /// `BytesView` and `ArrayView[Byte]` as distinct types, so byte strings need a
 /// separate entry point until the language provides a shared read-only view.
-pub async fn Sink::write_bytes(self : Sink[Byte], data : BytesView) -> Int {
+pub async fn Sink::write_bytes(self : Sink[Byte], data : BytesView) -> Int32 {
   if data.length() == 0 {
     return 0
   }
@@ -85,7 +85,7 @@ pub fn[X] Sink::is_open(self : Sink[X]) -> Bool {
 fn[X] Sink::cleanup_unaccepted(
   self : Sink[X],
   data : ArrayView[X],
-  offset : Int,
+  offset : Int32,
 ) -> Unit {
   match self.cleanup {
     Some(cleanup) =>
@@ -100,7 +100,7 @@ fn[X] Sink::cleanup_unaccepted(
 fn Sink::cleanup_unaccepted_bytes(
   self : Sink[Byte],
   data : BytesView,
-  offset : Int,
+  offset : Int32,
 ) -> Unit {
   match self.cleanup {
     Some(cleanup) =>
@@ -217,7 +217,7 @@ fn[X] local_future_get(state : Ref[LocalFutureState[X]]) -> X raise {
 
 ///|
 priv struct StreamPipeReader[X] {
-  max : Int
+  max : Int32
   mut value : FixedArray[X]?
   mut ended : Bool
   mut coro : Coroutine?
@@ -226,20 +226,20 @@ priv struct StreamPipeReader[X] {
 ///|
 priv struct StreamPipeWriter[X] {
   mut value : FixedArray[X]?
-  mut accepted : Int
+  mut accepted : Int32
   mut coro : Coroutine?
 }
 
 ///|
 priv struct StreamPipe[X] {
-  capacity : Int
+  capacity : Int32
   chunks : @deque.Deque[FixedArray[X]]
-  mut buffered : Int
+  mut buffered : Int32
   mut writer_closed : Bool
   mut reader_dropped : Bool
   mut cleanup : ((X) -> Unit)?
   mut head : FixedArray[X]?
-  mut head_pos : Int
+  mut head_pos : Int32
   readers : @deque.Deque[StreamPipeReader[X]]
   writers : @deque.Deque[StreamPipeWriter[X]]
 }
@@ -264,7 +264,7 @@ fn[X] wake_stream_pipe_reader(
 ///|
 fn[X] wake_stream_pipe_writer(
   writer : StreamPipeWriter[X],
-  accepted : Int,
+  accepted : Int32,
 ) -> Unit {
   match writer.coro {
     Some(coro) => {
@@ -404,7 +404,7 @@ fn[X] stream_pipe_close_writer(pipe : Ref[StreamPipe[X]]) -> Unit {
 async fn[X] stream_pipe_write(
   pipe : Ref[StreamPipe[X]],
   data : ArrayView[X],
-) -> Int {
+) -> Int32 {
   if data.length() == 0 || pipe.val.writer_closed || pipe.val.reader_dropped {
     return 0
   }
@@ -450,7 +450,7 @@ async fn[X] stream_pipe_write(
 ///|
 async fn[X] stream_pipe_read(
   pipe : Ref[StreamPipe[X]],
-  count : Int,
+  count : Int32,
 ) -> FixedArray[X]? {
   if count <= 0 {
     return Some([])
@@ -688,7 +688,7 @@ priv struct StreamProducerState[X] {
 
 ///|
 priv struct StreamSource[X] {
-  read : async (Int) -> FixedArray[X]?
+  read : async (Int32) -> FixedArray[X]?
   close : async () -> Unit
   close_sync : () -> Unit
 }
@@ -707,7 +707,7 @@ pub struct Stream[X] {
 
 ///|
 fn[X] new_stream_pipe(
-  capacity : Int,
+  capacity : Int32,
   cleanup : ((X) -> Unit)?,
 ) -> Ref[StreamPipe[X]] {
   if capacity < 0 {
@@ -747,7 +747,7 @@ fn[X] stream_pipe_sink(pipe : Ref[StreamPipe[X]]) -> Sink[X] {
 
 ///|
 fn[X] new_local_stream(
-  capacity : Int,
+  capacity : Int32,
   cleanup : ((X) -> Unit)?,
 ) -> (Stream[X], Sink[X]) {
   let pipe = new_stream_pipe(capacity, cleanup)
@@ -800,7 +800,7 @@ fn[X] materialize_stream_producer(
 }
 
 ///|
-pub fn[X] Stream::new(capacity? : Int = 0) -> (Stream[X], Sink[X]) {
+pub fn[X] Stream::new(capacity~ : Int32 = 0) -> (Stream[X], Sink[X]) {
   new_local_stream(capacity, None)
 }
 
@@ -809,7 +809,7 @@ pub fn[X] Stream::new(capacity? : Int = 0) -> (Stream[X], Sink[X]) {
 /// end is dropped.
 pub fn[X] Stream::new_with_cleanup(
   cleanup : (X) -> Unit,
-  capacity? : Int = 0,
+  capacity~ : Int32 = 0,
 ) -> (Stream[X], Sink[X]) {
   new_local_stream(capacity, Some(cleanup))
 }
@@ -840,7 +840,7 @@ pub fn[X] Stream::produce(
 ///|
 #internal(wit_bindgen, "generated binding code only")
 pub fn[X] Stream::from_source(
-  read : async (Int) -> FixedArray[X]?,
+  read : async (Int32) -> FixedArray[X]?,
   close : async () -> Unit,
   close_sync : () -> Unit,
 ) -> Stream[X] {
@@ -854,7 +854,7 @@ pub fn[X] Stream::from_source(
 /// reports no progress. `None` means the writable end has closed and no
 /// buffered values remain. A non-positive count returns an empty chunk without
 /// waiting.
-pub async fn[X] Stream::read(self : Stream[X], count : Int) -> FixedArray[X]? {
+pub async fn[X] Stream::read(self : Stream[X], count : Int32) -> FixedArray[X]? {
   match self.inner {
     Source(source) => (source.read)(count)
     Local(pipe) => stream_pipe_read(pipe, count)

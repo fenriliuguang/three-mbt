@@ -15,7 +15,7 @@ pub(all) enum ValueType {
 /// r186: `Node` https://github.com/mrdoob/three.js/blob/r186/src/nodes/core/Node.js#L22
 pub(all) enum Node {
   Uniform(String, ValueType)
-  Attribute(String, Int, ValueType)
+  Attribute(String, Int32, ValueType)
   Varying(String, ValueType)
   Float(Double)
   Add(Node, Node)
@@ -41,7 +41,7 @@ pub(all) enum Node {
 /// r186: `WGSLNodeBuilder` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/nodes/WGSLNodeBuilder.js#L297
 pub(all) struct Program {
   uniforms : Array[(String, ValueType)]
-  attributes : Array[(String, Int, ValueType)]
+  attributes : Array[(String, Int32, ValueType)]
   varyings : Array[(String, ValueType)]
   vertex_clip : Node
   vertex_varyings : Array[(String, Node)]
@@ -191,7 +191,7 @@ fn standard_preamble() -> String {
 }
 
 ///|
-fn position_attributes() -> Array[(String, Int, ValueType)] {
+fn position_attributes() -> Array[(String, Int32, ValueType)] {
   [
     ("position", 0, Vec3),
     ("normal", 1, Vec3),
@@ -201,7 +201,7 @@ fn position_attributes() -> Array[(String, Int, ValueType)] {
 }
 
 ///|
-fn mesh_attributes(instanced : Bool) -> Array[(String, Int, ValueType)] {
+fn mesh_attributes(instanced : Bool) -> Array[(String, Int32, ValueType)] {
   let attributes = position_attributes()
   if instanced {
     attributes.push(("instance_matrix", 3, Mat4))
@@ -309,7 +309,7 @@ fn with_instance_color(
 /// 不受光照。法线乘 0 只是为了让顶点布局和 Lambert 一致。贴图采样乘在颜色上，没有贴图时渲染器绑一张白纹理。
 /// `instanced` 为真时再乘实例矩阵和实例颜色。
 /// r186: `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14
-pub fn basic_program(instanced? : Bool = false) -> Program {
+pub fn basic_program(instanced~ : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = Attribute("normal", 1, Vec3)
   let shifted = Add(position, Mul(normal, Float(0.0)))
@@ -359,7 +359,7 @@ fn facing_preamble() -> String {
 ///|
 /// Lambert：`color * (ambient + lightColor * max(dot(N, L), 0))`。
 /// r186: `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24
-pub fn lambert_program(instanced? : Bool = false) -> Program {
+pub fn lambert_program(instanced~ : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let normal = mesh_normal(instanced)
   let world_normal = Swizzle(
@@ -453,7 +453,7 @@ pub fn lambert_program(instanced? : Bool = false) -> Program {
 ///|
 /// Standard：`baseColor * (1 - metalness)` 的 Lambert 漫反射，加上 GGX 高光。`baseColor` 已乘贴图。
 /// r186: `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
-pub fn standard_program(instanced? : Bool = false) -> Program {
+pub fn standard_program(instanced~ : Bool = false) -> Program {
   let position = Attribute("position", 0, Vec3)
   let placed = mesh_local(position, instanced)
   let normal = mesh_normal(instanced)

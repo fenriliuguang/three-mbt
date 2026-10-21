@@ -2,7 +2,7 @@
 
 ///|
 priv struct SubTask {
-  handle : Int
+  handle : Int32
   state : SubTaskState
 }
 
@@ -16,7 +16,7 @@ priv enum SubTaskState {
 }
 
 ///|
-fn SubTaskState::from(int : Int) -> SubTaskState {
+fn SubTaskState::from(int : Int32) -> SubTaskState {
   match int {
     0 => Starting
     1 => Started
@@ -28,7 +28,7 @@ fn SubTaskState::from(int : Int) -> SubTaskState {
 }
 
 ///|
-fn SubTask::from(code : Int) -> SubTask {
+fn SubTask::from(code : Int32) -> SubTask {
   { handle: code >> 4, state: SubTaskState::from(code & 0xf), }
 }
 
@@ -55,7 +55,7 @@ priv enum EventCode {
 }
 
 ///|
-fn EventCode::from(int : Int) -> EventCode {
+fn EventCode::from(int : Int32) -> EventCode {
   match int {
     0 => None
     1 => SubTask
@@ -71,16 +71,16 @@ fn EventCode::from(int : Int) -> EventCode {
 ///|
 priv enum Events {
   None
-  Subtask(Int, SubTaskState)
-  StreamRead(Int, StreamResult)
-  StreamWrite(Int, StreamResult)
-  FutureRead(Int, FutureReadResult)
-  FutureWrite(Int, FutureWriteResult)
+  Subtask(Int32, SubTaskState)
+  StreamRead(Int32, StreamResult)
+  StreamWrite(Int32, StreamResult)
+  FutureRead(Int32, FutureReadResult)
+  FutureWrite(Int32, FutureWriteResult)
   TaskCancelled
 }
 
 ///|
-fn Events::new(code : EventCode, i : Int, j : Int) -> Events {
+fn Events::new(code : EventCode, i : Int32, j : Int32) -> Events {
   match code {
     None => None
     SubTask => Subtask(i, SubTaskState::from(j))
@@ -98,11 +98,11 @@ fn Events::new(code : EventCode, i : Int, j : Int) -> Events {
 
 ///|
 #borrow(array)
-extern "wasm" fn int_array2ptr(array : FixedArray[Int]) -> Int =
+extern "wasm" fn int_array2ptr(array : FixedArray[Int32]) -> Int32 =
   #|(func (param i32) (result i32) local.get 0)
 
 ///|
-struct WaitableSet(Int) derive(Eq, Hash)
+struct WaitableSet(Int32) derive(Eq, Hash)
 
 ///|
 fn WaitableSet::new() -> WaitableSet {
@@ -115,8 +115,8 @@ fn WaitableSet::drop(self : Self) -> Unit {
 }
 
 ///|
-fn WaitableSet::poll(self : Self) -> (Events, Int) {
-  let payload : FixedArray[Int] = FixedArray::make(2, 0)
+fn WaitableSet::poll(self : Self) -> (Events, Int32) {
+  let payload : FixedArray[Int32] = FixedArray::make(2, 0)
   let event = waitable_set_poll(self.0, int_array2ptr(payload))
   (Events::new(EventCode::from(event), payload[0], payload[1]), payload[0])
 }
@@ -132,7 +132,7 @@ priv enum FutureReadResult {
 }
 
 ///|
-fn FutureReadResult::from(int : Int) -> FutureReadResult {
+fn FutureReadResult::from(int : Int32) -> FutureReadResult {
   match int {
     0 => Completed
     2 => Cancelled
@@ -148,7 +148,7 @@ priv enum FutureWriteResult {
 }
 
 ///|
-fn FutureWriteResult::from(int : Int) -> FutureWriteResult {
+fn FutureWriteResult::from(int : Int32) -> FutureWriteResult {
   match int {
     0 => Completed
     1 => Dropped
@@ -163,12 +163,12 @@ fn FutureWriteResult::from(int : Int) -> FutureWriteResult {
 
 ///|
 priv struct StreamResult {
-  progress : Int
+  progress : Int32
   copy_result : CopyResult
 }
 
 ///|
-fn StreamResult::from(int : Int) -> StreamResult {
+fn StreamResult::from(int : Int32) -> StreamResult {
   let progress = int >> 4
   let copy_result = CopyResult::from(int & 0xf)
   { progress, copy_result, }
@@ -182,7 +182,7 @@ priv enum CopyResult {
 }
 
 ///|
-fn CopyResult::from(int : Int) -> CopyResult {
+fn CopyResult::from(int : Int32) -> CopyResult {
   match int {
     0 => Completed
     1 => Dropped
@@ -204,7 +204,7 @@ priv enum CallbackCode {
 }
 
 ///|
-fn CallbackCode::encode(self : Self) -> Int {
+fn CallbackCode::encode(self : Self) -> Int32 {
   match self {
     Completed => 0
     Yield => 1
@@ -217,50 +217,50 @@ fn CallbackCode::encode(self : Self) -> Int {
 // #region Component async primitives
 
 ///|
-fn subtask_cancel(id : Int) -> Int = "$root" "[subtask-cancel]"
+fn subtask_cancel(id : Int32) -> Int32 = "$root" "[subtask-cancel]"
 
 ///|
-fn subtask_drop(id : Int) = "$root" "[subtask-drop]"
+fn subtask_drop(id : Int32) = "$root" "[subtask-drop]"
 
 ///|
-fn tls_set(tls : Int) = "$root" "[context-set-0]"
+fn tls_set(tls : Int32) = "$root" "[context-set-0]"
 
 ///|
-fn tls_get() -> Int = "$root" "[context-get-0]"
+fn tls_get() -> Int32 = "$root" "[context-get-0]"
 
 ///|
 fn task_cancel() = "[export]$root" "[task-cancel]"
 
 ///|
-fn waitable_set_new() -> Int = "$root" "[waitable-set-new]"
+fn waitable_set_new() -> Int32 = "$root" "[waitable-set-new]"
 
 ///|
-fn waitable_set_drop(set : Int) = "$root" "[waitable-set-drop]"
+fn waitable_set_drop(set : Int32) = "$root" "[waitable-set-drop]"
 
 ///|
 /// This poll is deliberately non-cancellable. Component-task cancellation is
 /// delivered by the stackless callback instead of being consumed here.
-fn waitable_set_poll(set : Int, payload : Int) -> Int = "$root" "[waitable-set-poll]"
+fn waitable_set_poll(set : Int32, payload : Int32) -> Int32 = "$root" "[waitable-set-poll]"
 
 ///|
 fn task_wakeup_stream_new() -> Int64 = "$root" "[stream-new-unit]"
 
 ///|
-fn task_wakeup_stream_read(handle : Int, ptr : Int, len : Int) -> Int = "$root" "[async-lower][stream-read-unit]"
+fn task_wakeup_stream_read(handle : Int32, ptr : Int32, len : Int32) -> Int32 = "$root" "[async-lower][stream-read-unit]"
 
 ///|
-fn task_wakeup_stream_write(handle : Int, ptr : Int, len : Int) -> Int = "$root" "[async-lower][stream-write-unit]"
+fn task_wakeup_stream_write(handle : Int32, ptr : Int32, len : Int32) -> Int32 = "$root" "[async-lower][stream-write-unit]"
 
 ///|
-fn task_wakeup_stream_cancel_read(handle : Int) -> Int = "$root" "[stream-cancel-read-unit]"
+fn task_wakeup_stream_cancel_read(handle : Int32) -> Int32 = "$root" "[stream-cancel-read-unit]"
 
 ///|
-fn task_wakeup_stream_drop_readable(handle : Int) = "$root" "[stream-drop-readable-unit]"
+fn task_wakeup_stream_drop_readable(handle : Int32) = "$root" "[stream-drop-readable-unit]"
 
 ///|
-fn task_wakeup_stream_drop_writable(handle : Int) = "$root" "[stream-drop-writable-unit]"
+fn task_wakeup_stream_drop_writable(handle : Int32) = "$root" "[stream-drop-writable-unit]"
 
 ///|
-fn waitable_join(waitable : Int, set : Int) = "$root" "[waitable-join]"
+fn waitable_join(waitable : Int32, set : Int32) = "$root" "[waitable-join]"
 
 // #endregion

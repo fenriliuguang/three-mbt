@@ -11,7 +11,7 @@ pub(all) struct Points {
   mut material : @materials.PointsMaterial
   mut materials : Array[@materials.PointsMaterial]?
   mut morph_target_influences : Array[Double]?
-  mut morph_target_dictionary : Map[String, Int]?
+  mut morph_target_dictionary : Map[String, Int32]?
 }
 
 ///|
@@ -48,7 +48,7 @@ pub extend Points with @core.AsNode::{to_node}
 pub fn Points::copy(
   self : Points,
   source : Points,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> Points {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
@@ -61,7 +61,7 @@ pub fn Points::copy(
 ///|
 /// 新建一份点云再复制。three.js 没有单独的 `Points.clone`，用的是 `Object3D.clone`。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn Points::clone(self : Points, recursive? : Bool = true) -> Points {
+pub fn Points::clone(self : Points, recursive~ : Bool = true) -> Points {
   Points::new(self.geometry, self.material).copy(self, recursive~)
 }
 
@@ -81,7 +81,7 @@ pub fn Points::update_morph_targets(self : Points) -> Unit {
     None => ()
     Some(attributes) => {
       let influences : Array[Double] = []
-      let dictionary : Map[String, Int] = Map([])
+      let dictionary : Map[String, Int32] = Map([])
       let mut index = 0
       while index < attributes.length() {
         let attribute = attributes[index]
@@ -153,10 +153,9 @@ pub fn Points::set_fog(self : Points, enabled : Bool) -> Unit {
 pub fn Points::set_transparent(
   self : Points,
   enabled : Bool,
-  opacity? : Double = 1.0,
+  opacity~ : Double = 1.0,
 ) -> Unit {
   self.material.transparent = enabled
   self.material.opacity = opacity
   self.refresh()
 }
-

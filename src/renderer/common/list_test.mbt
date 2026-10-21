@@ -2116,7 +2116,7 @@ test "frustum culls instanced meshes with their bounding sphere" {
       @math.Plane::new(normal=@math.Vector3::new(z=-1.0), constant=1.0),
     ),
   )
-  let drawn = @common.collect_opaque(scene.node, frustum=frustum)
+  let drawn = @common.collect_opaque(scene.node, frustum~)
   assert_eq(drawn.length(), 1)
   assert_eq(physical_equal(drawn[0].node, inside.node), true)
   match outside.instances.bounding_sphere {
@@ -2136,7 +2136,7 @@ test "frustum culls instanced meshes with their bounding sphere" {
     }
   }
   outside.node.frustum_culled = false
-  let kept = @common.collect_opaque(scene.node, frustum=frustum)
+  let kept = @common.collect_opaque(scene.node, frustum~)
   assert_eq(kept.length(), 2)
   assert_eq(physical_equal(kept[0].node, outside.node), true)
   assert_eq(physical_equal(kept[1].node, inside.node), true)
@@ -2151,8 +2151,8 @@ test "material groups draw as separate list items" {
       "position",
       @core.BufferAttribute::new(
         [
-          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
-          0.0, 5.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0, 0.0,
+          5.0, 1.0, 0.0,
         ],
         3,
       ),
@@ -2225,8 +2225,8 @@ test "wireframe groups stay on the wire list" {
       "position",
       @core.BufferAttribute::new(
         [
-          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
-          0.0, 5.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0, 0.0,
+          5.0, 1.0, 0.0,
         ],
         3,
       ),
@@ -2296,8 +2296,8 @@ test "draw range clips mesh groups" {
       "position",
       @core.BufferAttribute::new(
         [
-          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
-          0.0, 5.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0, 0.0,
+          5.0, 1.0, 0.0,
         ],
         3,
       ),
@@ -2333,8 +2333,8 @@ test "draw range clips mesh groups" {
       "position",
       @core.BufferAttribute::new(
         [
-          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0,
-          0.0, 5.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 0.0, 0.0, 6.0, 0.0, 0.0,
+          5.0, 1.0, 0.0,
         ],
         3,
       ),

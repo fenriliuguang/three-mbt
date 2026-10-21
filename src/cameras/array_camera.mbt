@@ -10,9 +10,7 @@ pub(all) struct ArrayCamera {
 }
 
 ///|
-pub fn ArrayCamera::new(
-  cameras? : Array[PerspectiveCamera],
-) -> ArrayCamera {
+pub fn ArrayCamera::new(cameras? : Array[PerspectiveCamera]) -> ArrayCamera {
   let node = Object3D::new(kind=@core.PerspectiveCamera)
   let camera = CameraState::perspective(50.0, 1.0, 0.1, 2000.0)
   camera.update_projection()

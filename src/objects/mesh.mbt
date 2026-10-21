@@ -20,9 +20,9 @@ pub(all) struct Mesh {
   mut geometry : BufferGeometry
   mut material : @materials.Material
   mut materials : Array[@materials.Material]?
-  mut count : Int
+  mut count : Int32
   mut morph_target_influences : Array[Double]?
-  mut morph_target_dictionary : Map[String, Int]?
+  mut morph_target_dictionary : Map[String, Int32]?
 }
 
 ///|
@@ -61,7 +61,7 @@ pub fn Mesh::update_morph_targets(self : Mesh) -> Unit {
     None => ()
     Some(attributes) => {
       let influences : Array[Double] = []
-      let dictionary : Map[String, Int] = Map([])
+      let dictionary : Map[String, Int32] = Map([])
       let mut index = 0
       while index < attributes.length() {
         let attribute = attributes[index]
@@ -93,11 +93,7 @@ pub extend Mesh with @core.AsNode::{to_node}
 /// 材质数组会复制一份新列表，里面的材质仍是原来的对象。源对象没有数组时，目标的数组清掉。
 /// 源对象有形变权重或名字表时各复制一份。源对象没有时，目标上已有的值留着。
 /// r186: `copy` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L110
-pub fn Mesh::copy(
-  self : Mesh,
-  source : Mesh,
-  recursive? : Bool = true,
-) -> Mesh {
+pub fn Mesh::copy(self : Mesh, source : Mesh, recursive~ : Bool = true) -> Mesh {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
   self.material = source.material
@@ -124,7 +120,7 @@ pub fn Mesh::copy(
   match source.morph_target_dictionary {
     None => ()
     Some(dictionary) => {
-      let copied : Map[String, Int] = Map([])
+      let copied : Map[String, Int32] = Map([])
       for pair in dictionary.iter() {
         let (name, index) = pair
         copied.set(name, index)
@@ -139,7 +135,7 @@ pub fn Mesh::copy(
 ///|
 /// 新建一份网格再复制。three.js 没有单独的 `Mesh.clone`，用的是 `Object3D.clone`。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn Mesh::clone(self : Mesh, recursive? : Bool = true) -> Mesh {
+pub fn Mesh::clone(self : Mesh, recursive~ : Bool = true) -> Mesh {
   Mesh::new(self.geometry, self.material).copy(self, recursive~)
 }
 
@@ -282,7 +278,7 @@ pub fn Mesh::set_fog(self : Mesh, enabled : Bool) -> Unit {
 pub fn Mesh::set_transparent(
   self : Mesh,
   enabled : Bool,
-  opacity? : Double = 1.0,
+  opacity~ : Double = 1.0,
 ) -> Unit {
   self.material.transparent = enabled
   self.material.opacity = opacity
@@ -419,4 +415,3 @@ fn copy_line_materials(
     }
   }
 }
-

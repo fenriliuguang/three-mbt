@@ -26,4 +26,3 @@ test "effect composer runs enabled passes in order" {
   assert_eq(gray.g, 0.125)
   assert_eq(gray.b, 0.125)
 }
-

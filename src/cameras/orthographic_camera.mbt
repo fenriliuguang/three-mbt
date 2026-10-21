@@ -10,12 +10,12 @@ pub(all) struct OrthographicCamera {
 
 ///|
 pub fn OrthographicCamera::new(
-  left? : Double = -1.0,
-  right? : Double = 1.0,
-  top? : Double = 1.0,
-  bottom? : Double = -1.0,
-  near? : Double = 0.1,
-  far? : Double = 2000.0,
+  left~ : Double = -1.0,
+  right~ : Double = 1.0,
+  top~ : Double = 1.0,
+  bottom~ : Double = -1.0,
+  near~ : Double = 0.1,
+  far~ : Double = 2000.0,
 ) -> OrthographicCamera {
   let node = Object3D::new(kind=@core.OrthographicCamera)
   let camera = CameraState::orthographic(left, right, top, bottom, near, far)
@@ -169,4 +169,3 @@ pub fn OrthographicCamera::clear_view_offset(self : OrthographicCamera) -> Unit 
     Some(camera) => camera.clear_view()
   }
 }
-

@@ -5,10 +5,10 @@
 /// r186: `Interpolant` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L20
 pub(all) struct Interpolant {
   parameter_positions : Array[Double]
-  mut cached_index : Int
+  mut cached_index : Int32
   result_buffer : Array[Double]
   sample_values : Array[Double]
-  value_size : Int
+  value_size : Int32
   mut settings : InterpolantSettings?
   default_settings : InterpolantSettings
 }
@@ -23,7 +23,7 @@ pub(all) struct InterpolantSettings {}
 pub fn Interpolant::new(
   parameter_positions : Array[Double],
   sample_values : Array[Double],
-  sample_size : Int,
+  sample_size : Int32,
   result_buffer? : Array[Double],
 ) -> Interpolant {
   let result_buffer = match result_buffer {
@@ -43,7 +43,7 @@ pub fn Interpolant::new(
     sample_values,
     value_size: sample_size,
     settings: None,
-    default_settings: InterpolantSettings::{},
+    default_settings: InterpolantSettings::{ },
   }
 }
 
@@ -52,7 +52,7 @@ pub fn Interpolant::new(
 /// r186: `copySampleValue_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L269
 pub fn Interpolant::copy_sample_value(
   self : Interpolant,
-  index : Int,
+  index : Int32,
 ) -> Array[Double] {
   let offset = index * self.value_size
   for i in 0..<self.value_size {
@@ -66,7 +66,7 @@ pub fn Interpolant::copy_sample_value(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L298
 pub fn Interpolant::interpolate(
   self : Interpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,
@@ -84,7 +84,7 @@ pub fn Interpolant::interpolate(
 /// r186: `intervalChanged_` https://github.com/mrdoob/three.js/blob/r186/src/math/Interpolant.js#L312
 pub fn Interpolant::interval_changed(
   self : Interpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t1 : Double,
 ) -> Unit {
@@ -96,7 +96,7 @@ pub fn Interpolant::interval_changed(
 
 ///|
 /// 越界下标对应 JavaScript 里的 `undefined`。
-fn position_at(positions : Array[Double], index : Int) -> Double? {
+fn position_at(positions : Array[Double], index : Int32) -> Double? {
   if index < 0 || index >= positions.length() {
     None
   } else {
@@ -150,16 +150,16 @@ fn present(bound : Double?) -> Double {
 
 ///|
 priv enum EvalStep {
-  CopySample(Int)
-  UseInterval(Int, Double, Double)
+  CopySample(Int32)
+  UseInterval(Int32, Double, Double)
 }
 
 ///|
 fn Interpolant::binary_search_interval(
   self : Interpolant,
   t : Double,
-  i1 : Int,
-  right : Int,
+  i1 : Int32,
+  right : Int32,
 ) -> EvalStep {
   let positions = self.parameter_positions
   let mut i1 = i1

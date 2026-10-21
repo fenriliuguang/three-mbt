@@ -9,7 +9,7 @@ pub(all) struct Sphere {
 }
 
 ///|
-pub fn Sphere::new(center? : Vector3, radius? : Double = -1.0) -> Sphere {
+pub fn Sphere::new(center? : Vector3, radius~ : Double = -1.0) -> Sphere {
   let center = match center {
     None => Vector3::new()
     Some(center) => center.clone()

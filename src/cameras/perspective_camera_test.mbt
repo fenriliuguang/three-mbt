@@ -351,4 +351,3 @@ test "panic Vector3.unproject requires a camera" {
   let node = @core.Object3D::new()
   ignore(node.unproject_point(@math.Vector3::new()))
 }
-

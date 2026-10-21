@@ -2,12 +2,12 @@
 
 ///|
 pub(all) struct CreateDesc {
-  height : UInt?
-  width : UInt?
+  height : UInt32?
+  width : UInt32?
 } derive(Show, Eq)
 
 ///|
-pub(all) struct Surface(Int) derive(Show, Eq)
+pub(all) struct Surface(Int32) derive(Show, Eq)
 
 ///|
 /// Drops a resource handle.
@@ -18,8 +18,8 @@ pub fn Surface::drop(self : Surface) -> Unit {
 
 ///|
 pub(all) struct ResizeEvent {
-  height : UInt
-  width : UInt
+  height : UInt32
+  width : UInt32
 } derive(Show, Eq)
 
 ///|
@@ -211,7 +211,7 @@ pub(all) enum Key {
 } derive(Show, Eq)
 
 ///|
-pub fn Key::ordinal(self : Key) -> Int {
+pub fn Key::ordinal(self : Key) -> Int32 {
   match self {
     BACKQUOTE => 0
     BACKSLASH => 1
@@ -388,7 +388,7 @@ pub fn Key::ordinal(self : Key) -> Int {
 }
 
 ///|
-pub fn Key::from(self : Int) -> Key {
+pub fn Key::from(self : Int32) -> Key {
   match self {
     0 => BACKQUOTE
     1 => BACKSLASH
@@ -586,7 +586,7 @@ pub fn Surface::surface(desc : CreateDesc) -> Surface {
     None => (0, 0)
     Some(payload3) => (1, payload3.reinterpret_as_int())
   }
-  let result : Int = wasmImportConstructorSurface(
+  let result : Int32 = wasmImportConstructorSurface(
     lowered, lowered1, lowered4, lowered5,
   )
   let ret = Surface::Surface(result)
@@ -594,17 +594,17 @@ pub fn Surface::surface(desc : CreateDesc) -> Surface {
 }
 
 ///|
-pub fn Surface::height(self : Surface) -> UInt {
+pub fn Surface::height(self : Surface) -> UInt32 {
   let Surface(handle) = self
-  let result : Int = wasmImportMethodSurfaceHeight(handle)
+  let result : Int32 = wasmImportMethodSurfaceHeight(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
 
 ///|
-pub fn Surface::width(self : Surface) -> UInt {
+pub fn Surface::width(self : Surface) -> UInt32 {
   let Surface(handle) = self
-  let result : Int = wasmImportMethodSurfaceWidth(handle)
+  let result : Int32 = wasmImportMethodSurfaceWidth(handle)
   let ret = result.reinterpret_as_uint()
   return ret
 }
@@ -612,8 +612,8 @@ pub fn Surface::width(self : Surface) -> UInt {
 ///|
 pub fn Surface::request_set_size(
   self : Surface,
-  height : UInt?,
-  width : UInt?,
+  height : UInt32?,
+  width : UInt32?,
 ) -> Unit {
   let Surface(handle) = self
 
@@ -635,7 +635,7 @@ pub fn Surface::request_set_size(
 pub fn Surface::on_resize(self : Surface) -> @async-core.Stream[ResizeEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnResize(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnResize(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnResizeStream0StreamLift(
     result,
   )
@@ -647,7 +647,7 @@ pub fn Surface::on_resize(self : Surface) -> @async-core.Stream[ResizeEvent] {
 pub fn Surface::on_frame(self : Surface) -> @async-core.Stream[FrameEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnFrame(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnFrame(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnFrameStream0StreamLift(
     result,
   )
@@ -661,7 +661,7 @@ pub fn Surface::on_pointer_up(
 ) -> @async-core.Stream[PointerEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnPointerUp(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnPointerUp(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnPointerUpStream0StreamLift(
     result,
   )
@@ -675,7 +675,7 @@ pub fn Surface::on_pointer_down(
 ) -> @async-core.Stream[PointerEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnPointerDown(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnPointerDown(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnPointerDownStream0StreamLift(
     result,
   )
@@ -689,7 +689,7 @@ pub fn Surface::on_pointer_move(
 ) -> @async-core.Stream[PointerEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnPointerMove(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnPointerMove(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnPointerMoveStream0StreamLift(
     result,
   )
@@ -701,7 +701,7 @@ pub fn Surface::on_pointer_move(
 pub fn Surface::on_key_up(self : Surface) -> @async-core.Stream[KeyEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnKeyUp(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnKeyUp(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnKeyUpStream0StreamLift(
     result,
   )
@@ -713,7 +713,7 @@ pub fn Surface::on_key_up(self : Surface) -> @async-core.Stream[KeyEvent] {
 pub fn Surface::on_key_down(self : Surface) -> @async-core.Stream[KeyEvent] {
   let Surface(handle) = self
   let lower_arg = handle
-  let result : Int = wasmImportMethodSurfaceOnKeyDown(lower_arg)
+  let result : Int32 = wasmImportMethodSurfaceOnKeyDown(lower_arg)
   let result0 = wasmWasiGfxSurfaceSurface020MethodSurfaceOnKeyDownStream0StreamLift(
     result,
   )

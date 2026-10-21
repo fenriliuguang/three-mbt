@@ -13,8 +13,8 @@ pub(all) struct DirectionalLight {
 
 ///|
 pub fn DirectionalLight::new(
-  hex? : Int = 0xFFFFFF,
-  intensity? : Double = 1.0,
+  hex~ : Int32 = 0xFFFFFF,
+  intensity~ : Double = 1.0,
 ) -> DirectionalLight {
   let node = make_light(
     @core.DirectionalLight,
@@ -92,4 +92,3 @@ pub impl @core.AsNode for DirectionalLight with fn to_node(self) {
 
 ///|
 pub extend DirectionalLight with @core.AsNode::{to_node}
-

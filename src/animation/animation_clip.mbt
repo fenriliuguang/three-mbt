@@ -13,7 +13,7 @@ pub(all) struct AnimationClip {
 pub fn AnimationClip::new(
   name : String,
   tracks : Array[KeyframeTrack],
-  duration? : Double = -1.0,
+  duration~ : Double = -1.0,
 ) -> AnimationClip {
   let mut span = duration
   if span < 0.0 {
@@ -34,4 +34,3 @@ priv enum Property {
   Quaternion
   Scale
 }
-

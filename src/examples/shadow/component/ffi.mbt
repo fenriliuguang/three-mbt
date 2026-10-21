@@ -1,10 +1,10 @@
 ///|
 pub fn mbt_ffi_cabi_realloc(
-  src_offset : Int,
-  src_size : Int,
-  _dst_alignment : Int,
-  dst_size : Int,
-) -> Int {
+  src_offset : Int32,
+  src_size : Int32,
+  _dst_alignment : Int32,
+  dst_size : Int32,
+) -> Int32 {
   if src_offset == 0 && src_size == 0 {
     return mbt_ffi_malloc(dst_size)
   }
@@ -27,28 +27,32 @@ pub fn mbt_ffi_cabi_realloc(
 }
 
 ///|
-extern "wasm" fn mbt_ffi_copy(dest : Int, src : Int, len : Int) =
+extern "wasm" fn mbt_ffi_copy(dest : Int32, src : Int32, len : Int32) =
   #|(func (param i32) (param i32) (param i32) local.get 0 local.get 1 local.get 2 memory.copy)
 
 ///|
-extern "wasm" fn mbt_ffi_malloc(size : Int) -> Int =
+extern "wasm" fn mbt_ffi_malloc(size : Int32) -> Int32 =
   #|(func (param i32) (result i32) (local i32)
   #| local.get 0 i32.const 4 i32.add call $moonbit.gc.malloc
   #| local.tee 1 i32.const 0 call $moonbit.init_array8
   #| local.get 1)
 
 ///|
-extern "wasm" fn mbt_ffi_free(position : Int) =
+extern "wasm" fn mbt_ffi_free(position : Int32) =
   #|(func (param i32) local.get 0 call $moonbit.decref)
 
 ///|
 #doc(hidden)
-pub fn wasmExportStart() -> Int {
+pub fn wasmExportStart() -> Int32 {
   @guest.wasmExportStart()
 }
 
 ///|
 #doc(hidden)
-pub fn wasmExportAsyncStart(event_raw : Int, waitable : Int, code : Int) -> Int {
+pub fn wasmExportAsyncStart(
+  event_raw : Int32,
+  waitable : Int32,
+  code : Int32,
+) -> Int32 {
   @guest.wasmExportAsyncStart(event_raw, waitable, code)
 }

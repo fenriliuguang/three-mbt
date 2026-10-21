@@ -114,10 +114,10 @@ fn Object3D::scan_lines(
   position : BufferAttribute,
   index : BufferAttribute?,
   threshold_sq : Double,
-  start : Int,
-  end : Int,
-  step : Int,
-  material_index : Int?,
+  start : Int32,
+  end : Int32,
+  step : Int32,
+  material_index : Int32?,
   close : Bool,
 ) -> Unit {
   match index {
@@ -192,10 +192,10 @@ fn Object3D::push_line_segment(
   ray : @math.Ray,
   position : BufferAttribute,
   threshold_sq : Double,
-  a : Int,
-  b : Int,
-  index : Int,
-  material_index : Int?,
+  a : Int32,
+  b : Int32,
+  index : Int32,
+  material_index : Int32?,
 ) -> Unit {
   let start = @math.Vector3::new()
   let end = @math.Vector3::new()

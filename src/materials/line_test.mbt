@@ -457,11 +457,17 @@ test "LineBasicMaterial stores and copies blendSrc" {
 ///|
 test "LineBasicMaterial stores and copies blendDst" {
   let defaults = @materials.LineBasicMaterial::new()
-  assert_eq(defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha, true)
+  assert_eq(
+    defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
   assert_eq(defaults.blend_dst.to_int(), 205)
   let source = @materials.LineBasicMaterial::new()
   source.blend_dst = @constants.BlendFactor::Zero
-  assert_eq(defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha, true)
+  assert_eq(
+    defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
   let destination = @materials.LineBasicMaterial::new()
   ignore(destination.copy(source))
   assert_eq(destination.blend_dst is @constants.BlendFactor::Zero, true)
@@ -490,7 +496,10 @@ test "LineBasicMaterial stores and copies blendEquation" {
   assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
   let destination = @materials.LineBasicMaterial::new()
   ignore(destination.copy(source))
-  assert_eq(destination.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(
+    destination.blend_equation is @constants.BlendEquation::Subtract,
+    true,
+  )
   assert_eq(destination.blend_equation.to_int(), 101)
   destination.blend_equation = @constants.BlendEquation::Max
   assert_eq(source.blend_equation is @constants.BlendEquation::Subtract, true)
@@ -499,10 +508,16 @@ test "LineBasicMaterial stores and copies blendEquation" {
   dashed.line.blend_equation = @constants.BlendEquation::Subtract
   let other = @materials.LineDashedMaterial::new()
   ignore(other.copy(dashed))
-  assert_eq(other.line.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(
+    other.line.blend_equation is @constants.BlendEquation::Subtract,
+    true,
+  )
   assert_eq(other.line.blend_equation.to_int(), 101)
   other.line.blend_equation = @constants.BlendEquation::Min
-  assert_eq(dashed.line.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(
+    dashed.line.blend_equation is @constants.BlendEquation::Subtract,
+    true,
+  )
   assert_eq(other.line.blend_equation.to_int(), 103)
 }
 
@@ -884,7 +899,8 @@ test "LineBasicMaterial stores and copies precision" {
   }
   match destination.precision {
     None => abort("destination precision")
-    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+    Some(precision) =>
+      assert_eq(precision is @constants.Precision::Mediump, true)
   }
   let dashed = @materials.LineDashedMaterial::new()
   dashed.line.precision = Some(@constants.Precision::Highp)
@@ -1190,7 +1206,7 @@ test "LineBasicMaterial clone keeps LineBasicMaterial and takes a new id" {
 ///|
 test "LineBasicMaterial addEventListener keeps one copy of a listener" {
   let material = @materials.LineBasicMaterial::new()
-  let listener = fn() {}
+  let listener = fn() {  }
   material.add_event_listener("dispose", listener)
   material.add_event_listener("dispose", listener)
   match material.listeners.get("dispose") {
@@ -1214,8 +1230,8 @@ test "LineBasicMaterial addEventListener keeps one copy of a listener" {
 ///|
 test "LineBasicMaterial hasEventListener reports a registered listener" {
   let material = @materials.LineBasicMaterial::new()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), true)
@@ -1228,8 +1244,8 @@ test "LineBasicMaterial hasEventListener reports a registered listener" {
 ///|
 test "LineBasicMaterial removeEventListener drops a registered listener" {
   let material = @materials.LineBasicMaterial::new()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   material.remove_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)
@@ -1283,7 +1299,11 @@ test "LineDashedMaterial clone keeps LineDashedMaterial and takes a new id" {
   assert_eq(defaults_clone.gap_size, 1.0)
   assert_eq(defaults_clone.line.version, 0)
   assert_eq(defaults_clone.line.id == defaults.line.id, false)
-  let source = @materials.LineDashedMaterial::new(scale=2.0, dash_size=4.0, gap_size=5.0)
+  let source = @materials.LineDashedMaterial::new(
+    scale=2.0,
+    dash_size=4.0,
+    gap_size=5.0,
+  )
   source.line.name = "dash"
   ignore(source.line.color.set_rgb(0.0, 1.0, 0.0))
   source.line.set_alpha_test(0.2)

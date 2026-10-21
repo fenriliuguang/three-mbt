@@ -164,7 +164,9 @@ test "clamp keeps each component inside its own range" {
   assert_eq(min.x, 1.0)
   assert_eq(max.y, 4.0)
   let inside = @math.Vector3::new(x=2.0, y=2.0, z=2.0)
-  ignore(inside.clamp(@math.Vector3::new(), @math.Vector3::new(x=3.0, y=3.0, z=3.0)))
+  ignore(
+    inside.clamp(@math.Vector3::new(), @math.Vector3::new(x=3.0, y=3.0, z=3.0)),
+  )
   assert_eq(inside.x, 2.0)
   assert_eq(inside.y, 2.0)
   assert_eq(inside.z, 2.0)
@@ -370,7 +372,9 @@ test "applyMatrix3 multiplies by a column-major 3x3 matrix" {
   assert_eq(v.x, 1.0)
   assert_eq(v.y, 2.0)
   assert_eq(v.z, 3.0)
-  let scale = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
+  let scale = @math.Matrix3::new().set(
+    2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0,
+  )
   ignore(v.apply_matrix3(scale))
   assert_eq(v.x, 2.0)
   assert_eq(v.y, 6.0)
@@ -471,7 +475,9 @@ test "setFromSphericalCoords uses y-up spherical coordinates" {
   assert_close(v.x, 0.0)
   assert_close(v.y, 0.0)
   assert_close(v.z, 2.0)
-  ignore(v.set_from_spherical_coords(2.0, 1.5707963267948966, 1.5707963267948966))
+  ignore(
+    v.set_from_spherical_coords(2.0, 1.5707963267948966, 1.5707963267948966),
+  )
   assert_close(v.x, 2.0)
   assert_close(v.y, 0.0)
   assert_close(v.z, 0.0)
@@ -561,9 +567,7 @@ test "setFromCartesianCoords recovers y-up spherical coordinates" {
   let tilted = @math.Spherical::new()
   ignore(
     tilted.set_from_cartesian_coords(
-      -0.5667197369881524,
-      3.510330247561491,
-      1.832050843389168,
+      -0.5667197369881524, 3.510330247561491, 1.832050843389168,
     ),
   )
   assert_close(tilted.radius, 4.0)
@@ -675,7 +679,9 @@ test "setFromCartesianCoords recovers a y-up cylinder" {
   assert_eq(origin.y, 0.0)
   let tilted = @math.Cylindrical::new()
   ignore(
-    tilted.set_from_cartesian_coords(-0.8865606199840186, 1.0, 2.866009467376818),
+    tilted.set_from_cartesian_coords(
+      -0.8865606199840186, 1.0, 2.866009467376818,
+    ),
   )
   assert_close(tilted.radius, 3.0)
   assert_close(tilted.theta, -0.3)
@@ -860,7 +866,9 @@ test "Vector2.applyMatrix3 uses an implicit z of 1" {
   ignore(v.apply_matrix3(@math.Matrix3::new()))
   assert_eq(v.x, 1.0)
   assert_eq(v.y, 2.0)
-  let shift = @math.Matrix3::new().set(1.0, 0.0, 3.0, 0.0, 1.0, 4.0, 0.0, 0.0, 1.0)
+  let shift = @math.Matrix3::new().set(
+    1.0, 0.0, 3.0, 0.0, 1.0, 4.0, 0.0, 0.0, 1.0,
+  )
   ignore(v.apply_matrix3(shift))
   assert_eq(v.x, 4.0)
   assert_eq(v.y, 6.0)
@@ -906,9 +914,7 @@ test "Vector2.clamp limits each component" {
   assert_eq(low.x, 1.0)
   assert_eq(high.y, 4.0)
   let inside = @math.Vector2::new(x=2.0, y=2.0)
-  ignore(
-    inside.clamp(@math.Vector2::new(), @math.Vector2::new(x=3.0, y=3.0)),
-  )
+  ignore(inside.clamp(@math.Vector2::new(), @math.Vector2::new(x=3.0, y=3.0)))
   assert_eq(inside.x, 2.0)
   assert_eq(inside.y, 2.0)
 }
@@ -1116,7 +1122,7 @@ test "Vector2.toArray writes two components at an offset" {
   assert_eq(fresh[0], 1.0)
   assert_eq(fresh[1], 2.0)
   let array = [9.0, 8.0, 7.0, 6.0]
-  let written = v.to_array(array=array, offset=1)
+  let written = v.to_array(array~, offset=1)
   assert_eq(physical_equal(written, array), true)
   assert_eq(written[0], 9.0)
   assert_eq(written[1], 1.0)
@@ -1475,7 +1481,8 @@ test "Vector4.setAxisAngleFromRotationMatrix reads axis and angle" {
   assert_close(quarter.z, 0.0)
   assert_close(quarter.w, 1.5707963267948966)
   let half = @math.Matrix4::new().set(
-    1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0,
+    1.0,
   )
   let flip = @math.Vector4::new()
   ignore(flip.set_axis_angle_from_rotation_matrix(half))
@@ -2666,7 +2673,7 @@ test "Triangle starts at the origin and copies its corners" {
   let a = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let b = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
   let c = @math.Vector3::new(x=7.0, y=8.0, z=9.0)
-  let triangle = @math.Triangle::new(a=a, b=b, c=c)
+  let triangle = @math.Triangle::new(a~, b~, c~)
   assert_eq(triangle.a.x, 1.0)
   assert_eq(triangle.a.y, 2.0)
   assert_eq(triangle.a.z, 3.0)
@@ -2757,7 +2764,8 @@ test "Triangle.getInterpolation blends the vertex values" {
   let v3 = @math.Vector3::new(x=0.0, y=0.0, z=1.0)
   let point = @math.Vector3::new(x=0.5, y=0.5, z=0.0)
   let target = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
-  match @math.Triangle::get_interpolation(point, p1, p2, p3, v1, v2, v3, target) {
+  match
+    @math.Triangle::get_interpolation(point, p1, p2, p3, v1, v2, v3, target) {
     None => assert_eq(true, false)
     Some(value) => {
       assert_eq(physical_equal(value, target), true)
@@ -2767,7 +2775,10 @@ test "Triangle.getInterpolation blends the vertex values" {
     }
   }
   let flat = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
-  match @math.Triangle::get_interpolation(flat, flat, flat, flat, v1, v2, v3, target) {
+  match
+    @math.Triangle::get_interpolation(
+      flat, flat, flat, flat, v1, v2, v3, target,
+    ) {
     None => {
       assert_eq(target.x, 0.0)
       assert_eq(target.y, 0.0)
@@ -3248,7 +3259,7 @@ test "Line3 stores copies of its endpoints" {
   assert_eq(empty.end.x, 0.0)
   let start = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let end = @math.Vector3::new(x=4.0, y=5.0, z=6.0)
-  let line = @math.Line3::new(start=start, end=end)
+  let line = @math.Line3::new(start~, end~)
   assert_eq(line.start.x, 1.0)
   assert_eq(line.start.y, 2.0)
   assert_eq(line.start.z, 3.0)
@@ -3422,7 +3433,7 @@ test "distanceSqToLine3 measures the gap between two segments" {
   )
   let c1 = @math.Vector3::new(x=9.0, y=9.0, z=9.0)
   let c2 = @math.Vector3::new(x=8.0, y=8.0, z=8.0)
-  assert_eq(line.distance_sq_to_line3(other, c1=c1, c2=c2), 1.0)
+  assert_eq(line.distance_sq_to_line3(other, c1~, c2~), 1.0)
   assert_eq(c1.x, 0.0)
   assert_eq(c1.y, 0.0)
   assert_eq(c1.z, 0.0)
@@ -3639,10 +3650,7 @@ test "Plane.equals compares the normal and the constant" {
 
 ///|
 test "Plane.clone copies the normal and the constant" {
-  let source = @math.Plane::new(
-    normal=@math.Vector3::new(y=1.0),
-    constant=-2.0,
-  )
+  let source = @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=-2.0)
   let plane = source.clone()
   assert_eq(plane.normal.x, 0.0)
   assert_eq(plane.normal.y, 1.0)
@@ -3655,10 +3663,7 @@ test "Plane.clone copies the normal and the constant" {
 
 ///|
 test "Plane.toJSON writes the normal and the constant" {
-  let plane = @math.Plane::new(
-    normal=@math.Vector3::new(y=1.0),
-    constant=-2.0,
-  )
+  let plane = @math.Plane::new(normal=@math.Vector3::new(y=1.0), constant=-2.0)
   let (normal, constant) = plane.to_json()
   assert_eq(normal.length(), 3)
   assert_eq(normal[0], 0.0)
@@ -3758,7 +3763,7 @@ test "Sphere.clampPoint pulls an outside point onto the sphere" {
 ///|
 test "Sphere.getBoundingBox encloses the sphere" {
   let center = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
-  let sphere = @math.Sphere::new(center=center, radius=1.0)
+  let sphere = @math.Sphere::new(center~, radius=1.0)
   let box = @math.Box3::empty()
   ignore(sphere.get_bounding_box(box))
   assert_eq(box.min.x, 0.0)
@@ -3816,10 +3821,7 @@ test "Sphere.expandByPoint grows the radius to include a point" {
 ///|
 test "Sphere.union encloses both spheres" {
   let sphere = @math.Sphere::new(radius=1.0)
-  let other = @math.Sphere::new(
-    center=@math.Vector3::new(x=4.0),
-    radius=1.0,
-  )
+  let other = @math.Sphere::new(center=@math.Vector3::new(x=4.0), radius=1.0)
   ignore(sphere.union(other))
   assert_eq(sphere.center.x, 2.0)
   assert_eq(sphere.center.y, 0.0)
@@ -3921,7 +3923,7 @@ test "Ray stores copies of its origin and direction" {
   assert_eq(empty.direction.z, -1.0)
   let origin = @math.Vector3::new(x=1.0, y=2.0, z=3.0)
   let direction = @math.Vector3::new(y=1.0)
-  let ray = @math.Ray::new(origin=origin, direction=direction)
+  let ray = @math.Ray::new(origin~, direction~)
   assert_eq(ray.origin.x, 1.0)
   assert_eq(ray.origin.y, 2.0)
   assert_eq(ray.origin.z, 3.0)
@@ -4708,7 +4710,9 @@ test "Color.setFromVector3 copies the vector components" {
 ///|
 test "Color.applyMatrix3 transforms the channels" {
   let color = @math.Color::new(r=0.25, g=0.5, b=0.75)
-  let swap = @math.Matrix3::new().set(0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+  let swap = @math.Matrix3::new().set(
+    0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  )
   ignore(color.apply_matrix3(swap))
   assert_eq(color.r, 0.5)
   assert_eq(color.g, 0.25)
@@ -4836,11 +4840,15 @@ test "Euler.equals compares the angles and the order" {
   assert_eq(euler.equals(same), true)
   assert_eq(euler.equals(euler), true)
   assert_eq(
-    euler.equals(@math.Euler::new(x=0.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX)),
+    euler.equals(
+      @math.Euler::new(x=0.0, y=2.0, z=3.0, order=@math.EulerOrder::ZYX),
+    ),
     false,
   )
   assert_eq(
-    euler.equals(@math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::XYZ)),
+    euler.equals(
+      @math.Euler::new(x=1.0, y=2.0, z=3.0, order=@math.EulerOrder::XYZ),
+    ),
     false,
   )
   assert_eq(euler.x, 1.0)
@@ -5070,7 +5078,9 @@ test "Matrix3.multiplyMatrices stores the product" {
 ///|
 test "Matrix3.multiply post-multiplies in place" {
   let m = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
-  let other = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let other = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
   ignore(m.multiply(other))
   assert_eq(m.elements[0], 2.0)
   assert_eq(m.elements[1], 12.0)
@@ -5087,7 +5097,9 @@ test "Matrix3.multiply post-multiplies in place" {
 ///|
 test "Matrix3.premultiply pre-multiplies in place" {
   let m = @math.Matrix3::new().set(2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0)
-  let other = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let other = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
   ignore(m.premultiply(other))
   assert_eq(m.elements[0], 2.0)
   assert_eq(m.elements[1], 8.0)
@@ -5242,7 +5254,9 @@ test "Matrix3.translate premultiplies a 2D translation" {
 ///|
 test "Matrix3.equals compares every element" {
   let m = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
-  let same = @math.Matrix3::new().set(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+  let same = @math.Matrix3::new().set(
+    1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+  )
   assert_eq(m.equals(same), true)
   same.elements[0] = 0.0
   assert_eq(m.equals(same), false)
@@ -5251,9 +5265,7 @@ test "Matrix3.equals compares every element" {
 ///|
 test "Matrix3.fromArray reads nine column-major elements" {
   let m = @math.Matrix3::new()
-  ignore(
-    m.from_array([1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0]),
-  )
+  ignore(m.from_array([1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0]))
   assert_eq(m.elements[0], 1.0)
   assert_eq(m.elements[1], 4.0)
   assert_eq(m.elements[2], 7.0)
@@ -5264,10 +5276,7 @@ test "Matrix3.fromArray reads nine column-major elements" {
   assert_eq(m.elements[7], 6.0)
   assert_eq(m.elements[8], 9.0)
   ignore(
-    m.from_array(
-      [9.0, 1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0],
-      offset=1,
-    ),
+    m.from_array([9.0, 1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0], offset=1),
   )
   assert_eq(m.elements[0], 1.0)
   assert_eq(m.elements[8], 9.0)
@@ -5347,8 +5356,7 @@ test "Matrix4.setFromMatrix3 copies the upper 3x3" {
 ///|
 test "Matrix4.extractBasis writes the first three columns" {
   let m = @math.Matrix4::new().set(
-    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0,
-    1.0,
+    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 1.0,
   )
   let x_axis = @math.Vector3::new()
   let y_axis = @math.Vector3::new()
@@ -5366,8 +5374,7 @@ test "Matrix4.extractBasis writes the first three columns" {
   x_axis.x = 0.0
   assert_eq(m.elements[0], 2.0)
   let flat = @math.Matrix4::new().set(
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
   )
   ignore(flat.extract_basis(x_axis, y_axis, z_axis))
   assert_eq(x_axis.x, 1.0)
@@ -5491,8 +5498,7 @@ test "Matrix4.makeShear stores six shear terms" {
 ///|
 test "Matrix4.fromArray reads sixteen column-major elements" {
   let values = [
-    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0,
-    1.0,
+    2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 1.0,
   ]
   let m = @math.Matrix4::new()
   ignore(m.from_array(values))
@@ -5504,8 +5510,8 @@ test "Matrix4.fromArray reads sixteen column-major elements" {
   ignore(
     m.from_array(
       [
-        9.0, 2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0,
-        0.0, 0.0, 1.0,
+        9.0, 2.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0,
+        0.0, 1.0,
       ],
       offset=1,
     ),
@@ -5524,7 +5530,13 @@ test "Matrix4.toArray writes sixteen column-major elements" {
   assert_eq(fresh[10], 4.0)
   assert_eq(fresh[15], 1.0)
   assert_eq(fresh[1], 0.0)
-  let placed = m.to_array(array=[9.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], offset=1)
+  let placed = m.to_array(
+    array=[
+      9.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0,
+    ],
+    offset=1,
+  )
   assert_eq(placed[0], 9.0)
   assert_eq(placed[1], 2.0)
   assert_eq(placed[16], 1.0)
@@ -5894,34 +5906,76 @@ test "MathUtils.setQuaternionFromProperEuler writes a proper Euler rotation" {
   let q = @math.Quaternion::new(x=1.0)
   let hits = [0]
   q.on_change = Some(fn() { hits[0] = hits[0] + 1 })
-  @math.set_quaternion_from_proper_euler(q, 0.0, 0.0, 0.0, @math.ProperEulerOrder::XYX)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.0,
+    0.0,
+    0.0,
+    @math.ProperEulerOrder::XYX,
+  )
   assert_eq(q.x, 0.0)
   assert_eq(q.y, 0.0)
   assert_eq(q.z, 0.0)
   assert_eq(q.w, 1.0)
   assert_eq(hits[0], 1)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::XYX)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::XYX,
+  )
   assert_close(q.x, 0.3050397769831039)
   assert_close(q.y, 0.12248959836900034)
   assert_close(q.z, 0.023239781325963473)
   assert_close(q.w, 0.9441434982635958)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::YZY)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::YZY,
+  )
   assert_close(q.x, 0.023239781325963473)
   assert_close(q.y, 0.3050397769831039)
   assert_close(q.z, 0.12248959836900034)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::ZXZ)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::ZXZ,
+  )
   assert_close(q.x, 0.12248959836900034)
   assert_close(q.y, 0.023239781325963473)
   assert_close(q.z, 0.3050397769831039)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::XZX)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::XZX,
+  )
   assert_close(q.x, 0.3050397769831039)
   assert_close(q.y, -0.023239781325963473)
   assert_close(q.z, 0.12248959836900034)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::YXY)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::YXY,
+  )
   assert_close(q.x, 0.12248959836900034)
   assert_close(q.y, 0.3050397769831039)
   assert_close(q.z, -0.023239781325963473)
-  @math.set_quaternion_from_proper_euler(q, 0.5, 0.25, 0.125, @math.ProperEulerOrder::ZYZ)
+  @math.set_quaternion_from_proper_euler(
+    q,
+    0.5,
+    0.25,
+    0.125,
+    @math.ProperEulerOrder::ZYZ,
+  )
   assert_close(q.x, -0.023239781325963473)
   assert_close(q.y, 0.12248959836900034)
   assert_close(q.z, 0.3050397769831039)
@@ -5934,13 +5988,22 @@ test "MathUtils.denormalize expands an integer range" {
   assert_eq(@math.denormalize(0.25, @math.ArrayComponentType::Float32), 0.25)
   assert_eq(@math.denormalize(0.0, @math.ArrayComponentType::Uint8), 0.0)
   assert_eq(@math.denormalize(255.0, @math.ArrayComponentType::Uint8), 1.0)
-  assert_eq(@math.denormalize(255.0, @math.ArrayComponentType::Uint8Clamped), 1.0)
+  assert_eq(
+    @math.denormalize(255.0, @math.ArrayComponentType::Uint8Clamped),
+    1.0,
+  )
   assert_eq(@math.denormalize(65535.0, @math.ArrayComponentType::Uint16), 1.0)
-  assert_eq(@math.denormalize(4294967295.0, @math.ArrayComponentType::Uint32), 1.0)
+  assert_eq(
+    @math.denormalize(4294967295.0, @math.ArrayComponentType::Uint32),
+    1.0,
+  )
   assert_eq(@math.denormalize(-127.0, @math.ArrayComponentType::Int8), -1.0)
   assert_eq(@math.denormalize(-128.0, @math.ArrayComponentType::Int8), -1.0)
   assert_eq(@math.denormalize(-32768.0, @math.ArrayComponentType::Int16), -1.0)
-  assert_eq(@math.denormalize(-2147483648.0, @math.ArrayComponentType::Int32), -1.0)
+  assert_eq(
+    @math.denormalize(-2147483648.0, @math.ArrayComponentType::Int32),
+    -1.0,
+  )
 }
 
 ///|
@@ -5951,7 +6014,10 @@ test "MathUtils.normalize packs a unit range into an integer" {
   assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint8Clamped), 255.0)
   assert_eq(@math.normalize(0.25, @math.ArrayComponentType::Uint8), 64.0)
   assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint16), 65535.0)
-  assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Uint32), 4294967295.0)
+  assert_eq(
+    @math.normalize(1.0, @math.ArrayComponentType::Uint32),
+    4294967295.0,
+  )
   assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Int8), 127.0)
   assert_eq(@math.normalize(-1.0, @math.ArrayComponentType::Int8), -127.0)
   assert_eq(@math.normalize(1.0, @math.ArrayComponentType::Int16), 32767.0)
@@ -5968,7 +6034,10 @@ test "MathUtils.generateUUID writes a version-4 UUID" {
   assert_eq(uuid[23:24].to_owned(), "-")
   assert_eq(uuid[14:15].to_owned(), "4")
   let variant = uuid[19:20].to_owned()
-  assert_eq(variant == "8" || variant == "9" || variant == "a" || variant == "b", true)
+  assert_eq(
+    variant == "8" || variant == "9" || variant == "a" || variant == "b",
+    true,
+  )
 }
 
 ///|
@@ -6620,7 +6689,10 @@ test "Interpolant.copySampleValue_ writes one sample into the result buffer" {
   let values = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]
   let given = [1.0, 2.0, 3.0]
   let interpolant = @math.Interpolant::new(
-    positions, values, 2, result_buffer=given,
+    positions,
+    values,
+    2,
+    result_buffer=given,
   )
   let written = interpolant.copy_sample_value(0)
   assert_eq(physical_equal(written, given), true)
@@ -6648,7 +6720,10 @@ test "Interpolant.intervalChanged_ leaves the samples in place" {
   let values = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]
   let given = [1.0, 2.0, 3.0]
   let interpolant = @math.Interpolant::new(
-    positions, values, 2, result_buffer=given,
+    positions,
+    values,
+    2,
+    result_buffer=given,
   )
   interpolant.interval_changed(1, 0.0, 1.0)
   assert_eq(interpolant.cached_index, 0)
@@ -6698,7 +6773,7 @@ test "Interpolant.getSettings_ prefers an assigned settings object" {
   let interpolant = @math.Interpolant::new([0.0, 1.0], [10.0, 20.0], 1)
   let defaults = interpolant.get_settings()
   assert_eq(physical_equal(defaults, interpolant.default_settings), true)
-  let custom = @math.InterpolantSettings::{}
+  let custom = @math.InterpolantSettings::{ }
   interpolant.settings = Some(custom)
   assert_eq(physical_equal(interpolant.get_settings(), custom), true)
   interpolant.settings = None
@@ -6732,7 +6807,10 @@ test "BezierInterpolant.new stores samples and no tangents" {
   assert_eq(bezier.interpolant.parameter_positions[0], 9.0)
   let given = [4.0, 5.0]
   let with_buffer = @math.BezierInterpolant::new(
-    positions, values, 1, result_buffer=given,
+    positions,
+    values,
+    1,
+    result_buffer=given,
   )
   assert_eq(with_buffer.interpolant.result_buffer[0], 4.0)
   assert_eq(with_buffer.interpolant.result_buffer[1], 5.0)
@@ -6888,7 +6966,10 @@ test "DiscreteInterpolant.new stores the samples" {
   assert_eq(discrete.interpolant.sample_values[1], 7.0)
   let given = [4.0, 5.0]
   let with_buffer = @math.DiscreteInterpolant::new(
-    positions, values, 1, result_buffer=given,
+    positions,
+    values,
+    1,
+    result_buffer=given,
   )
   assert_eq(with_buffer.interpolant.result_buffer[0], 4.0)
   assert_eq(with_buffer.interpolant.result_buffer[1], 5.0)
@@ -6936,7 +7017,10 @@ test "LinearInterpolant.new stores the samples" {
   assert_eq(linear.interpolant.sample_values[1], 7.0)
   let given = [4.0, 5.0]
   let with_buffer = @math.LinearInterpolant::new(
-    positions, values, 1, result_buffer=given,
+    positions,
+    values,
+    1,
+    result_buffer=given,
   )
   assert_eq(with_buffer.interpolant.result_buffer[0], 4.0)
   assert_eq(with_buffer.interpolant.result_buffer[1], 5.0)
@@ -6988,7 +7072,10 @@ test "QuaternionLinearInterpolant.new stores the samples" {
   assert_eq(slerp.interpolant.sample_values[3], 7.0)
   let given = [4.0, 5.0, 6.0, 8.0]
   let with_buffer = @math.QuaternionLinearInterpolant::new(
-    positions, values, 4, result_buffer=given,
+    positions,
+    values,
+    4,
+    result_buffer=given,
   )
   assert_eq(with_buffer.interpolant.result_buffer[0], 4.0)
   assert_eq(with_buffer.interpolant.result_buffer[3], 8.0)
@@ -7108,7 +7195,7 @@ test "Vector4.toArray writes four components at an offset" {
   assert_eq(fresh[2], 3.0)
   assert_eq(fresh[3], 4.0)
   let array = [9.0, 8.0, 7.0, 6.0, 5.0]
-  let written = v.to_array(array=array, offset=1)
+  let written = v.to_array(array~, offset=1)
   assert_eq(physical_equal(written, array), true)
   assert_eq(written[0], 9.0)
   assert_eq(written[1], 1.0)
@@ -7175,7 +7262,12 @@ test "setFromMatrix3Column reads one column" {
 
 ///|
 test "setFromEuler copies the three angles" {
-  let euler = @math.Euler::new(x=0.2, y=-0.4, z=0.6, order=@math.EulerOrder::YXZ)
+  let euler = @math.Euler::new(
+    x=0.2,
+    y=-0.4,
+    z=0.6,
+    order=@math.EulerOrder::YXZ,
+  )
   let v = @math.Vector3::new(x=9.0, y=8.0, z=7.0)
   ignore(v.set_from_euler(euler))
   assert_eq(v.x, 0.2)

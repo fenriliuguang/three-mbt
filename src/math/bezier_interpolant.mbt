@@ -15,7 +15,7 @@ pub(all) struct BezierInterpolant {
 pub fn BezierInterpolant::new(
   parameter_positions : Array[Double],
   sample_values : Array[Double],
-  sample_size : Int,
+  sample_size : Int32,
   result_buffer? : Array[Double],
 ) -> BezierInterpolant {
   let interpolant = match result_buffer {
@@ -28,7 +28,7 @@ pub fn BezierInterpolant::new(
         result_buffer=buffer,
       )
   }
-  { interpolant, in_tangents: None, out_tangents: None }
+  { interpolant, in_tangents: None, out_tangents: None, }
 }
 
 ///|
@@ -42,10 +42,7 @@ pub fn cubic_bezier(
   p3 : Double,
 ) -> Double {
   let k = 1.0 - s
-  k * k * k * p0 +
-  3.0 * k * k * s * p1 +
-  3.0 * k * s * s * p2 +
-  s * s * s * p3
+  k * k * k * p0 + 3.0 * k * k * s * p1 + 3.0 * k * s * s * p2 + s * s * s * p3
 }
 
 ///|
@@ -91,8 +88,8 @@ pub fn solve_bezier_parameter(
 fn write_linear_sample(
   result : Array[Double],
   values : Array[Double],
-  stride : Int,
-  i1 : Int,
+  stride : Int32,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,
@@ -112,7 +109,7 @@ fn write_linear_sample(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/BezierInterpolant.js#L22
 pub fn BezierInterpolant::interpolate(
   self : BezierInterpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,

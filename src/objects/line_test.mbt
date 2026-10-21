@@ -301,4 +301,3 @@ test "panic Line.raycast material index is out of range" {
   )
   ignore(raycaster.intersect_object(line.node))
 }
-

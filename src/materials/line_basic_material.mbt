@@ -120,10 +120,10 @@ pub(all) struct LineBasicMaterial {
   mut blend_src_alpha : @constants.BlendFactor?
   mut blend_dst_alpha : @constants.BlendFactor?
   mut blend_equation_alpha : @constants.BlendEquation?
-  mut stencil_write_mask : Int
+  mut stencil_write_mask : Int32
   mut stencil_func : @constants.StencilFunc
-  mut stencil_ref : Int
-  mut stencil_func_mask : Int
+  mut stencil_ref : Int32
+  mut stencil_func_mask : Int32
   mut stencil_fail : @constants.StencilOp
   mut stencil_z_fail : @constants.StencilOp
   mut stencil_z_pass : @constants.StencilOp
@@ -131,8 +131,8 @@ pub(all) struct LineBasicMaterial {
   mut clipping_planes : Array[@math.Plane]?
   mut precision : @constants.Precision?
   mut user_data : Map[String, String]
-  mut version : Int
-  id : Int
+  mut version : Int32
+  id : Int32
   mut uuid : String
   mut name : String
   type_name : String
@@ -140,7 +140,7 @@ pub(all) struct LineBasicMaterial {
 }
 
 ///|
-pub fn LineBasicMaterial::new(hex? : Int = 0xFFFFFF) -> LineBasicMaterial {
+pub fn LineBasicMaterial::new(hex~ : Int32 = 0xFFFFFF) -> LineBasicMaterial {
   {
     color: @math.Color::new().set_hex(hex),
     side: @constants.Front,
@@ -384,4 +384,3 @@ pub fn LineBasicMaterial::set_alpha_test(
   }
   self.alpha_test = value
 }
-

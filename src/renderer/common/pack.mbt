@@ -11,27 +11,27 @@ using @core {type BufferAttribute}
 /// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
 /// 再后面是聚光的位置、方向（`w` 为开关）、颜色，以及 `(distance, decay, coneCos, penumbraCos)`。
 /// 末尾 48 字节是半球光的天空色、地面色，以及方向（`w` 为开关）。没有半球光时是 0。
-pub let uniform_bytes : Int = 672
+pub let uniform_bytes : Int32 = 672
 
 ///|
 /// 只有位置时，每个顶点 12 字节。
-pub let position_stride : Int = 12
+pub let position_stride : Int32 = 12
 
 ///|
 /// 一个实例矩阵 16 个 `f32`，64 字节。
-pub let instance_matrix_stride : Int = 64
+pub let instance_matrix_stride : Int32 = 64
 
 ///|
 /// 一个实例颜色 `rgb`，12 字节。
-pub let instance_color_stride : Int = 12
+pub let instance_color_stride : Int32 = 12
 
 ///|
 /// 位置、法线、uv 和顶点色交错存放，每个顶点 48 字节。
-pub let vertex_stride : Int = 48
+pub let vertex_stride : Int32 = 48
 
 ///|
 /// WebGPU 要求 `bytesPerRow` 是 256 的倍数。
-pub fn copy_bytes_per_row(row_bytes : Int) -> Int {
+pub fn copy_bytes_per_row(row_bytes : Int32) -> Int32 {
   let alignment = 256
   let remainder = row_bytes % alignment
   if remainder == 0 {
@@ -42,7 +42,7 @@ pub fn copy_bytes_per_row(row_bytes : Int) -> Int {
 }
 
 ///|
-fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
+fn write_f32(dst : FixedArray[Byte], offset : Int32, value : Double) -> Unit {
   let bytes = Float::from_double(value).to_le_bytes()
   let mut index = 0
   while index < 4 {
@@ -52,7 +52,7 @@ fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
 }
 
 ///|
-fn write_u32(dst : FixedArray[Byte], offset : Int, value : Int) -> Unit {
+fn write_u32(dst : FixedArray[Byte], offset : Int32, value : Int32) -> Unit {
   let bits = value.reinterpret_as_uint()
   dst[offset] = bits.to_byte()
   dst[offset + 1] = (bits >> 8).to_byte()
@@ -63,7 +63,7 @@ fn write_u32(dst : FixedArray[Byte], offset : Int, value : Int) -> Unit {
 ///|
 fn write_vec3(
   dst : FixedArray[Byte],
-  offset : Int,
+  offset : Int32,
   x : Double,
   y : Double,
   z : Double,
@@ -76,7 +76,7 @@ fn write_vec3(
 ///|
 fn write_matrix4(
   dst : FixedArray[Byte],
-  offset : Int,
+  offset : Int32,
   matrix : @math.Matrix4,
 ) -> Unit {
   for index in 0..<16 {
@@ -106,7 +106,7 @@ pub fn pack_u32_indices(index : BufferAttribute) -> FixedArray[Byte] {
 
 ///|
 /// 整数索引进小端 `u32`。
-pub fn pack_index_array(indices : Array[Int]) -> FixedArray[Byte] {
+pub fn pack_index_array(indices : Array[Int32]) -> FixedArray[Byte] {
   let dst = FixedArray::make(indices.length() * 4, b'\x00')
   for item in 0..<indices.length() {
     write_u32(dst, item * 4, indices[item])
@@ -122,7 +122,7 @@ pub fn pack_position_normal_uv(
   position : BufferAttribute,
   normal : BufferAttribute?,
   uv : BufferAttribute?,
-  color? : BufferAttribute? = None,
+  color~ : BufferAttribute? = None,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(position.count * vertex_stride, b'\x00')
   for index in 0..<position.count {
@@ -160,9 +160,9 @@ pub fn pack_position_normal_uv(
 ///|
 fn write_vertex_color(
   dst : FixedArray[Byte],
-  offset : Int,
+  offset : Int32,
   color : BufferAttribute?,
-  index : Int,
+  index : Int32,
 ) -> Unit {
   match color {
     Some(color) if index < color.count => {
@@ -188,9 +188,9 @@ fn write_vertex_color(
 /// 把紧排的 `rgba8` 补到每行 256 字节对齐，供 `write_texture` 使用。
 pub fn pad_texture_rows(
   pixels : FixedArray[Byte],
-  width : Int,
-  height : Int,
-) -> (FixedArray[Byte], Int) {
+  width : Int32,
+  height : Int32,
+) -> (FixedArray[Byte], Int32) {
   let row = width * 4
   let stride = copy_bytes_per_row(row)
   if stride == row {
@@ -258,46 +258,46 @@ pub fn pack_uniforms(
   fog_far : Double,
   fog_density : Double,
   fog_mode : Double,
-  alpha_test? : Double = 0.0,
-  emissive_r? : Double = 0.0,
-  emissive_g? : Double = 0.0,
-  emissive_b? : Double = 0.0,
-  emissive_intensity? : Double = 1.0,
-  flat_shading? : Double = 0.0,
-  point_x? : Double = 0.0,
-  point_y? : Double = 0.0,
-  point_z? : Double = 0.0,
-  point_r? : Double = 0.0,
-  point_g? : Double = 0.0,
-  point_b? : Double = 0.0,
-  point_distance? : Double = 0.0,
-  point_decay? : Double = 2.0,
-  point_enabled? : Double = 0.0,
-  spot_x? : Double = 0.0,
-  spot_y? : Double = 0.0,
-  spot_z? : Double = 0.0,
-  spot_dx? : Double = 0.0,
-  spot_dy? : Double = 0.0,
-  spot_dz? : Double = 0.0,
-  spot_r? : Double = 0.0,
-  spot_g? : Double = 0.0,
-  spot_b? : Double = 0.0,
-  spot_distance? : Double = 0.0,
-  spot_decay? : Double = 2.0,
-  spot_cone_cos? : Double = 1.0,
-  spot_penumbra_cos? : Double = 1.0,
-  spot_enabled? : Double = 0.0,
-  side? : Double = 0.0,
-  hemisphere_sky_r? : Double = 0.0,
-  hemisphere_sky_g? : Double = 0.0,
-  hemisphere_sky_b? : Double = 0.0,
-  hemisphere_ground_r? : Double = 0.0,
-  hemisphere_ground_g? : Double = 0.0,
-  hemisphere_ground_b? : Double = 0.0,
-  hemisphere_x? : Double = 0.0,
-  hemisphere_y? : Double = 0.0,
-  hemisphere_z? : Double = 0.0,
-  hemisphere_enabled? : Double = 0.0,
+  alpha_test~ : Double = 0.0,
+  emissive_r~ : Double = 0.0,
+  emissive_g~ : Double = 0.0,
+  emissive_b~ : Double = 0.0,
+  emissive_intensity~ : Double = 1.0,
+  flat_shading~ : Double = 0.0,
+  point_x~ : Double = 0.0,
+  point_y~ : Double = 0.0,
+  point_z~ : Double = 0.0,
+  point_r~ : Double = 0.0,
+  point_g~ : Double = 0.0,
+  point_b~ : Double = 0.0,
+  point_distance~ : Double = 0.0,
+  point_decay~ : Double = 2.0,
+  point_enabled~ : Double = 0.0,
+  spot_x~ : Double = 0.0,
+  spot_y~ : Double = 0.0,
+  spot_z~ : Double = 0.0,
+  spot_dx~ : Double = 0.0,
+  spot_dy~ : Double = 0.0,
+  spot_dz~ : Double = 0.0,
+  spot_r~ : Double = 0.0,
+  spot_g~ : Double = 0.0,
+  spot_b~ : Double = 0.0,
+  spot_distance~ : Double = 0.0,
+  spot_decay~ : Double = 2.0,
+  spot_cone_cos~ : Double = 1.0,
+  spot_penumbra_cos~ : Double = 1.0,
+  spot_enabled~ : Double = 0.0,
+  side~ : Double = 0.0,
+  hemisphere_sky_r~ : Double = 0.0,
+  hemisphere_sky_g~ : Double = 0.0,
+  hemisphere_sky_b~ : Double = 0.0,
+  hemisphere_ground_r~ : Double = 0.0,
+  hemisphere_ground_g~ : Double = 0.0,
+  hemisphere_ground_b~ : Double = 0.0,
+  hemisphere_x~ : Double = 0.0,
+  hemisphere_y~ : Double = 0.0,
+  hemisphere_z~ : Double = 0.0,
+  hemisphere_enabled~ : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -409,7 +409,7 @@ pub fn point_quad_bytes() -> FixedArray[Byte] {
 /// 实例颜色。没有颜色时写成白色。个数按矩阵容量，而不是当前 `count`。
 pub fn pack_instance_colors(
   colors : BufferAttribute?,
-  count : Int,
+  count : Int32,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(count * instance_color_stride, b'\x00')
   let mut index = 0

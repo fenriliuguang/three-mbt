@@ -1,10 +1,10 @@
 // r186: `BufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L21
 
 ///|
-let next_attribute_id : Ref[Int] = Ref::Ref(0)
+let next_attribute_id : Ref[Int32] = Ref::Ref(0)
 
 ///|
-fn fresh_attribute_id() -> Int {
+fn fresh_attribute_id() -> Int32 {
   let id = next_attribute_id.val
   next_attribute_id.val = id + 1
   id
@@ -14,8 +14,8 @@ fn fresh_attribute_id() -> Int {
 /// 一段待上传的缓冲区间。上游没有单独的类。
 /// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L181
 pub(all) struct UpdateRange {
-  start : Int
-  count : Int
+  start : Int32
+  count : Int32
 }
 
 ///|
@@ -27,16 +27,16 @@ pub(all) struct UpdateRange {
 /// r186: `gpuType` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L130
 /// r186: `meshPerAttribute` https://github.com/mrdoob/three.js/blob/r186/src/core/InstancedBufferAttribute.js#L40
 pub(all) struct BufferAttribute {
-  id : Int
+  id : Int32
   mut name : String
   mut array : Array[Double]
-  mut item_size : Int
+  mut item_size : Int32
   mut normalized : Bool
-  mut count : Int
-  mut version : Int
-  mut usage : Int
-  mut gpu_type : Int
-  mut mesh_per_attribute : Int
+  mut count : Int32
+  mut version : Int32
+  mut usage : Int32
+  mut gpu_type : Int32
+  mut mesh_per_attribute : Int32
   update_ranges : Array[UpdateRange]
   mut on_upload_callback : (() -> Unit)?
   listeners : Map[String, Array[() -> Unit]]
@@ -45,9 +45,9 @@ pub(all) struct BufferAttribute {
 ///|
 pub fn BufferAttribute::new(
   array : Array[Double],
-  item_size : Int,
-  normalized? : Bool = false,
-  mesh_per_attribute? : Int = 1,
+  item_size : Int32,
+  normalized~ : Bool = false,
+  mesh_per_attribute~ : Int32 = 1,
 ) -> BufferAttribute {
   {
     id: fresh_attribute_id(),
@@ -68,8 +68,8 @@ pub fn BufferAttribute::new(
 
 ///|
 pub fn BufferAttribute::from_ints(
-  values : Array[Int],
-  item_size : Int,
+  values : Array[Int32],
+  item_size : Int32,
 ) -> BufferAttribute {
   let array = []
   for value in values {
@@ -95,7 +95,7 @@ pub fn BufferAttribute::set_needs_update(
 /// r186: `setUsage` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L167
 pub fn BufferAttribute::set_usage(
   self : BufferAttribute,
-  value : Int,
+  value : Int32,
 ) -> BufferAttribute {
   self.usage = value
   self
@@ -106,10 +106,10 @@ pub fn BufferAttribute::set_usage(
 /// r186: `addUpdateRange` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L181
 pub fn BufferAttribute::add_update_range(
   self : BufferAttribute,
-  start : Int,
-  count : Int,
+  start : Int32,
+  count : Int32,
 ) -> Unit {
-  self.update_ranges.push({ start, count })
+  self.update_ranges.push({ start, count, })
 }
 
 ///|
@@ -245,9 +245,9 @@ pub fn BufferAttribute::copy(
 /// r186: `copyAt` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L227
 pub fn BufferAttribute::copy_at(
   self : BufferAttribute,
-  index1 : Int,
+  index1 : Int32,
   attribute : BufferAttribute,
-  index2 : Int,
+  index2 : Int32,
 ) -> BufferAttribute {
   let mut destination = index1 * self.item_size
   let mut source = index2 * attribute.item_size
@@ -285,7 +285,7 @@ pub fn BufferAttribute::copy_array(
 pub fn BufferAttribute::set(
   self : BufferAttribute,
   value : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> BufferAttribute {
   if offset < 0 || offset + value.length() > self.array.length() {
     abort("BufferAttribute.set source does not fit")
@@ -302,14 +302,16 @@ pub fn BufferAttribute::set(
 /// 新建一份属性，数值与源独立。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L653
 pub fn BufferAttribute::clone(self : BufferAttribute) -> BufferAttribute {
-  BufferAttribute::new(self.array, self.item_size, normalized=self.normalized).copy(self)
+  BufferAttribute::new(self.array, self.item_size, normalized=self.normalized).copy(
+    self,
+  )
 }
 
 ///|
 pub fn BufferAttribute::get_component(
   self : BufferAttribute,
-  index : Int,
-  component : Int,
+  index : Int32,
+  component : Int32,
 ) -> Double {
   self.array[index * self.item_size + component]
 }
@@ -319,8 +321,8 @@ pub fn BufferAttribute::get_component(
 /// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L403
 pub fn BufferAttribute::set_component(
   self : BufferAttribute,
-  index : Int,
-  component : Int,
+  index : Int32,
+  component : Int32,
   value : Double,
 ) -> BufferAttribute {
   self.array[index * self.item_size + component] = value
@@ -328,7 +330,7 @@ pub fn BufferAttribute::set_component(
 }
 
 ///|
-pub fn BufferAttribute::get_x(self : BufferAttribute, index : Int) -> Double {
+pub fn BufferAttribute::get_x(self : BufferAttribute, index : Int32) -> Double {
   self.get_component(index, 0)
 }
 
@@ -337,14 +339,14 @@ pub fn BufferAttribute::get_x(self : BufferAttribute, index : Int) -> Double {
 /// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L436
 pub fn BufferAttribute::set_x(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
 ) -> BufferAttribute {
   self.set_component(index, 0, x)
 }
 
 ///|
-pub fn BufferAttribute::get_y(self : BufferAttribute, index : Int) -> Double {
+pub fn BufferAttribute::get_y(self : BufferAttribute, index : Int32) -> Double {
   self.get_component(index, 1)
 }
 
@@ -353,14 +355,14 @@ pub fn BufferAttribute::get_y(self : BufferAttribute, index : Int) -> Double {
 /// r186: `setY` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L469
 pub fn BufferAttribute::set_y(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   y : Double,
 ) -> BufferAttribute {
   self.set_component(index, 1, y)
 }
 
 ///|
-pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int) -> Double {
+pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int32) -> Double {
   self.get_component(index, 2)
 }
 
@@ -369,7 +371,7 @@ pub fn BufferAttribute::get_z(self : BufferAttribute, index : Int) -> Double {
 /// r186: `setZ` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L502
 pub fn BufferAttribute::set_z(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   z : Double,
 ) -> BufferAttribute {
   self.set_component(index, 2, z)
@@ -378,7 +380,7 @@ pub fn BufferAttribute::set_z(
 ///|
 /// 读取一个顶点的 w 分量。
 /// r186: `getW` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L518
-pub fn BufferAttribute::get_w(self : BufferAttribute, index : Int) -> Double {
+pub fn BufferAttribute::get_w(self : BufferAttribute, index : Int32) -> Double {
   self.get_component(index, 3)
 }
 
@@ -387,7 +389,7 @@ pub fn BufferAttribute::get_w(self : BufferAttribute, index : Int) -> Double {
 /// r186: `setW` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L535
 pub fn BufferAttribute::set_w(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   w : Double,
 ) -> BufferAttribute {
   self.set_component(index, 3, w)
@@ -398,7 +400,7 @@ pub fn BufferAttribute::set_w(
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector3.js#L1203
 pub fn BufferAttribute::copy_to_vector3(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Vector3,
 ) -> @math.Vector3 {
   target.set(self.get_x(index), self.get_y(index), self.get_z(index))
@@ -409,7 +411,7 @@ pub fn BufferAttribute::copy_to_vector3(
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L816
 pub fn BufferAttribute::copy_to_vector2(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Vector2,
 ) -> @math.Vector2 {
   target.set(self.get_x(index), self.get_y(index))
@@ -420,9 +422,9 @@ pub fn BufferAttribute::copy_to_vector2(
 /// r186: `getInterpolatedAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L195
 pub fn BufferAttribute::interpolate_vector2(
   self : BufferAttribute,
-  i1 : Int,
-  i2 : Int,
-  i3 : Int,
+  i1 : Int32,
+  i2 : Int32,
+  i3 : Int32,
   barycoord : @math.Vector3,
   target : @math.Vector2,
 ) -> @math.Vector2 {
@@ -443,7 +445,7 @@ pub fn BufferAttribute::interpolate_vector2(
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L1024
 pub fn BufferAttribute::copy_to_vector4(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Vector4,
 ) -> @math.Vector4 {
   target.set(
@@ -459,7 +461,7 @@ pub fn BufferAttribute::copy_to_vector4(
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L923
 pub fn BufferAttribute::copy_to_color(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Color,
 ) -> @math.Color {
   target.set(self.get_x(index), self.get_y(index), self.get_z(index))
@@ -470,7 +472,7 @@ pub fn BufferAttribute::copy_to_color(
 /// r186: `fromBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L862
 pub fn BufferAttribute::copy_to_quaternion(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Quaternion,
 ) -> @math.Quaternion {
   target.set(
@@ -504,9 +506,9 @@ pub fn BufferAttribute::set_box3(
 /// r186: `getInterpolatedAttribute` https://github.com/mrdoob/three.js/blob/r186/src/math/Triangle.js#L195
 pub fn BufferAttribute::interpolate_vector3(
   self : BufferAttribute,
-  i1 : Int,
-  i2 : Int,
-  i3 : Int,
+  i1 : Int32,
+  i2 : Int32,
+  i3 : Int32,
   barycoord : @math.Vector3,
   target : @math.Vector3,
 ) -> @math.Vector3 {
@@ -525,9 +527,9 @@ pub fn BufferAttribute::interpolate_vector3(
 pub fn BufferAttribute::set_triangle(
   self : BufferAttribute,
   target : @math.Triangle,
-  i0 : Int,
-  i1 : Int,
-  i2 : Int,
+  i0 : Int32,
+  i1 : Int32,
+  i2 : Int32,
 ) -> @math.Triangle {
   ignore(self.copy_to_vector3(i0, target.a))
   ignore(self.copy_to_vector3(i1, target.b))
@@ -540,7 +542,7 @@ pub fn BufferAttribute::set_triangle(
 /// r186: `setXY` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L553
 pub fn BufferAttribute::set_xy(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
 ) -> BufferAttribute {
@@ -553,7 +555,7 @@ pub fn BufferAttribute::set_xy(
 ///|
 pub fn BufferAttribute::set_xyz(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
   z : Double,
@@ -569,7 +571,7 @@ pub fn BufferAttribute::set_xyz(
 /// r186: `setXYZW` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L610
 pub fn BufferAttribute::set_xyzw(
   self : BufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
   z : Double,
@@ -672,13 +674,13 @@ pub fn BufferAttribute::transform_direction(
 /// `BufferAttribute.toJSON` 返回的数据。上游没有单独的类。重复次数不是 `1` 时带上实例字段。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/core/BufferAttribute.js#L664
 pub(all) struct AttributeJson {
-  item_size : Int
+  item_size : Int32
   array : Array[Double]
   normalized : Bool
   name : String
-  usage : Int
-  gpu_type : Int
-  mesh_per_attribute : Int?
+  usage : Int32
+  gpu_type : Int32
+  mesh_per_attribute : Int32?
   is_instanced_buffer_attribute : Bool?
 }
 
@@ -700,6 +702,10 @@ pub fn BufferAttribute::to_json(self : BufferAttribute) -> AttributeJson {
     } else {
       None
     },
-    is_instanced_buffer_attribute: if instanced { Some(true) } else { None },
+    is_instanced_buffer_attribute: if instanced {
+      Some(true)
+    } else {
+      None
+    },
   }
 }

@@ -34,7 +34,8 @@ test "SkinnedMesh.bind stores the skeleton and the inverse bind matrix" {
   let given = @math.Matrix4::new()
   ignore(
     given.set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   let explicit = @objects.Skeleton::new(bones=[bone])
@@ -116,7 +117,10 @@ test "panic SkinnedMesh.pose requires a skeleton" {
 test "SkinnedMesh.normalizeSkinWeights scales by the Manhattan length" {
   let geometry = @core.BufferGeometry::new()
   let weights = @core.BufferAttribute::new(
-    [2.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, -2.0, 2.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+    [
+      2.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, -2.0, 2.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+      1.0,
+    ],
     4,
   )
   ignore(geometry.set_attribute("skinWeight", weights))
@@ -165,7 +169,8 @@ test "SkinnedMesh.updateMatrixWorld refreshes the inverse bind matrix" {
   assert_eq(skin.bind_matrix_inverse.elements[0], 1.0)
   ignore(
     skin.bind_matrix.set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   skin.bind_mode = @constants.Detached
@@ -321,10 +326,9 @@ test "SkinnedMesh.getVertexPosition applies morphs then bones" {
   assert_eq(target.y, 7.0)
   assert_eq(target.z, 3.0)
   geometry.morph_targets_relative = true
-  geometry.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
-  )
+  geometry.morph_attributes.set("position", [
+    @core.BufferAttribute::new([2.0, 0.0, 0.0], 3),
+  ])
   skin.mesh.node.morph = Some(@core.MorphState::{
     base_position: [1.0, 2.0, 3.0],
     base_normal: None,
@@ -403,10 +407,7 @@ test "SkinnedMesh.computeBoundingBox unions skinned vertices" {
   assert_eq(box.max.z, 0.0)
   let empty_geometry = @core.BufferGeometry::new()
   ignore(
-    empty_geometry.set_attribute(
-      "position",
-      @core.BufferAttribute::new([], 3),
-    ),
+    empty_geometry.set_attribute("position", @core.BufferAttribute::new([], 3)),
   )
   let empty_skin = @objects.SkinnedMesh::new(
     empty_geometry,
@@ -475,10 +476,7 @@ test "SkinnedMesh.computeBoundingSphere encloses skinned vertices" {
   assert_eq(sphere.radius, 1.0)
   let empty_geometry = @core.BufferGeometry::new()
   ignore(
-    empty_geometry.set_attribute(
-      "position",
-      @core.BufferAttribute::new([], 3),
-    ),
+    empty_geometry.set_attribute("position", @core.BufferAttribute::new([], 3)),
   )
   let empty_skin = @objects.SkinnedMesh::new(
     empty_geometry,
@@ -520,7 +518,8 @@ test "SkinnedMesh.copy shares the skeleton and clones the bounds" {
   source.bind_mode = @constants.Detached
   ignore(
     source.bind_matrix.set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   ignore(
@@ -654,7 +653,8 @@ test "SkinnedMesh.clone shares the skeleton and drops children when asked" {
   source.bind_mode = @constants.Detached
   ignore(
     source.bind_matrix.set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 4.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   ignore(
@@ -671,7 +671,10 @@ test "SkinnedMesh.clone shares the skeleton and drops children when asked" {
   )
   source.bounding_box = Some(source_box)
   source.bounding_sphere = Some(
-    @math.Sphere::new(center=@math.Vector3::new(x=0.0, y=5.0, z=0.0), radius=1.0),
+    @math.Sphere::new(
+      center=@math.Vector3::new(x=0.0, y=5.0, z=0.0),
+      radius=1.0,
+    ),
   )
   let cloned = source.clone()
   assert_eq(physical_equal(cloned, source), false)
@@ -735,9 +738,7 @@ test "SkinnedMesh.raycast hits the deformed triangle" {
     geometry.set_attribute(
       "skinIndex",
       @core.BufferAttribute::new(
-        [
-          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        ],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         4,
       ),
     ),
@@ -746,9 +747,7 @@ test "SkinnedMesh.raycast hits the deformed triangle" {
     geometry.set_attribute(
       "skinWeight",
       @core.BufferAttribute::new(
-        [
-          1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-        ],
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
         4,
       ),
     ),
@@ -838,9 +837,7 @@ test "Object3D.raycast uses the skinned hook" {
     geometry.set_attribute(
       "skinIndex",
       @core.BufferAttribute::new(
-        [
-          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        ],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         4,
       ),
     ),
@@ -849,9 +846,7 @@ test "Object3D.raycast uses the skinned hook" {
     geometry.set_attribute(
       "skinWeight",
       @core.BufferAttribute::new(
-        [
-          1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-        ],
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
         4,
       ),
     ),
@@ -906,13 +901,19 @@ test "SkinnedMesh.raycast uses a material array" {
   ignore(
     geometry.set_attribute(
       "skinIndex",
-      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        4,
+      ),
     ),
   )
   ignore(
     geometry.set_attribute(
       "skinWeight",
-      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+      @core.BufferAttribute::new(
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+        4,
+      ),
     ),
   )
   let back = @materials.Material::basic()
@@ -973,13 +974,19 @@ test "panic SkinnedMesh.raycast material index is out of range" {
   ignore(
     geometry.set_attribute(
       "skinIndex",
-      @core.BufferAttribute::new([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 4),
+      @core.BufferAttribute::new(
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        4,
+      ),
     ),
   )
   ignore(
     geometry.set_attribute(
       "skinWeight",
-      @core.BufferAttribute::new([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 4),
+      @core.BufferAttribute::new(
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+        4,
+      ),
     ),
   )
   geometry.add_group(0, 3, material_index=1)
@@ -992,4 +999,3 @@ test "panic SkinnedMesh.raycast material index is out of range" {
   )
   ignore(skin.raycast(raycaster, []))
 }
-

@@ -38,26 +38,26 @@ pub(all) struct Intersection {
   point : @math.Vector3
   object : Object3D
   face : Face?
-  face_index : Int?
+  face_index : Int32?
   barycoord : @math.Vector3?
   uv : @math.Vector2?
   uv1 : @math.Vector2?
   normal : @math.Vector3?
-  index : Int?
+  index : Int32?
   distance_to_ray : Double?
-  instance_id : Int?
-  material_index : Int?
+  instance_id : Int32?
+  material_index : Int32?
 }
 
 ///|
 /// 上游没有单独的类。网格相交时写下的三角形，`materialIndex` 默认 `0`。
 /// r186: `face` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L489
 pub(all) struct Face {
-  a : Int
-  b : Int
-  c : Int
+  a : Int32
+  b : Int32
+  c : Int32
   normal : @math.Vector3
-  material_index : Int
+  material_index : Int32
 }
 
 ///|
@@ -86,8 +86,8 @@ pub(all) struct RaycasterParams {
 pub fn Raycaster::new(
   origin? : @math.Vector3,
   direction? : @math.Vector3,
-  near? : Double = 0.0,
-  far? : Double = 1.0 / 0.0,
+  near~ : Double = 0.0,
+  far~ : Double = 1.0 / 0.0,
 ) -> Raycaster {
   let ray = @math.Ray::new()
   match origin {
@@ -104,7 +104,7 @@ pub fn Raycaster::new(
     far,
     camera: None,
     layers: Layers::new(),
-    params: { line: { threshold: 1.0 }, points: { threshold: 1.0 } },
+    params: { line: { threshold: 1.0, }, points: { threshold: 1.0, }, },
   }
 }
 
@@ -142,7 +142,11 @@ pub fn Raycaster::set_from_camera(
         None => abort("Raycaster.set_from_camera requires a camera")
         Some(state) => {
           ignore(
-            self.ray.origin.set(coords.x, coords.y, state.projection.elements[14]),
+            self.ray.origin.set(
+              coords.x,
+              coords.y,
+              state.projection.elements[14],
+            ),
           )
           ignore(camera.unproject_point(self.ray.origin))
           ignore(
@@ -164,7 +168,7 @@ pub fn Raycaster::set_from_camera(
 pub fn Raycaster::intersect_object(
   self : Raycaster,
   object : Object3D,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
   intersects? : Array[Intersection],
 ) -> Array[Intersection] {
   let intersects = match intersects {
@@ -183,7 +187,7 @@ pub fn Raycaster::intersect_object(
 pub fn Raycaster::intersect_objects(
   self : Raycaster,
   objects : Array[Object3D],
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
   intersects? : Array[Intersection],
 ) -> Array[Intersection] {
   let intersects = match intersects {

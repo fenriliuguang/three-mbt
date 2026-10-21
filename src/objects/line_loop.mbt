@@ -12,7 +12,7 @@ pub(all) struct LineLoop {
   mut material : @materials.LineBasicMaterial
   mut materials : Array[@materials.LineBasicMaterial]?
   mut morph_target_influences : Array[Double]?
-  mut morph_target_dictionary : Map[String, Int]?
+  mut morph_target_dictionary : Map[String, Int32]?
 }
 
 ///|
@@ -50,7 +50,7 @@ pub extend LineLoop with @core.AsNode::{to_node}
 pub fn LineLoop::copy(
   self : LineLoop,
   source : LineLoop,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> LineLoop {
   ignore(self.node.copy(source.node, recursive~))
   self.geometry = source.geometry
@@ -63,7 +63,7 @@ pub fn LineLoop::copy(
 ///|
 /// 新建一条闭合折线再复制。three.js 没有单独的 `LineLoop.clone`，用的是 `Object3D.clone`。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn LineLoop::clone(self : LineLoop, recursive? : Bool = true) -> LineLoop {
+pub fn LineLoop::clone(self : LineLoop, recursive~ : Bool = true) -> LineLoop {
   LineLoop::new(self.geometry, self.material).copy(self, recursive~)
 }
 
@@ -84,7 +84,7 @@ pub fn LineLoop::update_morph_targets(self : LineLoop) -> Unit {
     None => ()
     Some(attributes) => {
       let influences : Array[Double] = []
-      let dictionary : Map[String, Int] = Map([])
+      let dictionary : Map[String, Int32] = Map([])
       let mut index = 0
       while index < attributes.length() {
         let attribute = attributes[index]
@@ -183,7 +183,7 @@ pub fn LineLoop::set_materials(
 }
 
 ///|
-fn identity_matrices(count : Int) -> BufferAttribute {
+fn identity_matrices(count : Int32) -> BufferAttribute {
   let array = []
   let mut index = 0
   while index < count {
@@ -211,7 +211,7 @@ fn identity_matrices(count : Int) -> BufferAttribute {
 ///|
 fn write_matrix(
   attribute : BufferAttribute,
-  index : Int,
+  index : Int32,
   matrix : @math.Matrix4,
 ) -> Unit {
   let offset = index * attribute.item_size
@@ -225,7 +225,7 @@ fn write_matrix(
 ///|
 fn read_matrix(
   attribute : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Matrix4,
 ) -> Unit {
   let offset = index * attribute.item_size
@@ -235,4 +235,3 @@ fn read_matrix(
     component = component + 1
   }
 }
-

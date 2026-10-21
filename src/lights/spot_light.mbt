@@ -11,12 +11,12 @@ pub(all) struct SpotLight {
 
 ///|
 pub fn SpotLight::new(
-  hex? : Int = 0xFFFFFF,
-  intensity? : Double = 1.0,
-  distance? : Double = 0.0,
-  angle? : Double = @std.PI / 3.0,
-  penumbra? : Double = 0.0,
-  decay? : Double = 2.0,
+  hex~ : Int32 = 0xFFFFFF,
+  intensity~ : Double = 1.0,
+  distance~ : Double = 0.0,
+  angle~ : Double = @std.PI / 3.0,
+  penumbra~ : Double = 0.0,
+  decay~ : Double = 2.0,
 ) -> SpotLight {
   let node = make_light(
     @core.SpotLight,
@@ -45,4 +45,3 @@ pub impl @core.AsNode for SpotLight with fn to_node(self) {
 
 ///|
 pub extend SpotLight with @core.AsNode::{to_node}
-

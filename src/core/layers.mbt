@@ -4,7 +4,7 @@
 /// 32 层可见性掩码。默认只属于第 0 层，与 r186 `Layers` 相同。
 /// r186: `Layers` https://github.com/mrdoob/three.js/blob/r186/src/core/Layers.js#L13
 pub(all) struct Layers {
-  mut mask : Int
+  mut mask : Int32
 }
 
 ///|
@@ -13,12 +13,12 @@ pub fn Layers::new() -> Layers {
 }
 
 ///|
-pub fn Layers::set(self : Layers, layer : Int) -> Unit {
+pub fn Layers::set(self : Layers, layer : Int32) -> Unit {
   self.mask = 1 << layer
 }
 
 ///|
-pub fn Layers::enable(self : Layers, layer : Int) -> Unit {
+pub fn Layers::enable(self : Layers, layer : Int32) -> Unit {
   self.mask = self.mask | (1 << layer)
 }
 
@@ -28,12 +28,12 @@ pub fn Layers::enable_all(self : Layers) -> Unit {
 }
 
 ///|
-pub fn Layers::toggle(self : Layers, layer : Int) -> Unit {
+pub fn Layers::toggle(self : Layers, layer : Int32) -> Unit {
   self.mask = self.mask ^ (1 << layer)
 }
 
 ///|
-pub fn Layers::disable(self : Layers, layer : Int) -> Unit {
+pub fn Layers::disable(self : Layers, layer : Int32) -> Unit {
   self.mask = self.mask & (1 << layer).lnot()
 }
 
@@ -48,6 +48,6 @@ pub fn Layers::intersects(self : Layers, layers : Layers) -> Bool {
 }
 
 ///|
-pub fn Layers::is_enabled(self : Layers, layer : Int) -> Bool {
+pub fn Layers::is_enabled(self : Layers, layer : Int32) -> Bool {
   (self.mask & (1 << layer)) != 0
 }

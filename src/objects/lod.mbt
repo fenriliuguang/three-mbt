@@ -7,7 +7,7 @@ pub(all) struct LOD {
   node : Object3D
   mut levels : Array[@core.LodLevel]
   mut auto_update : Bool
-  mut current_level : Int
+  mut current_level : Int32
 }
 
 ///|
@@ -38,8 +38,8 @@ pub extend LOD with @core.AsNode::{to_node}
 pub fn LOD::add_level(
   self : LOD,
   object : Object3D,
-  distance? : Double = 0.0,
-  hysteresis? : Double = 0.0,
+  distance~ : Double = 0.0,
+  hysteresis~ : Double = 0.0,
 ) -> LOD {
   let distance = distance.abs()
   let mut index = 0
@@ -56,7 +56,7 @@ pub fn LOD::add_level(
     next.push(self.levels[i])
     i = i + 1
   }
-  next.push({ object, distance, hysteresis })
+  next.push({ object, distance, hysteresis, })
   while i < count {
     next.push(self.levels[i])
     i = i + 1
@@ -102,17 +102,14 @@ pub fn LOD::remove_level(self : LOD, distance : Double) -> Bool {
 ///|
 /// 返回当前级别下标。新建时是 `0`。`update` 在多于一级时改写它。
 /// r186: `getCurrentLevel` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L175
-pub fn LOD::get_current_level(self : LOD) -> Int {
+pub fn LOD::get_current_level(self : LOD) -> Int32 {
   self.current_level
 }
 
 ///|
 /// 返回第一个距离阈值大于给定距离的前一级对象。对象可见时，阈值会减去 `distance * hysteresis`。没有级别时返回空。
 /// r186: `getObjectForDistance` https://github.com/mrdoob/three.js/blob/r186/src/objects/LOD.js#L188
-pub fn LOD::get_object_for_distance(
-  self : LOD,
-  distance : Double,
-) -> Object3D? {
+pub fn LOD::get_object_for_distance(self : LOD, distance : Double) -> Object3D? {
   @core.lod_object_for_distance(self.levels, distance)
 }
 
@@ -128,10 +125,12 @@ pub fn LOD::update(self : LOD, camera : Object3D) -> Unit {
     None => abort("LOD.update requires a camera")
     Some(state) => state
   }
-  let camera_position = @math.Vector3::new()
-    .set_from_matrix_position(camera.matrix_world)
-  let lod_position = @math.Vector3::new()
-    .set_from_matrix_position(self.node.matrix_world)
+  let camera_position = @math.Vector3::new().set_from_matrix_position(
+    camera.matrix_world,
+  )
+  let lod_position = @math.Vector3::new().set_from_matrix_position(
+    self.node.matrix_world,
+  )
   let distance = camera_position.distance_to(lod_position) / state.zoom
   self.levels[0].object.visible = true
   let mut i = 1

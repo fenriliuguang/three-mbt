@@ -70,14 +70,14 @@ pub fn EffectComposer::add_copy(self : EffectComposer, pass : CopyPass) -> Unit 
 }
 
 ///|
-pub fn EffectComposer::pass_count(self : EffectComposer) -> Int {
+pub fn EffectComposer::pass_count(self : EffectComposer) -> Int32 {
   self.passes.length()
 }
 
 ///|
 pub fn EffectComposer::set_enabled(
   self : EffectComposer,
-  index : Int,
+  index : Int32,
   enabled : Bool,
 ) -> Unit {
   if index >= 0 && index < self.passes.length() {
@@ -102,7 +102,7 @@ pub fn EffectComposer::any_enabled(self : EffectComposer) -> Bool {
 /// r186: `isLastEnabledPass` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/postprocessing/EffectComposer.js#L192
 pub fn EffectComposer::is_last_enabled(
   self : EffectComposer,
-  index : Int,
+  index : Int32,
 ) -> Bool {
   let mut next = index + 1
   while next < self.passes.length() {

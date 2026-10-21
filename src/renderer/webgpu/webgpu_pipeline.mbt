@@ -133,13 +133,13 @@ fn unlit_pipeline(
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
   cull : GpuCullMode,
-  instanced? : Bool = false,
-  blend? : Bool = false,
-  lines? : Bool = false,
-  depth_write? : Bool = true,
-  depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
-  color_write? : Bool = true,
-  premultiplied? : Bool = false,
+  instanced~ : Bool = false,
+  blend~ : Bool = false,
+  lines~ : Bool = false,
+  depth_write~ : Bool = true,
+  depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write~ : Bool = true,
+  premultiplied~ : Bool = false,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -226,7 +226,7 @@ fn depth_pipeline(
   pipeline_layout : @gpu.GpuPipelineLayout,
   instanced : Bool,
   cull : GpuCullMode,
-  compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
+  compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
 ) -> GpuRenderPipeline {
   device.create_render_pipeline({
     vertex: {
@@ -268,7 +268,7 @@ fn shadow_pipelines(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   instanced : Bool,
-  compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
+  compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS,
 ) -> ShadowPipelines {
   {
     back: depth_pipeline(
@@ -306,11 +306,11 @@ fn color_pipeline(
   format : GpuTextureFormat,
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
-  blend? : Bool = false,
-  depth_write? : Bool = true,
-  depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
-  color_write? : Bool = true,
-  premultiplied? : Bool = false,
+  blend~ : Bool = false,
+  depth_write~ : Bool = true,
+  depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write~ : Bool = true,
+  premultiplied~ : Bool = false,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -446,12 +446,12 @@ fn cull_pipelines(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
-  instanced? : Bool = false,
-  blend? : Bool = false,
-  depth_write? : Bool = true,
-  depth_compare? : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
-  color_write? : Bool = true,
-  premultiplied? : Bool = false,
+  instanced~ : Bool = false,
+  blend~ : Bool = false,
+  depth_write~ : Bool = true,
+  depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
+  color_write~ : Bool = true,
+  premultiplied~ : Bool = false,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -552,9 +552,9 @@ fn mesh_depth_modes(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
-  instanced? : Bool = false,
-  blend? : Bool = false,
-  premultiplied? : Bool = false,
+  instanced~ : Bool = false,
+  blend~ : Bool = false,
+  premultiplied~ : Bool = false,
 ) -> ColorModes[CullPipelines] {
   {
     write: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -594,7 +594,7 @@ fn wire_depth_modes(
   shader : GpuShaderModule,
   pipeline_layout : @gpu.GpuPipelineLayout,
   format : GpuTextureFormat,
-  instanced? : Bool = false,
+  instanced~ : Bool = false,
 ) -> ColorModes[GpuRenderPipeline] {
   {
     write: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -636,8 +636,8 @@ fn stroke_depth_modes(
   format : GpuTextureFormat,
   topology : @gpu.GpuPrimitiveTopology,
   instanced : Bool,
-  blend? : Bool = false,
-  premultiplied? : Bool = false,
+  blend~ : Bool = false,
+  premultiplied~ : Bool = false,
 ) -> ColorModes[GpuRenderPipeline] {
   {
     write: fill_depth_modes(fn(depth_write, depth_compare) {
@@ -923,4 +923,3 @@ fn bloom_pipeline(
   )
   (layout, pipeline, uniform, sampler)
 }
-

@@ -10,9 +10,9 @@ pub(all) struct HemisphereLight {
 
 ///|
 pub fn HemisphereLight::new(
-  sky? : Int = 0xFFFFFF,
-  ground? : Int = 0xFFFFFF,
-  intensity? : Double = 1.0,
+  sky~ : Int32 = 0xFFFFFF,
+  ground~ : Int32 = 0xFFFFFF,
+  intensity~ : Double = 1.0,
 ) -> HemisphereLight {
   let node = make_light(
     @core.HemisphereLight,

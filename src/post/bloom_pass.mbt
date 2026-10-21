@@ -82,7 +82,7 @@ pub fn high_pass(
 ///|
 /// 可分离高斯的第 `index` 个系数。`kernel_radius / 3` 是 sigma，和 r186 第一级模糊相同。
 /// r186: `_getSeparableBlurMaterial` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L505
-pub fn gaussian_coefficient(index : Int, kernel_radius : Int) -> Double {
+pub fn gaussian_coefficient(index : Int32, kernel_radius : Int32) -> Double {
   let safe = if kernel_radius < 1 { 1 } else { kernel_radius }
   let sigma = safe.to_double() / 3.0
   let i = index.to_double()
@@ -106,9 +106,9 @@ pub(all) struct BloomPass {
 
 ///|
 pub fn BloomPass::new(
-  strength? : Double = 1.0,
-  radius? : Double = 0.0,
-  threshold? : Double = 0.0,
+  strength~ : Double = 1.0,
+  radius~ : Double = 0.0,
+  threshold~ : Double = 0.0,
 ) -> BloomPass {
   {
     strength,
@@ -137,7 +137,7 @@ pub fn BloomPass::set_resolution_scale(
 /// r186: `bloomTintColors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L116
 pub fn BloomPass::set_tint(
   self : BloomPass,
-  level : Int,
+  level : Int32,
   r : Double,
   g : Double,
   b : Double,
@@ -181,11 +181,11 @@ pub fn pack_bloom(
   dir_x : Double,
   dir_y : Double,
   mode : Double,
-  kernel? : Double = 6.0,
-  factor? : Double = 1.0,
-  tint_r? : Double = 1.0,
-  tint_g? : Double = 1.0,
-  tint_b? : Double = 1.0,
+  kernel~ : Double = 6.0,
+  factor~ : Double = 1.0,
+  tint_r~ : Double = 1.0,
+  tint_g~ : Double = 1.0,
+  tint_b~ : Double = 1.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(64, b'\x00')
   write_f32(dst, 0, pass.threshold)
@@ -209,7 +209,7 @@ pub fn pack_bloom(
 /// 把一级染色乘上该级权重。白染色时结果就是权重本身。
 /// r186: `bloomTintColors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L116
 pub fn bloom_tinted(
-  level : Int,
+  level : Int32,
   tint_r : Double,
   tint_g : Double,
   tint_b : Double,
@@ -223,7 +223,7 @@ pub fn bloom_tinted(
 ///|
 /// 五级模糊的核半径，对应 `kernelSizeArray`。
 /// r186: `kernelSizeArray` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L425
-pub fn bloom_kernel_radius(level : Int) -> Int {
+pub fn bloom_kernel_radius(level : Int32) -> Int32 {
   match level {
     0 => 6
     1 => 10
@@ -236,7 +236,7 @@ pub fn bloom_kernel_radius(level : Int) -> Int {
 ///|
 /// 第 `level` 级的边长。先 `floor(base * scale)`，再每级对半，至少是 1。
 /// r186: `setSize` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L322
-pub fn bloom_scaled_size(base : Int, level : Int, scale : Double) -> Int {
+pub fn bloom_scaled_size(base : Int32, level : Int32, scale : Double) -> Int32 {
   let safe = if base < 1 { 1 } else { base }
   let clamped = if scale < 0.0 { 0.0 } else { scale }
   let mut size = (safe.to_double() * clamped).floor().to_int()
@@ -257,7 +257,7 @@ pub fn bloom_scaled_size(base : Int, level : Int, scale : Double) -> Int {
 
 ///|
 /// 缩放为 1 时的边长，和第 0 级全分辨率的现有路径相同。
-pub fn bloom_mip_size(base : Int, level : Int) -> Int {
+pub fn bloom_mip_size(base : Int32, level : Int32) -> Int32 {
   bloom_scaled_size(base, level, 1.0)
 }
 
@@ -265,7 +265,7 @@ pub fn bloom_mip_size(base : Int, level : Int) -> Int {
 /// 第 `level` 级的合成权重，`strength * lerpBloomFactor(bloomFactors[level], radius)`。
 /// r186: `lerpBloomFactor` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L579 ; `bloomFactors` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/tsl/display/BloomNode.js#L435
 pub fn bloom_level_weight(
-  level : Int,
+  level : Int32,
   strength : Double,
   radius : Double,
 ) -> Double {
@@ -379,4 +379,3 @@ pub fn bloom_wgsl() -> String {
     #|}
   code
 }
-

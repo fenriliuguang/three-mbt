@@ -5,9 +5,9 @@
 /// r186: `isMeshDistanceMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L36
 /// r186: `type` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshDistanceMaterial.js#L38
 pub fn Material::distance(
-  hex? : Int = 0xFFFFFF,
-  roughness? : Double = 1.0,
-  metalness? : Double = 0.0,
+  hex~ : Int32 = 0xFFFFFF,
+  roughness~ : Double = 1.0,
+  metalness~ : Double = 0.0,
 ) -> Material {
   {
     color: @math.Color::new().set_hex(hex),
@@ -39,7 +39,7 @@ pub fn Material::distance(
     premultiplied_alpha: false,
     visible: true,
     force_single_pass: false,
-    extensions: { clip_cull_distance: false, multi_draw: false },
+    extensions: { clip_cull_distance: false, multi_draw: false, },
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -157,4 +157,3 @@ pub fn Material::distance(
     listeners: Map([]),
   }
 }
-

@@ -11,11 +11,11 @@ pub(all) struct Spherical {
 
 ///|
 pub fn Spherical::new(
-  radius? : Double = 1.0,
-  phi? : Double = 0.0,
-  theta? : Double = 0.0,
+  radius~ : Double = 1.0,
+  phi~ : Double = 0.0,
+  theta~ : Double = 0.0,
 ) -> Spherical {
-  { radius, phi, theta }
+  { radius, phi, theta, }
 }
 
 ///|

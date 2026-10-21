@@ -12,9 +12,9 @@ pub(all) struct Color {
 
 ///|
 pub fn Color::new(
-  r? : Double = 1.0,
-  g? : Double = 1.0,
-  b? : Double = 1.0,
+  r~ : Double = 1.0,
+  g~ : Double = 1.0,
+  b~ : Double = 1.0,
 ) -> Color {
   { r, g, b, }
 }
@@ -54,13 +54,7 @@ pub fn Color::set_scalar(self : Color, scalar : Double) -> Color {
 /// 色相转成一个线性通道。
 /// r186: `hue2rgb` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L34
 fn hue2rgb(p : Double, q : Double, t : Double) -> Double {
-  let t = if t < 0.0 {
-    t + 1.0
-  } else if t > 1.0 {
-    t - 1.0
-  } else {
-    t
-  }
+  let t = if t < 0.0 { t + 1.0 } else if t > 1.0 { t - 1.0 } else { t }
   if t < 1.0 / 6.0 {
     p + (q - p) * 6.0 * t
   } else if t < 0.5 {
@@ -75,7 +69,12 @@ fn hue2rgb(p : Double, q : Double, t : Double) -> Double {
 ///|
 /// 用色相、饱和度、亮度写入线性通道。默认工作空间已是线性，不再做色彩空间转换。
 /// r186: `setHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L248
-pub fn Color::set_hsl(self : Color, h : Double, s : Double, l : Double) -> Color {
+pub fn Color::set_hsl(
+  self : Color,
+  h : Double,
+  s : Double,
+  l : Double,
+) -> Color {
   let h = euclidean_modulo(h, 1.0)
   let s = clamp(s, 0.0, 1.0)
   let l = clamp(l, 0.0, 1.0)
@@ -129,7 +128,7 @@ pub fn Color::convert_linear_to_srgb(self : Color) -> Color {
 
 ///|
 /// r186: `setHex` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L163
-pub fn Color::set_hex(self : Color, hex : Int) -> Color {
+pub fn Color::set_hex(self : Color, hex : Int32) -> Color {
   let hex = hex.to_double().floor().to_int()
   self.r = srgb_to_linear(((hex >> 16) & 255).to_double() / 255.0)
   self.g = srgb_to_linear(((hex >> 8) & 255).to_double() / 255.0)
@@ -148,7 +147,7 @@ pub fn Color::set_color_name(self : Color, style : String) -> Color {
 }
 
 ///|
-fn color_keyword(name : String) -> Int? {
+fn color_keyword(name : String) -> Int32? {
   match name {
     "aliceblue" => Some(0xF0F8FF)
     "antiquewhite" => Some(0xFAEBD7)
@@ -326,12 +325,12 @@ pub fn Color::set_style(self : Color, style : String) -> Color {
         Some(hex) =>
           if hex.length() == 3 {
             self
-              .set_rgb(
-                hex_nibble_at(hex, 0) / 15.0,
-                hex_nibble_at(hex, 1) / 15.0,
-                hex_nibble_at(hex, 2) / 15.0,
-              )
-              .convert_srgb_to_linear()
+            .set_rgb(
+              hex_nibble_at(hex, 0) / 15.0,
+              hex_nibble_at(hex, 1) / 15.0,
+              hex_nibble_at(hex, 2) / 15.0,
+            )
+            .convert_srgb_to_linear()
           } else if hex.length() == 6 {
             self.set_hex(hex_int(hex))
           } else {
@@ -358,12 +357,7 @@ fn css_color_function(style : String) -> (String, String)? {
   let mut i = 0
   while i < n {
     match style.get_char(i) {
-      Some(c) =>
-        if is_css_word(c) {
-          i = i + 1
-        } else {
-          break
-        }
+      Some(c) => if is_css_word(c) { i = i + 1 } else { break }
       None => break
     }
   }
@@ -411,12 +405,7 @@ fn css_hex_digits(style : String) -> String? {
   let mut i = 1
   while i < n {
     match style.get_char(i) {
-      Some(c) =>
-        if c.is_ascii_hexdigit() {
-          i = i + 1
-        } else {
-          return None
-        }
+      Some(c) => if c.is_ascii_hexdigit() { i = i + 1 } else { return None }
       None => return None
     }
   }
@@ -424,17 +413,12 @@ fn css_hex_digits(style : String) -> String? {
 }
 
 ///|
-fn skip_css_space(text : String, index : Int) -> Int {
+fn skip_css_space(text : String, index : Int32) -> Int32 {
   let mut index = index
   let n = text.length()
   while index < n {
     match text.get_char(index) {
-      Some(c) =>
-        if c.is_ascii_whitespace() {
-          index = index + 1
-        } else {
-          break
-        }
+      Some(c) => if c.is_ascii_whitespace() { index = index + 1 } else { break }
       None => break
     }
   }
@@ -442,7 +426,7 @@ fn skip_css_space(text : String, index : Int) -> Int {
 }
 
 ///|
-fn take_css_char(text : String, index : Int, expect : Char) -> Int? {
+fn take_css_char(text : String, index : Int32, expect : Char) -> Int32? {
   match text.get_char(index) {
     Some(c) => if c == expect { Some(index + 1) } else { None }
     None => None
@@ -450,7 +434,7 @@ fn take_css_char(text : String, index : Int, expect : Char) -> Int? {
 }
 
 ///|
-fn take_css_digits(text : String, index : Int) -> (Int, Double)? {
+fn take_css_digits(text : String, index : Int32) -> (Int32, Double)? {
   let starts = match text.get_char(index) {
     Some(c) => c.is_ascii_digit()
     None => false
@@ -477,7 +461,7 @@ fn take_css_digits(text : String, index : Int) -> (Int, Double)? {
 }
 
 ///|
-fn take_css_float(text : String, index : Int) -> (Int, Double)? {
+fn take_css_float(text : String, index : Int32) -> (Int32, Double)? {
   let mut index = index
   let mut value = 0.0
   let mut saw_digit = false
@@ -525,7 +509,7 @@ fn take_css_float(text : String, index : Int) -> (Int, Double)? {
 }
 
 ///|
-fn take_css_alpha(text : String, index : Int) -> Bool {
+fn take_css_alpha(text : String, index : Int32) -> Bool {
   let index = skip_css_space(text, index)
   if index >= text.length() {
     return true
@@ -560,19 +544,23 @@ fn rgb_byte_channels(components : String) -> (Double, Double, Double)? {
     Some(pair) => pair
     None => return None
   }
-  let i2 = match take_css_char(components, skip_css_space(components, i1), ',') {
+  let i2 = match
+    take_css_char(components, skip_css_space(components, i1), ',') {
     Some(index) => index
     None => return None
   }
-  let (i3, g) = match take_css_digits(components, skip_css_space(components, i2)) {
+  let (i3, g) = match
+    take_css_digits(components, skip_css_space(components, i2)) {
     Some(pair) => pair
     None => return None
   }
-  let i4 = match take_css_char(components, skip_css_space(components, i3), ',') {
+  let i4 = match
+    take_css_char(components, skip_css_space(components, i3), ',') {
     Some(index) => index
     None => return None
   }
-  let (i5, b) = match take_css_digits(components, skip_css_space(components, i4)) {
+  let (i5, b) = match
+    take_css_digits(components, skip_css_space(components, i4)) {
     Some(pair) => pair
     None => return None
   }
@@ -594,11 +582,13 @@ fn rgb_percent_channels(components : String) -> (Double, Double, Double)? {
     Some(index) => index
     None => return None
   }
-  let i3 = match take_css_char(components, skip_css_space(components, i2), ',') {
+  let i3 = match
+    take_css_char(components, skip_css_space(components, i2), ',') {
     Some(index) => index
     None => return None
   }
-  let (i4, g) = match take_css_digits(components, skip_css_space(components, i3)) {
+  let (i4, g) = match
+    take_css_digits(components, skip_css_space(components, i3)) {
     Some(pair) => pair
     None => return None
   }
@@ -606,11 +596,13 @@ fn rgb_percent_channels(components : String) -> (Double, Double, Double)? {
     Some(index) => index
     None => return None
   }
-  let i6 = match take_css_char(components, skip_css_space(components, i5), ',') {
+  let i6 = match
+    take_css_char(components, skip_css_space(components, i5), ',') {
     Some(index) => index
     None => return None
   }
-  let (i7, b) = match take_css_digits(components, skip_css_space(components, i6)) {
+  let (i7, b) = match
+    take_css_digits(components, skip_css_space(components, i6)) {
     Some(pair) => pair
     None => return None
   }
@@ -632,11 +624,13 @@ fn hsl_channels(components : String) -> (Double, Double, Double)? {
     Some(pair) => pair
     None => return None
   }
-  let i2 = match take_css_char(components, skip_css_space(components, i1), ',') {
+  let i2 = match
+    take_css_char(components, skip_css_space(components, i1), ',') {
     Some(index) => index
     None => return None
   }
-  let (i3, s) = match take_css_float(components, skip_css_space(components, i2)) {
+  let (i3, s) = match
+    take_css_float(components, skip_css_space(components, i2)) {
     Some(pair) => pair
     None => return None
   }
@@ -644,11 +638,13 @@ fn hsl_channels(components : String) -> (Double, Double, Double)? {
     Some(index) => index
     None => return None
   }
-  let i5 = match take_css_char(components, skip_css_space(components, i4), ',') {
+  let i5 = match
+    take_css_char(components, skip_css_space(components, i4), ',') {
     Some(index) => index
     None => return None
   }
-  let (i6, l) = match take_css_float(components, skip_css_space(components, i5)) {
+  let (i6, l) = match
+    take_css_float(components, skip_css_space(components, i5)) {
     Some(pair) => pair
     None => return None
   }
@@ -664,7 +660,7 @@ fn hsl_channels(components : String) -> (Double, Double, Double)? {
 }
 
 ///|
-fn hex_nibble(c : Char) -> Int {
+fn hex_nibble(c : Char) -> Int32 {
   if c.is_ascii_digit() {
     c.to_int() - '0'.to_int()
   } else {
@@ -673,7 +669,7 @@ fn hex_nibble(c : Char) -> Int {
 }
 
 ///|
-fn hex_nibble_at(hex : String, index : Int) -> Double {
+fn hex_nibble_at(hex : String, index : Int32) -> Double {
   match hex.get_char(index) {
     Some(c) => hex_nibble(c).to_double()
     None => 0.0
@@ -681,7 +677,7 @@ fn hex_nibble_at(hex : String, index : Int) -> Double {
 }
 
 ///|
-fn hex_int(hex : String) -> Int {
+fn hex_int(hex : String) -> Int32 {
   let mut value = 0
   let mut index = 0
   while index < hex.length() {
@@ -710,7 +706,7 @@ pub fn Color::clone(self : Color) -> Color {
 }
 
 ///|
-pub fn Color::get_hex(self : Color) -> Int {
+pub fn Color::get_hex(self : Color) -> Int32 {
   let r = linear_to_srgb(self.r).clamp(min=0.0, max=1.0) * 255.0
   let g = linear_to_srgb(self.g).clamp(min=0.0, max=1.0) * 255.0
   let b = linear_to_srgb(self.b).clamp(min=0.0, max=1.0) * 255.0
@@ -777,7 +773,12 @@ pub fn Color::get_style(self : Color) -> String {
 ///|
 /// 在色相、饱和度、亮度上各加一个偏移，再写回线性通道。
 /// r186: `offsetHSL` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L664
-pub fn Color::offset_hsl(self : Color, h : Double, s : Double, l : Double) -> Color {
+pub fn Color::offset_hsl(
+  self : Color,
+  h : Double,
+  s : Double,
+  l : Double,
+) -> Color {
   let (hue, saturation, lightness) = self.get_hsl()
   self.set_hsl(hue + h, saturation + s, lightness + l)
 }
@@ -911,7 +912,7 @@ pub fn Color::equals(self : Color, color : Color) -> Bool {
 pub fn Color::from_array(
   self : Color,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Color {
   self.r = array[offset]
   self.g = array[offset + 1]
@@ -925,7 +926,7 @@ pub fn Color::from_array(
 pub fn Color::to_array(
   self : Color,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []
@@ -944,6 +945,6 @@ pub fn Color::to_array(
 ///|
 /// 序列化成 sRGB 十六进制整数。
 /// r186: `toJSON` https://github.com/mrdoob/three.js/blob/r186/src/math/Color.js#L939
-pub fn Color::to_json(self : Color) -> Int {
+pub fn Color::to_json(self : Color) -> Int32 {
   self.get_hex()
 }

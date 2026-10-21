@@ -2,7 +2,7 @@
 
 ///|
 /// 计算着色器一个工作组的线程数。与 `wave_wgsl` 里的 `@workgroup_size` 相同。
-pub const WORKGROUP_SIZE : Int = 64
+pub const WORKGROUP_SIZE : Int32 = 64
 
 ///|
 const PI : Double = 3.141592653589793
@@ -16,12 +16,12 @@ const AMPLITUDE : Double = 0.5
 /// r186: `StorageBufferAttribute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/StorageBufferAttribute.js#L17
 pub(all) struct StoragePositions {
   geometry : @core.BufferGeometry
-  count : Int
+  count : Int32
   mut time : Double
 }
 
 ///|
-pub fn StoragePositions::new(count : Int) -> StoragePositions {
+pub fn StoragePositions::new(count : Int32) -> StoragePositions {
   let safe = if count < 1 { 1 } else { count }
   let geometry = @core.BufferGeometry::new()
   let values = []
@@ -61,7 +61,7 @@ pub fn StoragePositions::set_time(
 
 ///|
 /// `ceil(count / 64)`。`count <= 0` 时不派发。
-pub fn workgroup_count(count : Int) -> Int {
+pub fn workgroup_count(count : Int32) -> Int32 {
   if count <= 0 {
     0
   } else {
@@ -70,7 +70,11 @@ pub fn workgroup_count(count : Int) -> Int {
 }
 
 ///|
-pub fn wave_position(index : Int, count : Int, time : Double) -> @math.Vector3 {
+pub fn wave_position(
+  index : Int32,
+  count : Int32,
+  time : Double,
+) -> @math.Vector3 {
   let span = if count <= 1 { 1.0 } else { (count - 1).to_double() }
   let x = index.to_double() / span * 2.0 - 1.0
   let y = @std.sin(x * PI + time) * AMPLITUDE
@@ -78,7 +82,7 @@ pub fn wave_position(index : Int, count : Int, time : Double) -> @math.Vector3 {
 }
 
 ///|
-fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
+fn write_f32(dst : FixedArray[Byte], offset : Int32, value : Double) -> Unit {
   let bytes = Float::from_double(value).to_le_bytes()
   let mut index = 0
   while index < 4 {
@@ -89,7 +93,7 @@ fn write_f32(dst : FixedArray[Byte], offset : Int, value : Double) -> Unit {
 
 ///|
 /// 16 字节的 uniform：`(time, count, 0, 0)`，都是 `f32`。
-pub fn pack_wave_params(time : Double, count : Int) -> FixedArray[Byte] {
+pub fn pack_wave_params(time : Double, count : Int32) -> FixedArray[Byte] {
   let dst = FixedArray::make(16, b'\x00')
   write_f32(dst, 0, time)
   write_f32(dst, 4, count.to_double())

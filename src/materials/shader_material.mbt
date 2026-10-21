@@ -59,9 +59,9 @@ pub fn GlslVersion::code(self : GlslVersion) -> String {
 /// r186: `lights` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L195
 /// r186: `clipping` https://github.com/mrdoob/three.js/blob/r186/src/materials/ShaderMaterial.js#L204
 pub fn Material::shader(
-  hex? : Int = 0xFFFFFF,
-  roughness? : Double = 1.0,
-  metalness? : Double = 0.0,
+  hex~ : Int32 = 0xFFFFFF,
+  roughness~ : Double = 1.0,
+  metalness~ : Double = 0.0,
 ) -> Material {
   {
     color: @math.Color::new().set_hex(hex),
@@ -93,7 +93,7 @@ pub fn Material::shader(
     premultiplied_alpha: false,
     visible: true,
     force_single_pass: true,
-    extensions: { clip_cull_distance: false, multi_draw: false },
+    extensions: { clip_cull_distance: false, multi_draw: false, },
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -211,4 +211,3 @@ pub fn Material::shader(
     listeners: Map([]),
   }
 }
-

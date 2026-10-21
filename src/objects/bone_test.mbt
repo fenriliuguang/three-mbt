@@ -66,4 +66,3 @@ test "Bone.clone keeps the transform and drops children when asked" {
   assert_eq(source.node.children.length(), 1)
   assert_eq(source.node.position.y, 3.0)
 }
-

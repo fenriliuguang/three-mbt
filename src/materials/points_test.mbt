@@ -328,11 +328,17 @@ test "PointsMaterial stores and copies blendSrc" {
 ///|
 test "PointsMaterial stores and copies blendDst" {
   let defaults = @materials.PointsMaterial::new()
-  assert_eq(defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha, true)
+  assert_eq(
+    defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
   assert_eq(defaults.blend_dst.to_int(), 205)
   let source = @materials.PointsMaterial::new()
   source.blend_dst = @constants.BlendFactor::Zero
-  assert_eq(defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha, true)
+  assert_eq(
+    defaults.blend_dst is @constants.BlendFactor::OneMinusSrcAlpha,
+    true,
+  )
   let destination = @materials.PointsMaterial::new()
   ignore(destination.copy(source))
   assert_eq(destination.blend_dst is @constants.BlendFactor::Zero, true)
@@ -352,7 +358,10 @@ test "PointsMaterial stores and copies blendEquation" {
   assert_eq(defaults.blend_equation is @constants.BlendEquation::Add, true)
   let destination = @materials.PointsMaterial::new()
   ignore(destination.copy(source))
-  assert_eq(destination.blend_equation is @constants.BlendEquation::Subtract, true)
+  assert_eq(
+    destination.blend_equation is @constants.BlendEquation::Subtract,
+    true,
+  )
   assert_eq(destination.blend_equation.to_int(), 101)
   destination.blend_equation = @constants.BlendEquation::Max
   assert_eq(source.blend_equation is @constants.BlendEquation::Subtract, true)
@@ -618,7 +627,8 @@ test "PointsMaterial stores and copies precision" {
   }
   match destination.precision {
     None => abort("destination precision")
-    Some(precision) => assert_eq(precision is @constants.Precision::Mediump, true)
+    Some(precision) =>
+      assert_eq(precision is @constants.Precision::Mediump, true)
   }
 }
 
@@ -819,7 +829,7 @@ test "PointsMaterial clone keeps PointsMaterial and takes a new id" {
 ///|
 test "PointsMaterial addEventListener keeps one copy of a listener" {
   let material = @materials.PointsMaterial::new()
-  let listener = fn() {}
+  let listener = fn() {  }
   material.add_event_listener("dispose", listener)
   material.add_event_listener("dispose", listener)
   match material.listeners.get("dispose") {
@@ -843,8 +853,8 @@ test "PointsMaterial addEventListener keeps one copy of a listener" {
 ///|
 test "PointsMaterial hasEventListener reports a registered listener" {
   let material = @materials.PointsMaterial::new()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), true)
@@ -857,8 +867,8 @@ test "PointsMaterial hasEventListener reports a registered listener" {
 ///|
 test "PointsMaterial removeEventListener drops a registered listener" {
   let material = @materials.PointsMaterial::new()
-  let listener = fn() {}
-  let other_listener = fn() {}
+  let listener = fn() {  }
+  let other_listener = fn() {  }
   material.remove_event_listener("dispose", listener)
   assert_eq(material.has_event_listener("dispose", listener), false)
   material.add_event_listener("dispose", listener)

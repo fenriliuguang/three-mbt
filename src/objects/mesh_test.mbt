@@ -45,10 +45,9 @@ test "getVertexPosition applies a relative morph" {
   assert_eq(target.y, 5.0)
   assert_eq(target.z, 6.0)
   geometry.morph_targets_relative = true
-  geometry.morph_attributes.set(
-    "position",
-    [@core.BufferAttribute::new([2.0, 0.0, 0.0], 3)],
-  )
+  geometry.morph_attributes.set("position", [
+    @core.BufferAttribute::new([2.0, 0.0, 0.0], 3),
+  ])
   mesh.node.morph = Some(@core.MorphState::{
     base_position: [1.0, 2.0, 3.0],
     base_normal: None,
@@ -184,8 +183,7 @@ test "Mesh.copy shares geometry and material" {
   assert_eq(physical_equal(destination.node.children[0], child), false)
   match destination.node.mesh {
     None => assert_eq(false, true)
-    Some(binding) =>
-      assert_eq(physical_equal(binding.geometry, geometry), true)
+    Some(binding) => assert_eq(physical_equal(binding.geometry, geometry), true)
   }
   let bare = @objects.Mesh::new(
     @core.BufferGeometry::new(),
@@ -326,8 +324,7 @@ test "Mesh.clone shares geometry and drops children when asked" {
   assert_eq(physical_equal(cloned.node.children[0], child), false)
   match cloned.node.mesh {
     None => assert_eq(false, true)
-    Some(binding) =>
-      assert_eq(physical_equal(binding.geometry, geometry), true)
+    Some(binding) => assert_eq(physical_equal(binding.geometry, geometry), true)
   }
   let bare = source.clone(recursive=false)
   assert_eq(bare.node.children.length(), 0)
@@ -593,4 +590,3 @@ test "Object3D.intersectsFrustumArray uses only the counted frustums" {
   frustums.count = 2
   assert_eq(mesh.node.intersects_frustum_array(frustums), true)
 }
-

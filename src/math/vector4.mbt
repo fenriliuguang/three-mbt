@@ -12,10 +12,10 @@ pub(all) struct Vector4 {
 
 ///|
 pub fn Vector4::new(
-  x? : Double = 0.0,
-  y? : Double = 0.0,
-  z? : Double = 0.0,
-  w? : Double = 1.0,
+  x~ : Double = 0.0,
+  y~ : Double = 0.0,
+  z~ : Double = 0.0,
+  w~ : Double = 1.0,
 ) -> Vector4 {
   { x, y, z, w, }
 }
@@ -78,7 +78,7 @@ pub fn Vector4::set_w(self : Vector4, w : Double) -> Vector4 {
 /// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L217
 pub fn Vector4::set_component(
   self : Vector4,
-  index : Int,
+  index : Int32,
   value : Double,
 ) -> Vector4 {
   match index {
@@ -94,7 +94,7 @@ pub fn Vector4::set_component(
 ///|
 /// 0 是 x，1 是 y，2 是 z，3 是 w。其他下标中止。
 /// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector4.js#L240
-pub fn Vector4::get_component(self : Vector4, index : Int) -> Double {
+pub fn Vector4::get_component(self : Vector4, index : Int32) -> Double {
   match index {
     0 => self.x
     1 => self.y
@@ -330,8 +330,8 @@ pub fn Vector4::set_axis_angle_from_rotation_matrix(
     return self.set(x, y, z, angle)
   }
   let mut s = ((m32 - m23) * (m32 - m23) +
-    (m13 - m31) * (m13 - m31) +
-    (m21 - m12) * (m21 - m12)).sqrt()
+  (m13 - m31) * (m13 - m31) +
+  (m21 - m12) * (m21 - m12)).sqrt()
   if s.abs() < 0.001 {
     s = 1.0
   }
@@ -415,7 +415,7 @@ pub fn Vector4::clamp_length(
 ) -> Vector4 {
   let length = self.length()
   let divisor = if length == 0.0 { 1.0 } else { length }
-  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min~, max~))
 }
 
 ///|
@@ -557,7 +557,7 @@ pub fn Vector4::equals(self : Vector4, v : Vector4) -> Bool {
 pub fn Vector4::from_array(
   self : Vector4,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Vector4 {
   self.x = array[offset]
   self.y = array[offset + 1]
@@ -572,7 +572,7 @@ pub fn Vector4::from_array(
 pub fn Vector4::to_array(
   self : Vector4,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []

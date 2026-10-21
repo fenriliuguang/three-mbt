@@ -12,7 +12,7 @@ pub(all) struct DiscreteInterpolant {
 pub fn DiscreteInterpolant::new(
   parameter_positions : Array[Double],
   sample_values : Array[Double],
-  sample_size : Int,
+  sample_size : Int32,
   result_buffer? : Array[Double],
 ) -> DiscreteInterpolant {
   let interpolant = match result_buffer {
@@ -33,7 +33,7 @@ pub fn DiscreteInterpolant::new(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/DiscreteInterpolant.js#L25
 pub fn DiscreteInterpolant::interpolate(
   self : DiscreteInterpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,

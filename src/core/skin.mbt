@@ -10,7 +10,7 @@ pub(all) struct SkinState {
   inverse_binds : Array[@math.Matrix4]
   bind_position : Array[Double]
   bind_normal : Array[Double]?
-  indices : Array[Int]
+  indices : Array[Int32]
   weights : Array[Double]
 }
 
@@ -190,7 +190,7 @@ fn write_skinned(
 }
 
 ///|
-fn influence_stride(vertices : Int, weight_len : Int) -> Int {
+fn influence_stride(vertices : Int32, weight_len : Int32) -> Int32 {
   if vertices <= 0 {
     4
   } else {
@@ -206,10 +206,10 @@ fn influence_stride(vertices : Int, weight_len : Int) -> Int {
 ///|
 fn skin_vertex(
   bones : Array[@math.Matrix4],
-  indices : Array[Int],
+  indices : Array[Int32],
   weights : Array[Double],
-  vertex : Int,
-  stride : Int,
+  vertex : Int32,
+  stride : Int32,
   x : Double,
   y : Double,
   z : Double,

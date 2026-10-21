@@ -315,7 +315,11 @@ pub fn Matrix3::rotate(self : Matrix3, theta : Double) -> Matrix3 {
 ///|
 /// 用两个数组成二维平移矩阵。
 /// r186: `makeTranslation` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L471
-pub fn Matrix3::make_translation(self : Matrix3, x : Double, y : Double) -> Matrix3 {
+pub fn Matrix3::make_translation(
+  self : Matrix3,
+  x : Double,
+  y : Double,
+) -> Matrix3 {
   self.set(1.0, 0.0, x, 0.0, 1.0, y, 0.0, 0.0, 1.0)
 }
 
@@ -347,7 +351,7 @@ pub fn Matrix3::equals(self : Matrix3, matrix : Matrix3) -> Bool {
 pub fn Matrix3::from_array(
   self : Matrix3,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Matrix3 {
   let te = self.elements
   for i in 0..<9 {
@@ -362,7 +366,7 @@ pub fn Matrix3::from_array(
 pub fn Matrix3::to_array(
   self : Matrix3,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []

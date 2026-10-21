@@ -47,11 +47,11 @@ fn Object3D::raycast_lod(
     None => return
     Some(levels) => levels
   }
-  let position = @math.Vector3::new().set_from_matrix_position(self.matrix_world)
-  match lod_object_for_distance(
-    levels,
-    raycaster.ray.origin.distance_to(position),
-  ) {
+  let position = @math.Vector3::new().set_from_matrix_position(
+    self.matrix_world,
+  )
+  match
+    lod_object_for_distance(levels, raycaster.ray.origin.distance_to(position)) {
     None => ()
     Some(object) => ignore(object.raycast(raycaster, intersects))
   }

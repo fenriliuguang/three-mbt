@@ -10,7 +10,7 @@ pub(all) struct AnimationAction {
   mut time_scale : Double
   mut weight : Double
   mut loop_mode : LoopMode
-  mut repetitions : Int
+  mut repetitions : Int32
   mut clamp_when_finished : Bool
   mut enabled : Bool
   mut paused : Bool
@@ -54,7 +54,7 @@ pub fn AnimationAction::stop(self : AnimationAction) -> Unit {
 pub fn AnimationAction::set_loop(
   self : AnimationAction,
   mode : LoopMode,
-  repetitions? : Int = -1,
+  repetitions~ : Int32 = -1,
 ) -> Unit {
   self.loop_mode = mode
   self.repetitions = repetitions
@@ -75,4 +75,3 @@ pub fn AnimationAction::set_time_scale(
 ) -> Unit {
   self.time_scale = scale
 }
-

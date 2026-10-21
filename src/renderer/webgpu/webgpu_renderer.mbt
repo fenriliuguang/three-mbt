@@ -114,8 +114,8 @@ pub struct WebGPURenderer {
   storages : Array[StorageGpu]
   uniforms : Array[ObjectGpu]
   textures : Array[TextureGpu]
-  mut swap_width : UInt
-  mut swap_height : UInt
+  mut swap_width : UInt32
+  mut swap_height : UInt32
   mut swapchain_dirty : Bool
   mut reversed_depth : Bool
 }
@@ -938,8 +938,8 @@ fn WebGPURenderer::stroke_pipeline(
 ///|
 fn WebGPURenderer::ensure_depth(
   self : WebGPURenderer,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
 ) -> GpuTextureView {
   match self.depth {
     Some(depth) =>
@@ -1336,8 +1336,8 @@ fn WebGPURenderer::draw_lines(
   pass : @gpu.GpuRenderPassEncoder,
   pipeline : GpuRenderPipeline,
   geometry : PositionGpu,
-  draw_start : Int,
-  draw_count : Int,
+  draw_start : Int32,
+  draw_count : Int32,
 ) -> Unit {
   ignore(self)
   let full = match geometry.indices {
@@ -1363,8 +1363,8 @@ fn WebGPURenderer::draw_lines(
 ///|
 fn sync_camera(
   camera : @core.Object3D,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   reversed_depth : Bool,
 ) -> Unit {
   match camera.camera {
@@ -1415,7 +1415,7 @@ fn WebGPURenderer::sync_swapchain(self : WebGPURenderer) -> Unit {
 }
 
 ///|
-fn extent(value : Int) -> UInt {
+fn extent(value : Int32) -> UInt32 {
   if value < 1 {
     1U
   } else {
@@ -1805,7 +1805,7 @@ fn shadow_pack(lights : @common.LightFrame, receive : Bool) -> ShadowPack {
 ///|
 fn WebGPURenderer::ensure_shadow(
   self : WebGPURenderer,
-  size : Int,
+  size : Int32,
 ) -> ShadowMap {
   let extent = if size < 1 { 1U } else { size.reinterpret_as_uint() }
   let reversed = self.reversed_depth
@@ -1861,7 +1861,11 @@ fn WebGPURenderer::ensure_shadow(
 ///|
 /// 分组范围。`group_count` 小于 0 时画全部。
 /// r186: `getDrawParameters` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/RenderObject.js#L603
-fn mesh_draw(group_count : Int, group_start : Int, full : Int) -> (UInt, UInt?) {
+fn mesh_draw(
+  group_count : Int32,
+  group_start : Int32,
+  full : Int32,
+) -> (UInt32, UInt32?) {
   if group_count < 0 {
     (full.reinterpret_as_uint(), None)
   } else {
@@ -2152,8 +2156,8 @@ fn WebGPURenderer::tone_bind(
 ///|
 fn WebGPURenderer::bloom_color(
   self : WebGPURenderer,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   format : GpuTextureFormat,
   label : String,
 ) -> (GpuTexture, GpuTextureView) {
@@ -2174,8 +2178,8 @@ fn WebGPURenderer::bloom_color(
 ///|
 fn WebGPURenderer::ensure_bloom(
   self : WebGPURenderer,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
 ) -> BloomPyramid {
   match self.bloom_pyramid {
     Some(cached) =>
@@ -2313,7 +2317,7 @@ fn WebGPURenderer::bloom_submit(
   mode : Double,
   kernel : Double,
   factor : Double,
-  tint_level : Int,
+  tint_level : Int32,
   color : GpuTextureView,
   glow : GpuTextureView,
   target : GpuTextureView,
@@ -2379,8 +2383,8 @@ fn WebGPURenderer::bloom_submit(
 fn WebGPURenderer::bloom_prepare(
   self : WebGPURenderer,
   source : GpuTextureView,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   pass : @post.BloomPass,
 ) -> GpuTextureView {
   let base_w = @post.bloom_scaled_size(
@@ -2451,7 +2455,7 @@ fn WebGPURenderer::bloom_prepare(
     input = mip.v_view
     level = level + 1
   }
-  let factor = fn(index : Int) -> Double {
+  let factor = fn(index : Int32) -> Double {
     match index {
       0 => 1.0
       1 => 0.8
@@ -2524,8 +2528,8 @@ fn WebGPURenderer::bloom_prepare(
 fn WebGPURenderer::bloom_to(
   self : WebGPURenderer,
   source : GpuTextureView,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   pass : @post.BloomPass,
   target : GpuTextureView,
 ) -> Unit {
@@ -2538,8 +2542,8 @@ fn WebGPURenderer::bloom_to(
 ///|
 fn WebGPURenderer::ensure_chain(
   self : WebGPURenderer,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
 ) -> ChainBuffers {
   match self.chain_buffers {
     Some(cached) =>
@@ -2636,8 +2640,8 @@ fn WebGPURenderer::compose_effect(
   effect : @post.ComposerEffect,
   read : GpuTextureView,
   target : GpuTextureView,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
 ) -> Unit {
   match effect {
     @post.Grayscale(pass) => {
@@ -2700,11 +2704,11 @@ fn WebGPURenderer::draw_meshes(
   state : @core.CameraState,
   lights : @common.LightFrame,
   fog : @scenes.Fog?,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   shadow_group : GpuBindGroup,
   blend : Bool,
-  lines? : Bool = false,
+  lines~ : Bool = false,
 ) -> Unit {
   for item in items {
     let draw_mesh = match item.instances {
@@ -3118,8 +3122,8 @@ fn WebGPURenderer::draw_transparent(
   state : @core.CameraState,
   lights : @common.LightFrame,
   fog : @scenes.Fog?,
-  width : UInt,
-  height : UInt,
+  width : UInt32,
+  height : UInt32,
   shadow_group : GpuBindGroup,
   viewport_width : Double,
   viewport_height : Double,

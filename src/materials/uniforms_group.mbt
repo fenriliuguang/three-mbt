@@ -13,10 +13,10 @@ fn copied_uniforms(source : Map[String, Double]) -> Map[String, Double] {
 }
 
 ///|
-let next_uniforms_group_id : Ref[Int] = Ref::Ref(0)
+let next_uniforms_group_id : Ref[Int32] = Ref::Ref(0)
 
 ///|
-fn fresh_uniforms_group_id() -> Int {
+fn fresh_uniforms_group_id() -> Int32 {
   let id = next_uniforms_group_id.val
   next_uniforms_group_id.val = id + 1
   id
@@ -26,9 +26,9 @@ fn fresh_uniforms_group_id() -> Int {
 /// 一组 uniform。渲染器会把它收成一个 UBO。这一刀存编号、名字、`usage`、一组数字和监听表。颜色、向量、数组和贴图仍不进组。`dispose` 只通知 `dispose` 监听。
 /// r186: `UniformsGroup` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L15 ; `id` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L40 ; `name` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L47 ; `usage` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L55 ; `uniforms` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L62 ; `dispose` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L130
 pub(all) struct UniformsGroup {
-  id : Int
+  id : Int32
   mut name : String
-  mut usage : Int
+  mut usage : Int32
   mut uniforms : Array[Double]
   listeners : Map[String, Array[() -> Unit]]
 }
@@ -36,7 +36,7 @@ pub(all) struct UniformsGroup {
 ///|
 /// 新建一组。名字默认空，`usage` 默认 `35044`，数字列表和监听表默认空。编号从 `0` 起递增。
 /// r186: `UniformsGroup` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L20
-pub fn UniformsGroup::new(name? : String = "") -> UniformsGroup {
+pub fn UniformsGroup::new(name~ : String = "") -> UniformsGroup {
   {
     id: fresh_uniforms_group_id(),
     name,
@@ -49,7 +49,10 @@ pub fn UniformsGroup::new(name? : String = "") -> UniformsGroup {
 ///|
 /// 把一个数字追加进组，并返回这一组。颜色、向量、数组和贴图仍不能加进来。
 /// r186: `add` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L72
-pub fn UniformsGroup::add(self : UniformsGroup, value : Double) -> UniformsGroup {
+pub fn UniformsGroup::add(
+  self : UniformsGroup,
+  value : Double,
+) -> UniformsGroup {
   self.uniforms.push(value)
   self
 }
@@ -90,7 +93,7 @@ pub fn UniformsGroup::set_name(
 /// r186: `setUsage` https://github.com/mrdoob/three.js/blob/r186/src/core/UniformsGroup.js#L116
 pub fn UniformsGroup::set_usage(
   self : UniformsGroup,
-  value : Int,
+  value : Int32,
 ) -> UniformsGroup {
   self.usage = value
   self
@@ -166,7 +169,10 @@ pub fn UniformsGroup::remove_event_listener(
 ///|
 /// 按名字通知已经登记的监听。调用期间改列表不会漏掉这一轮快照。
 /// r186: `dispatchEvent` https://github.com/mrdoob/three.js/blob/r186/src/core/EventDispatcher.js#L101
-pub fn UniformsGroup::dispatch_event(self : UniformsGroup, kind : String) -> Unit {
+pub fn UniformsGroup::dispatch_event(
+  self : UniformsGroup,
+  kind : String,
+) -> Unit {
   match self.listeners.get(kind) {
     None => ()
     Some(listeners) => {
@@ -228,4 +234,3 @@ fn copied_uniforms_groups(
   }
   copied
 }
-

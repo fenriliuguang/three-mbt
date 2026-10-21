@@ -11,25 +11,27 @@
 pub(all) struct InterleavedBufferAttribute {
   mut name : String
   data : InterleavedBuffer
-  item_size : Int
-  offset : Int
+  item_size : Int32
+  offset : Int32
   mut normalized : Bool
 }
 
 ///|
 pub fn InterleavedBufferAttribute::new(
   data : InterleavedBuffer,
-  item_size : Int,
-  offset : Int,
-  normalized? : Bool = false,
+  item_size : Int32,
+  offset : Int32,
+  normalized~ : Bool = false,
 ) -> InterleavedBufferAttribute {
-  { name: "", data, item_size, offset, normalized }
+  { name: "", data, item_size, offset, normalized, }
 }
 
 ///|
 /// 顶点数，与交错缓冲的 `count` 相同。
 /// r186: `count` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L77
-pub fn InterleavedBufferAttribute::count(self : InterleavedBufferAttribute) -> Int {
+pub fn InterleavedBufferAttribute::count(
+  self : InterleavedBufferAttribute,
+) -> Int32 {
   self.data.count
 }
 
@@ -57,8 +59,8 @@ pub fn InterleavedBufferAttribute::set_needs_update(
 /// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L184
 pub fn InterleavedBufferAttribute::get_component(
   self : InterleavedBufferAttribute,
-  index : Int,
-  component : Int,
+  index : Int32,
+  component : Int32,
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset + component]
 }
@@ -68,8 +70,8 @@ pub fn InterleavedBufferAttribute::get_component(
 /// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L202
 pub fn InterleavedBufferAttribute::set_component(
   self : InterleavedBufferAttribute,
-  index : Int,
-  component : Int,
+  index : Int32,
+  component : Int32,
   value : Double,
 ) -> InterleavedBufferAttribute {
   self.data.array[index * self.data.stride + self.offset + component] = value
@@ -81,7 +83,7 @@ pub fn InterleavedBufferAttribute::set_component(
 /// r186: `getX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L286
 pub fn InterleavedBufferAttribute::get_x(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset]
 }
@@ -91,7 +93,7 @@ pub fn InterleavedBufferAttribute::get_x(
 /// r186: `getY` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L302
 pub fn InterleavedBufferAttribute::get_y(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset + 1]
 }
@@ -101,7 +103,7 @@ pub fn InterleavedBufferAttribute::get_y(
 /// r186: `getZ` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L318
 pub fn InterleavedBufferAttribute::get_z(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset + 2]
 }
@@ -111,7 +113,7 @@ pub fn InterleavedBufferAttribute::get_z(
 /// r186: `getW` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L334
 pub fn InterleavedBufferAttribute::get_w(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
 ) -> Double {
   self.data.array[index * self.data.stride + self.offset + 3]
 }
@@ -121,7 +123,7 @@ pub fn InterleavedBufferAttribute::get_w(
 /// r186: `setXY` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L352
 pub fn InterleavedBufferAttribute::set_xy(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
 ) -> InterleavedBufferAttribute {
@@ -136,7 +138,7 @@ pub fn InterleavedBufferAttribute::set_xy(
 /// r186: `setXYZ` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L379
 pub fn InterleavedBufferAttribute::set_xyz(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
   z : Double,
@@ -153,7 +155,7 @@ pub fn InterleavedBufferAttribute::set_xyz(
 /// r186: `setXYZW` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L409
 pub fn InterleavedBufferAttribute::set_xyzw(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
   y : Double,
   z : Double,
@@ -226,7 +228,7 @@ pub fn InterleavedBufferAttribute::transform_direction(
 /// r186: `setX` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L219
 pub fn InterleavedBufferAttribute::set_x(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   x : Double,
 ) -> InterleavedBufferAttribute {
   self.data.array[index * self.data.stride + self.offset] = x
@@ -238,7 +240,7 @@ pub fn InterleavedBufferAttribute::set_x(
 /// r186: `setY` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L236
 pub fn InterleavedBufferAttribute::set_y(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   y : Double,
 ) -> InterleavedBufferAttribute {
   self.data.array[index * self.data.stride + self.offset + 1] = y
@@ -250,7 +252,7 @@ pub fn InterleavedBufferAttribute::set_y(
 /// r186: `setZ` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L253
 pub fn InterleavedBufferAttribute::set_z(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   z : Double,
 ) -> InterleavedBufferAttribute {
   self.data.array[index * self.data.stride + self.offset + 2] = z
@@ -262,7 +264,7 @@ pub fn InterleavedBufferAttribute::set_z(
 /// r186: `setW` https://github.com/mrdoob/three.js/blob/r186/src/core/InterleavedBufferAttribute.js#L270
 pub fn InterleavedBufferAttribute::set_w(
   self : InterleavedBufferAttribute,
-  index : Int,
+  index : Int32,
   w : Double,
 ) -> InterleavedBufferAttribute {
   self.data.array[index * self.data.stride + self.offset + 3] = w

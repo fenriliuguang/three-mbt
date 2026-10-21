@@ -75,15 +75,15 @@ pub(all) struct MaterialDraw {
 pub(all) struct InstanceData {
   matrices : BufferAttribute
   mut colors : BufferAttribute?
-  mut count : Int
-  mut version : Int
+  mut count : Int32
+  mut version : Int32
   mut bounding_sphere : @math.Sphere?
 }
 
 ///|
 fn read_instance_matrix(
   attribute : BufferAttribute,
-  index : Int,
+  index : Int32,
   target : @math.Matrix4,
 ) -> Unit {
   let offset = index * attribute.item_size
@@ -183,7 +183,7 @@ pub(all) struct PrimitiveDraw {
 /// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18
 pub(all) struct ShadowState {
   camera : Object3D
-  mut map_size : Int
+  mut map_size : Int32
   mut bias : Double
   mut normal_bias : Double
   mut radius : Double

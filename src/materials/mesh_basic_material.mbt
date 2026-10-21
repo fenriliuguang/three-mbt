@@ -1,7 +1,7 @@
 // r186: `MeshBasicMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshBasicMaterial.js#L14
 
 ///|
-pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
+pub fn Material::basic(hex~ : Int32 = 0xFFFFFF) -> Material {
   {
     color: @math.Color::new().set_hex(hex),
     side: @constants.Front,
@@ -32,7 +32,7 @@ pub fn Material::basic(hex? : Int = 0xFFFFFF) -> Material {
     premultiplied_alpha: false,
     visible: true,
     force_single_pass: false,
-    extensions: { clip_cull_distance: false, multi_draw: false },
+    extensions: { clip_cull_distance: false, multi_draw: false, },
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -159,7 +159,6 @@ pub(all) struct MeshBasicMaterial {
 }
 
 ///|
-pub fn MeshBasicMaterial::new(hex? : Int = 0xFFFFFF) -> MeshBasicMaterial {
+pub fn MeshBasicMaterial::new(hex~ : Int32 = 0xFFFFFF) -> MeshBasicMaterial {
   { material: Material::basic(hex~), }
 }
-

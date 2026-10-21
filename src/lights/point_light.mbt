@@ -9,10 +9,10 @@ pub(all) struct PointLight {
 
 ///|
 pub fn PointLight::new(
-  hex? : Int = 0xFFFFFF,
-  intensity? : Double = 1.0,
-  distance? : Double = 0.0,
-  decay? : Double = 2.0,
+  hex~ : Int32 = 0xFFFFFF,
+  intensity~ : Double = 1.0,
+  distance~ : Double = 0.0,
+  decay~ : Double = 2.0,
 ) -> PointLight {
   {
     node: make_light(
@@ -33,4 +33,3 @@ pub impl @core.AsNode for PointLight with fn to_node(self) {
 
 ///|
 pub extend PointLight with @core.AsNode::{to_node}
-

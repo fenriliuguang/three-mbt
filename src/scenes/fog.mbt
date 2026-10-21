@@ -22,9 +22,9 @@ pub(all) struct Fog {
 ///|
 /// 线性雾。默认 `near = 1`、`far = 1000`，与 r186 `Fog` 相同。
 pub fn Fog::linear(
-  hex? : Int = 0xFFFFFF,
-  near? : Double = 1.0,
-  far? : Double = 1000.0,
+  hex~ : Int32 = 0xFFFFFF,
+  near~ : Double = 1.0,
+  far~ : Double = 1000.0,
 ) -> Fog {
   {
     color: @math.Color::new().set_hex(hex),
@@ -38,7 +38,7 @@ pub fn Fog::linear(
 ///|
 /// 指数平方雾。默认密度 `0.00025`，与 r186 `FogExp2` 相同。
 /// r186: `FogExp2` https://github.com/mrdoob/three.js/blob/r186/src/scenes/FogExp2.js#L13
-pub fn Fog::exp2(hex? : Int = 0xFFFFFF, density? : Double = 0.00025) -> Fog {
+pub fn Fog::exp2(hex~ : Int32 = 0xFFFFFF, density~ : Double = 0.00025) -> Fog {
   {
     color: @math.Color::new().set_hex(hex),
     near: 1.0,
@@ -71,4 +71,3 @@ pub fn Fog::factor(self : Fog, depth : Double) -> Double {
     }
   }
 }
-

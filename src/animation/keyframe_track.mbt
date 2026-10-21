@@ -9,7 +9,7 @@ pub(all) struct KeyframeTrack {
   name : String
   times : Array[Double]
   values : Array[Double]
-  value_size : Int
+  value_size : Int32
   mut interpolation : Interpolation
   cubic_spline : Bool
 }
@@ -29,7 +29,7 @@ fn check_times(times : Array[Double]) -> Unit {
 fn check_track(
   times : Array[Double],
   values : Array[Double],
-  size : Int,
+  size : Int32,
 ) -> Unit {
   if times.length() == 0 || values.length() != times.length() * size {
     abort("keyframe track size does not match its times")
@@ -41,7 +41,7 @@ fn check_track(
 fn check_cubic(
   times : Array[Double],
   values : Array[Double],
-  size : Int,
+  size : Int32,
 ) -> Unit {
   if times.length() == 0 || values.length() != times.length() * size * 3 {
     abort("keyframe track size does not match its times")
@@ -94,7 +94,7 @@ pub fn KeyframeTrack::numbers(
   name : String,
   times : Array[Double],
   values : Array[Double],
-  value_size : Int,
+  value_size : Int32,
 ) -> KeyframeTrack {
   check_track(times, values, value_size)
   {
@@ -114,7 +114,7 @@ pub fn KeyframeTrack::cubic_numbers(
   name : String,
   times : Array[Double],
   values : Array[Double],
-  value_size : Int,
+  value_size : Int32,
 ) -> KeyframeTrack {
   check_cubic(times, values, value_size)
   {
@@ -164,4 +164,3 @@ pub fn KeyframeTrack::cubic_quaternion(
     cubic_spline: true,
   }
 }
-

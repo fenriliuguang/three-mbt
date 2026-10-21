@@ -4,8 +4,8 @@
 struct DepthTarget {
   texture : GpuTexture
   view : GpuTextureView
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
 }
 
 ///|
@@ -13,16 +13,16 @@ struct GeometryGpu {
   geometry : @core.BufferGeometry
   vertices : GpuBuffer
   indices : GpuBuffer?
-  index_count : Int
-  vertex_count : Int
-  mut version : Int
+  index_count : Int32
+  vertex_count : Int32
+  mut version : Int32
 }
 
 ///|
 struct WireGpu {
   geometry : @core.BufferGeometry
   indices : GpuBuffer
-  index_count : Int
+  index_count : Int32
 }
 
 ///|
@@ -30,10 +30,10 @@ struct PositionGpu {
   geometry : @core.BufferGeometry
   vertices : GpuBuffer
   indices : GpuBuffer?
-  index_count : Int
-  vertex_count : Int
+  index_count : Int32
+  vertex_count : Int32
   mut points : GpuBuffer?
-  mut point_count : Int
+  mut point_count : Int32
 }
 
 ///|
@@ -48,7 +48,7 @@ struct InstanceGpu {
   data : @core.InstanceData
   matrices : GpuBuffer
   colors : GpuBuffer
-  mut version : Int
+  mut version : Int32
 }
 
 ///|
@@ -57,7 +57,7 @@ struct StorageGpu {
   buffer : GpuBuffer
   uniform : GpuBuffer
   group : GpuBindGroup
-  count : Int
+  count : Int32
 }
 
 ///|
@@ -65,7 +65,7 @@ struct ShadowMap {
   texture : GpuTexture
   view : GpuTextureView
   group : GpuBindGroup
-  size : UInt
+  size : UInt32
   reversed : Bool
 }
 
@@ -108,9 +108,9 @@ struct ColorTarget {
   group : GpuBindGroup
   depth_texture : GpuTexture
   depth_view : GpuTextureView
-  width : UInt
-  height : UInt
-  version : Int
+  width : UInt32
+  height : UInt32
+  version : Int32
 }
 
 ///|
@@ -216,8 +216,8 @@ fn shader_visibility() -> @gpu.GpuShaderStage {
 fn upload_texture(
   device : GpuDevice,
   layout : GpuBindGroupLayout,
-  width : Int,
-  height : Int,
+  width : Int32,
+  height : Int32,
   pixels : FixedArray[Byte],
   wrap_s : @constants.Wrapping,
   wrap_t : @constants.Wrapping,
@@ -373,4 +373,3 @@ fn drop_chain(buffers : ChainBuffers) -> Unit {
   buffers.a_texture.drop()
   buffers.b_texture.drop()
 }
-

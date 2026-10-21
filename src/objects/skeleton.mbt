@@ -147,7 +147,7 @@ pub fn Skeleton::get_bone_by_name(self : Skeleton, name : String) -> Bone? {
     }
     index = index + 1
   }
-    None
+  None
 }
 
 ///|
@@ -257,7 +257,7 @@ pub fn Skeleton::from_json(
 }
 
 ///|
-fn zero_doubles(count : Int) -> Array[Double] {
+fn zero_doubles(count : Int32) -> Array[Double] {
   let values = []
   let mut index = 0
   while index < count {
@@ -266,4 +266,3 @@ fn zero_doubles(count : Int) -> Array[Double] {
   }
   values
 }
-

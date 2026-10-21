@@ -141,7 +141,10 @@ test "LineSegments.computeLineDistances accumulates each pair" {
 ///|
 test "LineSegments.updateMorphTargets indexes named targets" {
   let empty = @core.BufferGeometry::new()
-  let bare = @objects.LineSegments::new(empty, @materials.LineBasicMaterial::new())
+  let bare = @objects.LineSegments::new(
+    empty,
+    @materials.LineBasicMaterial::new(),
+  )
   assert_eq(bare.morph_target_influences is None, true)
   assert_eq(bare.morph_target_dictionary is None, true)
   let geometry = @core.BufferGeometry::new()
@@ -210,4 +213,3 @@ test "LineSegments.updateMorphTargets indexes named targets" {
     Some(dictionary) => assert_eq(dictionary.get("0"), Some(0))
   }
 }
-

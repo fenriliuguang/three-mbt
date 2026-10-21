@@ -10,14 +10,14 @@
 /// r186: `flipY` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L71
 /// r186: `unpackAlignment` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L81
 pub(all) struct DataTexture {
-  mut width : Int
-  mut height : Int
+  mut width : Int32
+  mut height : Int32
   data : Array[Double]
   mut format : @constants.PixelFormat
   mut needs_update : Bool
   mut flip_y : Bool
   mut generate_mipmaps : Bool
-  mut unpack_alignment : Int
+  mut unpack_alignment : Int32
   mut wrap_s : @constants.Wrapping
   mut wrap_t : @constants.Wrapping
   mut mag_filter : @constants.TextureFilter
@@ -29,9 +29,9 @@ pub(all) struct DataTexture {
 /// r186: `constructor` https://github.com/mrdoob/three.js/blob/r186/src/textures/DataTexture.js#L32
 pub fn DataTexture::new(
   data : Array[Double],
-  width? : Int = 1,
-  height? : Int = 1,
-  format? : @constants.PixelFormat = @constants.PixelFormat::RGBA,
+  width~ : Int32 = 1,
+  height~ : Int32 = 1,
+  format~ : @constants.PixelFormat = @constants.PixelFormat::RGBA,
 ) -> DataTexture {
   if width < 1 ||
     height < 1 ||
@@ -80,4 +80,5 @@ pub fn DataTexture::clone(self : DataTexture) -> DataTexture {
 /// 释放 GPU 资源。这里没有贴图事件，调用本身不改浮点。
 /// r186: `dispose` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L647
 pub fn DataTexture::dispose(_self : DataTexture) -> Unit {
+
 }

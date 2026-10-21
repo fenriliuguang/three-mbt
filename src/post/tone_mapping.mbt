@@ -225,7 +225,7 @@ pub(all) struct ToneMappingPass {
 ///|
 pub fn ToneMappingPass::new(
   mapping? : @constants.ToneMapping,
-  exposure? : Double = 1.0,
+  exposure~ : Double = 1.0,
 ) -> ToneMappingPass {
   let mapping = match mapping {
     None => @constants.ToneMapping::No
@@ -266,7 +266,7 @@ pub fn tone_map(
   b : Double,
   mapping : @constants.ToneMapping,
   exposure : Double,
-  srgb? : Bool = false,
+  srgb~ : Bool = false,
 ) -> @math.Color {
   let mapped = match mapping {
     No => @math.Color::new(r~, g~, b~)
@@ -317,7 +317,7 @@ pub fn tone_map(
 pub fn pack_tone(
   mapping : @constants.ToneMapping,
   exposure : Double,
-  srgb? : Bool = false,
+  srgb~ : Bool = false,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(16, b'\x00')
   write_f32(dst, 0, mapping.to_int().to_double())
@@ -470,4 +470,3 @@ pub fn tone_wgsl() -> String {
     #|}
   code
 }
-

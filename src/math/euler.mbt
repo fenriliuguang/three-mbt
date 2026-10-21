@@ -26,10 +26,10 @@ pub(all) struct Euler {
 
 ///|
 pub fn Euler::new(
-  x? : Double = 0.0,
-  y? : Double = 0.0,
-  z? : Double = 0.0,
-  order? : EulerOrder = XYZ,
+  x~ : Double = 0.0,
+  y~ : Double = 0.0,
+  z~ : Double = 0.0,
+  order~ : EulerOrder = XYZ,
 ) -> Euler {
   { x, y, z, order, on_change: None, }
 }
@@ -105,7 +105,7 @@ pub fn Euler::set_from_rotation_matrix(
   self : Euler,
   m : Matrix4,
   order? : EulerOrder,
-  update? : Bool = true,
+  update~ : Bool = true,
 ) -> Euler {
   let order = match order {
     None => self.order
@@ -196,7 +196,7 @@ pub fn Euler::set_from_quaternion(
   self : Euler,
   q : Quaternion,
   order? : EulerOrder,
-  update? : Bool = true,
+  update~ : Bool = true,
 ) -> Euler {
   let matrix = Matrix4::new().make_rotation_from_quaternion(q)
   match order {
@@ -215,7 +215,7 @@ pub fn Euler::set_from_vector3(
 ) -> Euler {
   match order {
     None => self.set(v.x, v.y, v.z)
-    Some(order) => self.set(v.x, v.y, v.z, order=order)
+    Some(order) => self.set(v.x, v.y, v.z, order~)
   }
 }
 
@@ -228,8 +228,12 @@ pub fn Euler::reorder(self : Euler, new_order : EulerOrder) -> Euler {
 ///|
 fn same_order(a : EulerOrder, b : EulerOrder) -> Bool {
   match (a, b) {
-    (XYZ, XYZ) | (YXZ, YXZ) | (ZXY, ZXY) | (ZYX, ZYX) | (YZX, YZX) | (XZY, XZY) =>
-      true
+    (XYZ, XYZ)
+    | (YXZ, YXZ)
+    | (ZXY, ZXY)
+    | (ZYX, ZYX)
+    | (YZX, YZX)
+    | (XZY, XZY) => true
     _ => false
   }
 }
@@ -254,7 +258,7 @@ pub fn Euler::from_array(
 ) -> Euler {
   match order {
     None => self.set(array[0], array[1], array[2])
-    Some(order) => self.set(array[0], array[1], array[2], order=order)
+    Some(order) => self.set(array[0], array[1], array[2], order~)
   }
 }
 
@@ -264,7 +268,7 @@ pub fn Euler::from_array(
 pub fn Euler::to_array(
   self : Euler,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> (Array[Double], EulerOrder) {
   let target = match array {
     None => []

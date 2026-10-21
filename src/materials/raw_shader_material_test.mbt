@@ -61,4 +61,3 @@ test "Material raw sets isRawShaderMaterial" {
     Some(value) => assert_eq(value, "1")
   }
 }
-

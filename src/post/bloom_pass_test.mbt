@@ -73,4 +73,3 @@ test "bloom high pass and composite match r186" {
   assert_eq(packed[38], b'\xC0')
   assert_eq(packed[39], b'\x40')
 }
-

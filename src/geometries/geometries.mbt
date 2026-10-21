@@ -10,9 +10,9 @@ pub(all) struct BoxParameters {
   width : Double
   height : Double
   depth : Double
-  width_segments : Int
-  height_segments : Int
-  depth_segments : Int
+  width_segments : Int32
+  height_segments : Int32
+  depth_segments : Int32
 }
 
 ///|
@@ -24,7 +24,7 @@ pub(all) struct BoxGeometry {
 }
 
 ///|
-fn set_axis(vector : @math.Vector3, axis : Int, value : Double) -> Unit {
+fn set_axis(vector : @math.Vector3, axis : Int32, value : Double) -> Unit {
   match axis {
     0 => vector.x = value
     1 => vector.y = value
@@ -37,21 +37,21 @@ fn build_plane(
   vertices : Array[Double],
   normals : Array[Double],
   uvs : Array[Double],
-  indices : Array[Int],
+  indices : Array[Int32],
   geometry : BufferGeometry,
-  u : Int,
-  v : Int,
-  w : Int,
+  u : Int32,
+  v : Int32,
+  w : Int32,
   udir : Double,
   vdir : Double,
   width : Double,
   height : Double,
   depth : Double,
-  grid_x : Int,
-  grid_y : Int,
-  material_index : Int,
-  number_of_vertices : Int,
-) -> Int {
+  grid_x : Int32,
+  grid_y : Int32,
+  material_index : Int32,
+  number_of_vertices : Int32,
+) -> Int32 {
   let segment_width = width / grid_x.to_double()
   let segment_height = height / grid_y.to_double()
   let width_half = width / 2.0
@@ -117,12 +117,12 @@ fn build_plane(
 
 ///|
 pub fn BoxGeometry::new(
-  width? : Double = 1.0,
-  height? : Double = 1.0,
-  depth? : Double = 1.0,
-  width_segments? : Int = 1,
-  height_segments? : Int = 1,
-  depth_segments? : Int = 1,
+  width~ : Double = 1.0,
+  height~ : Double = 1.0,
+  depth~ : Double = 1.0,
+  width_segments~ : Int32 = 1,
+  height_segments~ : Int32 = 1,
+  depth_segments~ : Int32 = 1,
 ) -> BoxGeometry {
   let geometry = BufferGeometry::new()
   let vertices = []

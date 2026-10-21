@@ -3,16 +3,16 @@
 ///|
 struct PostGroup {
   source : @textures.Texture
-  version : Int
-  width : UInt
-  height : UInt
+  version : Int32
+  width : UInt32
+  height : UInt32
   group : GpuBindGroup
 }
 
 ///|
 priv struct BloomLevel {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   h_texture : GpuTexture
   h_view : GpuTextureView
   v_texture : GpuTexture
@@ -21,8 +21,8 @@ priv struct BloomLevel {
 
 ///|
 struct BloomPyramid {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   bright_texture : GpuTexture
   bright_view : GpuTextureView
   levels : Array[BloomLevel]
@@ -34,8 +34,8 @@ struct BloomPyramid {
 
 ///|
 struct ChainBuffers {
-  width : UInt
-  height : UInt
+  width : UInt32
+  height : UInt32
   a_texture : GpuTexture
   a_view : GpuTextureView
   b_texture : GpuTexture
@@ -238,4 +238,3 @@ pub fn WebGPURenderer::compose(
     index = index + 1
   }
 }
-

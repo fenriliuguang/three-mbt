@@ -6,9 +6,9 @@
 pub(all) struct CubicInterpolant {
   interpolant : Interpolant
   mut weight_prev : Double
-  mut offset_prev : Int
+  mut offset_prev : Int32
   mut weight_next : Double
-  mut offset_next : Int
+  mut offset_next : Int32
   default_settings : SplineEndings
 }
 
@@ -25,7 +25,7 @@ pub(all) struct SplineEndings {
 pub fn CubicInterpolant::new(
   parameter_positions : Array[Double],
   sample_values : Array[Double],
-  sample_size : Int,
+  sample_size : Int32,
   result_buffer? : Array[Double],
 ) -> CubicInterpolant {
   let interpolant = match result_buffer {
@@ -56,7 +56,7 @@ pub fn CubicInterpolant::new(
 /// r186: `intervalChanged_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L41
 pub fn CubicInterpolant::interval_changed(
   self : CubicInterpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t1 : Double,
 ) -> Unit {
@@ -118,7 +118,7 @@ pub fn CubicInterpolant::interval_changed(
 /// r186: `interpolate_` https://github.com/mrdoob/three.js/blob/r186/src/math/interpolants/CubicInterpolant.js#L120
 pub fn CubicInterpolant::interpolate(
   self : CubicInterpolant,
-  i1 : Int,
+  i1 : Int32,
   t0 : Double,
   t : Double,
   t1 : Double,

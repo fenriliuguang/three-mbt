@@ -9,7 +9,7 @@ pub(all) struct Vector2 {
 }
 
 ///|
-pub fn Vector2::new(x? : Double = 0.0, y? : Double = 0.0) -> Vector2 {
+pub fn Vector2::new(x~ : Double = 0.0, y~ : Double = 0.0) -> Vector2 {
   { x, y, }
 }
 
@@ -47,7 +47,7 @@ pub fn Vector2::set_y(self : Vector2, y : Double) -> Vector2 {
 /// r186: `setComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L167
 pub fn Vector2::set_component(
   self : Vector2,
-  index : Int,
+  index : Int32,
   value : Double,
 ) -> Vector2 {
   match index {
@@ -61,7 +61,7 @@ pub fn Vector2::set_component(
 ///|
 /// 0 是 x，1 是 y。其他下标中止。
 /// r186: `getComponent` https://github.com/mrdoob/three.js/blob/r186/src/math/Vector2.js#L187
-pub fn Vector2::get_component(self : Vector2, index : Int) -> Double {
+pub fn Vector2::get_component(self : Vector2, index : Int32) -> Double {
   match index {
     0 => self.x
     1 => self.y
@@ -236,7 +236,7 @@ pub fn Vector2::clamp_length(
 ) -> Vector2 {
   let length = self.length()
   let divisor = if length == 0.0 { 1.0 } else { length }
-  self.divide_scalar(divisor).multiply_scalar(length.clamp(min=min, max=max))
+  self.divide_scalar(divisor).multiply_scalar(length.clamp(min~, max~))
 }
 
 ///|
@@ -363,7 +363,7 @@ pub fn Vector2::lerp_vectors(
 pub fn Vector2::from_array(
   self : Vector2,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Vector2 {
   self.x = array[offset]
   self.y = array[offset + 1]
@@ -376,7 +376,7 @@ pub fn Vector2::from_array(
 pub fn Vector2::to_array(
   self : Vector2,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []

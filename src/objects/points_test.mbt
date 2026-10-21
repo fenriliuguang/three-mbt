@@ -197,7 +197,10 @@ test "Points.updateMorphTargets indexes named targets" {
       assert_eq(dictionary.get("tall"), Some(1))
     }
   }
-  let other = @objects.Points::new(geometry, @materials.PointsMaterial::new(size=4.0))
+  let other = @objects.Points::new(
+    geometry,
+    @materials.PointsMaterial::new(size=4.0),
+  )
   match other.morph_target_influences {
     None => assert_eq(false, true)
     Some(weights) => assert_eq(weights[0], 0.0)
@@ -362,7 +365,10 @@ test "point and line raycasts record the group material index" {
       ),
     ),
   )
-  let line = @objects.Line::new(line_geometry, @materials.LineBasicMaterial::new())
+  let line = @objects.Line::new(
+    line_geometry,
+    @materials.LineBasicMaterial::new(),
+  )
   line.set_materials([
     @materials.LineBasicMaterial::new(),
     @materials.LineBasicMaterial::new(),
@@ -437,4 +443,3 @@ test "panic Points.raycast material index is out of range" {
   )
   ignore(raycaster.intersect_object(points.node))
 }
-

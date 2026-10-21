@@ -55,7 +55,8 @@ test "Skeleton.init replaces a mismatched inverse list" {
   let one = @math.Matrix4::new()
   ignore(
     one.set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 9.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 9.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   let mismatched = [one]
@@ -176,7 +177,8 @@ test "Skeleton.clone shares inverses and clears the matrix buffer" {
   assert_eq(cloned.bone_inverses[0].elements[13], 5.0)
   ignore(
     cloned.bone_inverses[0].set(
-      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 7.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 7.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+      1.0,
     ),
   )
   assert_eq(arm.bone_inverses[0].elements[13], 7.0)
@@ -313,7 +315,7 @@ test "Skeleton.computeBoneTexture grows the matrix buffer" {
     bones.push(@objects.Bone::new())
     index = index + 1
   }
-  let wide = @objects.Skeleton::new(bones=bones)
+  let wide = @objects.Skeleton::new(bones~)
   assert_eq(wide.bone_matrices.length(), 272)
   wide.bone_matrices[0] = 4.0
   ignore(wide.compute_bone_texture())
@@ -471,4 +473,3 @@ test "panic Skeleton.computeBoneTexture aborts when the buffer does not fit" {
   arm.bone_matrices = big
   ignore(arm.compute_bone_texture())
 }
-

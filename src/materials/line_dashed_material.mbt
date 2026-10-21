@@ -20,13 +20,13 @@ pub(all) struct LineDashedMaterial {
 
 ///|
 pub fn LineDashedMaterial::new(
-  hex? : Int = 0xFFFFFF,
-  scale? : Double = 1.0,
-  dash_size? : Double = 3.0,
-  gap_size? : Double = 1.0,
+  hex~ : Int32 = 0xFFFFFF,
+  scale~ : Double = 1.0,
+  dash_size~ : Double = 3.0,
+  gap_size~ : Double = 1.0,
 ) -> LineDashedMaterial {
   {
-    line: LineBasicMaterial::new(hex=hex),
+    line: LineBasicMaterial::new(hex~),
     scale,
     dash_size,
     gap_size,
@@ -52,7 +52,9 @@ pub fn LineDashedMaterial::copy(
 ///|
 /// 没有单独的 `LineDashedMaterial.clone`。按 `Material.clone` 新建一份虚线材质，再 `copy`。新材质的 `type_name` 仍是 `LineDashedMaterial`，内嵌线段是新的 `LineBasicMaterial`，有自己的 `id` 和 `uuid`。`alpha_test` 穿过 `0` 时内嵌线段的 `version` 从 `0` 加一。线段绘制仍不读这份克隆。
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/materials/Material.js#L1107
-pub fn LineDashedMaterial::clone(self : LineDashedMaterial) -> LineDashedMaterial {
+pub fn LineDashedMaterial::clone(
+  self : LineDashedMaterial,
+) -> LineDashedMaterial {
   LineDashedMaterial::new().copy(self)
 }
 
@@ -82,4 +84,3 @@ pub fn LineDashedMaterial::keeps_distance(
   let wrapped = scaled - total * (scaled / total).floor()
   wrapped <= self.dash_size
 }
-

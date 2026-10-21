@@ -18,7 +18,7 @@ pub fn Box2::new(min? : Vector2, max? : Vector2) -> Box2 {
     None => Vector2::new(x=@double.neg_infinity, y=@double.neg_infinity)
     Some(max) => max.clone()
   }
-  { min, max }
+  { min, max, }
 }
 
 ///|

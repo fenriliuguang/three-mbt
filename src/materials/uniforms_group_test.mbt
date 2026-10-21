@@ -113,8 +113,8 @@ test "UniformsGroup dispose runs dispose listeners" {
 ///|
 test "UniformsGroup hasEventListener checks one function" {
   let frame = @materials.UniformsGroup::new(name="Frame")
-  let listener = fn() {}
-  let other = fn() {}
+  let listener = fn() {  }
+  let other = fn() {  }
   assert_eq(frame.has_event_listener("dispose", listener), false)
   frame.add_event_listener("dispose", listener)
   assert_eq(frame.has_event_listener("dispose", listener), true)
@@ -126,8 +126,14 @@ test "UniformsGroup hasEventListener checks one function" {
   shader.uniforms_groups.push(frame)
   let onto = @materials.Material::shader()
   ignore(onto.copy(shader))
-  assert_eq(onto.uniforms_groups[0].has_event_listener("dispose", listener), false)
-  assert_eq(shader.uniforms_groups[0].has_event_listener("dispose", listener), true)
+  assert_eq(
+    onto.uniforms_groups[0].has_event_listener("dispose", listener),
+    false,
+  )
+  assert_eq(
+    shader.uniforms_groups[0].has_event_listener("dispose", listener),
+    true,
+  )
 }
 
 ///|
@@ -135,7 +141,7 @@ test "UniformsGroup removeEventListener drops one function" {
   let frame = @materials.UniformsGroup::new(name="Frame")
   let hits = Ref::Ref(0)
   let listener = fn() { hits.val = hits.val + 1 }
-  let other = fn() {}
+  let other = fn() {  }
   frame.add_event_listener("dispose", listener)
   frame.remove_event_listener("dispose", listener)
   assert_eq(frame.has_event_listener("dispose", listener), false)
@@ -173,7 +179,7 @@ test "UniformsGroup clone keeps values and drops listeners" {
   let frame = @materials.UniformsGroup::new(name="Frame")
   ignore(frame.set_usage(35048))
   ignore(frame.add(1.0).add(2.0))
-  let listener = fn() {}
+  let listener = fn() {  }
   frame.add_event_listener("dispose", listener)
   let cloned = frame.clone()
   assert_eq(cloned.name, "Frame")
@@ -193,12 +199,12 @@ test "UniformsGroup copy keeps id and listeners" {
   let frame = @materials.UniformsGroup::new(name="Frame")
   ignore(frame.set_usage(35048))
   ignore(frame.add(1.0).add(2.0))
-  let source_listener = fn() {}
+  let source_listener = fn() {  }
   frame.add_event_listener("dispose", source_listener)
   let onto = @materials.UniformsGroup::new(name="Other")
   ignore(onto.add(9.0))
   let kept = onto.uniforms
-  let dest_listener = fn() {}
+  let dest_listener = fn() {  }
   onto.add_event_listener("change", dest_listener)
   let id = onto.id
   ignore(onto.copy(frame))
@@ -214,4 +220,3 @@ test "UniformsGroup copy keeps id and listeners" {
   assert_eq(frame.uniforms[0], 1.0)
   assert_eq(frame.name, "Frame")
 }
-

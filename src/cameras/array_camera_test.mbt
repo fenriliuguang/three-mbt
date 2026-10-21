@@ -78,7 +78,7 @@ test "FrustumArray.setFromArrayCamera caches one frustum per sub camera" {
   assert_same_frustum(frustums.frustums[1], frustum_from_camera(shifted))
   assert_eq(
     frustums.frustums[0].planes[0].constant ==
-      frustums.frustums[1].planes[0].constant,
+    frustums.frustums[1].planes[0].constant,
     false,
   )
   let kept = frustums.frustums[1].planes[0].constant

@@ -22,8 +22,8 @@ priv struct SemaphoreWaiter {
 
 ///|
 pub struct Semaphore {
-  size : Int
-  priv mut value : Int
+  size : Int32
+  priv mut value : Int32
   priv waiters : @deque.Deque[SemaphoreWaiter]
 }
 
@@ -34,8 +34,8 @@ pub struct Semaphore {
 /// omitted.
 #alias(new, deprecated)
 pub fn Semaphore::Semaphore(
-  size : Int,
-  initial_value? : Int = size,
+  size : Int32,
+  initial_value~ : Int32 = size,
 ) -> Semaphore {
   if size <= 0 {
     abort("size of semaphore must be positive")

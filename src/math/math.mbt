@@ -47,7 +47,7 @@ pub fn clamp(value : Double, min : Double, max : Double) -> Double {
 /// 欧几里得取模，结果与除数同号。
 /// r186: `euclideanModulo` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L57
 pub fn euclidean_modulo(n : Double, m : Double) -> Double {
-  ((n % m) + m) % m
+  (n % m + m) % m
 }
 
 ///|
@@ -91,7 +91,7 @@ pub fn damp(x : Double, y : Double, lambda : Double, dt : Double) -> Double {
 ///|
 /// 在 `0` 和 `length` 之间来回折返。`length` 默认是 1。
 /// r186: `pingpong` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L147
-pub fn pingpong(x : Double, length? : Double = 1.0) -> Double {
+pub fn pingpong(x : Double, length~ : Double = 1.0) -> Double {
   length - (euclidean_modulo(x, length * 2.0) - length).abs()
 }
 
@@ -148,12 +148,12 @@ pub fn rand_float_spread(range : Double) -> Double {
 }
 
 ///|
-let mulberry_seed : Ref[UInt] = Ref::Ref(1234567U)
+let mulberry_seed : Ref[UInt32] = Ref::Ref(1234567U)
 
 ///|
 /// 用 Mulberry32 生成 `[0, 1)` 里的确定性随机数。传入种子会重置序列。
 /// r186: `seededRandom` https://github.com/mrdoob/three.js/blob/r186/src/math/MathUtils.js#L242
-pub fn seeded_random(s? : Int) -> Double {
+pub fn seeded_random(s? : Int32) -> Double {
   match s {
     Some(value) => mulberry_seed.val = value.reinterpret_as_uint()
     None => ()
@@ -161,7 +161,7 @@ pub fn seeded_random(s? : Int) -> Double {
   mulberry_seed.val = mulberry_seed.val + 0x6D2B79F5U
   let mut t = mulberry_seed.val
   t = (t ^ (t >> 15)) * (t | 1U)
-  t = t ^ (t + ((t ^ (t >> 7)) * (t | 61U)))
+  t = t ^ (t + (t ^ (t >> 7)) * (t | 61U))
   (t ^ (t >> 14)).to_double() / 4294967296.0
 }
 
@@ -273,7 +273,7 @@ pub fn normalize(value : Double, component : ArrayComponentType) -> Double {
 }
 
 ///|
-fn hex_byte(byte : UInt) -> String {
+fn hex_byte(byte : UInt32) -> String {
   let digits = "0123456789abcdef"
   let hi = ((byte >> 4) & 0xFU).reinterpret_as_int()
   let lo = (byte & 0xFU).reinterpret_as_int()
@@ -281,7 +281,7 @@ fn hex_byte(byte : UInt) -> String {
 }
 
 ///|
-fn random_bits() -> UInt {
+fn random_bits() -> UInt32 {
   let rng = @random.Rand::Rand()
   (rng.double() * 4294967295.0).to_uint()
 }

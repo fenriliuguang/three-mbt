@@ -29,7 +29,9 @@ fn Object3D::raycast_sprite(
     None => abort("Sprite.raycast requires a camera")
     Some(state) => state
   }
-  let world_scale = @math.Vector3::new().set_from_matrix_scale(self.matrix_world)
+  let world_scale = @math.Vector3::new().set_from_matrix_scale(
+    self.matrix_world,
+  )
   let view_world = @math.Matrix4::new().copy(camera.matrix_world)
   ignore(
     self.model_view_matrix.multiply_matrices(
@@ -72,16 +74,17 @@ fn Object3D::raycast_sprite(
   if distance < raycaster.near || distance > raycaster.far {
     return
   }
-  let uv = match @math.Triangle::get_interpolation(
-    point,
-    a,
-    b,
-    c,
-    @math.Vector3::new(x=uv_a.x, y=uv_a.y),
-    @math.Vector3::new(x=uv_b.x, y=uv_b.y),
-    @math.Vector3::new(x=uv_c.x, y=uv_c.y),
-    @math.Vector3::new(),
-  ) {
+  let uv = match
+    @math.Triangle::get_interpolation(
+      point,
+      a,
+      b,
+      c,
+      @math.Vector3::new(x=uv_a.x, y=uv_a.y),
+      @math.Vector3::new(x=uv_b.x, y=uv_b.y),
+      @math.Vector3::new(x=uv_c.x, y=uv_c.y),
+      @math.Vector3::new(),
+    ) {
     None => None
     Some(blended) => Some(@math.Vector2::new(x=blended.x, y=blended.y))
   }

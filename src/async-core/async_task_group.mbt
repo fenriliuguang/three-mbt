@@ -34,7 +34,7 @@ priv enum TaskGroupState {
 pub struct TaskGroup[X] {
   priv children : Set[Coroutine]
   priv parent : Coroutine
-  priv mut waiting : Int
+  priv mut waiting : Int32
   priv mut state : TaskGroupState
   priv mut result : X?
   priv group_defer : Array[async () -> Unit]
@@ -122,8 +122,8 @@ fn[X] TaskGroup::spawn_coroutine(
 pub fn[X] TaskGroup::spawn_bg(
   self : TaskGroup[X],
   f : async () -> Unit,
-  no_wait? : Bool = false,
-  allow_failure? : Bool = false,
+  no_wait~ : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   ignore(self.spawn_coroutine(f, no_wait~, allow_failure~))
 }
@@ -157,8 +157,8 @@ pub fn[X] TaskGroup::spawn_bg(
 pub fn[G, X] TaskGroup::spawn(
   self : TaskGroup[G],
   f : async () -> X,
-  no_wait? : Bool = false,
-  allow_failure? : Bool = false,
+  no_wait~ : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Task[X] {
   let value = @ref.new(Option::None)
   let coro = self.spawn_coroutine(

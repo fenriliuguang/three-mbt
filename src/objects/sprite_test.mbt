@@ -261,4 +261,3 @@ test "Sprite.intersectsFrustumArray uses only the counted frustums" {
   frustums.count = 2
   assert_eq(sprite.intersects_frustum_array(frustums), true)
 }
-

@@ -197,4 +197,3 @@ test "cineon aces agx and neutral match r186" {
   assert_eq(@constants.ToneMapping::AgX.to_int(), 6)
   assert_eq(@constants.ToneMapping::Neutral.to_int(), 7)
 }
-

@@ -1,7 +1,7 @@
 // r186: `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24
 
 ///|
-pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
+pub fn Material::lambert(hex~ : Int32 = 0xFFFFFF) -> Material {
   {
     color: @math.Color::new().set_hex(hex),
     side: @constants.Front,
@@ -32,7 +32,7 @@ pub fn Material::lambert(hex? : Int = 0xFFFFFF) -> Material {
     premultiplied_alpha: false,
     visible: true,
     force_single_pass: false,
-    extensions: { clip_cull_distance: false, multi_draw: false },
+    extensions: { clip_cull_distance: false, multi_draw: false, },
     emissive: @math.Color::new(r=0.0, g=0.0, b=0.0),
     emissive_intensity: 1.0,
     emissive_map: None,
@@ -159,7 +159,6 @@ pub(all) struct MeshLambertMaterial {
 }
 
 ///|
-pub fn MeshLambertMaterial::new(hex? : Int = 0xFFFFFF) -> MeshLambertMaterial {
+pub fn MeshLambertMaterial::new(hex~ : Int32 = 0xFFFFFF) -> MeshLambertMaterial {
   { material: Material::lambert(hex~), }
 }
-

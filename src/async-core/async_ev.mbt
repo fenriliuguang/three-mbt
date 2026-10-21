@@ -14,7 +14,7 @@
 
 ///|
 priv struct EventLoop {
-  subscribes : Map[WaitableSet, Map[Int, Subscriber]]
+  subscribes : Map[WaitableSet, Map[Int32, Subscriber]]
   wakeups : Map[WaitableSet, TaskWakeup]
   tasks : Map[WaitableSet, Coroutine]
   owned_coroutines : Map[WaitableSet, @set.Set[Coroutine]]
@@ -26,8 +26,8 @@ priv struct EventLoop {
 
 ///|
 priv struct TaskWakeup {
-  reader : Int
-  writer : Int
+  reader : Int32
+  writer : Int32
   mut reading : Bool
   mut signaled : Bool
 }
@@ -50,7 +50,7 @@ fn current_waitableset() -> WaitableSet {
 }
 
 ///|
-fn subscribers_for(waitable_set : WaitableSet) -> Map[Int, Subscriber] {
+fn subscribers_for(waitable_set : WaitableSet) -> Map[Int32, Subscriber] {
   match ev.subscribes.get(waitable_set) {
     Some(subscribers) => subscribers
     None => {
@@ -106,7 +106,7 @@ fn acknowledge_cancellation(waitable_set : WaitableSet) -> Unit {
 ///|
 fn notify_subscriber(
   waitable_set : WaitableSet,
-  waitable_id : Int,
+  waitable_id : Int32,
   event : Events,
 ) -> Unit {
   if ev.wakeups.get(waitable_set) is Some(wakeup) &&
@@ -130,7 +130,7 @@ fn notify_subscriber(
 }
 
 ///|
-fn next_callback(waitable_set : WaitableSet) -> Int {
+fn next_callback(waitable_set : WaitableSet) -> Int32 {
   if ev.post_return_flush.get(waitable_set) is Some(true) {
     ev.post_return_flush.remove(waitable_set)
     reschedule(waitable_set)
@@ -173,7 +173,7 @@ fn next_callback(waitable_set : WaitableSet) -> Int {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub fn with_waitableset(f : async () -> Unit) -> Int {
+pub fn with_waitableset(f : async () -> Unit) -> Int32 {
   let waitable_set = WaitableSet::new()
   let owned = @set.Set([])
   tls_set(waitable_set.0)
@@ -212,7 +212,7 @@ pub fn task_returned() -> Unit {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub fn cb(event : Int, waitable_id : Int, code : Int) -> Int {
+pub fn cb(event : Int32, waitable_id : Int32, code : Int32) -> Int32 {
   let waitable_set = current_waitableset()
   let events = Events::new(EventCode::from(event), waitable_id, code)
   let preserve_task_wakeup = match events {
@@ -297,12 +297,12 @@ pub fn has_component_task_scope() -> Bool {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub fn current_component_task_token() -> Int {
+pub fn current_component_task_token() -> Int32 {
   current_waitableset().0
 }
 
 ///|
-fn detach_waitable(waitable_id : Int) -> Unit {
+fn detach_waitable(waitable_id : Int32) -> Unit {
   let waitable_set = current_waitableset()
   if ev.subscribes.get(waitable_set) is Some(subscribers) {
     if subscribers.get(waitable_id) is Some(subscriber) {
@@ -317,7 +317,7 @@ fn detach_waitable(waitable_id : Int) -> Unit {
 }
 
 ///|
-fn remove_subscriber(waitable_set : WaitableSet, waitable_id : Int) -> Unit {
+fn remove_subscriber(waitable_set : WaitableSet, waitable_id : Int32) -> Unit {
   if ev.subscribes.get(waitable_set) is Some(subscribers) {
     subscribers.remove(waitable_id)
     if subscribers.is_empty() {
@@ -402,8 +402,8 @@ fn drop_task_wakeup(waitable_set : WaitableSet) -> Unit {
 
 ///|
 fn cancel_waitable_event(
-  owner_task : Int,
-  waitable_id : Int,
+  owner_task : Int32,
+  waitable_id : Int32,
   cancel : () -> Events,
 ) -> Events {
   let waitable_set = WaitableSet(owner_task)
@@ -427,7 +427,7 @@ fn cancel_waitable_event(
 /// Complete an operation immediately or suspend until its terminal waitable
 /// event arrives. This is the single owner of subscription registration and
 /// detachment for future and stream copy operations.
-async fn waitable_event(waitable_id : Int, immediate : Events?) -> Events {
+async fn waitable_event(waitable_id : Int32, immediate : Events?) -> Events {
   let waitable_set = current_waitableset()
   match immediate {
     Some(event) => {
@@ -477,7 +477,7 @@ async fn waitable_event(waitable_id : Int, immediate : Events?) -> Events {
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
 pub async fn suspend_for_subtask(
-  val : Int,
+  val : Int32,
   settle_lowered_arguments : (Bool) -> Unit,
   drop_returned_result : () -> Unit,
 ) -> Unit {
@@ -587,7 +587,7 @@ pub async fn suspend_for_subtask(
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub async fn suspend_for_future_read(idx : Int, val : Int) -> Unit {
+pub async fn suspend_for_future_read(idx : Int32, val : Int32) -> Unit {
   let event = if val == -1 {
     waitable_event(idx, None)
   } else {
@@ -605,9 +605,9 @@ pub async fn suspend_for_future_read(idx : Int, val : Int) -> Unit {
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
 pub fn cancel_future_read(
-  owner_task : Int,
-  idx : Int,
-  cancel : () -> Int,
+  owner_task : Int32,
+  idx : Int32,
+  cancel : () -> Int32,
 ) -> Bool {
   let event = cancel_waitable_event(owner_task, idx, () => {
     FutureRead(idx, FutureReadResult::from(cancel()))
@@ -623,10 +623,10 @@ pub fn cancel_future_read(
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
 pub fn cancel_stream_read(
-  owner_task : Int,
-  idx : Int,
-  cancel : () -> Int,
-) -> Int {
+  owner_task : Int32,
+  idx : Int32,
+  cancel : () -> Int32,
+) -> Int32 {
   let event = cancel_waitable_event(owner_task, idx, () => {
     StreamRead(idx, StreamResult::from(cancel()))
   })
@@ -637,7 +637,7 @@ pub fn cancel_stream_read(
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub fn cancel_stream_write(idx : Int, cancel : () -> Int) -> Int {
+pub fn cancel_stream_write(idx : Int32, cancel : () -> Int32) -> Int32 {
   let event = cancel_waitable_event(current_component_task_token(), idx, () => {
     StreamWrite(idx, StreamResult::from(cancel()))
   })
@@ -648,7 +648,10 @@ pub fn cancel_stream_write(idx : Int, cancel : () -> Int) -> Int {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub async fn suspend_for_future_write_terminal(idx : Int, val : Int) -> Bool? {
+pub async fn suspend_for_future_write_terminal(
+  idx : Int32,
+  val : Int32,
+) -> Bool? {
   let event = if val == -1 {
     waitable_event(idx, None)
   } else {
@@ -666,7 +669,7 @@ pub async fn suspend_for_future_write_terminal(idx : Int, val : Int) -> Bool? {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub async fn suspend_for_stream_read(idx : Int, val : Int) -> (Int, Bool) {
+pub async fn suspend_for_stream_read(idx : Int32, val : Int32) -> (Int32, Bool) {
   let event = if val == -1 {
     waitable_event(idx, None)
   } else {
@@ -689,7 +692,10 @@ pub async fn suspend_for_stream_read(idx : Int, val : Int) -> (Int, Bool) {
 ///|
 #internal(wit_bindgen, "generated binding code only")
 #doc(hidden)
-pub async fn suspend_for_stream_write(idx : Int, val : Int) -> (Int, Bool) {
+pub async fn suspend_for_stream_write(
+  idx : Int32,
+  val : Int32,
+) -> (Int32, Bool) {
   let event = if val == -1 {
     waitable_event(idx, None)
   } else {

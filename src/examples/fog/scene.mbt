@@ -8,7 +8,7 @@ using @objects {type Mesh}
 using @scenes {type Fog, type Scene}
 
 ///|
-fn cube_at(scene : Scene, hex : Int, z : Double) -> Mesh {
+fn cube_at(scene : Scene, hex : Int32, z : Double) -> Mesh {
   let mesh = Mesh::new(
     @geometries.BoxGeometry::new().geometry,
     @materials.MeshLambertMaterial::new(hex~).material,

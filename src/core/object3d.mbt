@@ -1,10 +1,10 @@
 // r186: `Object3D` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L64
 
 ///|
-let next_object_id : Ref[Int] = Ref::Ref(1)
+let next_object_id : Ref[Int32] = Ref::Ref(1)
 
 ///|
-fn fresh_object_id() -> Int {
+fn fresh_object_id() -> Int32 {
   let id = next_object_id.val
   next_object_id.val = id + 1
   id
@@ -33,7 +33,7 @@ fn faces_negative_z(kind : NodeKind) -> Bool {
 }
 
 ///|
-fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
+fn child_index(children : Array[Object3D], object : Object3D) -> Int32? {
   for i in 0..<children.length() {
     if physical_equal(children[i], object) {
       return Some(i)
@@ -51,7 +51,7 @@ fn child_index(children : Array[Object3D], object : Object3D) -> Int? {
 /// r186: `uuid` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L97
 /// r186: `raycast` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L178
 pub(all) struct Object3D {
-  id : Int
+  id : Int32
   mut uuid : String
   mut name : String
   kind : NodeKind
@@ -74,7 +74,7 @@ pub(all) struct Object3D {
   mut cast_shadow : Bool
   mut receive_shadow : Bool
   mut frustum_culled : Bool
-  mut render_order : Int
+  mut render_order : Int32
   mut pivot : @math.Vector3?
   mut camera : CameraState?
   mut mesh : MeshBinding?
@@ -89,7 +89,7 @@ pub(all) struct Object3D {
 }
 
 ///|
-pub fn Object3D::new(kind? : NodeKind = Object) -> Object3D {
+pub fn Object3D::new(kind~ : NodeKind = Object) -> Object3D {
   let rotation = @math.Euler::new()
   let quaternion = @math.Quaternion::new()
   bind_rotation(rotation, quaternion)
@@ -275,7 +275,7 @@ pub fn Object3D::unproject_point(
 /// r186: `updateMatrixWorld` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1176
 pub fn Object3D::update_matrix_world(
   self : Object3D,
-  force? : Bool = false,
+  force~ : Bool = false,
 ) -> Unit {
   self.update_matrix_world_inner(force)
 }
@@ -311,9 +311,9 @@ fn Object3D::update_matrix_world_inner(self : Object3D, force : Bool) -> Unit {
 ///|
 pub fn Object3D::update_world_matrix(
   self : Object3D,
-  update_parents? : Bool = false,
-  update_children? : Bool = false,
-  force? : Bool = false,
+  update_parents~ : Bool = false,
+  update_children~ : Bool = false,
+  force~ : Bool = false,
 ) -> Unit {
   if update_parents {
     match self.parent {
@@ -673,7 +673,7 @@ pub fn Object3D::attach(self : Object3D, object : Object3D) -> Object3D {
 ///|
 /// 深度优先，先看自己再看子节点。
 /// r186: `getObjectById` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L917
-pub fn Object3D::get_object_by_id(self : Object3D, id : Int) -> Object3D? {
+pub fn Object3D::get_object_by_id(self : Object3D, id : Int32) -> Object3D? {
   if self.id == id {
     return Some(self)
   }
@@ -750,7 +750,7 @@ pub fn Object3D::traverse_ancestors(
 
 ///|
 /// r186: `clone` https://github.com/mrdoob/three.js/blob/r186/src/core/Object3D.js#L1592
-pub fn Object3D::clone(self : Object3D, recursive? : Bool = true) -> Object3D {
+pub fn Object3D::clone(self : Object3D, recursive~ : Bool = true) -> Object3D {
   Object3D::new(kind=self.kind).copy(self, recursive~)
 }
 
@@ -761,7 +761,7 @@ pub fn Object3D::clone(self : Object3D, recursive? : Bool = true) -> Object3D {
 pub fn Object3D::copy(
   self : Object3D,
   source : Object3D,
-  recursive? : Bool = true,
+  recursive~ : Bool = true,
 ) -> Object3D {
   self.name = source.name
   ignore(self.up.copy(source.up))
@@ -855,7 +855,7 @@ pub fn Object3D::raycast(
 /// r186: `getVertexPosition` https://github.com/mrdoob/three.js/blob/r186/src/objects/Mesh.js#L176
 pub fn Object3D::get_vertex_position(
   self : Object3D,
-  index : Int,
+  index : Int32,
   target : @math.Vector3,
 ) -> @math.Vector3 {
   let geometry = match self.mesh {

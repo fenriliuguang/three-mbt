@@ -13,10 +13,10 @@ pub(all) struct Quaternion {
 
 ///|
 pub fn Quaternion::new(
-  x? : Double = 0.0,
-  y? : Double = 0.0,
-  z? : Double = 0.0,
-  w? : Double = 1.0,
+  x~ : Double = 0.0,
+  y~ : Double = 0.0,
+  z~ : Double = 0.0,
+  w~ : Double = 1.0,
 ) -> Quaternion {
   { x, y, z, w, on_change: None, }
 }
@@ -34,11 +34,11 @@ fn Quaternion::emit(self : Quaternion) -> Unit {
 /// r186: `slerpFlat` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L60
 pub fn Quaternion::slerp_flat(
   dst : Array[Double],
-  dst_offset : Int,
+  dst_offset : Int32,
   src0 : Array[Double],
-  src_offset0 : Int,
+  src_offset0 : Int32,
   src1 : Array[Double],
-  src_offset1 : Int,
+  src_offset1 : Int32,
   t : Double,
 ) -> Unit {
   let mut x0 = src0[src_offset0]
@@ -92,11 +92,11 @@ pub fn Quaternion::slerp_flat(
 /// r186: `multiplyQuaternionsFlat` https://github.com/mrdoob/three.js/blob/r186/src/math/Quaternion.js#L144
 pub fn Quaternion::multiply_quaternions_flat(
   dst : Array[Double],
-  dst_offset : Int,
+  dst_offset : Int32,
   src0 : Array[Double],
-  src_offset0 : Int,
+  src_offset0 : Int32,
   src1 : Array[Double],
-  src_offset1 : Int,
+  src_offset1 : Int32,
 ) -> Array[Double] {
   let x0 = src0[src_offset0]
   let y0 = src0[src_offset0 + 1]
@@ -190,7 +190,7 @@ pub fn Quaternion::identity(self : Quaternion) -> Quaternion {
 pub fn Quaternion::set_from_euler(
   self : Quaternion,
   euler : Euler,
-  update? : Bool = true,
+  update~ : Bool = true,
 ) -> Quaternion {
   let x = euler.x
   let y = euler.y
@@ -528,7 +528,7 @@ pub fn Quaternion::equals(self : Quaternion, quaternion : Quaternion) -> Bool {
 pub fn Quaternion::from_array(
   self : Quaternion,
   array : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Quaternion {
   self.x = array[offset]
   self.y = array[offset + 1]
@@ -544,7 +544,7 @@ pub fn Quaternion::from_array(
 pub fn Quaternion::to_array(
   self : Quaternion,
   array? : Array[Double],
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Array[Double] {
   let target = match array {
     None => []
