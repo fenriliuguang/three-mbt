@@ -177,7 +177,7 @@ Samples live under `src/examples` because only packages inside the `source` dire
 | [active](plan/active/) | 活跃中 | The slice being ported now |
 | [later](plan/later/) | 待实现 | Decided, not started |
 
-A module can appear in more than one directory. `materials` has landed shading in `done`. The `WebGLPrograms` prefix port was removed and stays out of scope. Environment maps stay in `later`. `ShaderLib` stays upstream with the rest of the GLSL sources.
+A module can appear in more than one directory. `materials` has landed shading in `done`. The `WebGLPrograms` prefix port was removed and stays out of scope. Environment maps and the detail-map fragment of the node compiler have landed. `WGSLNodeBuilder.js`, the rest of `src/nodes`, and MaterialX stay upstream until a material reaches them. `ShaderLib` stays upstream with the rest of the GLSL sources.
 
 The next slice is the WebGPU work named at the end of the last paragraph under `## Behavior` in a file under [plan/active/](plan/active/), when that sentence ends with “X stays later”. One slice is a module’s whole remaining WebGPU plan, not one sentence inside it, and it lands as one commit. The current materials note records that the WebGL program path was removed. Do not resume it. When no active file names such a slice, timed advance takes the next `later` file, moves its WebGPU items into `active`, and implements that file as one slice. Do not take the next slice from `done`. If `later` has no remaining WebGPU work, cancel the timer. WebGL and GLSL program work stays upstream.
 
@@ -208,7 +208,6 @@ The next slice is the WebGPU work named at the end of the last paragraph under `
 ### Later
 
 - [materials](plan/later/materials.md)
-- [nodes](plan/later/nodes.md)
 - [post](plan/later/post.md)
 - [renderer](plan/later/renderer.md)
 - [textures](plan/later/textures.md)

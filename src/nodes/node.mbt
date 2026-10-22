@@ -35,6 +35,10 @@ pub(all) enum Node {
   FacingNormal
   EmissiveSample
   AlphaSample
+  AoFactor
+  LightMap
+  Displaced
+  UnlitShade(Node)
 }
 
 ///|
@@ -154,7 +158,7 @@ fn shadow_preamble() -> String {
 /// r186: `D_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/D_GGX.js#L6 ; `V_GGX_SmithCorrelated` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/V_GGX_SmithCorrelated.js#L7 ; `F_Schlick` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/F_Schlick.js#L3 ; `BRDF_GGX` https://github.com/mrdoob/three.js/blob/r186/src/nodes/functions/BSDF/BRDF_GGX.js#L12 ; `roughnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/roughnessmap_fragment.glsl.js#L9 ; `metalnessFactor` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/metalnessmap_fragment.glsl.js#L9 ; `getIBLIrradiance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js#L4 ; `getIBLRadiance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js#L22
 fn standard_preamble() -> String {
   let lines = [
-    "struct EnvParams {\n  rotation : mat4x4<f32>,\n  params : vec4<f32>,\n};\n\n@group(4) @binding(0) var env_texture : texture_2d<f32>;\n@group(4) @binding(1) var env_sampler : sampler;\n@group(4) @binding(2) var<uniform> env_params : EnvParams;\n\nfn env_rotate(dir : vec3<f32>) -> vec3<f32> {\n  let r = env_params.rotation;\n  return r[0].xyz * dir.x + r[1].xyz * dir.y + r[2].xyz * dir.z;\n}\n\nfn env_uv(dir : vec3<f32>, row : f32) -> vec2<f32> {\n  let u = atan2(dir.z, dir.x) * 0.15915494309189535 + 0.5;\n  let v = 0.5 - asin(clamp(dir.y, -1.0, 1.0)) * 0.3183098861837907;\n  let level = clamp(v, 0.0, 0.999);\n  return vec2<f32>(u, (row + level) / 6.0);\n}\n\nfn pmrem_specular(dir : vec3<f32>, roughness : f32) -> vec3<f32> {\n  let levels = max(env_params.params.y, 1.0);\n  let scaled = roughness * (levels - 1.0);\n  let row0 = floor(scaled);\n  let row1 = min(row0 + 1.0, levels - 1.0);\n  let t = scaled - row0;\n  let a = textureSample(env_texture, env_sampler, env_uv(dir, row0)).xyz;\n  let b = textureSample(env_texture, env_sampler, env_uv(dir, row1)).xyz;\n  return mix(a, b, t);\n}\n\nfn pmrem_irradiance(dir : vec3<f32>) -> vec3<f32> {\n  return textureSample(env_texture, env_sampler, env_uv(dir, env_params.params.w)).xyz;\n}\n\nfn env_brdf(roughness : f32, nov : f32) -> vec2<f32> {\n  let c0 = vec4<f32>(-1.0, -0.0275, -0.572, 0.022);\n  let c1 = vec4<f32>(1.0, 0.0425, 1.04, -0.04);\n  let r = roughness * c0 + c1;\n  let a004 = min(r.x * r.x, exp2(-9.28 * nov)) * r.x + r.y;\n  return vec2<f32>(-1.04, 1.04) * a004 + r.zw;\n}\n\nfn env_indirect(N : vec3<f32>, V : vec3<f32>, diffuse_color : vec3<f32>, f0 : vec3<f32>, roughness : f32) -> vec3<f32> {\n  if (env_params.params.z < 0.5) {\n    return vec3<f32>(0.0);\n  }\n  let rotated_n = env_rotate(N);\n  let reflected = env_rotate(reflect(-V, N));\n  let irr = srgb_to_linear(pmrem_irradiance(rotated_n));\n  let spec = srgb_to_linear(pmrem_specular(reflected, roughness));\n  let nov = max(dot(N, V), 0.0);\n  let brdf = env_brdf(roughness, nov);\n  let diffuse = irr * diffuse_color * 0.3183098861837907;\n  let specular = spec * (f0 * brdf.x + brdf.y);\n  return (diffuse + specular) * env_params.params.x;\n}\n\n",
+    "struct EnvParams {\n  rotation : mat4x4<f32>,\n  params : vec4<f32>,\n};\n\n@group(4) @binding(0) var env_texture : texture_2d<f32>;\n@group(4) @binding(1) var env_sampler : sampler;\n@group(4) @binding(2) var<uniform> env_params : EnvParams;\n\nfn env_rotate(dir : vec3<f32>) -> vec3<f32> {\n  let r = env_params.rotation;\n  return r[0].xyz * dir.x + r[1].xyz * dir.y + r[2].xyz * dir.z;\n}\n\nfn env_uv(dir : vec3<f32>, row : f32) -> vec2<f32> {\n  let u = atan2(dir.z, dir.x) * 0.15915494309189535 + 0.5;\n  let v = 0.5 - asin(clamp(dir.y, -1.0, 1.0)) * 0.3183098861837907;\n  let level = clamp(v, 0.0, 0.999);\n  return vec2<f32>(u, (row + level) / 6.0);\n}\n\nfn pmrem_specular(dir : vec3<f32>, roughness : f32) -> vec3<f32> {\n  let levels = max(env_params.params.y, 1.0);\n  let scaled = roughness * (levels - 1.0);\n  let row0 = floor(scaled);\n  let row1 = min(row0 + 1.0, levels - 1.0);\n  let t = scaled - row0;\n  let a = textureSample(env_texture, env_sampler, env_uv(dir, row0)).xyz;\n  let b = textureSample(env_texture, env_sampler, env_uv(dir, row1)).xyz;\n  return mix(a, b, t);\n}\n\nfn pmrem_irradiance(dir : vec3<f32>) -> vec3<f32> {\n  return textureSample(env_texture, env_sampler, env_uv(dir, env_params.params.w)).xyz;\n}\n\nfn env_brdf(roughness : f32, nov : f32) -> vec2<f32> {\n  let c0 = vec4<f32>(-1.0, -0.0275, -0.572, 0.022);\n  let c1 = vec4<f32>(1.0, 0.0425, 1.04, -0.04);\n  let r = roughness * c0 + c1;\n  let a004 = min(r.x * r.x, exp2(-9.28 * nov)) * r.x + r.y;\n  return vec2<f32>(-1.04, 1.04) * a004 + r.zw;\n}\n\nfn env_indirect(N : vec3<f32>, V : vec3<f32>, diffuse_color : vec3<f32>, f0 : vec3<f32>, roughness : f32) -> vec3<f32> {\n  if (env_params.params.z < 0.5) {\n    return vec3<f32>(0.0);\n  }\n  let rotated_n = env_rotate(N);\n  let reflected = env_rotate(reflect(-V, N));\n  let irr = srgb_to_linear(pmrem_irradiance(rotated_n));\n  let spec = srgb_to_linear(pmrem_specular(reflected, roughness));\n  let nov = max(dot(N, V), 0.0);\n  let brdf = env_brdf(roughness, nov);\n  let diffuse = irr * diffuse_color * 0.3183098861837907;\n  let specular = spec * (f0 * brdf.x + brdf.y);\n  let ao = ao_factor();\n  var spec_scale = 1.0;\n  if ((uniforms.viewport).w != 0.0) {\n    spec_scale = clamp(pow(nov + ao, exp2(-16.0 * roughness - 1.0)) - 1.0 + ao, 0.0, 1.0);\n  }\n  return (diffuse * ao + specular * spec_scale) * env_params.params.x;\n}\n\n",
     "fn D_GGX(alpha : f32, NoH : f32) -> f32 {\n", "  let a2 = alpha * alpha;\n",
     "  let d = (NoH * a2 - NoH) * NoH + 1.0;\n", "  return 0.3183098861837907 * a2 / (d * d);\n",
     "}\n\n", "fn V_GGX_SmithCorrelated(alpha : f32, NoL : f32, NoV : f32) -> f32 {\n",
@@ -181,7 +185,7 @@ fn standard_preamble() -> String {
     "  let NoH = max(dot(N, H), 0.0);\n", "  let VoH = max(dot(V, H), 0.0);\n", "  let specular = F_Schlick(f0, VoH) * (D_GGX(alpha, NoH) * V_GGX_SmithCorrelated(alpha, NoL, NoV));\n",
     "  let diffuse = diffuse_color * 0.3183098861837907;\n", "  var direct = (diffuse + specular) * (uniforms.light_color).xyz * NoL * direct_shadow(world, N);\n",
     "  direct = direct + point_standard(N, V, world, diffuse, f0, alpha);\n", "  direct = direct + spot_standard(N, V, world, diffuse, f0, alpha);\n",
-    "  let indirect = ((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse + env_indirect(N, V, diffuse_color, f0, roughness);\n",
+    "  let indirect = ((uniforms.ambient).xyz + hemisphere_term(N) + light_map_color()) * diffuse * ao_factor() + env_indirect(N, V, diffuse_color, f0, roughness);\n",
     "  return vec4<f32>(direct + indirect, base.w);\n", "}\n\n",
   ]
   let mut text = ""
@@ -335,7 +339,11 @@ pub fn basic_program(instanced~ : Bool = false) -> Program {
     vertex_clip: Mul(Uniform("mvp", Mat4), mesh_local(shifted, instanced)),
     vertex_varyings: assignments,
     fragment_color: scale_alpha(
-      tint_vertex(tint_instance(Mul(Uniform("color", Vec4), sample), instanced)),
+      UnlitShade(
+        tint_vertex(
+          tint_instance(Mul(Uniform("color", Vec4), sample), instanced),
+        ),
+      ),
     ),
     sampled: true,
     shadowed: false,
@@ -343,8 +351,40 @@ pub fn basic_program(instanced~ : Bool = false) -> Program {
     roughness: false,
     metalness: false,
     alpha: true,
-    preamble: "",
+    preamble: indirect_bindings() + unlit_preamble(),
   }
+}
+
+///|
+/// 第 5 组的环境光遮蔽和光照贴图。遮蔽只乘间接光。没有贴图时强度写成 0，白纹理的结果是 1，黑光照贴图的结果是 0。
+/// r186: `ambientOcclusion` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/aomap_fragment.glsl.js#L5
+/// r186: `lightMapIrradiance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_fragment_maps.glsl.js#L7
+fn indirect_bindings() -> String {
+  "@group(5) @binding(4) var ao_texture : texture_2d<f32>;\n@group(5) @binding(5) var ao_sampler : sampler;\n@group(5) @binding(6) var light_texture : texture_2d<f32>;\n@group(5) @binding(7) var light_sampler : sampler;\n\nfn ao_factor() -> f32 {\n  let texel = textureSample(ao_texture, ao_sampler, input.v_uv).r;\n  return (texel - 1.0) * (uniforms.viewport).w + 1.0;\n}\n\nfn light_map_color() -> vec3<f32> {\n  let texel = textureSample(light_texture, light_sampler, input.v_uv).xyz;\n  return srgb_to_linear(texel) * (uniforms.point).z;\n}\n\n"
+}
+
+///|
+/// Basic 把光照贴图加在 1 上，再乘环境光遮蔽。直接光不存在。
+fn unlit_preamble() -> String {
+  "fn shade_unlit(color : vec4<f32>) -> vec4<f32> {\n  let lit = color.xyz * (vec3<f32>(1.0) + light_map_color()) * ao_factor();\n  return vec4<f32>(lit, color.w);\n}\n\n"
+}
+
+///|
+/// Lambert 和 Standard 的法线贴图、凹凸贴图和顶点位移。法线贴图优先于凹凸。Basic 不声明这些函数。
+/// r186: `getTangentFrame` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/normalmap_pars_fragment.glsl.js#L20
+/// r186: `USE_NORMALMAP_OBJECTSPACE` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/normal_fragment_maps.glsl.js#L3
+/// r186: `dHdxy_fwd` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl.js#L12
+/// r186: `perturbNormalArb` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl.js#L25
+/// r186: `transformed` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/displacementmap_vertex.glsl.js#L4
+/// r186: `computeSpecularOcclusion` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/lights_physical_pars_fragment.glsl.js#L655
+fn detail_preamble() -> String {
+  "@group(5) @binding(0) var normal_texture : texture_2d<f32>;\n@group(5) @binding(1) var normal_sampler : sampler;\n@group(5) @binding(2) var bump_texture : texture_2d<f32>;\n@group(5) @binding(3) var bump_sampler : sampler;\n@group(5) @binding(8) var displacement_texture : texture_2d<f32>;\n@group(5) @binding(9) var displacement_sampler : sampler;\n\nfn face_sign(front : bool) -> f32 {\n  let side = (uniforms.surface).w;\n  if (side > 0.5) {\n    if (front) {\n      return 1.0;\n    }\n    return -1.0;\n  }\n  if (side < -0.5) {\n    return -1.0;\n  }\n  return 1.0;\n}\n\nfn detail_normal(n : vec3<f32>, front : bool) -> vec3<f32> {\n  if ((uniforms.camera_position).w > 0.5) {\n    var texel = textureSample(normal_texture, normal_sampler, input.v_uv).xyz * 2.0 - 1.0;\n    if ((uniforms.ambient).w > 0.5) {\n      texel = texel * face_sign(front);\n      return normalize((uniforms.normal_matrix * vec4<f32>(texel, 0.0)).xyz);\n    }\n    texel.x = texel.x * (uniforms.light_direction).w;\n    texel.y = texel.y * (uniforms.light_color).w;\n    let q0 = dpdx(input.v_world);\n    let q1 = dpdy(input.v_world);\n    let st0 = dpdx(input.v_uv);\n    let st1 = dpdy(input.v_uv);\n    let q1perp = cross(q1, n);\n    let q0perp = cross(n, q0);\n    let t = q1perp * st0.x + q0perp * st1.x;\n    let b = q1perp * st0.y + q0perp * st1.y;\n    let det = max(dot(t, t), dot(b, b));\n    let scale = select(inverseSqrt(det), 0.0, det == 0.0);\n    return normalize(t * (texel.x * scale) + b * (texel.y * scale) + n * texel.z);\n  }\n  if ((uniforms.viewport).z != 0.0) {\n    let uv = input.v_uv;\n    let dx = dpdx(uv);\n    let dy = dpdy(uv);\n    let scale = (uniforms.viewport).z;\n    let h = textureSampleLevel(bump_texture, bump_sampler, uv, 0.0).x;\n    let hx = textureSampleLevel(bump_texture, bump_sampler, uv + dx, 0.0).x;\n    let hy = textureSampleLevel(bump_texture, bump_sampler, uv + dy, 0.0).x;\n    let dh = vec2<f32>((hx - h) * scale, (hy - h) * scale);\n    let face = face_sign(front);\n    let sx = normalize(dpdx(input.v_world));\n    let sy = normalize(dpdy(input.v_world));\n    let r1 = cross(sy, n);\n    let r2 = cross(n, sx);\n    let fdet = dot(sx, r1) * face;\n    let grad = sign(fdet) * (dh.x * r1 + dh.y * r2);\n    return normalize(abs(fdet) * n - grad);\n  }\n  return n;\n}\n\n" +
+  displace_fn()
+}
+
+///|
+fn displace_fn() -> String {
+  "fn displace(position : vec3<f32>, normal : vec3<f32>, uv : vec2<f32>) -> vec3<f32> {\n  if ((uniforms.point_color).w < 0.5) {\n    return position;\n  }\n  let height = textureSampleLevel(displacement_texture, displacement_sampler, uv, 0.0).x;\n  return position + normalize(normal) * (height * (uniforms.point).w + (uniforms.point_position).w);\n}\n\n"
 }
 
 ///|
@@ -361,7 +401,7 @@ fn facing_preamble() -> String {
 /// Lambert：`color * (ambient + lightColor * max(dot(N, L), 0))`。
 /// r186: `MeshLambertMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshLambertMaterial.js#L24
 pub fn lambert_program(instanced~ : Bool = false) -> Program {
-  let position = Attribute("position", 0, Vec3)
+  let position = Displaced
   let normal = mesh_normal(instanced)
   let world_normal = Swizzle(
     Mul(Uniform("normal_matrix", Mat4), Vec4(normal, Float(0.0))),
@@ -380,13 +420,11 @@ pub fn lambert_program(instanced~ : Bool = false) -> Program {
     Mul(Swizzle(Uniform("light_color", Vec4), "xyz"), ndotl),
     DirectShadow,
   )
-  let lit = Add(
-    Add(
-      Add(Add(Swizzle(Uniform("ambient", Vec4), "xyz"), HemisphereTerm), direct),
-      PointTerm,
-    ),
-    SpotTerm,
+  let indirect = Mul(
+    Add(Add(Swizzle(Uniform("ambient", Vec4), "xyz"), HemisphereTerm), LightMap),
+    AoFactor,
   )
+  let lit = Add(Add(Add(indirect, direct), PointTerm), SpotTerm)
   let sample = TextureSample(Varying("v_uv", Vec2))
   let rgb = Mul(
     Mul(Swizzle(Uniform("color", Vec4), "xyz"), lit),
@@ -409,6 +447,20 @@ pub fn lambert_program(instanced~ : Bool = false) -> Program {
     colored_assignments,
     fog_depth(mesh_local(position, instanced)),
   )
+  let lights = if instanced {
+    instance_preamble() +
+    facing_preamble() +
+    shadow_preamble() +
+    point_preamble() +
+    spot_preamble() +
+    hemisphere_preamble()
+  } else {
+    facing_preamble() +
+    shadow_preamble() +
+    point_preamble() +
+    spot_preamble() +
+    hemisphere_preamble()
+  }
   {
     uniforms: frame_uniforms(),
     attributes: mesh_attributes(instanced),
@@ -434,20 +486,7 @@ pub fn lambert_program(instanced~ : Bool = false) -> Program {
     roughness: false,
     metalness: false,
     alpha: true,
-    preamble: if instanced {
-      instance_preamble() +
-      facing_preamble() +
-      shadow_preamble() +
-      point_preamble() +
-      spot_preamble() +
-      hemisphere_preamble()
-    } else {
-      facing_preamble() +
-      shadow_preamble() +
-      point_preamble() +
-      spot_preamble() +
-      hemisphere_preamble()
-    },
+    preamble: indirect_bindings() + detail_preamble() + lights,
   }
 }
 
@@ -455,7 +494,7 @@ pub fn lambert_program(instanced~ : Bool = false) -> Program {
 /// Standard：`baseColor * (1 - metalness)` 的 Lambert 漫反射，加上 GGX 高光。`baseColor` 已乘贴图。
 /// r186: `MeshStandardMaterial` https://github.com/mrdoob/three.js/blob/r186/src/materials/MeshStandardMaterial.js#L41
 pub fn standard_program(instanced~ : Bool = false) -> Program {
-  let position = Attribute("position", 0, Vec3)
+  let position = Displaced
   let placed = mesh_local(position, instanced)
   let normal = mesh_normal(instanced)
   let world_normal = Swizzle(
@@ -485,6 +524,22 @@ pub fn standard_program(instanced~ : Bool = false) -> Program {
     colored_assignments,
     fog_depth(placed),
   )
+  let lights = if instanced {
+    instance_preamble() +
+    facing_preamble() +
+    shadow_preamble() +
+    point_preamble() +
+    spot_preamble() +
+    hemisphere_preamble() +
+    standard_preamble()
+  } else {
+    facing_preamble() +
+    shadow_preamble() +
+    point_preamble() +
+    spot_preamble() +
+    hemisphere_preamble() +
+    standard_preamble()
+  }
   {
     uniforms: frame_uniforms(),
     attributes: mesh_attributes(instanced),
@@ -500,22 +555,7 @@ pub fn standard_program(instanced~ : Bool = false) -> Program {
     roughness: true,
     metalness: true,
     alpha: true,
-    preamble: if instanced {
-      instance_preamble() +
-      facing_preamble() +
-      shadow_preamble() +
-      point_preamble() +
-      spot_preamble() +
-      hemisphere_preamble() +
-      standard_preamble()
-    } else {
-      facing_preamble() +
-      shadow_preamble() +
-      point_preamble() +
-      spot_preamble() +
-      hemisphere_preamble() +
-      standard_preamble()
-    },
+    preamble: indirect_bindings() + detail_preamble() + lights,
   }
 }
 

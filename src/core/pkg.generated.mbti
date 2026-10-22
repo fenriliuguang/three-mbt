@@ -372,6 +372,18 @@ pub(all) struct MaterialDraw {
   env_map : @textures.Texture?
   env_map_intensity : Double
   env_rotation : @math.Matrix4
+  normal_map : @textures.Texture?
+  normal_map_type : @constants.NormalMapType
+  normal_scale : @math.Vector2
+  bump_map : @textures.Texture?
+  bump_scale : Double
+  ao_map : @textures.Texture?
+  ao_map_intensity : Double
+  light_map : @textures.Texture?
+  light_map_intensity : Double
+  displacement_map : @textures.Texture?
+  displacement_scale : Double
+  displacement_bias : Double
 }
 
 pub(all) struct MeshBinding {
@@ -405,6 +417,18 @@ pub(all) struct MeshBinding {
   env_map : @textures.Texture?
   env_map_intensity : Double
   env_rotation : @math.Matrix4
+  normal_map : @textures.Texture?
+  normal_map_type : @constants.NormalMapType
+  normal_scale : @math.Vector2
+  bump_map : @textures.Texture?
+  bump_scale : Double
+  ao_map : @textures.Texture?
+  ao_map_intensity : Double
+  light_map : @textures.Texture?
+  light_map_intensity : Double
+  displacement_map : @textures.Texture?
+  displacement_scale : Double
+  displacement_bias : Double
   instances : InstanceData?
   group_sides : Array[@constants.Side]?
   group_draws : Array[MaterialDraw]?

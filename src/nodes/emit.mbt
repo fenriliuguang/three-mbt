@@ -42,19 +42,26 @@ fn emit_expr(node : Node) -> String {
     Swizzle(value, suffix) => "(\{emit_expr(value)}).\{suffix}"
     TextureSample(uv) => "sample_color(\{emit_expr(uv)})"
     StandardLit(base) =>
-      "standard_lit(\{emit_expr(base)}, facing_normal(input.v_normal, front), input.v_world)"
+      "standard_lit(\{emit_expr(base)}, \{lit_normal()}, input.v_world)"
     InstanceNormal(normal) =>
       "instance_normal(\{emit_expr(normal)}, input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2)"
-    DirectShadow =>
-      "direct_shadow(input.v_world, facing_normal(input.v_normal, front))"
-    PointTerm =>
-      "point_term(input.v_world, facing_normal(input.v_normal, front))"
-    SpotTerm => "spot_term(input.v_world, facing_normal(input.v_normal, front))"
-    HemisphereTerm => "hemisphere_term(facing_normal(input.v_normal, front))"
-    FacingNormal => "facing_normal(input.v_normal, front)"
+    DirectShadow => "direct_shadow(input.v_world, \{lit_normal()})"
+    PointTerm => "point_term(input.v_world, \{lit_normal()})"
+    SpotTerm => "spot_term(input.v_world, \{lit_normal()})"
+    HemisphereTerm => "hemisphere_term(\{lit_normal()})"
+    FacingNormal => lit_normal()
     EmissiveSample => "sample_emissive(input.v_uv)"
     AlphaSample => "textureSample(alpha_texture, alpha_sampler, input.v_uv)"
+    AoFactor => "ao_factor()"
+    LightMap => "light_map_color()"
+    Displaced => "displace(input.position, input.normal, input.uv)"
+    UnlitShade(color) => "shade_unlit(\{emit_expr(color)})"
   }
+}
+
+///|
+fn lit_normal() -> String {
+  "detail_normal(facing_normal(input.v_normal, front), front)"
 }
 
 ///|
@@ -212,15 +219,28 @@ pub fn line_wgsl() -> String {
 }
 
 ///|
-/// 阴影贴图只写深度。uniform 只声明开头的 `mvp`，和完整 uniform 块的前 64 字节对齐。
+/// 阴影贴图只写深度。uniform 用完整的帧块，这样位移的缩放和偏移落在原来的空槽里。
+/// 第 1 组是位移贴图。没有贴图时 `point_color.w` 为 0，顶点留在原处。
 /// r186: `DirectionalLightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/DirectionalLightShadow.js#L9
+/// r186: `transformed` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/displacementmap_vertex.glsl.js#L4
 pub fn shadow_wgsl() -> String {
-  "struct Uniforms {\n  mvp : mat4x4<f32>,\n}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n  @location(0) position : vec3<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.clip = uniforms.mvp * vec4<f32>(input.position, 1.0);\n  return output;\n}\n"
+  uniform_header() +
+  shadow_displace_bindings() +
+  displace_fn() +
+  "struct VertexInput {\n  @location(0) position : vec3<f32>,\n  @location(1) normal : vec3<f32>,\n  @location(2) uv : vec2<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.clip = uniforms.mvp * vec4<f32>(displace(input.position, input.normal, input.uv), 1.0);\n  return output;\n}\n"
 }
 
 ///|
 pub fn shadow_instanced_wgsl() -> String {
-  "struct Uniforms {\n  mvp : mat4x4<f32>,\n}\n\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n  @location(0) position : vec3<f32>,\n  @location(3) instance_matrix_0 : vec4<f32>,\n  @location(4) instance_matrix_1 : vec4<f32>,\n  @location(5) instance_matrix_2 : vec4<f32>,\n  @location(6) instance_matrix_3 : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  let instance = mat4x4<f32>(input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2, input.instance_matrix_3);\n  output.clip = uniforms.mvp * instance * vec4<f32>(input.position, 1.0);\n  return output;\n}\n"
+  uniform_header() +
+  shadow_displace_bindings() +
+  displace_fn() +
+  "struct VertexInput {\n  @location(0) position : vec3<f32>,\n  @location(1) normal : vec3<f32>,\n  @location(2) uv : vec2<f32>,\n  @location(3) instance_matrix_0 : vec4<f32>,\n  @location(4) instance_matrix_1 : vec4<f32>,\n  @location(5) instance_matrix_2 : vec4<f32>,\n  @location(6) instance_matrix_3 : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) clip : vec4<f32>,\n}\n\n@vertex\nfn vs(input : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  let local = displace(input.position, input.normal, input.uv);\n  let instance = mat4x4<f32>(input.instance_matrix_0, input.instance_matrix_1, input.instance_matrix_2, input.instance_matrix_3);\n  output.clip = uniforms.mvp * instance * vec4<f32>(local, 1.0);\n  return output;\n}\n"
+}
+
+///|
+fn shadow_displace_bindings() -> String {
+  "@group(1) @binding(0) var displacement_texture : texture_2d<f32>;\n@group(1) @binding(1) var displacement_sampler : sampler;\n\n"
 }
 
 ///|

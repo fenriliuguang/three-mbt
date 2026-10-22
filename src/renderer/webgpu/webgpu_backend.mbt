@@ -192,6 +192,45 @@ fn fragment_visibility() -> @gpu.GpuShaderStage {
 }
 
 ///|
+fn vertex_visibility() -> @gpu.GpuShaderStage {
+  @gpu.GpuShaderStage::default().set(@gpu.GpuShaderStageFlag::VERTEX)
+}
+
+///|
+fn sampled_texture_entry(
+  binding : UInt32,
+  visibility : @gpu.GpuShaderStage,
+) -> @gpu.GpuBindGroupLayoutEntry {
+  {
+    binding,
+    visibility,
+    buffer: None,
+    sampler: None,
+    texture: Some({
+      sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+      view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+      multisampled: Some(false),
+    }),
+    storage_texture: None,
+  }
+}
+
+///|
+fn filtering_sampler_entry(
+  binding : UInt32,
+  visibility : @gpu.GpuShaderStage,
+) -> @gpu.GpuBindGroupLayoutEntry {
+  {
+    binding,
+    visibility,
+    buffer: None,
+    sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+    texture: None,
+    storage_texture: None,
+  }
+}
+
+///|
 fn compute_visibility() -> @gpu.GpuShaderStage {
   @gpu.GpuShaderStage::default().set(@gpu.GpuShaderStageFlag::COMPUTE)
 }

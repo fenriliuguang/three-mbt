@@ -101,6 +101,17 @@ pub struct WebGPURenderer {
   env_black : TextureGpu
   env_fallback : GpuBindGroup
   envs : Array[EnvGpu]
+  detail_layout : GpuBindGroupLayout
+  detail_groups : Array[GpuBindGroup]
+  detail_normal : Array[@textures.Texture?]
+  detail_bump : Array[@textures.Texture?]
+  detail_ao : Array[@textures.Texture?]
+  detail_light : Array[@textures.Texture?]
+  detail_displacement : Array[@textures.Texture?]
+  displace_layout : GpuBindGroupLayout
+  displace_fallback : GpuBindGroup
+  displace_groups : Array[GpuBindGroup]
+  displace_maps : Array[@textures.Texture?]
   shadow_layout : GpuBindGroupLayout
   shadow_sampler : GpuSampler
   shadow_sampler_reversed : GpuSampler
@@ -344,6 +355,30 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("env"),
   })
+  let fragment = fragment_visibility()
+  let vertex = vertex_visibility()
+  let detail_layout = device.create_bind_group_layout({
+    entries: [
+      sampled_texture_entry(0U, fragment),
+      filtering_sampler_entry(1U, fragment),
+      sampled_texture_entry(2U, fragment),
+      filtering_sampler_entry(3U, fragment),
+      sampled_texture_entry(4U, fragment),
+      filtering_sampler_entry(5U, fragment),
+      sampled_texture_entry(6U, fragment),
+      filtering_sampler_entry(7U, fragment),
+      sampled_texture_entry(8U, shader_visibility()),
+      filtering_sampler_entry(9U, shader_visibility()),
+    ],
+    label: Some("detail"),
+  })
+  let displace_layout = device.create_bind_group_layout({
+    entries: [
+      sampled_texture_entry(0U, vertex),
+      filtering_sampler_entry(1U, vertex),
+    ],
+    label: Some("displace"),
+  })
   let pipeline_layout = device.create_pipeline_layout({
     bind_group_layouts: [
       Some(layout),
@@ -351,6 +386,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       Some(shadow_layout),
       Some(surface_layout),
       Some(env_layout),
+      Some(detail_layout),
     ],
     immediate_size: None,
     label: Some("frame"),
@@ -359,6 +395,11 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     bind_group_layouts: [Some(layout)],
     immediate_size: None,
     label: Some("color"),
+  })
+  let shadow_mesh_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout), Some(displace_layout)],
+    immediate_size: None,
+    label: Some("shadow-mesh"),
   })
   let line_shader = shader_module(device, @nodes.line_wgsl(), "line")
   let points_shader = shader_module(device, @nodes.points_wgsl(), "points")
@@ -497,6 +538,20 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       },
     ],
     label: Some("env-fallback"),
+  })
+  let displace_fallback = device.create_bind_group({
+    layout: displace_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(env_black.view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(env_black.sampler),
+      },
+    ],
+    label: Some("displace-fallback"),
   })
   let window = target.window()
   {
@@ -776,25 +831,38 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     env_black,
     env_fallback,
     envs: [],
+    detail_layout,
+    detail_groups: [],
+    detail_normal: [],
+    detail_bump: [],
+    detail_ao: [],
+    detail_light: [],
+    detail_displacement: [],
+    displace_layout,
+    displace_fallback,
+    displace_groups: [],
+    displace_maps: [],
     shadow_layout,
     shadow_sampler,
     shadow_sampler_reversed,
     shadow_dummy,
-    shadow_depth: shadow_pipelines(device, shadow_shader, color_layout, false),
+    shadow_depth: shadow_pipelines(
+      device, shadow_shader, shadow_mesh_layout, false,
+    ),
     shadow_depth_instanced: shadow_pipelines(
-      device, shadow_instanced_shader, color_layout, true,
+      device, shadow_instanced_shader, shadow_mesh_layout, true,
     ),
     shadow_depth_reversed: shadow_pipelines(
       device,
       shadow_shader,
-      color_layout,
+      shadow_mesh_layout,
       false,
       compare=@gpu.GpuCompareFunction::GREATER,
     ),
     shadow_depth_instanced_reversed: shadow_pipelines(
       device,
       shadow_instanced_shader,
-      color_layout,
+      shadow_mesh_layout,
       true,
       compare=@gpu.GpuCompareFunction::GREATER,
     ),
@@ -1539,6 +1607,7 @@ fn WebGPURenderer::color_target(
       return cached
     }
     self.drop_surface_groups(source)
+    self.drop_detail_groups(source)
     drop_color_target(cached)
   }
   let texture = self.device.create_texture({
@@ -1640,7 +1709,10 @@ fn WebGPURenderer::texture_group(
       }
       if found >= 0 {
         match self.textures[found].source {
-          Some(cached) => self.drop_surface_groups(cached)
+          Some(cached) => {
+            self.drop_surface_groups(cached)
+            self.drop_detail_groups(cached)
+          }
           None => ()
         }
         drop_texture(self.textures[found])
@@ -1829,6 +1901,195 @@ fn WebGPURenderer::surface_group(
   self.surface_alpha.push(alpha)
   self.surface_groups.push(group)
   group
+}
+
+///|
+fn WebGPURenderer::drop_detail_groups(
+  self : WebGPURenderer,
+  source : @textures.Texture,
+) -> Unit {
+  let mut index = 0
+  while index < self.detail_groups.length() {
+    let hit = same_texture(self.detail_normal[index], Some(source)) ||
+      same_texture(self.detail_bump[index], Some(source)) ||
+      same_texture(self.detail_ao[index], Some(source)) ||
+      same_texture(self.detail_light[index], Some(source)) ||
+      same_texture(self.detail_displacement[index], Some(source))
+    if hit {
+      self.detail_groups[index].drop()
+      let last = self.detail_groups.length() - 1
+      self.detail_groups[index] = self.detail_groups[last]
+      self.detail_normal[index] = self.detail_normal[last]
+      self.detail_bump[index] = self.detail_bump[last]
+      self.detail_ao[index] = self.detail_ao[last]
+      self.detail_light[index] = self.detail_light[last]
+      self.detail_displacement[index] = self.detail_displacement[last]
+      ignore(self.detail_groups.pop())
+      ignore(self.detail_normal.pop())
+      ignore(self.detail_bump.pop())
+      ignore(self.detail_ao.pop())
+      ignore(self.detail_light.pop())
+      ignore(self.detail_displacement.pop())
+    } else {
+      index = index + 1
+    }
+  }
+  index = 0
+  while index < self.displace_groups.length() {
+    if same_texture(self.displace_maps[index], Some(source)) {
+      self.displace_groups[index].drop()
+      let last = self.displace_groups.length() - 1
+      self.displace_groups[index] = self.displace_groups[last]
+      self.displace_maps[index] = self.displace_maps[last]
+      ignore(self.displace_groups.pop())
+      ignore(self.displace_maps.pop())
+    } else {
+      index = index + 1
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::detail_view(
+  self : WebGPURenderer,
+  map : @textures.Texture?,
+  black : Bool,
+) -> (GpuTextureView, GpuSampler) {
+  match map {
+    Some(_) => self.texture_views(map)
+    None =>
+      if black {
+        (self.env_black.view, self.env_black.sampler)
+      } else {
+        (self.white.view, self.white.sampler)
+      }
+  }
+}
+
+///|
+/// 第 5 组：法线、凹凸、环境光遮蔽、光照贴图、位移。缺的法线、凹凸和遮蔽用白纹理，缺的光照和位移用黑纹理。
+fn WebGPURenderer::detail_group(
+  self : WebGPURenderer,
+  normal : @textures.Texture?,
+  bump : @textures.Texture?,
+  ao : @textures.Texture?,
+  light : @textures.Texture?,
+  displacement : @textures.Texture?,
+) -> GpuBindGroup {
+  ignore(self.texture_group(normal))
+  ignore(self.texture_group(bump))
+  ignore(self.texture_group(ao))
+  ignore(self.texture_group(light))
+  ignore(self.texture_group(displacement))
+  let mut index = 0
+  while index < self.detail_groups.length() {
+    if same_texture(self.detail_normal[index], normal) &&
+      same_texture(self.detail_bump[index], bump) &&
+      same_texture(self.detail_ao[index], ao) &&
+      same_texture(self.detail_light[index], light) &&
+      same_texture(self.detail_displacement[index], displacement) {
+      return self.detail_groups[index]
+    }
+    index = index + 1
+  }
+  let (normal_view, normal_sampler) = self.detail_view(normal, false)
+  let (bump_view, bump_sampler) = self.detail_view(bump, false)
+  let (ao_view, ao_sampler) = self.detail_view(ao, false)
+  let (light_view, light_sampler) = self.detail_view(light, true)
+  let (displacement_view, displacement_sampler) = self.detail_view(
+    displacement, true,
+  )
+  let group = self.device.create_bind_group({
+    layout: self.detail_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(normal_view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(normal_sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(bump_view),
+      },
+      {
+        binding: 3U,
+        resource: @gpu.GpuBindingResource::GpuSampler(bump_sampler),
+      },
+      {
+        binding: 4U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(ao_view),
+      },
+      {
+        binding: 5U,
+        resource: @gpu.GpuBindingResource::GpuSampler(ao_sampler),
+      },
+      {
+        binding: 6U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(light_view),
+      },
+      {
+        binding: 7U,
+        resource: @gpu.GpuBindingResource::GpuSampler(light_sampler),
+      },
+      {
+        binding: 8U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(displacement_view),
+      },
+      {
+        binding: 9U,
+        resource: @gpu.GpuBindingResource::GpuSampler(displacement_sampler),
+      },
+    ],
+    label: Some("detail"),
+  })
+  self.detail_normal.push(normal)
+  self.detail_bump.push(bump)
+  self.detail_ao.push(ao)
+  self.detail_light.push(light)
+  self.detail_displacement.push(displacement)
+  self.detail_groups.push(group)
+  group
+}
+
+///|
+fn WebGPURenderer::displace_group(
+  self : WebGPURenderer,
+  map : @textures.Texture?,
+) -> GpuBindGroup {
+  match map {
+    None => self.displace_fallback
+    Some(source) => {
+      ignore(self.texture_group(Some(source)))
+      let mut index = 0
+      while index < self.displace_groups.length() {
+        if same_texture(self.displace_maps[index], Some(source)) {
+          return self.displace_groups[index]
+        }
+        index = index + 1
+      }
+      let (view, sampler) = self.texture_views(Some(source))
+      let group = self.device.create_bind_group({
+        layout: self.displace_layout,
+        entries: [
+          {
+            binding: 0U,
+            resource: @gpu.GpuBindingResource::GpuTextureView(view),
+          },
+          {
+            binding: 1U,
+            resource: @gpu.GpuBindingResource::GpuSampler(sampler),
+          },
+        ],
+        label: Some("displace"),
+      })
+      self.displace_maps.push(Some(source))
+      self.displace_groups.push(group)
+      group
+    }
+  }
 }
 
 ///|
@@ -2199,6 +2460,82 @@ fn WebGPURenderer::ensure_skin(
 }
 
 ///|
+priv struct DetailUniforms {
+  has_normal : Double
+  normal_scale_x : Double
+  normal_scale_y : Double
+  object_space : Double
+  bump_scale : Double
+  ao_intensity : Double
+  light_intensity : Double
+  displacement_scale : Double
+  displacement_bias : Double
+  has_displacement : Double
+}
+
+///|
+fn detail_uniforms(item : @common.RenderItem) -> DetailUniforms {
+  let lit = match item.shading {
+    @constants.Lambert | @constants.Standard => true
+    @constants.Basic => false
+  }
+  let has_normal = lit && item.normal_map is Some(_)
+  let has_displacement = lit && item.displacement_map is Some(_)
+  let object_space = has_normal &&
+    item.normal_map_type is @constants.ObjectSpace
+  {
+    has_normal: if has_normal {
+      1.0
+    } else {
+      0.0
+    },
+    normal_scale_x: if has_normal {
+      item.normal_scale.x
+    } else {
+      0.0
+    },
+    normal_scale_y: if has_normal {
+      item.normal_scale.y
+    } else {
+      0.0
+    },
+    object_space: if object_space {
+      1.0
+    } else {
+      0.0
+    },
+    bump_scale: if lit && item.bump_map is Some(_) {
+      item.bump_scale
+    } else {
+      0.0
+    },
+    ao_intensity: match item.ao_map {
+      Some(_) => item.ao_map_intensity
+      None => 0.0
+    },
+    light_intensity: match item.light_map {
+      Some(_) => item.light_map_intensity
+      None => 0.0
+    },
+    displacement_scale: if has_displacement {
+      item.displacement_scale
+    } else {
+      0.0
+    },
+    displacement_bias: if has_displacement {
+      item.displacement_bias
+    } else {
+      0.0
+    },
+    has_displacement: if has_displacement {
+      1.0
+    } else {
+      0.0
+    },
+  }
+}
+
+///|
 fn WebGPURenderer::draw_shadow(
   self : WebGPURenderer,
   scene : @scenes.Scene,
@@ -2258,6 +2595,7 @@ fn WebGPURenderer::draw_shadow(
       Some(geometry) => {
         let mvp = @common.model_view_projection(state, item.node)
         let gpu = self.object_gpu(item.node)
+        let detail = detail_uniforms(item)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -2288,6 +2626,16 @@ fn WebGPURenderer::draw_shadow(
           1.0,
           0.0,
           0.0,
+          has_normal=detail.has_normal,
+          normal_scale_x=detail.normal_scale_x,
+          normal_scale_y=detail.normal_scale_y,
+          normal_object_space=detail.object_space,
+          bump_scale=detail.bump_scale,
+          ao_intensity=detail.ao_intensity,
+          light_map_intensity=detail.light_intensity,
+          displacement_scale=detail.displacement_scale,
+          displacement_bias=detail.displacement_bias,
+          has_displacement=detail.has_displacement,
         )
         ignore(
           self.device
@@ -2346,6 +2694,20 @@ fn WebGPURenderer::draw_shadow(
           }
         }
         ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+        let displacement_map = if detail.has_displacement > 0.5 {
+          item.displacement_map
+        } else {
+          None
+        }
+        ignore(
+          pass.set_bind_group(
+            1U,
+            Some(self.displace_group(displacement_map)),
+            None,
+            None,
+            None,
+          ),
+        )
         match geometry.indices {
           None => {
             let (count, first) = mesh_draw(
@@ -3196,6 +3558,7 @@ fn WebGPURenderer::draw_meshes(
         let eye = camera.matrix_world.elements
         let shade = shadow_pack(lights, item.node.receive_shadow)
         let haze = fog_pack(fog, item.fog)
+        let detail = detail_uniforms(item)
         let uniforms = @common.pack_uniforms(
           mvp,
           @common.normal_matrix(item.node.matrix_world),
@@ -3270,6 +3633,16 @@ fn WebGPURenderer::draw_meshes(
           hemisphere_y=lights.hemisphere_direction.y,
           hemisphere_z=lights.hemisphere_direction.z,
           hemisphere_enabled=lights.hemisphere_enabled,
+          has_normal=detail.has_normal,
+          normal_scale_x=detail.normal_scale_x,
+          normal_scale_y=detail.normal_scale_y,
+          normal_object_space=detail.object_space,
+          bump_scale=detail.bump_scale,
+          ao_intensity=detail.ao_intensity,
+          light_map_intensity=detail.light_intensity,
+          displacement_scale=detail.displacement_scale,
+          displacement_bias=detail.displacement_bias,
+          has_displacement=detail.has_displacement,
         )
         ignore(
           self.device
@@ -3397,6 +3770,38 @@ fn WebGPURenderer::draw_meshes(
             _ => self.env_fallback
           }
           ignore(pass.set_bind_group(4U, Some(env_group), None, None, None))
+          let normal_map = if detail.has_normal > 0.5 {
+            item.normal_map
+          } else {
+            None
+          }
+          let bump_map = if detail.bump_scale != 0.0 {
+            item.bump_map
+          } else {
+            None
+          }
+          let displacement_map = if detail.has_displacement > 0.5 {
+            item.displacement_map
+          } else {
+            None
+          }
+          ignore(
+            pass.set_bind_group(
+              5U,
+              Some(
+                self.detail_group(
+                  normal_map,
+                  bump_map,
+                  item.ao_map,
+                  item.light_map,
+                  displacement_map,
+                ),
+              ),
+              None,
+              None,
+              None,
+            ),
+          )
           if lines {
             match wire {
               None => ()

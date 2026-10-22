@@ -59,6 +59,10 @@ pub(all) enum Node {
   FacingNormal
   EmissiveSample
   AlphaSample
+  AoFactor
+  LightMap
+  Displaced
+  UnlitShade(Node)
 }
 
 pub(all) struct Program {

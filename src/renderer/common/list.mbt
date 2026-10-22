@@ -37,6 +37,18 @@ pub(all) struct RenderItem {
   env_map : @textures.Texture?
   env_map_intensity : Double
   env_rotation : @math.Matrix4
+  normal_map : @textures.Texture?
+  normal_map_type : @constants.NormalMapType
+  normal_scale : @math.Vector2
+  bump_map : @textures.Texture?
+  bump_scale : Double
+  ao_map : @textures.Texture?
+  ao_map_intensity : Double
+  light_map : @textures.Texture?
+  light_map_intensity : Double
+  displacement_map : @textures.Texture?
+  displacement_scale : Double
+  displacement_bias : Double
   instances : @core.InstanceData?
   group_start : Int32
   group_count : Int32
@@ -106,6 +118,18 @@ fn push_binding_item(
     env_map: binding.env_map,
     env_map_intensity: binding.env_map_intensity,
     env_rotation: binding.env_rotation,
+    normal_map: binding.normal_map,
+    normal_map_type: binding.normal_map_type,
+    normal_scale: binding.normal_scale,
+    bump_map: binding.bump_map,
+    bump_scale: binding.bump_scale,
+    ao_map: binding.ao_map,
+    ao_map_intensity: binding.ao_map_intensity,
+    light_map: binding.light_map,
+    light_map_intensity: binding.light_map_intensity,
+    displacement_map: binding.displacement_map,
+    displacement_scale: binding.displacement_scale,
+    displacement_bias: binding.displacement_bias,
     instances: binding.instances,
     group_start,
     group_count,
@@ -150,6 +174,18 @@ fn push_group_item(
     env_map: draw.env_map,
     env_map_intensity: draw.env_map_intensity,
     env_rotation: draw.env_rotation,
+    normal_map: draw.normal_map,
+    normal_map_type: draw.normal_map_type,
+    normal_scale: draw.normal_scale,
+    bump_map: draw.bump_map,
+    bump_scale: draw.bump_scale,
+    ao_map: draw.ao_map,
+    ao_map_intensity: draw.ao_map_intensity,
+    light_map: draw.light_map,
+    light_map_intensity: draw.light_map_intensity,
+    displacement_map: draw.displacement_map,
+    displacement_scale: draw.displacement_scale,
+    displacement_bias: draw.displacement_bias,
     instances: binding.instances,
     group_start,
     group_count,

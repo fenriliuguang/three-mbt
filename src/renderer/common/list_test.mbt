@@ -1540,6 +1540,198 @@ test "env params pack a matrix and four floats" {
 }
 
 ///|
+test "detail maps reach the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshStandardMaterial::new()
+  let normal = @textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\x80'))
+  let bump = @textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\x40'))
+  let ao = @textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\xFF'))
+  let light = @textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\x10'))
+  let displacement = @textures.Texture::from_rgba8(
+    1,
+    1,
+    FixedArray::make(4, b'\x20'),
+  )
+  material.material.normal_map = Some(normal)
+  material.material.normal_map_type = @constants.ObjectSpace
+  material.material.normal_scale.x = 2.0
+  material.material.normal_scale.y = 3.0
+  material.material.bump_map = Some(bump)
+  material.material.bump_scale = 4.0
+  material.material.ao_map = Some(ao)
+  material.material.ao_map_intensity = 0.5
+  material.material.light_map = Some(light)
+  material.material.light_map_intensity = 1.5
+  material.material.displacement_map = Some(displacement)
+  material.material.displacement_scale = 0.25
+  material.material.displacement_bias = -0.1
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(
+    drawn[0].normal_map_type.to_int(),
+    @constants.OBJECT_SPACE_NORMAL_MAP,
+  )
+  assert_eq(drawn[0].normal_scale.x, 2.0)
+  assert_eq(drawn[0].normal_scale.y, 3.0)
+  assert_eq(drawn[0].bump_scale, 4.0)
+  assert_eq(drawn[0].ao_map_intensity, 0.5)
+  assert_eq(drawn[0].light_map_intensity, 1.5)
+  assert_eq(drawn[0].displacement_scale, 0.25)
+  assert_eq(drawn[0].displacement_bias, -0.1)
+  match drawn[0].normal_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, normal), true)
+  }
+  match drawn[0].bump_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, bump), true)
+  }
+  match drawn[0].ao_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, ao), true)
+  }
+  match drawn[0].light_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, light), true)
+  }
+  match drawn[0].displacement_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, displacement), true)
+  }
+}
+
+///|
+test "detail uniforms occupy the spare frame slots" {
+  let mvp = @math.Matrix4::new()
+  let zero = @math.Vector3::new()
+  let packed = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    has_normal=1.0,
+    normal_scale_x=2.0,
+    normal_scale_y=0.5,
+    normal_object_space=1.0,
+    bump_scale=2.0,
+    ao_intensity=0.5,
+    light_map_intensity=2.0,
+    displacement_scale=5.0,
+    displacement_bias=0.5,
+    has_displacement=1.0,
+  )
+  assert_eq(packed[148], b'\x00')
+  assert_eq(packed[149], b'\x00')
+  assert_eq(packed[150], b'\x80')
+  assert_eq(packed[151], b'\x3F')
+  assert_eq(packed[172], b'\x00')
+  assert_eq(packed[173], b'\x00')
+  assert_eq(packed[174], b'\x00')
+  assert_eq(packed[175], b'\x3F')
+  assert_eq(packed[188], b'\x00')
+  assert_eq(packed[189], b'\x00')
+  assert_eq(packed[190], b'\x00')
+  assert_eq(packed[191], b'\x40')
+  assert_eq(packed[268], b'\x00')
+  assert_eq(packed[269], b'\x00')
+  assert_eq(packed[270], b'\x80')
+  assert_eq(packed[271], b'\x3F')
+  assert_eq(packed[296], b'\x00')
+  assert_eq(packed[297], b'\x00')
+  assert_eq(packed[298], b'\x00')
+  assert_eq(packed[299], b'\x40')
+  assert_eq(packed[300], b'\x00')
+  assert_eq(packed[301], b'\x00')
+  assert_eq(packed[302], b'\x00')
+  assert_eq(packed[303], b'\x3F')
+  assert_eq(packed[312], b'\x00')
+  assert_eq(packed[313], b'\x00')
+  assert_eq(packed[314], b'\x00')
+  assert_eq(packed[315], b'\x40')
+  assert_eq(packed[316], b'\x00')
+  assert_eq(packed[317], b'\x00')
+  assert_eq(packed[318], b'\xA0')
+  assert_eq(packed[319], b'\x40')
+  assert_eq(packed[524], b'\x00')
+  assert_eq(packed[525], b'\x00')
+  assert_eq(packed[526], b'\x00')
+  assert_eq(packed[527], b'\x3F')
+  assert_eq(packed[540], b'\x00')
+  assert_eq(packed[541], b'\x00')
+  assert_eq(packed[542], b'\x80')
+  assert_eq(packed[543], b'\x3F')
+  let plain = @common.pack_uniforms(
+    mvp,
+    mvp,
+    @math.Color::new(),
+    1.0,
+    zero,
+    zero,
+    zero,
+    mvp,
+    zero,
+    1.0,
+    0.0,
+    mvp,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    mvp,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+  )
+  assert_eq(plain[148], b'\x00')
+  assert_eq(plain[172], b'\x00')
+  assert_eq(plain[188], b'\x00')
+  assert_eq(plain[268], b'\x00')
+  assert_eq(plain[296], b'\x00')
+  assert_eq(plain[300], b'\x00')
+  assert_eq(plain[312], b'\x00')
+  assert_eq(plain[316], b'\x00')
+  assert_eq(plain[524], b'\x00')
+  assert_eq(plain[540], b'\x00')
+}
+
+///|
 test "an alpha map reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()

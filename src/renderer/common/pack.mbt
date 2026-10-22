@@ -11,6 +11,9 @@ using @core {type BufferAttribute}
 /// 自发光 `rgb` 之后是点光的位置、颜色，以及 `(distance, decay, enabled, 0)`。
 /// 再后面是聚光的位置、方向（`w` 为开关）、颜色，以及 `(distance, decay, coneCos, penumbraCos)`。
 /// 末尾 48 字节是半球光的天空色、地面色，以及方向（`w` 为开关）。没有半球光时是 0。
+/// 贴图参数占用原来空着的分量，没有贴图时仍是 0：`ambient.w` 是物体空间法线，`light_color.w` 和 `light_direction.w` 是法线缩放，`camera_position.w` 表示有法线贴图。
+/// `viewport.z` 是凹凸缩放，`viewport.w` 是环境光遮蔽强度，`point.z` 是光照贴图强度，`point.w` 是位移缩放。
+/// `point_position.w` 是位移偏移，`point_color.w` 表示有位移贴图。
 pub let uniform_bytes : Int32 = 672
 
 ///|
@@ -370,6 +373,16 @@ pub fn pack_uniforms(
   hemisphere_y~ : Double = 0.0,
   hemisphere_z~ : Double = 0.0,
   hemisphere_enabled~ : Double = 0.0,
+  has_normal~ : Double = 0.0,
+  normal_scale_x~ : Double = 0.0,
+  normal_scale_y~ : Double = 0.0,
+  normal_object_space~ : Double = 0.0,
+  bump_scale~ : Double = 0.0,
+  ao_intensity~ : Double = 0.0,
+  light_map_intensity~ : Double = 0.0,
+  displacement_scale~ : Double = 0.0,
+  displacement_bias~ : Double = 0.0,
+  has_displacement~ : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -379,18 +392,26 @@ pub fn pack_uniforms(
   write_f32(dst, 136, color.b)
   write_f32(dst, 140, opacity)
   write_vec3(dst, 144, ambient.x, ambient.y, ambient.z)
+  write_f32(dst, 148, normal_object_space)
   write_vec3(dst, 160, light_color.x, light_color.y, light_color.z)
+  write_f32(dst, 172, normal_scale_y)
   write_vec3(dst, 176, light_direction.x, light_direction.y, light_direction.z)
+  write_f32(dst, 188, normal_scale_x)
   write_matrix4(dst, 192, model)
   write_vec3(dst, 256, camera_position.x, camera_position.y, camera_position.z)
+  write_f32(dst, 268, has_normal)
   write_f32(dst, 272, roughness)
   write_f32(dst, 276, metalness)
   write_f32(dst, 280, alpha_test)
   write_f32(dst, 284, side)
   write_f32(dst, 288, viewport_width)
   write_f32(dst, 292, viewport_height)
+  write_f32(dst, 296, bump_scale)
+  write_f32(dst, 300, ao_intensity)
   write_f32(dst, 304, point_size)
   write_f32(dst, 308, size_attenuation)
+  write_f32(dst, 312, light_map_intensity)
+  write_f32(dst, 316, displacement_scale)
   write_matrix4(dst, 320, view)
   write_matrix4(dst, 384, shadow)
   write_f32(dst, 448, shadow_bias)
@@ -412,9 +433,11 @@ pub fn pack_uniforms(
   write_f32(dst, 512, point_x)
   write_f32(dst, 516, point_y)
   write_f32(dst, 520, point_z)
+  write_f32(dst, 524, displacement_bias)
   write_f32(dst, 528, point_r)
   write_f32(dst, 532, point_g)
   write_f32(dst, 536, point_b)
+  write_f32(dst, 540, has_displacement)
   write_f32(dst, 544, point_distance)
   write_f32(dst, 548, point_decay)
   write_f32(dst, 552, point_enabled)

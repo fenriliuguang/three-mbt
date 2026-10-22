@@ -23,7 +23,7 @@ test "lambert material uses ambient and one directional light" {
   let wgsl = @nodes.lambert_wgsl()
   assert_eq(
     includes(
-      wgsl, "max(dot(normalize(facing_normal(input.v_normal, front)), (uniforms.light_direction).xyz), 0.0)",
+      wgsl, "max(dot(normalize(detail_normal(facing_normal(input.v_normal, front), front)), (uniforms.light_direction).xyz), 0.0)",
     ),
     true,
   )
@@ -54,7 +54,9 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
   assert_eq(includes(wgsl, "uniforms.camera_position"), true)
   assert_eq(includes(wgsl, "@location(2) v_world : vec3<f32>"), true)
   assert_eq(
-    includes(wgsl, "((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse"),
+    includes(
+      wgsl, "((uniforms.ambient).xyz + hemisphere_term(N) + light_map_color()) * diffuse * ao_factor()",
+    ),
     true,
   )
   assert_eq(
@@ -200,7 +202,7 @@ test "lambert and standard add one point light" {
   assert_eq(includes(lambert, "1.0 / max(pow(dist, decay), 0.01)"), true)
   assert_eq(
     includes(
-      lambert, "point_term(input.v_world, facing_normal(input.v_normal, front))",
+      lambert, "point_term(input.v_world, detail_normal(facing_normal(input.v_normal, front), front))",
     ),
     true,
   )
@@ -219,7 +221,7 @@ test "lambert and standard add one point light" {
   assert_eq(includes(lambert, "fn spot_cone("), true)
   assert_eq(
     includes(
-      lambert, "spot_term(input.v_world, facing_normal(input.v_normal, front))",
+      lambert, "spot_term(input.v_world, detail_normal(facing_normal(input.v_normal, front), front))",
     ),
     true,
   )
@@ -232,7 +234,9 @@ test "lambert and standard add one point light" {
   assert_eq(includes(basic, "fn spot_standard("), false)
   assert_eq(includes(lambert, "fn hemisphere_term("), true)
   assert_eq(
-    includes(lambert, "hemisphere_term(facing_normal(input.v_normal, front))"),
+    includes(
+      lambert, "hemisphere_term(detail_normal(facing_normal(input.v_normal, front), front))",
+    ),
     true,
   )
   assert_eq(
@@ -293,7 +297,7 @@ test "lit materials sample a directional shadow map" {
   assert_eq(includes(lambert, "(uniforms.ambient).xyz"), true)
   assert_eq(
     includes(
-      lambert, "direct_shadow(input.v_world, facing_normal(input.v_normal, front))",
+      lambert, "direct_shadow(input.v_world, detail_normal(facing_normal(input.v_normal, front), front))",
     ),
     true,
   )
@@ -301,7 +305,7 @@ test "lit materials sample a directional shadow map" {
   assert_eq(includes(standard, "direct_shadow(world, N)"), true)
   assert_eq(
     includes(
-      standard, "((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse",
+      standard, "((uniforms.ambient).xyz + hemisphere_term(N) + light_map_color()) * diffuse * ao_factor()",
     ),
     true,
   )
@@ -310,7 +314,7 @@ test "lit materials sample a directional shadow map" {
   assert_eq(
     includes(
       @nodes.shadow_wgsl(),
-      "uniforms.mvp * vec4<f32>(input.position, 1.0)",
+      "uniforms.mvp * vec4<f32>(displace(input.position, input.normal, input.uv), 1.0)",
     ),
     true,
   )
@@ -344,4 +348,34 @@ test "lines return the uniform color and points scale like r186" {
   assert_eq(includes(points, "apply_fog(shaded, input.v_fog_depth)"), true)
   assert_eq(includes(points, "color.a < (uniforms.surface).z"), true)
   assert_eq(includes(points, "discard"), true)
+}
+
+///|
+test "detail maps reach basic lambert and standard" {
+  let basic = @nodes.basic_wgsl()
+  let lambert = @nodes.lambert_wgsl()
+  let standard = @nodes.standard_wgsl()
+  assert_eq(includes(basic, "fn shade_unlit("), true)
+  assert_eq(includes(basic, "fn ao_factor("), true)
+  assert_eq(includes(basic, "fn light_map_color("), true)
+  assert_eq(includes(basic, "@group(5) @binding(4) var ao_texture"), true)
+  assert_eq(includes(basic, "fn detail_normal("), false)
+  assert_eq(includes(basic, "fn displace("), false)
+  assert_eq(includes(lambert, "fn detail_normal("), true)
+  assert_eq(includes(lambert, "fn displace("), true)
+  assert_eq(
+    includes(lambert, "displace(input.position, input.normal, input.uv)"),
+    true,
+  )
+  assert_eq(includes(lambert, "@group(5) @binding(0) var normal_texture"), true)
+  assert_eq(
+    includes(lambert, "@group(5) @binding(8) var displacement_texture"),
+    true,
+  )
+  assert_eq(includes(standard, "fn detail_normal("), true)
+  assert_eq(includes(standard, "fn displace("), true)
+  assert_eq(includes(standard, "computeSpecularOcclusion"), false)
+  assert_eq(includes(standard, "exp2(-16.0 * roughness - 1.0)"), true)
+  assert_eq(includes(@nodes.line_wgsl(), "@group(5)"), false)
+  assert_eq(includes(@nodes.points_wgsl(), "@group(5)"), false)
 }

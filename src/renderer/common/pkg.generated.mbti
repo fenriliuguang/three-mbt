@@ -59,7 +59,7 @@ pub fn pack_u32_indices(@core.BufferAttribute) -> FixedArray[Byte]
 
 pub fn pack_u32_values(Array[Int]) -> FixedArray[Byte]
 
-pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double, @math.Matrix4, Double, Double, Double, Double, @math.Matrix4, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, alpha_test? : Double, emissive_r? : Double, emissive_g? : Double, emissive_b? : Double, emissive_intensity? : Double, flat_shading? : Double, point_x? : Double, point_y? : Double, point_z? : Double, point_r? : Double, point_g? : Double, point_b? : Double, point_distance? : Double, point_decay? : Double, point_enabled? : Double, spot_x? : Double, spot_y? : Double, spot_z? : Double, spot_dx? : Double, spot_dy? : Double, spot_dz? : Double, spot_r? : Double, spot_g? : Double, spot_b? : Double, spot_distance? : Double, spot_decay? : Double, spot_cone_cos? : Double, spot_penumbra_cos? : Double, spot_enabled? : Double, side? : Double, hemisphere_sky_r? : Double, hemisphere_sky_g? : Double, hemisphere_sky_b? : Double, hemisphere_ground_r? : Double, hemisphere_ground_g? : Double, hemisphere_ground_b? : Double, hemisphere_x? : Double, hemisphere_y? : Double, hemisphere_z? : Double, hemisphere_enabled? : Double) -> FixedArray[Byte]
+pub fn pack_uniforms(@math.Matrix4, @math.Matrix4, @math.Color, Double, @math.Vector3, @math.Vector3, @math.Vector3, @math.Matrix4, @math.Vector3, Double, Double, @math.Matrix4, Double, Double, Double, Double, @math.Matrix4, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, alpha_test? : Double, emissive_r? : Double, emissive_g? : Double, emissive_b? : Double, emissive_intensity? : Double, flat_shading? : Double, point_x? : Double, point_y? : Double, point_z? : Double, point_r? : Double, point_g? : Double, point_b? : Double, point_distance? : Double, point_decay? : Double, point_enabled? : Double, spot_x? : Double, spot_y? : Double, spot_z? : Double, spot_dx? : Double, spot_dy? : Double, spot_dz? : Double, spot_r? : Double, spot_g? : Double, spot_b? : Double, spot_distance? : Double, spot_decay? : Double, spot_cone_cos? : Double, spot_penumbra_cos? : Double, spot_enabled? : Double, side? : Double, hemisphere_sky_r? : Double, hemisphere_sky_g? : Double, hemisphere_sky_b? : Double, hemisphere_ground_r? : Double, hemisphere_ground_g? : Double, hemisphere_ground_b? : Double, hemisphere_x? : Double, hemisphere_y? : Double, hemisphere_z? : Double, hemisphere_enabled? : Double, has_normal? : Double, normal_scale_x? : Double, normal_scale_y? : Double, normal_object_space? : Double, bump_scale? : Double, ao_intensity? : Double, light_map_intensity? : Double, displacement_scale? : Double, displacement_bias? : Double, has_displacement? : Double) -> FixedArray[Byte]
 
 pub fn pad_texture_rows(FixedArray[Byte], Int, Int) -> (FixedArray[Byte], Int)
 
@@ -160,6 +160,18 @@ pub(all) struct RenderItem {
   env_map : @textures.Texture?
   env_map_intensity : Double
   env_rotation : @math.Matrix4
+  normal_map : @textures.Texture?
+  normal_map_type : @constants.NormalMapType
+  normal_scale : @math.Vector2
+  bump_map : @textures.Texture?
+  bump_scale : Double
+  ao_map : @textures.Texture?
+  ao_map_intensity : Double
+  light_map : @textures.Texture?
+  light_map_intensity : Double
+  displacement_map : @textures.Texture?
+  displacement_scale : Double
+  displacement_bias : Double
   instances : @core.InstanceData?
   group_start : Int
   group_count : Int
