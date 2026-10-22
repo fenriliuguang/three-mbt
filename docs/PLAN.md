@@ -179,7 +179,7 @@ Samples live under `src/examples` because only packages inside the `source` dire
 
 A module can appear in more than one directory. `materials` has landed shading in `done`. The `WebGLPrograms` prefix port was removed and stays out of scope. Environment maps stay in `later`. `ShaderLib` stays upstream with the rest of the GLSL sources.
 
-The next slice is the name at the end of the last paragraph under `## Behavior` in a file under [plan/active/](plan/active/), when that sentence ends with “X stays later” and X is work on the WebGPU path. The current materials note records that the WebGL program path was removed. Do not resume it. When no active file names such a slice, timed advance takes the next WebGPU item from [plan/later/](plan/later/), moves it into `active`, and implements that one slice. Do not take the next slice from `done`. If `later` has no remaining WebGPU item, cancel the timer. WebGL and GLSL program work stays upstream.
+The next slice is the WebGPU work named at the end of the last paragraph under `## Behavior` in a file under [plan/active/](plan/active/), when that sentence ends with “X stays later”. One slice is a module’s whole remaining WebGPU plan, not one sentence inside it, and it lands as one commit. The current materials note records that the WebGL program path was removed. Do not resume it. When no active file names such a slice, timed advance takes the next `later` file, moves its WebGPU items into `active`, and implements that file as one slice. Do not take the next slice from `done`. If `later` has no remaining WebGPU work, cancel the timer. WebGL and GLSL program work stays upstream.
 
 ### Done
 
