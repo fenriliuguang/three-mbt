@@ -30,6 +30,12 @@ pub const CONSTANT_ALPHA_FACTOR : Int = 213
 
 pub const CONSTANT_COLOR_FACTOR : Int = 211
 
+pub const CUBE_REFLECTION_MAPPING : Int = 301
+
+pub const CUBE_REFRACTION_MAPPING : Int = 302
+
+pub const CUBE_UV_REFLECTION_MAPPING : Int = 306
+
 pub const CUSTOM_BLENDING : Int = 5
 
 pub const CUSTOM_TONE_MAPPING : Int = 5
@@ -53,6 +59,10 @@ pub const DYNAMIC_READ_USAGE : Int = 35049
 pub const EQUAL_DEPTH : Int = 4
 
 pub const EQUAL_STENCIL_FUNC : Int = 514
+
+pub const EQUIRECTANGULAR_REFLECTION_MAPPING : Int = 303
+
+pub const EQUIRECTANGULAR_REFRACTION_MAPPING : Int = 304
 
 pub const FLOAT_TYPE : Int = 1015
 
@@ -196,6 +206,8 @@ pub const SUBTRACT_EQUATION : Int = 101
 
 pub const TANGENT_SPACE_NORMAL_MAP : Int = 0
 
+pub const UV_MAPPING : Int = 300
+
 pub const VSM_SHADOW_MAP : Int = 3
 
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
@@ -257,6 +269,13 @@ pub(all) enum Blending {
   Custom
 }
 pub fn Blending::to_int(Self) -> Int
+
+pub(all) enum ColorSpace {
+  No
+  SRGB
+  LinearSRGB
+}
+pub fn ColorSpace::name(Self) -> String
 
 pub(all) enum Combine {
   Multiply
@@ -388,6 +407,16 @@ pub(all) enum TextureFilter {
 pub fn TextureFilter::is_nearest(Self) -> Bool
 pub fn TextureFilter::mip_linear(Self) -> Bool
 pub fn TextureFilter::to_int(Self) -> Int
+
+pub(all) enum TextureMapping {
+  UV
+  CubeReflection
+  CubeRefraction
+  EquirectangularReflection
+  EquirectangularRefraction
+  CubeUVReflection
+}
+pub fn TextureMapping::to_int(Self) -> Int
 
 pub(all) enum ToneMapping {
   No

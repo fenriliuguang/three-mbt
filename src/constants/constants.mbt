@@ -604,6 +604,74 @@ pub fn TextureFilter::mip_linear(self : TextureFilter) -> Bool {
 }
 
 ///|
+/// 用几何的 UV 采样。对齐 `UVMapping`（300）。
+pub const UV_MAPPING : Int32 = 300
+
+///|
+/// 立方体反射。对齐 `CubeReflectionMapping`（301）。
+pub const CUBE_REFLECTION_MAPPING : Int32 = 301
+
+///|
+/// 立方体折射。对齐 `CubeRefractionMapping`（302）。
+pub const CUBE_REFRACTION_MAPPING : Int32 = 302
+
+///|
+/// 等距柱状反射。对齐 `EquirectangularReflectionMapping`（303）。
+pub const EQUIRECTANGULAR_REFLECTION_MAPPING : Int32 = 303
+
+///|
+/// 等距柱状折射。对齐 `EquirectangularRefractionMapping`（304）。
+pub const EQUIRECTANGULAR_REFRACTION_MAPPING : Int32 = 304
+
+///|
+/// PMREM 图集。对齐 `CubeUVReflectionMapping`（306）。
+pub const CUBE_UV_REFLECTION_MAPPING : Int32 = 306
+
+///|
+/// 贴图如何贴到物体上。数值与 r186 `src/constants.js` 一致。默认是 `UV`。
+/// r186: `UVMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L508 ; `CubeReflectionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L516 ; `CubeRefractionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L524 ; `EquirectangularReflectionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L532 ; `EquirectangularRefractionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L540 ; `CubeUVReflectionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L548
+pub(all) enum TextureMapping {
+  UV
+  CubeReflection
+  CubeRefraction
+  EquirectangularReflection
+  EquirectangularRefraction
+  CubeUVReflection
+}
+
+///|
+pub fn TextureMapping::to_int(self : TextureMapping) -> Int32 {
+  match self {
+    UV => UV_MAPPING
+    CubeReflection => CUBE_REFLECTION_MAPPING
+    CubeRefraction => CUBE_REFRACTION_MAPPING
+    EquirectangularReflection => EQUIRECTANGULAR_REFLECTION_MAPPING
+    EquirectangularRefraction => EQUIRECTANGULAR_REFRACTION_MAPPING
+    CubeUVReflection => CUBE_UV_REFLECTION_MAPPING
+  }
+}
+
+///|
+/// 贴图色彩空间。字符串与 r186 一致：空、`srgb`、`srgb-linear`。
+/// 只有 `SRGB` 在采样时做 `SRGBToLinear`。
+/// r186: `NoColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1301 ; `SRGBColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1309 ; `LinearSRGBColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1317
+pub(all) enum ColorSpace {
+  No
+  SRGB
+  LinearSRGB
+}
+
+///|
+/// r186: `NoColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1301 ; `SRGBColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1309 ; `LinearSRGBColorSpace` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L1317
+pub fn ColorSpace::name(self : ColorSpace) -> String {
+  match self {
+    No => ""
+    SRGB => "srgb"
+    LinearSRGB => "srgb-linear"
+  }
+}
+
+///|
 /// 纹素通道。`RGBA` 是四个浮点，`Red` 是一个浮点。
 /// r186: `RGBAFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L763 ; `RedFormat` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L788
 pub(all) enum PixelFormat {

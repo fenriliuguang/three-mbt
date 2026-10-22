@@ -5,6 +5,8 @@
 ///
 /// `flip_y` 默认 true，与 r186 一致：上传前把行序颠倒，使图像顶部落到较高的 v。
 /// `channel` 默认 `0`。渲染器不按它改着色器。
+/// `mapping` 默认 `UV`。`color_space` 默认 `No`，只有 `SRGB` 在采样时解码。
+/// `video` 默认 false。没有 DOM 视频元素。
 /// 本阶段不生成 mipmap。
 ///
 /// `attachment` 为 true 时，像素在 GPU 颜色目标上，`data` 只是 1×1 占位。
@@ -23,6 +25,9 @@ pub(all) struct Texture {
   attachment : Bool
   mut version : Int32
   mut channel : Int32
+  mut mapping : @constants.TextureMapping
+  mut color_space : @constants.ColorSpace
+  mut video : Bool
 }
 
 ///|
@@ -56,6 +61,9 @@ pub fn Texture::from_rgba8(
     attachment: false,
     version: 0,
     channel: 0,
+    mapping: @constants.TextureMapping::UV,
+    color_space: @constants.ColorSpace::No,
+    video: false,
   }
 }
 
@@ -83,6 +91,9 @@ pub fn Texture::attachment(width : Int32, height : Int32) -> Texture {
     attachment: true,
     version: 0,
     channel: 0,
+    mapping: @constants.TextureMapping::UV,
+    color_space: @constants.ColorSpace::No,
+    video: false,
   }
 }
 

@@ -1444,7 +1444,9 @@ fn mesh_from(
     ignore(material.emissive.set_rgb(prim.mat.er, prim.mat.eg, prim.mat.eb))
     material.emissive_intensity = prim.mat.emissive_intensity
     if prim.mat.emissive_texture >= 0 {
-      material.emissive_map = Some(textures[prim.mat.emissive_texture])
+      let map = textures[prim.mat.emissive_texture]
+      map.color_space = @constants.ColorSpace::SRGB
+      material.emissive_map = Some(map)
     }
     if prim.mat.metal_rough_texture >= 0 {
       let map = textures[prim.mat.metal_rough_texture]

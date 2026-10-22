@@ -1,5 +1,6 @@
 import {
   "fenriliuguang/three-mbt/cameras",
+  "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/geometries",
   "fenriliuguang/three-mbt/lights",
   "fenriliuguang/three-mbt/materials",
@@ -11,7 +12,6 @@ import {
 }
 
 import {
-  "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/renderer/common",
 } for "test"
 

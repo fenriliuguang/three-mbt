@@ -156,6 +156,10 @@ test "color and emissive maps decode sRGB" {
   assert_eq(includes(lambert, "fn sample_emissive("), true)
   assert_eq(includes(standard, "fn sample_emissive("), true)
   assert_eq(includes(standard, "srgb_to_linear(texel.xyz)"), true)
+  assert_eq(includes(standard, "(uniforms.point_params).w > 0.5"), true)
+  assert_eq(includes(standard, "(uniforms.spot_position).w > 0.5"), true)
+  assert_eq(includes(standard, "(uniforms.spot_color).w > 0.5"), true)
+  assert_eq(includes(standard, "env_params.params.z > 1.5"), true)
   assert_eq(
     includes(
       standard, "textureSample(roughness_texture, roughness_sampler, input.v_uv)",

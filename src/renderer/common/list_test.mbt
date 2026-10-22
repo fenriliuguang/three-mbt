@@ -1539,6 +1539,11 @@ test "env params pack a matrix and four floats" {
   assert_eq(off[64], b'\x00')
   assert_eq(off[72], b'\x00')
   assert_eq(off[75], b'\x00')
+  let srgb = @common.pack_env_params(@math.Matrix4::new(), 1.0, true, srgb=true)
+  assert_eq(srgb[72], b'\x00')
+  assert_eq(srgb[73], b'\x00')
+  assert_eq(srgb[74], b'\x00')
+  assert_eq(srgb[75], b'\x40')
 }
 
 ///|

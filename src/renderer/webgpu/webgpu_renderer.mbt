@@ -1882,6 +1882,7 @@ fn WebGPURenderer::texture_group(
         }
         return self.color_target(source).group
       }
+      source.update()
       let mut found = -1
       let mut index = 0
       while index < self.textures.length() {
@@ -2789,6 +2790,20 @@ fn WebGPURenderer::ensure_skin(
 }
 
 ///|
+/// 贴图色彩空间是 `SRGB` 时写成 1，采样器才做 `SRGBToLinear`。没有贴图是 0。
+fn transfer_flag(map : @textures.Texture?) -> Double {
+  match map {
+    Some(texture) =>
+      if texture.color_space is @constants.ColorSpace::SRGB {
+        1.0
+      } else {
+        0.0
+      }
+    None => 0.0
+  }
+}
+
+///|
 priv struct DetailUniforms {
   has_normal : Double
   normal_scale_x : Double
@@ -3040,6 +3055,9 @@ fn WebGPURenderer::draw_shadow(
           displacement_scale=detail.displacement_scale,
           displacement_bias=detail.displacement_bias,
           has_displacement=detail.has_displacement,
+          map_srgb=transfer_flag(item.map),
+          emissive_srgb=transfer_flag(item.emissive_map),
+          light_srgb=transfer_flag(item.light_map),
         )
         ignore(
           self.device
@@ -4022,7 +4040,12 @@ fn WebGPURenderer::bind_env(
     let (view, sampler) = self.texture_views(Some(atlas))
     let params = pack_buffer(
       self.device,
-      @common.pack_env_params(rotation, intensity, true),
+      @common.pack_env_params(
+        rotation,
+        intensity,
+        true,
+        srgb=atlas.color_space is @constants.ColorSpace::SRGB,
+      ),
       vertex=false,
       index=false,
       uniform=true,
@@ -4067,7 +4090,12 @@ fn WebGPURenderer::bind_env(
     .write_buffer_with_copy(
       current.params,
       0UL,
-      @common.pack_env_params(rotation, intensity, true),
+      @common.pack_env_params(
+        rotation,
+        intensity,
+        true,
+        srgb=current.atlas.color_space is @constants.ColorSpace::SRGB,
+      ),
       None,
       None,
     ),
@@ -4318,6 +4346,9 @@ fn WebGPURenderer::draw_meshes(
           displacement_scale=detail.displacement_scale,
           displacement_bias=detail.displacement_bias,
           has_displacement=detail.has_displacement,
+          map_srgb=transfer_flag(item.map),
+          emissive_srgb=transfer_flag(item.emissive_map),
+          light_srgb=transfer_flag(item.light_map),
         )
         ignore(
           self.device

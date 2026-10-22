@@ -65,13 +65,15 @@ fn lit_normal() -> String {
 }
 
 ///|
-/// 颜色贴图和自发光贴图按 r186 `SRGBToLinear` 解码。alpha 保持存储值。粗糙度、金属度和透明贴图不解码。
-/// r186: `SRGBToLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L205
+/// 颜色贴图和自发光贴图在色彩空间是 `SRGB` 时按 r186 `SRGBToLinear` 解码。
+/// `point_params.w` 大于 0.5 时解码颜色贴图。`spot_position.w` 大于 0.5 时解码自发光贴图。
+/// alpha 保持存储值。粗糙度、金属度和透明贴图不解码。
+/// r186: `SRGBToLinear` https://github.com/mrdoob/three.js/blob/r186/src/math/ColorManagement.js#L205 ; `colorSpace` https://github.com/mrdoob/three.js/blob/r186/src/textures/Texture.js#L299
 fn color_decode_wgsl(emissive : Bool) -> String {
-  let mut text = "fn srgb_to_linear(c : vec3<f32>) -> vec3<f32> {\n  let low = c * 0.0773993808;\n  let high = pow(c * 0.9478672986 + 0.0521327014, vec3<f32>(2.4));\n  return select(high, low, c < vec3<f32>(0.04045));\n}\n\nfn sample_color(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(map_texture, map_sampler, uv);\n  return vec4<f32>(srgb_to_linear(texel.xyz), texel.w);\n}\n\n"
+  let mut text = "fn srgb_to_linear(c : vec3<f32>) -> vec3<f32> {\n  let low = c * 0.0773993808;\n  let high = pow(c * 0.9478672986 + 0.0521327014, vec3<f32>(2.4));\n  return select(high, low, c < vec3<f32>(0.04045));\n}\n\nfn sample_color(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(map_texture, map_sampler, uv);\n  let linear = srgb_to_linear(texel.xyz);\n  let rgb = select(texel.xyz, linear, (uniforms.point_params).w > 0.5);\n  return vec4<f32>(rgb, texel.w);\n}\n\n"
   if emissive {
     text = text +
-      "fn sample_emissive(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(emissive_texture, emissive_sampler, uv);\n  return vec4<f32>(srgb_to_linear(texel.xyz), texel.w);\n}\n\n"
+      "fn sample_emissive(uv : vec2<f32>) -> vec4<f32> {\n  let texel = textureSample(emissive_texture, emissive_sampler, uv);\n  let linear = srgb_to_linear(texel.xyz);\n  let rgb = select(texel.xyz, linear, (uniforms.spot_position).w > 0.5);\n  return vec4<f32>(rgb, texel.w);\n}\n\n"
   }
   text
 }

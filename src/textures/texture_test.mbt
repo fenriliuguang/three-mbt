@@ -75,6 +75,11 @@ test "checker is rgba8 and flip_y reverses rows" {
   assert_eq(map.needs_update, true)
   assert_eq(map.flip_y, true)
   assert_eq(map.channel, 0)
+  assert_eq(map.mapping is @constants.TextureMapping::UV, true)
+  assert_eq(map.mapping.to_int(), 300)
+  assert_eq(map.color_space is @constants.ColorSpace::No, true)
+  assert_eq(map.color_space.name(), "")
+  assert_eq(map.video, false)
   assert_eq(map.attachment, false)
   assert_eq(map.version, 0)
   assert_eq(map.wrap_s is @constants.ClampToEdge, true)
@@ -122,4 +127,42 @@ test "render target keeps one attachment texture" {
   assert_eq(target.texture.width, 1)
   assert_eq(target.texture.height, 1)
   assert_eq(target.texture.version, 2)
+  assert_eq(target.texture.mapping is @constants.TextureMapping::UV, true)
+  assert_eq(target.texture.color_space is @constants.ColorSpace::No, true)
+  assert_eq(target.texture.video, false)
+}
+
+///|
+test "mapping color space and video stay on the texture" {
+  assert_eq(@constants.TextureMapping::UV.to_int(), 300)
+  assert_eq(@constants.TextureMapping::CubeReflection.to_int(), 301)
+  assert_eq(@constants.TextureMapping::CubeRefraction.to_int(), 302)
+  assert_eq(@constants.TextureMapping::EquirectangularReflection.to_int(), 303)
+  assert_eq(@constants.TextureMapping::EquirectangularRefraction.to_int(), 304)
+  assert_eq(@constants.TextureMapping::CubeUVReflection.to_int(), 306)
+  assert_eq(@constants.ColorSpace::No.name(), "")
+  assert_eq(@constants.ColorSpace::SRGB.name(), "srgb")
+  assert_eq(@constants.ColorSpace::LinearSRGB.name(), "srgb-linear")
+  let pixels = FixedArray::make(4, b'\x80')
+  pixels[3] = b'\xFF'
+  let map = @textures.Texture::from_rgba8(1, 1, pixels)
+  map.mapping = @constants.TextureMapping::EquirectangularReflection
+  map.color_space = @constants.ColorSpace::SRGB
+  assert_eq(map.mapping.to_int(), 303)
+  assert_eq(map.color_space.name(), "srgb")
+  map.update()
+  assert_eq(map.version, 0)
+  assert_eq(map.needs_update, true)
+  let frame = @textures.Texture::video(1, 1, pixels)
+  assert_eq(frame.video, true)
+  assert_eq(frame.mapping is @constants.TextureMapping::UV, true)
+  assert_eq(frame.color_space is @constants.ColorSpace::No, true)
+  assert_eq(frame.mag_filter is @constants.Linear, true)
+  assert_eq(frame.min_filter is @constants.Linear, true)
+  assert_eq(frame.version, 0)
+  frame.needs_update = false
+  frame.update()
+  assert_eq(frame.needs_update, true)
+  assert_eq(frame.version, 1)
+  assert_eq(frame.rgba8()[0], b'\x80')
 }

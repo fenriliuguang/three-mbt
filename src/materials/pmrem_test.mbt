@@ -14,6 +14,8 @@ test "a constant environment stays constant on every atlas row" {
   assert_eq(atlas.width, 1)
   assert_eq(atlas.height, 6)
   assert_eq(atlas.flip_y, false)
+  assert_eq(atlas.mapping is @constants.TextureMapping::CubeUVReflection, true)
+  assert_eq(atlas.color_space is @constants.ColorSpace::No, true)
   let bytes = atlas.rgba8()
   assert_eq(bytes.length(), 24)
   for index in 0..<24 {
@@ -107,4 +109,42 @@ test "yaw of pi/2 turns +X with the euler matrix" {
   assert_eq(turned.x, c / length)
   assert_eq(turned.y, 0.0)
   assert_eq(turned.z, -s / length)
+}
+
+///|
+test "color space and cube UV mapping stay on the atlas" {
+  let pixels = FixedArray::make(4, b'\x00')
+  pixels[0] = b'\x80'
+  pixels[1] = b'\x80'
+  pixels[2] = b'\x80'
+  pixels[3] = b'\xFF'
+  let linear = @textures.Texture::from_rgba8(1, 1, pixels)
+  let linear_atlas = @materials.pmrem_atlas(linear)
+  let linear_bytes = linear_atlas.rgba8()
+  assert_eq(linear_bytes[0], b'\x80')
+  assert_eq(linear_bytes[4], b'\x80')
+  let encoded = @textures.Texture::from_rgba8(1, 1, pixels)
+  encoded.color_space = @constants.ColorSpace::SRGB
+  let srgb_atlas = @materials.pmrem_atlas(encoded)
+  assert_eq(srgb_atlas.color_space is @constants.ColorSpace::SRGB, true)
+  assert_eq(srgb_atlas.rgba8()[0], b'\x80')
+  let decoded = @math.srgb_to_linear(128.0 / 255.0)
+  let stored = (@math.linear_to_srgb(decoded) * 255.0)
+    .round()
+    .to_int()
+    .to_byte()
+  assert_eq(srgb_atlas.rgba8()[4], stored)
+  let rows = FixedArray::make(2 * 6 * 4, b'\x10')
+  rows[3] = b'\xFF'
+  let cube = @textures.Texture::from_rgba8(2, 6, rows)
+  cube.flip_y = false
+  cube.mapping = @constants.TextureMapping::CubeUVReflection
+  cube.color_space = @constants.ColorSpace::LinearSRGB
+  let kept = @materials.pmrem_atlas(cube)
+  assert_eq(kept.width, 2)
+  assert_eq(kept.height, 6)
+  assert_eq(kept.mapping is @constants.TextureMapping::CubeUVReflection, true)
+  assert_eq(kept.color_space is @constants.ColorSpace::LinearSRGB, true)
+  assert_eq(kept.rgba8()[0], b'\x10')
+  assert_eq(kept.rgba8()[3], b'\xFF')
 }

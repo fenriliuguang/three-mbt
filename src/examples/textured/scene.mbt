@@ -61,6 +61,7 @@ pub fn TexturedScene::new() -> TexturedScene {
     first=0xF4F1DE,
     second=0x3D405B,
   )
+  map.color_space = @constants.ColorSpace::SRGB
   mesh.set_map(Some(map))
   ignore(scene.add(mesh))
   let ambient = @lights.AmbientLight::new(hex=0x404040, intensity=1.0)

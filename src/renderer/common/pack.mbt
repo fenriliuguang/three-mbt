@@ -245,18 +245,21 @@ pub fn pack_f32_values(values : Array[Double]) -> FixedArray[Byte] {
 }
 
 ///|
-/// 环境贴图第 4 组：64 字节旋转矩阵，接着强度、镜面级数 5、是否有环境、辐照度行号 5。
+/// 环境贴图第 4 组：64 字节旋转矩阵，接着强度、镜面级数 5、环境标志、辐照度行号 5。
+/// 环境标志是 0 没有环境，1 有环境且字节已是线性，2 有环境且图集是 sRGB。
 /// r186: `getIBLIrradiance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js#L4
 pub fn pack_env_params(
   rotation : @math.Matrix4,
   intensity : Double,
   has_env : Bool,
+  srgb~ : Bool = false,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(80, b'\x00')
   write_matrix4(dst, 0, rotation)
   write_f32(dst, 64, intensity)
   write_f32(dst, 68, 5.0)
-  write_f32(dst, 72, if has_env { 1.0 } else { 0.0 })
+  let present = if !has_env { 0.0 } else if srgb { 2.0 } else { 1.0 }
+  write_f32(dst, 72, present)
   write_f32(dst, 76, 5.0)
   dst
 }
@@ -383,6 +386,9 @@ pub fn pack_uniforms(
   displacement_scale~ : Double = 0.0,
   displacement_bias~ : Double = 0.0,
   has_displacement~ : Double = 0.0,
+  map_srgb~ : Double = 0.0,
+  emissive_srgb~ : Double = 0.0,
+  light_srgb~ : Double = 0.0,
 ) -> FixedArray[Byte] {
   let dst = FixedArray::make(uniform_bytes, b'\x00')
   write_matrix4(dst, 0, mvp)
@@ -465,6 +471,9 @@ pub fn pack_uniforms(
   write_f32(dst, 660, hemisphere_y)
   write_f32(dst, 664, hemisphere_z)
   write_f32(dst, 668, hemisphere_enabled)
+  write_f32(dst, 556, map_srgb)
+  write_f32(dst, 572, emissive_srgb)
+  write_f32(dst, 604, light_srgb)
   dst
 }
 

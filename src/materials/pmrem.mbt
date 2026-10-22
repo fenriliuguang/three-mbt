@@ -111,14 +111,23 @@ fn read_linear(
   width : Int32,
   x : Int32,
   y : Int32,
+  decode : Bool,
 ) -> (Double, Double, Double, Double) {
   let offset = (y * width + x) * 4
-  (
-    @math.srgb_to_linear(pixels[offset].to_int().to_double() / 255.0),
-    @math.srgb_to_linear(pixels[offset + 1].to_int().to_double() / 255.0),
-    @math.srgb_to_linear(pixels[offset + 2].to_int().to_double() / 255.0),
-    pixels[offset + 3].to_int().to_double() / 255.0,
-  )
+  let r = pixels[offset].to_int().to_double() / 255.0
+  let g = pixels[offset + 1].to_int().to_double() / 255.0
+  let b = pixels[offset + 2].to_int().to_double() / 255.0
+  let a = pixels[offset + 3].to_int().to_double() / 255.0
+  if decode {
+    (
+      @math.srgb_to_linear(r),
+      @math.srgb_to_linear(g),
+      @math.srgb_to_linear(b),
+      a,
+    )
+  } else {
+    (r, g, b, a)
+  }
 }
 
 ///|
@@ -127,9 +136,16 @@ fn sample_equirect(
   width : Int32,
   height : Int32,
   dir : @math.Vector3,
+  decode : Bool,
 ) -> (Double, Double, Double, Double) {
   let (u, v) = uv_from_direction(dir)
-  read_linear(pixels, width, texel_index(u, width), texel_index(v, height))
+  read_linear(
+    pixels,
+    width,
+    texel_index(u, width),
+    texel_index(v, height),
+    decode,
+  )
 }
 
 ///|
@@ -158,10 +174,14 @@ fn write_pixel(
   g : Double,
   b : Double,
   a : Double,
+  encode : Bool,
 ) -> Unit {
-  dst[offset] = linear_byte(r)
-  dst[offset + 1] = linear_byte(g)
-  dst[offset + 2] = linear_byte(b)
+  let red = if encode { linear_byte(r) } else { unit_byte(r) }
+  let green = if encode { linear_byte(g) } else { unit_byte(g) }
+  let blue = if encode { linear_byte(b) } else { unit_byte(b) }
+  dst[offset] = red
+  dst[offset + 1] = green
+  dst[offset + 2] = blue
   dst[offset + 3] = unit_byte(a)
 }
 
@@ -213,6 +233,7 @@ fn prefilter_ggx(
   height : Int32,
   dir : @math.Vector3,
   roughness : Double,
+  decode : Bool,
 ) -> (Double, Double, Double, Double) {
   let mut sum_r = 0.0
   let mut sum_g = 0.0
@@ -233,7 +254,7 @@ fn prefilter_ggx(
     ignore(light.normalize())
     let ndotl = dir.dot(light)
     if ndotl > 0.0 {
-      let (r, g, b, a) = sample_equirect(pixels, width, height, light)
+      let (r, g, b, a) = sample_equirect(pixels, width, height, light, decode)
       sum_r = sum_r + r * ndotl
       sum_g = sum_g + g * ndotl
       sum_b = sum_b + b * ndotl
@@ -243,7 +264,7 @@ fn prefilter_ggx(
     sample = sample + 1
   }
   if weight == 0.0 {
-    sample_equirect(pixels, width, height, dir)
+    sample_equirect(pixels, width, height, dir, decode)
   } else {
     (sum_r / weight, sum_g / weight, sum_b / weight, sum_a / weight)
   }
@@ -255,6 +276,7 @@ fn prefilter_irradiance(
   width : Int32,
   height : Int32,
   dir : @math.Vector3,
+  decode : Bool,
 ) -> (Double, Double, Double, Double) {
   let mut sum_r = 0.0
   let mut sum_g = 0.0
@@ -271,7 +293,7 @@ fn prefilter_irradiance(
       let u = (x.to_double() + 0.5) / width.to_double()
       let v = (y.to_double() + 0.5) / height.to_double()
       let sample_dir = direction_from_uv(u, v)
-      let (r, g, b, a) = read_linear(pixels, width, x, y)
+      let (r, g, b, a) = read_linear(pixels, width, x, y, decode)
       mean_r = mean_r + r
       mean_g = mean_g + g
       mean_b = mean_b + b
@@ -332,12 +354,30 @@ pub fn rotate_env_direction(
 }
 
 ///|
-/// 把等距柱状环境贴图收成一张图集。每一级最长 16、最高 8，更大时最近邻缩小。
+/// 把环境贴图收成一张图集。`CubeUV` 已经是图集，只拷贝字节并保留色彩空间。
+/// 其余映射按等距柱状图处理。每一级最长 16、最高 8，更大时最近邻缩小。
 /// 前 5 行是粗糙度 0、0.25、0.5、0.75、1。最后一行是辐照度。
-/// 粗糙度 0 直接拷贝。更高的粗糙度在线性光里做 8 次 GGX，再写回 sRGB。
-/// 上游 `GGX_SAMPLES` 是 256。
-/// r186: `fromEquirectangular` https://github.com/mrdoob/three.js/blob/r186/src/extras/PMREMGenerator.js#L151 ; `GGX_SAMPLES` https://github.com/mrdoob/three.js/blob/r186/src/extras/PMREMGenerator.js#L37
+/// 粗糙度 0 直接拷贝。源色彩空间是 `SRGB` 时，更高的粗糙度在线性光里做 8 次 GGX，再写回 sRGB。
+/// `No` 和 `LinearSRGB` 按存储值过滤，不再编码。上游 `GGX_SAMPLES` 是 256。
+/// 结果的 `mapping` 是 `CubeUV`。
+/// r186: `fromEquirectangular` https://github.com/mrdoob/three.js/blob/r186/src/extras/PMREMGenerator.js#L151 ; `GGX_SAMPLES` https://github.com/mrdoob/three.js/blob/r186/src/extras/PMREMGenerator.js#L37 ; `CubeUVReflectionMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L548
 pub fn pmrem_atlas(source : @textures.Texture) -> @textures.Texture {
+  if source.mapping is @constants.TextureMapping::CubeUVReflection {
+    let atlas = @textures.Texture::from_rgba8(
+      source.width,
+      source.height,
+      source.rgba8(),
+    )
+    atlas.flip_y = false
+    atlas.wrap_s = @constants.ClampToEdge
+    atlas.wrap_t = @constants.ClampToEdge
+    atlas.mag_filter = @constants.Linear
+    atlas.min_filter = @constants.Linear
+    atlas.mapping = @constants.TextureMapping::CubeUVReflection
+    atlas.color_space = source.color_space
+    return atlas
+  }
+  let decode = source.color_space is @constants.ColorSpace::SRGB
   let (level_w, level_h) = level_extent(source.width, source.height)
   let level = downsample(
     top_rgba8(source),
@@ -357,10 +397,10 @@ pub fn pmrem_atlas(source : @textures.Texture) -> @textures.Texture {
         let v = (y.to_double() + 0.5) / level_h.to_double()
         let dir = direction_from_uv(u, v)
         let (r, g, b, a) = prefilter_ggx(
-          level, level_w, level_h, dir, roughness,
+          level, level_w, level_h, dir, roughness, decode,
         )
         let offset = row * row_bytes + (y * level_w + x) * 4
-        write_pixel(dst, offset, r, g, b, a)
+        write_pixel(dst, offset, r, g, b, a, decode)
       }
     }
   }
@@ -370,9 +410,11 @@ pub fn pmrem_atlas(source : @textures.Texture) -> @textures.Texture {
       let u = (x.to_double() + 0.5) / level_w.to_double()
       let v = (y.to_double() + 0.5) / level_h.to_double()
       let dir = direction_from_uv(u, v)
-      let (r, g, b, a) = prefilter_irradiance(level, level_w, level_h, dir)
+      let (r, g, b, a) = prefilter_irradiance(
+        level, level_w, level_h, dir, decode,
+      )
       let offset = irradiance_row * row_bytes + (y * level_w + x) * 4
-      write_pixel(dst, offset, r, g, b, a)
+      write_pixel(dst, offset, r, g, b, a, decode)
     }
   }
   let atlas = @textures.Texture::from_rgba8(
@@ -385,5 +427,11 @@ pub fn pmrem_atlas(source : @textures.Texture) -> @textures.Texture {
   atlas.wrap_t = @constants.ClampToEdge
   atlas.mag_filter = @constants.Linear
   atlas.min_filter = @constants.Linear
+  atlas.mapping = @constants.TextureMapping::CubeUVReflection
+  atlas.color_space = if decode {
+    @constants.ColorSpace::SRGB
+  } else {
+    source.color_space
+  }
   atlas
 }

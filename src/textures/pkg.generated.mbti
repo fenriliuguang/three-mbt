@@ -47,11 +47,16 @@ pub(all) struct Texture {
   attachment : Bool
   mut version : Int
   mut channel : Int
+  mut mapping : @constants.TextureMapping
+  mut color_space : @constants.ColorSpace
+  mut video : Bool
 }
 pub fn Texture::attachment(Int, Int) -> Self
 pub fn Texture::checker(width~ : Int, height~ : Int, cell~ : Int, first~ : Int, second~ : Int) -> Self
 pub fn Texture::from_rgba8(Int, Int, FixedArray[Byte]) -> Self
 pub fn Texture::rgba8(Self) -> FixedArray[Byte]
+pub fn Texture::update(Self) -> Unit
+pub fn Texture::video(Int, Int, FixedArray[Byte]) -> Self
 
 // Type aliases
 
