@@ -32,4 +32,4 @@ MoonBit 移植 three.js r186 的 WebGPU 世界。动手前先读 [docs/PLAN.md](
 
 ## 定时推进
 
-用户指定截止时间后，没到点就开启下一刀，不判断这一刀能不能在截止前做完。规则见 [.cursor/skills/timed-advance/SKILL.md](.cursor/skills/timed-advance/SKILL.md)。
+用户指定截止时间后，没到点就开启下一刀，不判断这一刀能不能在截止前做完。活跃队列没有下一刀时，从 `docs/plan/later/` 取一份 WebGPU 计划再推进。`later` 也没有可做的项就取消定时器。规则见 [.cursor/skills/timed-advance/SKILL.md](.cursor/skills/timed-advance/SKILL.md)。

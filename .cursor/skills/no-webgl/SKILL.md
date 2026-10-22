@@ -27,4 +27,4 @@ description: >
 
 ## 计划
 
-`docs/plan/active/materials.md` 不再排 GLSL 前缀。定时推进如果读到 WebGL、GLSL 前缀、`WebGLPrograms` 或 `ShaderLib`，不要开工。下一刀必须是 WebGPU 路径上的工作。
+`docs/plan/active/materials.md` 不再排 GLSL 前缀。定时推进如果读到 WebGL、GLSL 前缀、`WebGLPrograms` 或 `ShaderLib`，不要开工，从 `later` 取刀时也跳过这些项。下一刀必须是 WebGPU 路径上的工作。

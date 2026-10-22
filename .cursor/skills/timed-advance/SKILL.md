@@ -21,26 +21,38 @@ TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S %Z'
 
 用户给了别的时区，就用那个时区。用户没给日期，截止日是今天。把截止时刻记成绝对时间，例如 `2026-10-12 18:00 CST`。
 
-现在早于截止时刻，就开始下一刀。
+现在早于截止时刻，就开始下一刀。活跃队列和 `docs/plan/later/` 都没有可做的 WebGPU 项时，不要空转到截止时刻：取消定时器并报告。
 
 现在等于或晚于截止时刻，不要开新的一刀。取消这次任务的定时器。已经改到一半的内容，能测完就测完、提交并推送；不能测完就停下，不要为了收尾再扩大改动。用简短中文说明停在哪一次提交、工作区是否干净。
 
 ## 怎么持续
 
-1. 接到截止时间后立刻订一个重复定时器，让空闲后的下一刀自己到来。间隔 60 秒。名字用 `advance-until` 加上截止时刻，避免和别的任务撞车。提示词写清绝对截止时间、时区，以及这三条：先看时间；没到点就做下一刀；到点就取消这个定时器。
+1. 接到截止时间后立刻订一个重复定时器，让空闲后的下一刀自己到来。间隔 60 秒。名字用 `advance-until` 加上截止时刻，避免和别的任务撞车。提示词写清绝对截止时间、时区，以及这几条：先看时间；没到点就做活跃队列里的下一刀，活跃队列没有就从 `docs/plan/later/` 取一份 WebGPU 计划并实现；`later` 也没有，或已经到点，就取消这个定时器。点名 WebGL、GLSL 前缀、`WebGLProgram`、`WebGLPrograms`、`ShaderLib`、`src/renderers/shaders` 的项不要开工。
 2. 订完就做第一刀，然后结束这一轮。不要在同一轮里连做多刀。定时器到了再做下一刀。
-3. 每一刀做完并推送之后，再看一次时间。没到点就留着定时器，结束这一轮。到点就取消定时器并报告。
+3. 每一刀做完并推送之后，再看一次时间。到点就取消定时器并报告。没到点就再看活跃队列和 `later`：都没有可做的 WebGPU 项就取消定时器并报告；还有就留着定时器，结束这一轮。
 4. 定时器可能在忙碌时攒下多次通知。每次醒来先看时间。到点之后，后面的通知也不再开新刀。
 5. 定时器已经不在订阅列表里，就不要重复取消。
 
 ## 这一刀是什么
 
-本仓库一次只做 [docs/plan/active/materials.md](../../../docs/plan/active/materials.md) 里还没落地的下一小块。名字在该文件 `## Behavior` 最后一段末尾，句子以 “X stays later” 结束。最后一段没有这句，或这句点名 WebGL、GLSL 前缀、`WebGLProgram`、`WebGLPrograms`、`ShaderLib`、`src/renderers/shaders`，就不要开工。这些路径按 [no-webgl](../no-webgl/SKILL.md) 留在上游。不要从 `docs/plan/done/` 或 `docs/plan/later/` 里挑下一刀。提交和推送按 [direct-to-main](../direct-to-main/SKILL.md)：在 `main` 上 `git push origin main`，不开 Pull Request。不跑宿主窗口验收。
+一次只做一刀。不要从 `docs/plan/done/` 里挑。WebGL、GLSL 前缀、`WebGLProgram`、`WebGLPrograms`、`ShaderLib`、`src/renderers/shaders` 按 [no-webgl](../no-webgl/SKILL.md) 留在上游，活跃队列和 `later` 里点名这些的都跳过。提交和推送按 [direct-to-main](../direct-to-main/SKILL.md)：在 `main` 上 `git push origin main`，不开 Pull Request。不跑宿主窗口验收。
+
+活跃队列是 `docs/plan/active/` 下的计划。按文件名排序，找 `## Behavior` 最后一段以 “X stays later” 结尾、且 X 是 WebGPU 路径上的工作的那一刀。找到就做这一刀，不要同时再从 `later` 取。
+
+活跃队列里没有这样一刀时，从 `docs/plan/later/` 取一份新计划。按文件名排序读这些文件。一份文件里的下一刀，是 `## Behavior` 里第一段还没落地的 WebGPU 工作，不把一段再拆成更小的项。这一段只有排除名单上的路径时就跳过。Behavior 没有点名具体工作时，改取 checklist 里第一行 `status` 为 `later`、且不在排除名单上的项。取到之后：
+
+1. 把这一项从 `later` 原文里挪走。该文件不再剩下任何待实现的 WebGPU 项就删掉它，并把它从 [docs/PLAN.md](../../../docs/PLAN.md) 的 Later 列表去掉。排除名单上的句子留在 `later`，不要拿来开工。
+2. 写入 `docs/plan/active/<同一模块>.md`。`## Behavior` 最后一段以 “X stays later” 结束，X 就是这一项。在 [docs/PLAN.md](../../../docs/PLAN.md) 的 Active 列表里补上这个文件。
+3. 接着实现这一刀。做完后把落地说明补进 `docs/plan/done/<模块>.md`，并拿掉 active 里这句 “X stays later”。不要在同一轮里再从 `later` 取下一份。
+
+`docs/plan/later/` 里也没有可做的 WebGPU 项时，立刻取消这次任务的定时器，即使还没到截止时刻。不要开新刀。用简短中文说明活跃队列和 `later` 都空了，以及停在哪一次提交、工作区是否干净。
 
 测试、格式和 `moon info` 仍按仓库规则做完再推送。到点时已经开始的这一刀，也按这个标准收尾；收不了尾就停。
 
 ## 不做什么
 
 - 不因为「可能做不完」而把截止前提前成最后一刀。
-- 不到点不取消定时器。
+- 活跃队列还有 “X stays later” 时，不绕过它去 `later` 取刀。
+- 不到点、且还有刀可做时，不取消定时器。
+- 活跃队列和 `later` 都没有可做的 WebGPU 项时，不等到截止时刻再取消定时器。
 - 到点后不借「已经订阅了」再开一刀。
