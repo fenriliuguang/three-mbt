@@ -1,7 +1,8 @@
 // r186: `SkinnedMesh` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L38 ; `Skeleton` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L37
 
 ///|
-/// 蒙皮用的绑定姿态。顶点留在网格局部空间，不在着色器里蒙皮。
+/// 蒙皮用的绑定姿态。顶点留在网格局部空间。
+/// `write` 仍在 CPU 上重写属性。渲染器另用计算着色器，从这份绑定姿态加形变后再蒙皮，避免和 CPU 结果叠两次。
 /// 关节矩阵是 `joint.matrixWorld * inverseBindMatrix`。
 /// 绑定矩阵是单位矩阵；每帧再用网格 `matrixWorld` 的逆把结果收回局部空间。
 /// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
@@ -112,6 +113,42 @@ fn morphed_source(
       }
     }
   }
+}
+
+///|
+/// 形变之后、蒙皮之前的位置。计算着色器读这份，不读 `write` 改过的属性。
+/// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
+pub fn SkinState::source_position(
+  self : SkinState,
+  node : Object3D,
+) -> Array[Double] {
+  morphed_source(node, self.bind_position, true)
+}
+
+///|
+/// 没有绑定法线时返回 `None`。有形变时先加上 `NORMAL` 增量。
+/// r186: `applyBoneTransform` https://github.com/mrdoob/three.js/blob/r186/src/objects/SkinnedMesh.js#L319
+pub fn SkinState::source_normal(
+  self : SkinState,
+  node : Object3D,
+) -> Array[Double]? {
+  match self.bind_normal {
+    None => None
+    Some(values) => Some(morphed_source(node, values, false))
+  }
+}
+
+///|
+/// 每个关节一行，`joint.matrixWorld * inverseBindMatrix`。
+/// r186: `update` https://github.com/mrdoob/three.js/blob/r186/src/objects/Skeleton.js#L199
+pub fn SkinState::bone_palette(self : SkinState) -> Array[@math.Matrix4] {
+  bone_matrices(self)
+}
+
+///|
+/// 一个顶点的影响个数。缺权重时按 4 计，读取时越界的影响跳过。
+pub fn SkinState::influence_width(self : SkinState) -> Int32 {
+  influence_stride(self.bind_position.length() / 3, self.weights.length())
 }
 
 ///|

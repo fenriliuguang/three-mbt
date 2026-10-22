@@ -627,6 +627,10 @@ pub(all) struct SkinState {
   indices : Array[Int]
   weights : Array[Double]
 }
+pub fn SkinState::bone_palette(Self) -> Array[@math.Matrix4]
+pub fn SkinState::influence_width(Self) -> Int
+pub fn SkinState::source_normal(Self, Object3D) -> Array[Double]?
+pub fn SkinState::source_position(Self, Object3D) -> Array[Double]
 pub fn SkinState::write(Self, Object3D, BufferGeometry) -> Unit
 
 pub(all) struct SpriteState {

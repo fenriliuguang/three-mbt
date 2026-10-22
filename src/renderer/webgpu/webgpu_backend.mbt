@@ -52,6 +52,22 @@ struct InstanceGpu {
 }
 
 ///|
+struct SkinGpu {
+  node : @core.Object3D
+  source : GpuBuffer
+  output : GpuBuffer
+  bones : GpuBuffer
+  joints : GpuBuffer
+  weights : GpuBuffer
+  params : GpuBuffer
+  group : GpuBindGroup
+  vertex_count : Int32
+  bone_bytes : Int32
+  joint_bytes : Int32
+  weight_bytes : Int32
+}
+
+///|
 struct StorageGpu {
   source : @compute.StoragePositions
   buffer : GpuBuffer

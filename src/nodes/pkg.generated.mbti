@@ -26,6 +26,8 @@ pub fn shadow_instanced_wgsl() -> String
 
 pub fn shadow_wgsl() -> String
 
+pub fn skin_wgsl() -> String
+
 pub fn standard_instanced_wgsl() -> String
 
 pub fn standard_program(instanced? : Bool) -> Program

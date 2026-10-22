@@ -207,7 +207,6 @@ The next slice is the WebGPU work named at the end of the last paragraph under `
 
 ### Later
 
-- [gltf](plan/later/gltf.md)
 - [materials](plan/later/materials.md)
 - [nodes](plan/later/nodes.md)
 - [post](plan/later/post.md)

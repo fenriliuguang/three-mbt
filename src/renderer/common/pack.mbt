@@ -206,6 +206,61 @@ pub fn pad_texture_rows(
 }
 
 ///|
+/// 列主序 `mat4x4<f32>` 紧排。空列表得到 0 字节。
+pub fn pack_matrices(matrices : Array[@math.Matrix4]) -> FixedArray[Byte] {
+  let dst = FixedArray::make(matrices.length() * 64, b'\x00')
+  let mut index = 0
+  while index < matrices.length() {
+    write_matrix4(dst, index * 64, matrices[index])
+    index = index + 1
+  }
+  dst
+}
+
+///|
+/// `u32` 紧排，小端。
+pub fn pack_u32_values(values : Array[Int32]) -> FixedArray[Byte] {
+  let dst = FixedArray::make(values.length() * 4, b'\x00')
+  let mut index = 0
+  while index < values.length() {
+    write_u32(dst, index * 4, values[index])
+    index = index + 1
+  }
+  dst
+}
+
+///|
+/// `f32` 紧排，小端。
+pub fn pack_f32_values(values : Array[Double]) -> FixedArray[Byte] {
+  let dst = FixedArray::make(values.length() * 4, b'\x00')
+  let mut index = 0
+  while index < values.length() {
+    write_f32(dst, index * 4, values[index])
+    index = index + 1
+  }
+  dst
+}
+
+///|
+/// 蒙皮计算的 uniform：64 字节绑定逆矩阵，接着四个 `u32`。
+/// `skin_normal` 为 0 时法线原样拷贝。
+pub fn pack_skin_params(
+  bind_inverse : @math.Matrix4,
+  vertex_count : Int32,
+  bone_count : Int32,
+  stride : Int32,
+  skin_normal : Bool,
+) -> FixedArray[Byte] {
+  let dst = FixedArray::make(80, b'\x00')
+  write_matrix4(dst, 0, bind_inverse)
+  write_u32(dst, 64, vertex_count)
+  write_u32(dst, 68, bone_count)
+  write_u32(dst, 72, stride)
+  write_u32(dst, 76, if skin_normal { 1 } else { 0 })
+  dst
+}
+
+///|
 /// 把模型矩阵的法线矩阵放进 4×4 的左上角，供 WGSL 的 `mat4x4` 使用。
 /// r186: `getNormalMatrix` https://github.com/mrdoob/three.js/blob/r186/src/math/Matrix3.js#L352
 pub fn normal_matrix(model : @math.Matrix4) -> @math.Matrix4 {

@@ -74,6 +74,8 @@ pub struct WebGPURenderer {
   points_blend_premul : ColorModes[GpuRenderPipeline]
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
+  skin : GpuComputePipeline
+  skin_layout : GpuBindGroupLayout
   post : GpuRenderPipeline
   post_layout : GpuBindGroupLayout
   post_uniform : GpuBuffer
@@ -112,6 +114,7 @@ pub struct WebGPURenderer {
   positions : Array[PositionGpu]
   instances : Array[InstanceGpu]
   storages : Array[StorageGpu]
+  skins : Array[SkinGpu]
   uniforms : Array[ObjectGpu]
   textures : Array[TextureGpu]
   mut swap_width : UInt32
@@ -381,6 +384,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     label: Some("shadow-dummy"),
   })
   let wave = wave_pipeline(device)
+  let skin = skin_pipeline(device)
   let post = fullscreen_pipeline(
     device,
     format,
@@ -660,6 +664,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ),
     wave: wave.1,
     wave_layout: wave.0,
+    skin: skin.1,
+    skin_layout: skin.0,
     post: post.1,
     post_layout: post.0,
     post_uniform: post.2,
@@ -718,6 +724,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     positions: [],
     instances: [],
     storages: [],
+    skins: [],
     uniforms: [],
     textures: [],
     swap_width: window.width(),
@@ -1874,6 +1881,241 @@ fn mesh_draw(
 }
 
 ///|
+fn storage_bytes(
+  bytes : FixedArray[Byte],
+  fallback : Int32,
+) -> FixedArray[Byte] {
+  if bytes.length() == 0 {
+    FixedArray::make(fallback, b'\x00')
+  } else {
+    bytes
+  }
+}
+
+///|
+fn make_storage(device : GpuDevice, bytes : FixedArray[Byte]) -> GpuBuffer {
+  let buffer = device.create_buffer({
+    size: bytes.length().to_uint64(),
+    usage: flags_storage_vertex(),
+    mapped_at_creation: None,
+    label: Some("skin"),
+  })
+  ignore(device.queue().write_buffer_with_copy(buffer, 0UL, bytes, None, None))
+  buffer
+}
+
+///|
+fn WebGPURenderer::skin_slot(
+  self : WebGPURenderer,
+  node : @core.Object3D,
+) -> Int32? {
+  let mut index = 0
+  while index < self.skins.length() {
+    if physical_equal(self.skins[index].node, node) {
+      return Some(index)
+    }
+    index = index + 1
+  }
+  None
+}
+
+///|
+fn WebGPURenderer::mesh_vertices(
+  self : WebGPURenderer,
+  node : @core.Object3D,
+  instanced : Bool,
+  lines : Bool,
+  fallback : GpuBuffer,
+) -> GpuBuffer {
+  if lines || instanced {
+    return fallback
+  }
+  match self.skin_slot(node) {
+    None => fallback
+    Some(index) => self.skins[index].output
+  }
+}
+
+///|
+/// 非实例三角形在绘制前从绑定姿态做一次计算蒙皮。实例、线和点仍用 CPU 改过的顶点。
+/// r186: `compute` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L2877
+fn WebGPURenderer::prepare_skins(
+  self : WebGPURenderer,
+  root : @core.Object3D,
+) -> Unit {
+  let pending = [root]
+  let mut index = 0
+  while index < pending.length() {
+    let node = pending[index]
+    match node.skin {
+      None => ()
+      Some(skin) =>
+        match node.mesh {
+          None => ()
+          Some(binding) =>
+            match binding.instances {
+              Some(_) => ()
+              None => self.dispatch_skin(node, skin, binding.geometry)
+            }
+        }
+    }
+    let mut child = 0
+    while child < node.children.length() {
+      pending.push(node.children[child])
+      child = child + 1
+    }
+    index = index + 1
+  }
+}
+
+///|
+fn WebGPURenderer::dispatch_skin(
+  self : WebGPURenderer,
+  node : @core.Object3D,
+  skin : @core.SkinState,
+  geometry : @core.BufferGeometry,
+) -> Unit {
+  let positions = skin.source_position(node)
+  let count = positions.length() / 3
+  if count < 1 {
+    return
+  }
+  let normal = match skin.source_normal(node) {
+    None => None
+    Some(values) => Some(@core.BufferAttribute::new(values, 3))
+  }
+  let source_bytes = @common.pack_position_normal_uv(
+    @core.BufferAttribute::new(positions, 3),
+    normal,
+    geometry.get_attribute("uv"),
+    color=geometry.get_attribute("color"),
+  )
+  let bones = skin.bone_palette()
+  let bone_bytes = storage_bytes(@common.pack_matrices(bones), 64)
+  let joint_bytes = storage_bytes(@common.pack_u32_values(skin.indices), 4)
+  let weight_bytes = storage_bytes(@common.pack_f32_values(skin.weights), 4)
+  let bind_inverse = @math.Matrix4::new()
+  ignore(bind_inverse.copy(node.matrix_world).invert())
+  let params = @common.pack_skin_params(
+    bind_inverse,
+    count,
+    bones.length(),
+    skin.influence_width(),
+    normal is Some(_),
+  )
+  let gpu = self.ensure_skin(
+    node, source_bytes, bone_bytes, joint_bytes, weight_bytes, params, count,
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.source, 0UL, source_bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.output, 0UL, source_bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.bones, 0UL, bone_bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.joints, 0UL, joint_bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.weights, 0UL, weight_bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(gpu.params, 0UL, params, None, None),
+  )
+  let groups = @compute.workgroup_count(count)
+  if groups < 1 {
+    return
+  }
+  let encoder = self.device.create_command_encoder(None)
+  let pass = encoder.begin_compute_pass(None)
+  pass.set_pipeline(self.skin)
+  ignore(pass.set_bind_group(0U, Some(gpu.group), None, None, None))
+  pass.dispatch_workgroups(groups.reinterpret_as_uint(), None, None)
+  pass.end()
+  self.device.queue().submit([encoder.finish(None)])
+}
+
+///|
+fn WebGPURenderer::ensure_skin(
+  self : WebGPURenderer,
+  node : @core.Object3D,
+  source_bytes : FixedArray[Byte],
+  bone_bytes : FixedArray[Byte],
+  joint_bytes : FixedArray[Byte],
+  weight_bytes : FixedArray[Byte],
+  params : FixedArray[Byte],
+  vertex_count : Int32,
+) -> SkinGpu {
+  let fits = fn(cached : SkinGpu) -> Bool {
+    cached.vertex_count == vertex_count &&
+    cached.bone_bytes == bone_bytes.length() &&
+    cached.joint_bytes == joint_bytes.length() &&
+    cached.weight_bytes == weight_bytes.length()
+  }
+  match self.skin_slot(node) {
+    Some(index) => if fits(self.skins[index]) { return self.skins[index] }
+    None => ()
+  }
+  let source = make_storage(self.device, source_bytes)
+  let output = make_storage(self.device, source_bytes)
+  let bones = make_storage(self.device, bone_bytes)
+  let joints = make_storage(self.device, joint_bytes)
+  let weights = make_storage(self.device, weight_bytes)
+  let uniform = pack_buffer(
+    self.device,
+    params,
+    vertex=false,
+    index=false,
+    uniform=true,
+  )
+  let group = self.device.create_bind_group({
+    layout: self.skin_layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuBuffer(source), },
+      { binding: 1U, resource: @gpu.GpuBindingResource::GpuBuffer(output), },
+      { binding: 2U, resource: @gpu.GpuBindingResource::GpuBuffer(bones), },
+      { binding: 3U, resource: @gpu.GpuBindingResource::GpuBuffer(joints), },
+      { binding: 4U, resource: @gpu.GpuBindingResource::GpuBuffer(weights), },
+      { binding: 5U, resource: @gpu.GpuBindingResource::GpuBuffer(uniform), },
+    ],
+    label: Some("skin"),
+  })
+  let cached = {
+    node,
+    source,
+    output,
+    bones,
+    joints,
+    weights,
+    params: uniform,
+    group,
+    vertex_count,
+    bone_bytes: bone_bytes.length(),
+    joint_bytes: joint_bytes.length(),
+    weight_bytes: weight_bytes.length(),
+  }
+  match self.skin_slot(node) {
+    Some(index) => self.skins[index] = cached
+    None => self.skins.push(cached)
+  }
+  cached
+}
+
+///|
 fn WebGPURenderer::draw_shadow(
   self : WebGPURenderer,
   scene : @scenes.Scene,
@@ -1991,7 +2233,19 @@ fn WebGPURenderer::draw_shadow(
             @constants.Double => shadow_group.double
           },
         )
-        pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+        pass.set_vertex_buffer(
+          0U,
+          Some(
+            self.mesh_vertices(
+              item.node,
+              item.instances is Some(_),
+              false,
+              geometry.vertices,
+            ),
+          ),
+          None,
+          None,
+        )
         let instance_count = match item.instances {
           Some(data) =>
             if data.count < data.matrices.count {
@@ -2858,7 +3112,19 @@ fn WebGPURenderer::draw_meshes(
               }
             },
           )
-          pass.set_vertex_buffer(0U, Some(geometry.vertices), None, None)
+          pass.set_vertex_buffer(
+            0U,
+            Some(
+              self.mesh_vertices(
+                item.node,
+                item.instances is Some(_),
+                lines,
+                geometry.vertices,
+              ),
+            ),
+            None,
+            None,
+          )
           let instance_count = match item.instances {
             Some(data) => {
               let capacity = data.matrices.count
@@ -3196,6 +3462,7 @@ pub fn WebGPURenderer::render(
   }
   sync_camera(camera, width, height, self.reversed_depth)
   @common.update_frame(scene.node, camera)
+  self.prepare_skins(scene.node)
   let state = match camera.camera {
     None => return
     Some(state) => state

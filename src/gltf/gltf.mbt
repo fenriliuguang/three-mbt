@@ -57,6 +57,8 @@ priv struct Mat {
   eg : Double
   eb : Double
   emissive_intensity : Double
+  emissive_texture : Int32
+  metal_rough_texture : Int32
 }
 
 ///|
@@ -135,7 +137,7 @@ pub(all) struct Gltf {
 /// 再带上粗糙度、金属度和 `doubleSided`。`alphaMode` 为 `BLEND` 时进透明队列，`MASK` 写入 `alphaTest`，`OPAQUE` 忽略 alpha。`KHR_materials_unlit` 改用 `MeshBasicMaterial`。`emissiveFactor` 按线性通道写入 Lambert 和 Standard，缺省黑色；unlit 忽略它。`KHR_materials_emissive_strength` 写入 `emissiveIntensity`，缺省 1，`0` 保留。
 /// 节点上的相机会建成透视或正交相机。
 /// 动画读取 `translation`、`rotation` 和 `scale`。`LINEAR` 与 `STEP` 按线性或离散采样，`CUBICSPLINE` 按切线布局采样。
-/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。贴图先不读。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。`JOINTS_2` 和 `WEIGHTS_2` 只在第二组成对出现后再加四个，缺第二组时忽略第三组。`JOINTS_3` 和 `WEIGHTS_3` 只在第三组成对出现后再加四个，缺第三组时忽略第四组。
+/// `KHR_lights_punctual` 的平行光会挂到节点上。`mesh.weights` 会把 `POSITION` 形变增量烘焙进顶点，已有法线时也烘焙 `NORMAL`，已有顶点色时也烘焙 `COLOR_0`。节点 `weights` 按索引盖过网格权重；和网格权重不同时复制几何再烘焙。动画通道 `weights` 写成 `.morphTargetInfluences`，按采样结果从底数重烘焙。没有形变目标的节点跳过该通道。点光按节点位置挂上，`range` 写成 `distance`，`decay` 为 2。聚光同样使用 `range` 和 `decay` 2，`outerConeAngle` 写成 `angle`，`penumbra` 为 `1 - innerConeAngle / outerConeAngle`，目标在本地 `(0, 0, -1)`。PNG 图像写成 `rgba8`，`flipY` 为 false。`emissiveTexture` 进自发光贴图，`metallicRoughnessTexture` 同时进粗糙度和金属度。`texCoord` 大于 0 或 JPEG 会拒绝。`JOINTS_0` 和 `WEIGHTS_0` 在 CPU 上按线性混合写入顶点：关节矩阵是关节世界矩阵乘 `inverseBindMatrices`，再乘网格世界矩阵的逆。缺一对属性时不蒙皮。有形变目标时先把 `POSITION` 和 `NORMAL` 增量加进底数，再蒙皮。`JOINTS_1` 和 `WEIGHTS_1` 成对时再加四个影响，并和第一组一起归一化。`JOINTS_2` 和 `WEIGHTS_2` 只在第二组成对出现后再加四个，缺第二组时忽略第三组。`JOINTS_3` 和 `WEIGHTS_3` 只在第三组成对出现后再加四个，缺第三组时忽略第四组。
 /// r186: `parse` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L430
 pub fn parse(text : String, bin~ : Bytes = b"") -> Gltf raise GltfError {
   let root = as_object(parse_json(text))
@@ -143,13 +145,16 @@ pub fn parse(text : String, bin~ : Bytes = b"") -> Gltf raise GltfError {
   let bins = load_buffers(root, bin)
   let views = load_views(root)
   let accs = load_accessors(root)
-  let materials = load_materials(root)
+  let images = load_images(root, bins, views)
+  let samplers = load_samplers(root)
+  let textures = load_gltf_textures(root, images, samplers)
+  let materials = load_materials(root, textures.length())
   let meshes = load_meshes(root, bins, views, accs, materials)
   let cameras = load_cameras(root)
   let lights = load_punctuals(root)
   let skins = load_skins(root, bins, views, accs)
   let nodes = load_nodes(root)
-  let built = build_nodes(nodes, meshes, cameras, lights, skins)
+  let built = build_nodes(nodes, meshes, cameras, lights, skins, textures)
   link_children(nodes, built)
   let animations = load_animations(root, bins, views, accs, built)
   let group = @objects.Group::new()
@@ -436,17 +441,24 @@ fn default_mat() -> Mat {
     eg: 0.0,
     eb: 0.0,
     emissive_intensity: 1.0,
+    emissive_texture: -1,
+    metal_rough_texture: -1,
   }
 }
 
 ///|
-fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
+/// r186: `metallicRoughnessTexture` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3643 ; `emissiveMap` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3728
+fn load_mat(
+  obj : Map[String, Json],
+  texture_count : Int32,
+) -> Mat raise GltfError {
   let mut r = 1.0
   let mut g = 1.0
   let mut b = 1.0
   let mut alpha = 1.0
   let mut roughness = 1.0
   let mut metalness = 1.0
+  let mut metal_rough = -1
   match obj.get("pbrMetallicRoughness") {
     None => ()
     Some(value) => {
@@ -468,6 +480,10 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
       }
       roughness = opt_f64(pbr, "roughnessFactor", 1.0)
       metalness = opt_f64(pbr, "metallicFactor", 1.0)
+      metal_rough = checked_texture(
+        texture_info(pbr, "metallicRoughnessTexture"),
+        texture_count,
+      )
     }
   }
   let mode = opt_string(obj, "alphaMode", "OPAQUE")
@@ -492,11 +508,16 @@ fn load_mat(obj : Map[String, Json]) -> Mat raise GltfError {
     eg,
     eb,
     emissive_intensity: emissive_strength(obj),
+    emissive_texture: checked_texture(
+      texture_info(obj, "emissiveTexture"),
+      texture_count,
+    ),
+    metal_rough_texture: metal_rough,
   }
 }
 
 ///|
-/// 缺省是黑色。`0` 是有效值，不按缺失处理。自发光贴图先不读。
+/// 缺省是黑色。`0` 是有效值，不按缺失处理。贴图索引另记。
 /// r186: `emissiveFactor` https://github.com/mrdoob/three.js/blob/r186/examples/jsm/loaders/GLTFLoader.js#L3719
 fn emissive_factor(
   obj : Map[String, Json],
@@ -550,12 +571,15 @@ fn material_unlit(obj : Map[String, Json]) -> Bool raise GltfError {
 }
 
 ///|
-fn load_materials(root : Map[String, Json]) -> Array[Mat] raise GltfError {
+fn load_materials(
+  root : Map[String, Json],
+  texture_count : Int32,
+) -> Array[Mat] raise GltfError {
   let listed = objects(root, "materials")
   let out = []
   let mut i = 0
   while i < listed.length() {
-    out.push(load_mat(listed[i]))
+    out.push(load_mat(listed[i], texture_count))
     i = i + 1
   }
   out
@@ -1401,6 +1425,7 @@ fn apply_transform(node : @core.Object3D, desc : NodeDesc) -> Unit {
 fn mesh_from(
   prim : Prim,
   node_weights : Array[Double]?,
+  textures : Array[@textures.Texture],
 ) -> @objects.Mesh raise GltfError {
   let geometry = geometry_for(prim, node_weights)
   let material = if prim.mat.unlit {
@@ -1418,6 +1443,14 @@ fn mesh_from(
   if prim.mat.unlit == false {
     ignore(material.emissive.set_rgb(prim.mat.er, prim.mat.eg, prim.mat.eb))
     material.emissive_intensity = prim.mat.emissive_intensity
+    if prim.mat.emissive_texture >= 0 {
+      material.emissive_map = Some(textures[prim.mat.emissive_texture])
+    }
+    if prim.mat.metal_rough_texture >= 0 {
+      let map = textures[prim.mat.metal_rough_texture]
+      material.roughness_map = Some(map)
+      material.metalness_map = Some(map)
+    }
   }
   let mesh = @objects.Mesh::new(geometry, material)
   if prim.targets.length() > 0 {
@@ -2127,6 +2160,7 @@ fn build_nodes(
   cameras : Array[Cam],
   lights : Array[Punctual],
   skins : Array[SkinDef],
+  textures : Array[@textures.Texture],
 ) -> Array[@core.Object3D] raise GltfError {
   check_skin_joints(skins, nodes.length())
   let pending : Array[PendingSkin] = []
@@ -2151,7 +2185,7 @@ fn build_nodes(
         let prims = meshes[index]
         let mut p = 0
         while p < prims.length() {
-          let mesh = mesh_from(prims[p], desc.weights)
+          let mesh = mesh_from(prims[p], desc.weights, textures)
           match desc.skin {
             None => ()
             Some(skin_index) =>

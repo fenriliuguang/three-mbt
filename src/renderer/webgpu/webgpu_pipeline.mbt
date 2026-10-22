@@ -721,6 +721,54 @@ fn wave_pipeline(
 }
 
 ///|
+fn buffer_layout(
+  binding : UInt32,
+  kind : @gpu.GpuBufferBindingType,
+) -> @gpu.GpuBindGroupLayoutEntry {
+  {
+    binding,
+    visibility: compute_visibility(),
+    buffer: Some({
+      type_: Some(kind),
+      has_dynamic_offset: None,
+      min_binding_size: None,
+    }),
+    sampler: None,
+    texture: None,
+    storage_texture: None,
+  }
+}
+
+///|
+fn skin_pipeline(
+  device : GpuDevice,
+) -> (GpuBindGroupLayout, GpuComputePipeline) {
+  let layout = device.create_bind_group_layout({
+    entries: [
+      buffer_layout(0U, @gpu.GpuBufferBindingType::READ_ONLY_STORAGE),
+      buffer_layout(1U, @gpu.GpuBufferBindingType::STORAGE),
+      buffer_layout(2U, @gpu.GpuBufferBindingType::READ_ONLY_STORAGE),
+      buffer_layout(3U, @gpu.GpuBufferBindingType::READ_ONLY_STORAGE),
+      buffer_layout(4U, @gpu.GpuBufferBindingType::READ_ONLY_STORAGE),
+      buffer_layout(5U, @gpu.GpuBufferBindingType::UNIFORM),
+    ],
+    label: Some("skin"),
+  })
+  let pipeline_layout = device.create_pipeline_layout({
+    bind_group_layouts: [Some(layout)],
+    immediate_size: None,
+    label: Some("skin"),
+  })
+  let shader = shader_module(device, @nodes.skin_wgsl(), "skin")
+  let pipeline = device.create_compute_pipeline({
+    compute: { module_: shader, entry_point: Some("main"), constants: None, },
+    layout: @gpu.Specific(pipeline_layout),
+    label: Some("skin"),
+  })
+  (layout, pipeline)
+}
+
+///|
 fn fullscreen_pipeline(
   device : GpuDevice,
   format : GpuTextureFormat,
