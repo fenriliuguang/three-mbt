@@ -1,4 +1,4 @@
-// r186: `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15
+// r186: `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `CustomToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/tonemapping_pars_fragment.glsl.js#L199
 
 ///|
 fn clamp01(value : Double) -> Double {
@@ -214,7 +214,7 @@ fn neutral_color(
 
 ///|
 /// 屏幕输出上的色调映射。默认 `No`、曝光 1，与 r186 `Renderer` 相同。
-/// `No` 不乘曝光。其余曲线先乘曝光。`Custom` 没有曲线。
+/// `No` 和 `Custom` 不乘曝光。`Custom` 的默认曲线是恒等。其余曲线先乘曝光。
 /// r186: `toneMapping` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L192
 pub(all) struct ToneMappingPass {
   mut mapping : @constants.ToneMapping
@@ -258,8 +258,8 @@ pub fn ToneMappingPass::set_exposure(
 }
 
 ///|
-/// 与全屏着色器相同的曲线。`No` 原样返回，不看曝光。`srgb` 为真时再按 `LinearToSRGB` 编码。
-/// r186: `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208
+/// 与全屏着色器相同的曲线。`No` 和 `Custom` 原样返回，不看曝光。`srgb` 为真时再按 `LinearToSRGB` 编码。
+/// r186: `linearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L15 ; `reinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L39 ; `cineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L65 ; `acesFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L107 ; `CustomToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/tonemapping_pars_fragment.glsl.js#L199 ; `agxToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L166 ; `neutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/nodes/display/ToneMappingFunctions.js#L208
 pub fn tone_map(
   r : Double,
   g : Double,
@@ -270,6 +270,7 @@ pub fn tone_map(
 ) -> @math.Color {
   let mapped = match mapping {
     No => @math.Color::new(r~, g~, b~)
+    Custom => @math.Color::new(r~, g~, b~)
     Linear =>
       @math.Color::new(
         r=clamp01(r * exposure),

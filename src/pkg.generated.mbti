@@ -162,6 +162,8 @@ pub using @core {type BufferAttribute}
 
 pub using @core {type BufferGeometry}
 
+pub using @post {type ClearMaskPass}
+
 pub using @math {type Color}
 
 pub using @post {type ComposerEffect}
@@ -222,6 +224,8 @@ pub using @core {type LodLevel}
 
 pub using @constants {type LoopMode}
 
+pub using @post {type MaskPass}
+
 pub using @materials {type Material}
 
 pub using @materials {type MaterialKind}
@@ -259,6 +263,8 @@ pub using @materials {type PointsMaterial}
 pub using @core {type PrimitiveKind}
 
 pub using @math {type Quaternion}
+
+pub using @post {type RenderPipeline}
 
 pub using @textures {type RenderTarget}
 

@@ -117,8 +117,11 @@ pub using @post {
   type ComposerEffect,
   type CopyPass,
   type ComposerPass,
+  type ClearMaskPass,
   type EffectComposer,
   type GrayscalePass,
+  type MaskPass,
+  type RenderPipeline,
   type ToneMappingPass,
 }
 

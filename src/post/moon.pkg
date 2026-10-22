@@ -1,6 +1,8 @@
 // 阶段 7。全屏后处理。不接触 WebGPU 绑定。
 import {
   "fenriliuguang/three-mbt/constants",
+  "fenriliuguang/three-mbt/core",
   "fenriliuguang/three-mbt/math",
+  "fenriliuguang/three-mbt/scenes",
   "moonbitlang/core/math" @std,
 }

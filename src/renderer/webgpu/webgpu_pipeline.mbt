@@ -8,7 +8,7 @@ struct ShadowPipelines {
 }
 
 ///|
-struct CullPipelines {
+priv struct CullPipelines {
   front : GpuRenderPipeline
   back : GpuRenderPipeline
   double : GpuRenderPipeline
@@ -35,7 +35,7 @@ fn[T] DepthModes::pick(
 
 ///|
 /// 颜色写入打开和关掉各一套深度状态。关掉时片段写掩码为 0。
-struct ColorModes[T] {
+priv struct ColorModes[T] {
   write : DepthModes[T]
   quiet : DepthModes[T]
 }
@@ -140,12 +140,14 @@ fn unlit_pipeline(
   depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write~ : Bool = true,
   premultiplied~ : Bool = false,
+  stencil~ : Int32 = 0,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
   } else {
     Some(@gpu.GpuColorWrite::default())
   }
+  let stencil_state = stencil_face(stencil)
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
       color: {
@@ -195,13 +197,13 @@ fn unlit_pipeline(
       unclipped_depth: None,
     }),
     depth_stencil: Some({
-      format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+      format: @gpu.GpuTextureFormat::DEPTH24PLUS_STENCIL8,
       depth_write_enabled: Some(depth_write),
       depth_compare: Some(depth_compare),
-      stencil_front: None,
-      stencil_back: None,
-      stencil_read_mask: None,
-      stencil_write_mask: None,
+      stencil_front: stencil_state,
+      stencil_back: stencil_state,
+      stencil_read_mask: stencil_read(stencil),
+      stencil_write_mask: stencil_write(stencil),
       depth_bias: None,
       depth_bias_slope_scale: None,
       depth_bias_clamp: None,
@@ -311,12 +313,14 @@ fn color_pipeline(
   depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write~ : Bool = true,
   premultiplied~ : Bool = false,
+  stencil~ : Int32 = 0,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
   } else {
     Some(@gpu.GpuColorWrite::default())
   }
+  let stencil_state = stencil_face(stencil)
   let blend_state : @gpu.GpuBlendState? = if blend {
     Some({
       color: {
@@ -404,13 +408,13 @@ fn color_pipeline(
       unclipped_depth: None,
     }),
     depth_stencil: Some({
-      format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+      format: @gpu.GpuTextureFormat::DEPTH24PLUS_STENCIL8,
       depth_write_enabled: Some(depth_write),
       depth_compare: Some(depth_compare),
-      stencil_front: None,
-      stencil_back: None,
-      stencil_read_mask: None,
-      stencil_write_mask: None,
+      stencil_front: stencil_state,
+      stencil_back: stencil_state,
+      stencil_read_mask: stencil_read(stencil),
+      stencil_write_mask: stencil_write(stencil),
       depth_bias: None,
       depth_bias_slope_scale: None,
       depth_bias_clamp: None,
@@ -452,6 +456,7 @@ fn cull_pipelines(
   depth_compare~ : @gpu.GpuCompareFunction = @gpu.GpuCompareFunction::LESS_EQUAL,
   color_write~ : Bool = true,
   premultiplied~ : Bool = false,
+  stencil~ : Int32 = 0,
 ) -> CullPipelines {
   {
     front: unlit_pipeline(
@@ -466,6 +471,7 @@ fn cull_pipelines(
       depth_compare~,
       color_write~,
       premultiplied~,
+      stencil~,
     ),
     back: unlit_pipeline(
       device,
@@ -479,6 +485,7 @@ fn cull_pipelines(
       depth_compare~,
       color_write~,
       premultiplied~,
+      stencil~,
     ),
     double: unlit_pipeline(
       device,
@@ -492,6 +499,7 @@ fn cull_pipelines(
       depth_compare~,
       color_write~,
       premultiplied~,
+      stencil~,
     ),
   }
 }
@@ -775,6 +783,7 @@ fn fullscreen_pipeline(
   code : String,
   name : String,
   uniform_bytes : FixedArray[Byte],
+  mask~ : Bool = false,
 ) -> (GpuBindGroupLayout, GpuRenderPipeline, GpuBuffer) {
   let layout = device.create_bind_group_layout({
     entries: [
@@ -833,7 +842,7 @@ fn fullscreen_pipeline(
       cull_mode: Some(GpuCullMode::NONE),
       unclipped_depth: None,
     }),
-    depth_stencil: None,
+    depth_stencil: fullscreen_depth(mask),
     multisample: None,
     fragment: Some({
       targets: [Some({ format, blend: None, write_mask: None, })],
@@ -858,6 +867,7 @@ fn fullscreen_pipeline(
 fn bloom_pipeline(
   device : GpuDevice,
   format : GpuTextureFormat,
+  mask~ : Bool = false,
 ) -> (GpuBindGroupLayout, GpuRenderPipeline, GpuBuffer, GpuSampler) {
   let layout = device.create_bind_group_layout({
     entries: [
@@ -936,7 +946,7 @@ fn bloom_pipeline(
       cull_mode: Some(GpuCullMode::NONE),
       unclipped_depth: None,
     }),
-    depth_stencil: None,
+    depth_stencil: fullscreen_depth(mask),
     multisample: None,
     fragment: Some({
       targets: [Some({ format, blend: None, write_mask: None, })],
@@ -970,4 +980,565 @@ fn bloom_pipeline(
     }),
   )
   (layout, pipeline, uniform, sampler)
+}
+
+///|
+fn stencil_face(mode : Int32) -> @gpu.GpuStencilFaceState? {
+  if mode == 1 {
+    Some({
+      compare: Some(@gpu.GpuCompareFunction::ALWAYS),
+      fail_op: Some(@gpu.GpuStencilOperation::REPLACE),
+      depth_fail_op: Some(@gpu.GpuStencilOperation::REPLACE),
+      pass_op: Some(@gpu.GpuStencilOperation::REPLACE),
+    })
+  } else if mode == 2 {
+    Some({
+      compare: Some(@gpu.GpuCompareFunction::EQUAL),
+      fail_op: Some(@gpu.GpuStencilOperation::KEEP),
+      depth_fail_op: Some(@gpu.GpuStencilOperation::KEEP),
+      pass_op: Some(@gpu.GpuStencilOperation::KEEP),
+    })
+  } else {
+    None
+  }
+}
+
+///|
+fn stencil_read(mode : Int32) -> UInt32? {
+  if mode == 0 {
+    None
+  } else {
+    Some(255U)
+  }
+}
+
+///|
+fn stencil_write(mode : Int32) -> UInt32? {
+  if mode == 1 {
+    Some(255U)
+  } else if mode == 2 {
+    Some(0U)
+  } else {
+    None
+  }
+}
+
+///|
+/// 蒙版全屏通道测模板等于 1，深度比较恒通过，不写深度。
+fn fullscreen_depth(mask : Bool) -> @gpu.GpuDepthStencilState? {
+  if mask {
+    let face = stencil_face(2)
+    Some({
+      format: @gpu.GpuTextureFormat::DEPTH24PLUS_STENCIL8,
+      depth_write_enabled: Some(false),
+      depth_compare: Some(@gpu.GpuCompareFunction::ALWAYS),
+      stencil_front: face,
+      stencil_back: face,
+      stencil_read_mask: stencil_read(2),
+      stencil_write_mask: stencil_write(2),
+      depth_bias: None,
+      depth_bias_slope_scale: None,
+      depth_bias_clamp: None,
+    })
+  } else {
+    None
+  }
+}
+
+///|
+/// 颜色目标格式不同的一整套网格、线和点管线。深度格式都是 `depth24plus-stencil8`。
+priv struct MeshFormats {
+  basic : ColorModes[CullPipelines]
+  lambert : ColorModes[CullPipelines]
+  standard : ColorModes[CullPipelines]
+  basic_instanced : ColorModes[CullPipelines]
+  lambert_instanced : ColorModes[CullPipelines]
+  standard_instanced : ColorModes[CullPipelines]
+  basic_blend : ColorModes[CullPipelines]
+  basic_blend_premul : ColorModes[CullPipelines]
+  lambert_blend : ColorModes[CullPipelines]
+  lambert_blend_premul : ColorModes[CullPipelines]
+  standard_blend : ColorModes[CullPipelines]
+  standard_blend_premul : ColorModes[CullPipelines]
+  basic_instanced_blend : ColorModes[CullPipelines]
+  basic_instanced_blend_premul : ColorModes[CullPipelines]
+  lambert_instanced_blend : ColorModes[CullPipelines]
+  lambert_instanced_blend_premul : ColorModes[CullPipelines]
+  standard_instanced_blend : ColorModes[CullPipelines]
+  standard_instanced_blend_premul : ColorModes[CullPipelines]
+  basic_lines : ColorModes[GpuRenderPipeline]
+  lambert_lines : ColorModes[GpuRenderPipeline]
+  standard_lines : ColorModes[GpuRenderPipeline]
+  basic_lines_instanced : ColorModes[GpuRenderPipeline]
+  lambert_lines_instanced : ColorModes[GpuRenderPipeline]
+  standard_lines_instanced : ColorModes[GpuRenderPipeline]
+  line_list : ColorModes[GpuRenderPipeline]
+  line_strip : ColorModes[GpuRenderPipeline]
+  points : ColorModes[GpuRenderPipeline]
+  line_list_blend : ColorModes[GpuRenderPipeline]
+  line_list_blend_premul : ColorModes[GpuRenderPipeline]
+  line_strip_blend : ColorModes[GpuRenderPipeline]
+  line_strip_blend_premul : ColorModes[GpuRenderPipeline]
+  points_blend : ColorModes[GpuRenderPipeline]
+  points_blend_premul : ColorModes[GpuRenderPipeline]
+}
+
+///|
+fn mesh_formats(
+  device : GpuDevice,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  color_layout : @gpu.GpuPipelineLayout,
+  format : GpuTextureFormat,
+) -> MeshFormats {
+  let basic_shader = shader_module(device, @nodes.basic_wgsl(), "basic")
+  let lambert_shader = shader_module(device, @nodes.lambert_wgsl(), "lambert")
+  let standard_shader = shader_module(
+    device,
+    @nodes.standard_wgsl(),
+    "standard",
+  )
+  let basic_instanced_shader = shader_module(
+    device,
+    @nodes.basic_instanced_wgsl(),
+    "basic-instanced",
+  )
+  let lambert_instanced_shader = shader_module(
+    device,
+    @nodes.lambert_instanced_wgsl(),
+    "lambert-instanced",
+  )
+  let standard_instanced_shader = shader_module(
+    device,
+    @nodes.standard_instanced_wgsl(),
+    "standard-instanced",
+  )
+  let line_shader = shader_module(device, @nodes.line_wgsl(), "line")
+  let points_shader = shader_module(device, @nodes.points_wgsl(), "points")
+  {
+    basic: mesh_depth_modes(device, basic_shader, pipeline_layout, format),
+    lambert: mesh_depth_modes(device, lambert_shader, pipeline_layout, format),
+    standard: mesh_depth_modes(device, standard_shader, pipeline_layout, format),
+    basic_instanced: mesh_depth_modes(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    lambert_instanced: mesh_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    standard_instanced: mesh_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    basic_blend: mesh_depth_modes(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    basic_blend_premul: mesh_depth_modes(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
+    ),
+    lambert_blend: mesh_depth_modes(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    lambert_blend_premul: mesh_depth_modes(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
+    ),
+    standard_blend: mesh_depth_modes(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+    ),
+    standard_blend_premul: mesh_depth_modes(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      blend=true,
+      premultiplied=true,
+    ),
+    basic_instanced_blend: mesh_depth_modes(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    basic_instanced_blend_premul: mesh_depth_modes(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
+    ),
+    lambert_instanced_blend: mesh_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    lambert_instanced_blend_premul: mesh_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
+    ),
+    standard_instanced_blend: mesh_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+    ),
+    standard_instanced_blend_premul: mesh_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+      blend=true,
+      premultiplied=true,
+    ),
+    basic_lines: wire_depth_modes(device, basic_shader, pipeline_layout, format),
+    lambert_lines: wire_depth_modes(
+      device, lambert_shader, pipeline_layout, format,
+    ),
+    standard_lines: wire_depth_modes(
+      device, standard_shader, pipeline_layout, format,
+    ),
+    basic_lines_instanced: wire_depth_modes(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    lambert_lines_instanced: wire_depth_modes(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    standard_lines_instanced: wire_depth_modes(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      instanced=true,
+    ),
+    line_list: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+    ),
+    line_strip: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+    ),
+    points: stroke_depth_modes(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+    ),
+    line_list_blend: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      blend=true,
+    ),
+    line_list_blend_premul: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      blend=true,
+      premultiplied=true,
+    ),
+    line_strip_blend: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      blend=true,
+    ),
+    line_strip_blend_premul: stroke_depth_modes(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      blend=true,
+      premultiplied=true,
+    ),
+    points_blend: stroke_depth_modes(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      blend=true,
+    ),
+    points_blend_premul: stroke_depth_modes(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      blend=true,
+      premultiplied=true,
+    ),
+  }
+}
+
+///|
+/// 蒙版覆盖。颜色不写，深度不写，模板恒通过并替换。
+priv struct MaskCoverage {
+  basic : CullPipelines
+  lambert : CullPipelines
+  standard : CullPipelines
+  basic_instanced : CullPipelines
+  lambert_instanced : CullPipelines
+  standard_instanced : CullPipelines
+  basic_lines : GpuRenderPipeline
+  lambert_lines : GpuRenderPipeline
+  standard_lines : GpuRenderPipeline
+  basic_lines_instanced : GpuRenderPipeline
+  lambert_lines_instanced : GpuRenderPipeline
+  standard_lines_instanced : GpuRenderPipeline
+  points : GpuRenderPipeline
+  line_strip : GpuRenderPipeline
+  line_list : GpuRenderPipeline
+}
+
+///|
+priv struct MaskSet {
+  forward : MaskCoverage
+  reversed : MaskCoverage
+}
+
+///|
+fn mask_coverage(
+  device : GpuDevice,
+  pipeline_layout : @gpu.GpuPipelineLayout,
+  color_layout : @gpu.GpuPipelineLayout,
+  compare : @gpu.GpuCompareFunction,
+) -> MaskCoverage {
+  let format = @gpu.GpuTextureFormat::RGBA16FLOAT
+  let basic_shader = shader_module(device, @nodes.basic_wgsl(), "mask-basic")
+  let lambert_shader = shader_module(
+    device,
+    @nodes.lambert_wgsl(),
+    "mask-lambert",
+  )
+  let standard_shader = shader_module(
+    device,
+    @nodes.standard_wgsl(),
+    "mask-standard",
+  )
+  let basic_instanced_shader = shader_module(
+    device,
+    @nodes.basic_instanced_wgsl(),
+    "mask-basic-instanced",
+  )
+  let lambert_instanced_shader = shader_module(
+    device,
+    @nodes.lambert_instanced_wgsl(),
+    "mask-lambert-instanced",
+  )
+  let standard_instanced_shader = shader_module(
+    device,
+    @nodes.standard_instanced_wgsl(),
+    "mask-standard-instanced",
+  )
+  let line_shader = shader_module(device, @nodes.line_wgsl(), "mask-line")
+  let points_shader = shader_module(device, @nodes.points_wgsl(), "mask-points")
+  let cover = fn(shader : GpuShaderModule, instanced : Bool) -> CullPipelines {
+    cull_pipelines(
+      device,
+      shader,
+      pipeline_layout,
+      format,
+      instanced~,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    )
+  }
+  {
+    basic: cover(basic_shader, false),
+    lambert: cover(lambert_shader, false),
+    standard: cover(standard_shader, false),
+    basic_instanced: cover(basic_instanced_shader, true),
+    lambert_instanced: cover(lambert_instanced_shader, true),
+    standard_instanced: cover(standard_instanced_shader, true),
+    basic_lines: unlit_pipeline(
+      device,
+      basic_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    lambert_lines: unlit_pipeline(
+      device,
+      lambert_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    standard_lines: unlit_pipeline(
+      device,
+      standard_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    basic_lines_instanced: unlit_pipeline(
+      device,
+      basic_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    lambert_lines_instanced: unlit_pipeline(
+      device,
+      lambert_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    standard_lines_instanced: unlit_pipeline(
+      device,
+      standard_instanced_shader,
+      pipeline_layout,
+      format,
+      GpuCullMode::NONE,
+      instanced=true,
+      lines=true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    points: color_pipeline(
+      device,
+      points_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
+      true,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    line_strip: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_STRIP,
+      false,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+    line_list: color_pipeline(
+      device,
+      line_shader,
+      color_layout,
+      format,
+      @gpu.GpuPrimitiveTopology::LINE_LIST,
+      false,
+      depth_write=false,
+      depth_compare=compare,
+      color_write=false,
+      stencil=1,
+    ),
+  }
 }

@@ -12,6 +12,14 @@ A five-level bloom pass has landed. The high pass uses Rec.709 luminance and `sm
 
 An effect composer has landed as an ordered pass chain. `EffectComposer` holds grayscale, tone-mapping, bloom, and copy passes. A pass with `enabled` false is skipped. Earlier passes draw into a pair of full-size canvas-format buffers, and the last enabled pass draws to the window and presents. The copy pass multiplies every channel by `opacity`, which defaults to 1 and is not clamped. The scene is still drawn by `render` into a color target first. `examples/compose` is a Lambert cube with grayscale at amount 0.5, then ACES at exposure 1. The window sample is `scripts/build-compose.sh`. Host playback stays out of this pass. The node `RenderPipeline`, half-float scene targets, and masks stay later.
 
+`Custom` tone mapping has landed as value 5. The CPU curve and the fullscreen shader return the input color and ignore exposure, matching the r186 placeholder, then `LinearToSRGB` still runs when `srgb` is on. The other seven curves are unchanged.
+
+Scene color targets and the composer's intermediate buffers are `rgba16float`. The swapchain stays on the canvas format. Draws into a scene target use a second mesh pipeline set with that color format. Bloom intermediates were already `rgba16float` and now use a half-float bloom pipeline; the pass that presents still targets the canvas format. Color-pass depth is `depth24plus-stencil8`.
+
+`RenderPipeline` runs the hand-written composer chain. `output_color_transform` defaults to true and, when the chain writes color, applies the pipeline's tone mapping once as the final fullscreen step. With no color pass, the window clears to `vec4(0, 0, 1, 1)`, then that blue goes through the curve when the transform is on. `needs_update` is set when the mapping, exposure, sRGB flag, or transform flag changes, and `render_pipeline` consumes it. The TSL output node stays upstream.
+
+Composer masks have landed. `MaskPass` does not swap read and write. It keeps the color and depth images, clears stencil to 0 (or 1 when `inverse` is set), and draws the mask scene with color and depth writes off and stencil replace. The reference is 1, or 0 when `inverse` is set. Later color passes copy the current image, then draw only where stencil equals 1. `ClearMaskPass` turns that test off and also does not swap. A mask after the last color pass does not hold the present. `clear` false keeps the previous stencil instead of clearing it.
+
 ## Checklist
 
 | status | phase | item | packages |

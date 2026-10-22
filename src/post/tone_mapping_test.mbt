@@ -194,6 +194,42 @@ test "cineon aces agx and neutral match r186" {
   assert_eq(near(high.b, 0.422529, 1.0e-4), true)
   assert_eq(@constants.ToneMapping::Cineon.to_int(), 3)
   assert_eq(@constants.ToneMapping::ACES.to_int(), 4)
+  assert_eq(@constants.ToneMapping::Custom.to_int(), 5)
   assert_eq(@constants.ToneMapping::AgX.to_int(), 6)
   assert_eq(@constants.ToneMapping::Neutral.to_int(), 7)
+  let custom = @post.tone_map(
+    2.0,
+    0.0,
+    0.0,
+    @constants.ToneMapping::Custom,
+    5.0,
+  )
+  assert_eq(custom.r, 2.0)
+  assert_eq(custom.g, 0.0)
+  assert_eq(custom.b, 0.0)
+  let custom_encoded = @post.tone_map(
+    1.0,
+    0.5,
+    0.0,
+    @constants.ToneMapping::Custom,
+    5.0,
+    srgb=true,
+  )
+  assert_eq(custom_encoded.r, @math.linear_to_srgb(1.0))
+  assert_eq(custom_encoded.g, @math.linear_to_srgb(0.5))
+  assert_eq(custom_encoded.b, 0.0)
+  let packed_custom = @post.pack_tone(@constants.ToneMapping::Custom, 1.0)
+  assert_eq(packed_custom[0], b'\x00')
+  assert_eq(packed_custom[1], b'\x00')
+  assert_eq(packed_custom[2], b'\xA0')
+  assert_eq(packed_custom[3], b'\x40')
+  assert_eq(packed_custom[4], b'\x00')
+  assert_eq(packed_custom[5], b'\x00')
+  assert_eq(packed_custom[6], b'\x80')
+  assert_eq(packed_custom[7], b'\x3F')
+  let wgsl_custom = @post.tone_wgsl()
+  assert_eq(
+    wgsl_custom.contains("params.mapping > 4.5 && params.mapping < 5.5"),
+    true,
+  )
 }

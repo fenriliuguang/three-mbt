@@ -703,7 +703,7 @@ pub const CINEON_TONE_MAPPING : Int32 = 3
 pub const ACES_FILMIC_TONE_MAPPING : Int32 = 4
 
 ///|
-/// 由调用方自己改着色器。对齐 `CustomToneMapping`（5）。这一阶段还不采样它。
+/// 占位曲线是恒等，不乘曝光。对齐 `CustomToneMapping`（5）。
 pub const CUSTOM_TONE_MAPPING : Int32 = 5
 
 ///|
@@ -715,14 +715,15 @@ pub const AGX_TONE_MAPPING : Int32 = 6
 pub const NEUTRAL_TONE_MAPPING : Int32 = 7
 
 ///|
-/// `Custom` 仍只留数值，不采样。其余七种都有曲线。
-/// r186: `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `LinearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L431 ; `ReinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L439 ; `CineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L447 ; `ACESFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L455 ; `AgXToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L473 ; `NeutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L483
+/// 八种曲线。`Custom` 的默认实现是恒等，不乘曝光。
+/// r186: `NoToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L423 ; `LinearToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L431 ; `ReinhardToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L439 ; `CineonToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L447 ; `ACESFilmicToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L455 ; `CustomToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L465 ; `AgXToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L473 ; `NeutralToneMapping` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L483
 pub(all) enum ToneMapping {
   No
   Linear
   Reinhard
   Cineon
   ACES
+  Custom
   AgX
   Neutral
 }
@@ -735,6 +736,7 @@ pub fn ToneMapping::to_int(self : ToneMapping) -> Int32 {
     Reinhard => REINHARD_TONE_MAPPING
     Cineon => CINEON_TONE_MAPPING
     ACES => ACES_FILMIC_TONE_MAPPING
+    Custom => CUSTOM_TONE_MAPPING
     AgX => AGX_TONE_MAPPING
     Neutral => NEUTRAL_TONE_MAPPING
   }

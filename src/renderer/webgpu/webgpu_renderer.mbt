@@ -9,6 +9,7 @@ using @gpu {
   type GpuComputePipeline,
   type GpuCullMode,
   type GpuDevice,
+  type GpuPipelineLayout,
   type GpuRenderPipeline,
   type GpuSampler,
   type GpuShaderModule,
@@ -24,6 +25,7 @@ using @gpu {
 /// `reversed_depth` 默认关闭。打开后颜色通道和阴影通道都走反向深度：比较按 `ReversedDepthFuncs` 重映射，投影反转，深度清成 0。阴影采样比较从 `less` 换成 `greater`。
 /// `shadow_side` 为空时，正面材质的阴影画背面，背面材质画正面，双面画两面。设了值就按那个面投射。
 /// 透明网格用另一组开启混合的管线。`premultiplied_alpha` 打开后，颜色和 alpha 的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。关掉时源因子保持 `SrcAlpha`。不透明和线框不混合。阴影通道没有颜色混合。
+/// 画到场景颜色目标时用半精度管线，交换链仍用画布格式。颜色通道的深度是 `depth24plus-stencil8`，蒙版往模板里替换。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3767
 pub struct WebGPURenderer {
@@ -39,39 +41,26 @@ pub struct WebGPURenderer {
   surface_metalness : Array[@textures.Texture?]
   surface_alpha : Array[@textures.Texture?]
   surface_groups : Array[GpuBindGroup]
-  basic : ColorModes[CullPipelines]
-  lambert : ColorModes[CullPipelines]
-  standard : ColorModes[CullPipelines]
-  basic_instanced : ColorModes[CullPipelines]
-  lambert_instanced : ColorModes[CullPipelines]
-  standard_instanced : ColorModes[CullPipelines]
-  basic_blend : ColorModes[CullPipelines]
-  basic_blend_premul : ColorModes[CullPipelines]
-  lambert_blend : ColorModes[CullPipelines]
-  lambert_blend_premul : ColorModes[CullPipelines]
-  standard_blend : ColorModes[CullPipelines]
-  standard_blend_premul : ColorModes[CullPipelines]
-  basic_instanced_blend : ColorModes[CullPipelines]
-  basic_instanced_blend_premul : ColorModes[CullPipelines]
-  lambert_instanced_blend : ColorModes[CullPipelines]
-  lambert_instanced_blend_premul : ColorModes[CullPipelines]
-  standard_instanced_blend : ColorModes[CullPipelines]
-  standard_instanced_blend_premul : ColorModes[CullPipelines]
-  basic_lines : ColorModes[GpuRenderPipeline]
-  lambert_lines : ColorModes[GpuRenderPipeline]
-  standard_lines : ColorModes[GpuRenderPipeline]
-  basic_lines_instanced : ColorModes[GpuRenderPipeline]
-  lambert_lines_instanced : ColorModes[GpuRenderPipeline]
-  standard_lines_instanced : ColorModes[GpuRenderPipeline]
-  line_list : ColorModes[GpuRenderPipeline]
-  line_strip : ColorModes[GpuRenderPipeline]
-  points : ColorModes[GpuRenderPipeline]
-  line_list_blend : ColorModes[GpuRenderPipeline]
-  line_list_blend_premul : ColorModes[GpuRenderPipeline]
-  line_strip_blend : ColorModes[GpuRenderPipeline]
-  line_strip_blend_premul : ColorModes[GpuRenderPipeline]
-  points_blend : ColorModes[GpuRenderPipeline]
-  points_blend_premul : ColorModes[GpuRenderPipeline]
+  priv meshes : MeshFormats
+  priv mesh_layout : GpuPipelineLayout
+  priv stroke_layout : GpuPipelineLayout
+  priv mut hdr_meshes : MeshFormats?
+  priv mut mask_set : MaskSet?
+  priv held_layouts : Array[GpuBindGroupLayout]
+  priv held_buffers : Array[GpuBuffer]
+  priv held_samplers : Array[GpuSampler]
+  post_hdr : GpuRenderPipeline
+  tone_hdr : GpuRenderPipeline
+  copy_hdr : GpuRenderPipeline
+  bloom_hdr : GpuRenderPipeline
+  post_mask : GpuRenderPipeline
+  tone_mask : GpuRenderPipeline
+  copy_mask : GpuRenderPipeline
+  bloom_mask : GpuRenderPipeline
+  post_hdr_mask : GpuRenderPipeline
+  tone_hdr_mask : GpuRenderPipeline
+  copy_hdr_mask : GpuRenderPipeline
+  bloom_hdr_mask : GpuRenderPipeline
   wave : GpuComputePipeline
   wave_layout : GpuBindGroupLayout
   skin : GpuComputePipeline
@@ -142,28 +131,7 @@ pub struct WebGPURenderer {
 pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
   let device = target.device()
   let format = @gpu.get_gpu().get_preferred_canvas_format()
-  let basic_shader = shader_module(device, @nodes.basic_wgsl(), "basic")
-  let lambert_shader = shader_module(device, @nodes.lambert_wgsl(), "lambert")
-  let standard_shader = shader_module(
-    device,
-    @nodes.standard_wgsl(),
-    "standard",
-  )
-  let basic_instanced_shader = shader_module(
-    device,
-    @nodes.basic_instanced_wgsl(),
-    "basic-instanced",
-  )
-  let lambert_instanced_shader = shader_module(
-    device,
-    @nodes.lambert_instanced_wgsl(),
-    "lambert-instanced",
-  )
-  let standard_instanced_shader = shader_module(
-    device,
-    @nodes.standard_instanced_wgsl(),
-    "standard-instanced",
-  )
+  let hdr_format = @gpu.GpuTextureFormat::RGBA16FLOAT
   let layout = device.create_bind_group_layout({
     entries: [
       {
@@ -401,8 +369,6 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     immediate_size: None,
     label: Some("shadow-mesh"),
   })
-  let line_shader = shader_module(device, @nodes.line_wgsl(), "line")
-  let points_shader = shader_module(device, @nodes.points_wgsl(), "points")
   let shadow_shader = shader_module(device, @nodes.shadow_wgsl(), "shadow")
   let shadow_instanced_shader = shader_module(
     device,
@@ -490,6 +456,78 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     @post.pack_opacity(1.0),
   )
   let bloom = bloom_pipeline(device, format)
+  let post_hdr = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.grayscale_wgsl(),
+    "post-hdr",
+    @post.pack_amount(1.0),
+  )
+  let tone_hdr = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.tone_wgsl(),
+    "tone-hdr",
+    @post.pack_tone(@constants.ToneMapping::No, 1.0),
+  )
+  let copy_hdr = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.copy_wgsl(),
+    "copy-hdr",
+    @post.pack_opacity(1.0),
+  )
+  let bloom_hdr = bloom_pipeline(device, hdr_format)
+  let post_mask = fullscreen_pipeline(
+    device,
+    format,
+    @post.grayscale_wgsl(),
+    "post-mask",
+    @post.pack_amount(1.0),
+    mask=true,
+  )
+  let tone_mask = fullscreen_pipeline(
+    device,
+    format,
+    @post.tone_wgsl(),
+    "tone-mask",
+    @post.pack_tone(@constants.ToneMapping::No, 1.0),
+    mask=true,
+  )
+  let copy_mask = fullscreen_pipeline(
+    device,
+    format,
+    @post.copy_wgsl(),
+    "copy-mask",
+    @post.pack_opacity(1.0),
+    mask=true,
+  )
+  let bloom_mask = bloom_pipeline(device, format, mask=true)
+  let post_hdr_mask = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.grayscale_wgsl(),
+    "post-hdr-mask",
+    @post.pack_amount(1.0),
+    mask=true,
+  )
+  let tone_hdr_mask = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.tone_wgsl(),
+    "tone-hdr-mask",
+    @post.pack_tone(@constants.ToneMapping::No, 1.0),
+    mask=true,
+  )
+  let copy_hdr_mask = fullscreen_pipeline(
+    device,
+    hdr_format,
+    @post.copy_wgsl(),
+    "copy-hdr-mask",
+    @post.pack_opacity(1.0),
+    mask=true,
+  )
+  let bloom_hdr_mask = bloom_pipeline(device, hdr_format, mask=true)
   let white = upload_texture(
     device,
     texture_layout,
@@ -567,235 +605,52 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     surface_metalness: [],
     surface_alpha: [],
     surface_groups: [],
-    basic: mesh_depth_modes(device, basic_shader, pipeline_layout, format),
-    lambert: mesh_depth_modes(device, lambert_shader, pipeline_layout, format),
-    standard: mesh_depth_modes(device, standard_shader, pipeline_layout, format),
-    basic_instanced: mesh_depth_modes(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    lambert_instanced: mesh_depth_modes(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    standard_instanced: mesh_depth_modes(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    basic_blend: mesh_depth_modes(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-    ),
-    basic_blend_premul: mesh_depth_modes(
-      device,
-      basic_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      premultiplied=true,
-    ),
-    lambert_blend: mesh_depth_modes(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-    ),
-    lambert_blend_premul: mesh_depth_modes(
-      device,
-      lambert_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      premultiplied=true,
-    ),
-    standard_blend: mesh_depth_modes(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-    ),
-    standard_blend_premul: mesh_depth_modes(
-      device,
-      standard_shader,
-      pipeline_layout,
-      format,
-      blend=true,
-      premultiplied=true,
-    ),
-    basic_instanced_blend: mesh_depth_modes(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-    ),
-    basic_instanced_blend_premul: mesh_depth_modes(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-      premultiplied=true,
-    ),
-    lambert_instanced_blend: mesh_depth_modes(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-    ),
-    lambert_instanced_blend_premul: mesh_depth_modes(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-      premultiplied=true,
-    ),
-    standard_instanced_blend: mesh_depth_modes(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-    ),
-    standard_instanced_blend_premul: mesh_depth_modes(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-      blend=true,
-      premultiplied=true,
-    ),
-    basic_lines: wire_depth_modes(device, basic_shader, pipeline_layout, format),
-    lambert_lines: wire_depth_modes(
-      device, lambert_shader, pipeline_layout, format,
-    ),
-    standard_lines: wire_depth_modes(
-      device, standard_shader, pipeline_layout, format,
-    ),
-    basic_lines_instanced: wire_depth_modes(
-      device,
-      basic_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    lambert_lines_instanced: wire_depth_modes(
-      device,
-      lambert_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    standard_lines_instanced: wire_depth_modes(
-      device,
-      standard_instanced_shader,
-      pipeline_layout,
-      format,
-      instanced=true,
-    ),
-    line_list: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_LIST,
-      false,
-    ),
-    line_strip: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_STRIP,
-      false,
-    ),
-    points: stroke_depth_modes(
-      device,
-      points_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
-      true,
-    ),
-    line_list_blend: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_LIST,
-      false,
-      blend=true,
-    ),
-    line_list_blend_premul: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_LIST,
-      false,
-      blend=true,
-      premultiplied=true,
-    ),
-    line_strip_blend: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_STRIP,
-      false,
-      blend=true,
-    ),
-    line_strip_blend_premul: stroke_depth_modes(
-      device,
-      line_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::LINE_STRIP,
-      false,
-      blend=true,
-      premultiplied=true,
-    ),
-    points_blend: stroke_depth_modes(
-      device,
-      points_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
-      true,
-      blend=true,
-    ),
-    points_blend_premul: stroke_depth_modes(
-      device,
-      points_shader,
-      color_layout,
-      format,
-      @gpu.GpuPrimitiveTopology::TRIANGLE_LIST,
-      true,
-      blend=true,
-      premultiplied=true,
-    ),
+    meshes: mesh_formats(device, pipeline_layout, color_layout, format),
+    mesh_layout: pipeline_layout,
+    stroke_layout: color_layout,
+    hdr_meshes: None,
+    mask_set: None,
+    held_layouts: [
+      post_hdr.0,
+      tone_hdr.0,
+      copy_hdr.0,
+      bloom_hdr.0,
+      post_mask.0,
+      tone_mask.0,
+      copy_mask.0,
+      bloom_mask.0,
+      post_hdr_mask.0,
+      tone_hdr_mask.0,
+      copy_hdr_mask.0,
+      bloom_hdr_mask.0,
+    ],
+    held_buffers: [
+      post_hdr.2,
+      tone_hdr.2,
+      copy_hdr.2,
+      bloom_hdr.2,
+      post_mask.2,
+      tone_mask.2,
+      copy_mask.2,
+      bloom_mask.2,
+      post_hdr_mask.2,
+      tone_hdr_mask.2,
+      copy_hdr_mask.2,
+      bloom_hdr_mask.2,
+    ],
+    held_samplers: [bloom_hdr.3, bloom_mask.3, bloom_hdr_mask.3],
+    post_hdr: post_hdr.1,
+    tone_hdr: tone_hdr.1,
+    copy_hdr: copy_hdr.1,
+    bloom_hdr: bloom_hdr.1,
+    post_mask: post_mask.1,
+    tone_mask: tone_mask.1,
+    copy_mask: copy_mask.1,
+    bloom_mask: bloom_mask.1,
+    post_hdr_mask: post_hdr_mask.1,
+    tone_hdr_mask: tone_hdr_mask.1,
+    copy_hdr_mask: copy_hdr_mask.1,
+    bloom_hdr_mask: bloom_hdr_mask.1,
     wave: wave.1,
     wave_layout: wave.0,
     skin: skin.1,
@@ -916,18 +771,20 @@ fn WebGPURenderer::wire_pipeline(
   depth_test : Bool,
   depth_func : @constants.DepthFunc,
   color_write : Bool,
+  hdr~ : Bool = false,
 ) -> GpuRenderPipeline {
+  let formats = self.color_formats(hdr)
   let modes = if instanced {
     match shading {
-      @constants.Basic => self.basic_lines_instanced
-      @constants.Lambert => self.lambert_lines_instanced
-      @constants.Standard => self.standard_lines_instanced
+      @constants.Basic => formats.basic_lines_instanced
+      @constants.Lambert => formats.lambert_lines_instanced
+      @constants.Standard => formats.standard_lines_instanced
     }
   } else {
     match shading {
-      @constants.Basic => self.basic_lines
-      @constants.Lambert => self.lambert_lines
-      @constants.Standard => self.standard_lines
+      @constants.Basic => formats.basic_lines
+      @constants.Lambert => formats.lambert_lines
+      @constants.Standard => formats.standard_lines
     }
   }
   modes.pick(depth_write, depth_test, depth_func, color_write)
@@ -973,10 +830,11 @@ fn WebGPURenderer::pipeline(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied : Bool,
+  hdr~ : Bool = false,
 ) -> GpuRenderPipeline {
   self.cull_group(
     shading, side, false, blend, depth_write, depth_test, depth_func, color_write,
-    premultiplied,
+    premultiplied, hdr,
   )
 }
 
@@ -991,10 +849,11 @@ fn WebGPURenderer::instanced_pipeline(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied : Bool,
+  hdr~ : Bool = false,
 ) -> GpuRenderPipeline {
   self.cull_group(
     shading, side, true, blend, depth_write, depth_test, depth_func, color_write,
-    premultiplied,
+    premultiplied, hdr,
   )
 }
 
@@ -1010,46 +869,48 @@ fn WebGPURenderer::cull_group(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied : Bool,
+  hdr : Bool,
 ) -> GpuRenderPipeline {
+  let formats = self.color_formats(hdr)
   let modes = if blend && premultiplied {
     if instanced {
       match shading {
-        @constants.Basic => self.basic_instanced_blend_premul
-        @constants.Lambert => self.lambert_instanced_blend_premul
-        @constants.Standard => self.standard_instanced_blend_premul
+        @constants.Basic => formats.basic_instanced_blend_premul
+        @constants.Lambert => formats.lambert_instanced_blend_premul
+        @constants.Standard => formats.standard_instanced_blend_premul
       }
     } else {
       match shading {
-        @constants.Basic => self.basic_blend_premul
-        @constants.Lambert => self.lambert_blend_premul
-        @constants.Standard => self.standard_blend_premul
+        @constants.Basic => formats.basic_blend_premul
+        @constants.Lambert => formats.lambert_blend_premul
+        @constants.Standard => formats.standard_blend_premul
       }
     }
   } else if blend {
     if instanced {
       match shading {
-        @constants.Basic => self.basic_instanced_blend
-        @constants.Lambert => self.lambert_instanced_blend
-        @constants.Standard => self.standard_instanced_blend
+        @constants.Basic => formats.basic_instanced_blend
+        @constants.Lambert => formats.lambert_instanced_blend
+        @constants.Standard => formats.standard_instanced_blend
       }
     } else {
       match shading {
-        @constants.Basic => self.basic_blend
-        @constants.Lambert => self.lambert_blend
-        @constants.Standard => self.standard_blend
+        @constants.Basic => formats.basic_blend
+        @constants.Lambert => formats.lambert_blend
+        @constants.Standard => formats.standard_blend
       }
     }
   } else if instanced {
     match shading {
-      @constants.Basic => self.basic_instanced
-      @constants.Lambert => self.lambert_instanced
-      @constants.Standard => self.standard_instanced
+      @constants.Basic => formats.basic_instanced
+      @constants.Lambert => formats.lambert_instanced
+      @constants.Standard => formats.standard_instanced
     }
   } else {
     match shading {
-      @constants.Basic => self.basic
-      @constants.Lambert => self.lambert
-      @constants.Standard => self.standard
+      @constants.Basic => formats.basic
+      @constants.Lambert => formats.lambert
+      @constants.Standard => formats.standard
     }
   }
   let group = modes.pick(depth_write, depth_test, depth_func, color_write)
@@ -1070,27 +931,154 @@ fn WebGPURenderer::stroke_pipeline(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied : Bool,
+  hdr~ : Bool = false,
 ) -> GpuRenderPipeline {
+  let formats = self.color_formats(hdr)
   let modes = if blend && premultiplied {
     match kind {
-      @core.PrimitiveKind::Points => self.points_blend_premul
-      @core.PrimitiveKind::Line => self.line_strip_blend_premul
-      @core.PrimitiveKind::LineSegments => self.line_list_blend_premul
+      @core.PrimitiveKind::Points => formats.points_blend_premul
+      @core.PrimitiveKind::Line => formats.line_strip_blend_premul
+      @core.PrimitiveKind::LineSegments => formats.line_list_blend_premul
     }
   } else if blend {
     match kind {
-      @core.PrimitiveKind::Points => self.points_blend
-      @core.PrimitiveKind::Line => self.line_strip_blend
-      @core.PrimitiveKind::LineSegments => self.line_list_blend
+      @core.PrimitiveKind::Points => formats.points_blend
+      @core.PrimitiveKind::Line => formats.line_strip_blend
+      @core.PrimitiveKind::LineSegments => formats.line_list_blend
     }
   } else {
     match kind {
-      @core.PrimitiveKind::Points => self.points
-      @core.PrimitiveKind::Line => self.line_strip
-      @core.PrimitiveKind::LineSegments => self.line_list
+      @core.PrimitiveKind::Points => formats.points
+      @core.PrimitiveKind::Line => formats.line_strip
+      @core.PrimitiveKind::LineSegments => formats.line_list
     }
   }
   modes.pick(depth_write, depth_test, depth_func, color_write)
+}
+
+///|
+fn WebGPURenderer::color_formats(
+  self : WebGPURenderer,
+  hdr : Bool,
+) -> MeshFormats {
+  ignore(self.held_layouts.length())
+  ignore(self.held_buffers.length())
+  ignore(self.held_samplers.length())
+  if hdr {
+    self.ensure_hdr_meshes()
+  } else {
+    self.meshes
+  }
+}
+
+///|
+fn WebGPURenderer::ensure_hdr_meshes(self : WebGPURenderer) -> MeshFormats {
+  match self.hdr_meshes {
+    Some(cached) => cached
+    None => {
+      let built = mesh_formats(
+        self.device,
+        self.mesh_layout,
+        self.stroke_layout,
+        @gpu.GpuTextureFormat::RGBA16FLOAT,
+      )
+      self.hdr_meshes = Some(built)
+      built
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::ensure_mask_set(self : WebGPURenderer) -> MaskSet {
+  match self.mask_set {
+    Some(cached) => cached
+    None => {
+      let built : MaskSet = {
+        forward: mask_coverage(
+          self.device,
+          self.mesh_layout,
+          self.stroke_layout,
+          @gpu.GpuCompareFunction::LESS_EQUAL,
+        ),
+        reversed: mask_coverage(
+          self.device,
+          self.mesh_layout,
+          self.stroke_layout,
+          @gpu.GpuCompareFunction::GREATER_EQUAL,
+        ),
+      }
+      self.mask_set = Some(built)
+      built
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::mask_coverage(self : WebGPURenderer) -> MaskCoverage {
+  let set = self.ensure_mask_set()
+  if self.reversed_depth {
+    set.reversed
+  } else {
+    set.forward
+  }
+}
+
+///|
+fn WebGPURenderer::mask_pipeline(
+  self : WebGPURenderer,
+  shading : @constants.Shading,
+  side : @constants.Side,
+  instanced : Bool,
+  lines : Bool,
+) -> GpuRenderPipeline {
+  let coverage = self.mask_coverage()
+  if lines {
+    if instanced {
+      match shading {
+        @constants.Basic => coverage.basic_lines_instanced
+        @constants.Lambert => coverage.lambert_lines_instanced
+        @constants.Standard => coverage.standard_lines_instanced
+      }
+    } else {
+      match shading {
+        @constants.Basic => coverage.basic_lines
+        @constants.Lambert => coverage.lambert_lines
+        @constants.Standard => coverage.standard_lines
+      }
+    }
+  } else {
+    let group = if instanced {
+      match shading {
+        @constants.Basic => coverage.basic_instanced
+        @constants.Lambert => coverage.lambert_instanced
+        @constants.Standard => coverage.standard_instanced
+      }
+    } else {
+      match shading {
+        @constants.Basic => coverage.basic
+        @constants.Lambert => coverage.lambert
+        @constants.Standard => coverage.standard
+      }
+    }
+    match side {
+      @constants.Front => group.front
+      @constants.Back => group.back
+      @constants.Double => group.double
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::mask_stroke(
+  self : WebGPURenderer,
+  kind : @core.PrimitiveKind,
+) -> GpuRenderPipeline {
+  let coverage = self.mask_coverage()
+  match kind {
+    @core.PrimitiveKind::Points => coverage.points
+    @core.PrimitiveKind::Line => coverage.line_strip
+    @core.PrimitiveKind::LineSegments => coverage.line_list
+  }
 }
 
 ///|
@@ -1114,7 +1102,7 @@ fn WebGPURenderer::ensure_depth(
     mip_level_count: Some(1U),
     sample_count: Some(1U),
     dimension: Some(@gpu.GpuTextureDimension::D2),
-    format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+    format: @gpu.GpuTextureFormat::DEPTH24PLUS_STENCIL8,
     usage: flags_texture(),
     view_formats: None,
     texture_binding_view_dimension: None,
@@ -1583,7 +1571,7 @@ fn extent(value : Int32) -> UInt32 {
 
 ///|
 /// 按纹理身份缓存颜色目标和它自己的深度缓冲。尺寸或版本变了就重建。
-/// 格式跟画布相同，这样网格管线可以画进去。
+/// 颜色是 `rgba16float`。深度带模板，蒙版通道往里面替换。交换链仍用画布格式。
 fn WebGPURenderer::color_target(
   self : WebGPURenderer,
   source : @textures.Texture,
@@ -1615,7 +1603,7 @@ fn WebGPURenderer::color_target(
     mip_level_count: Some(1U),
     sample_count: Some(1U),
     dimension: Some(@gpu.GpuTextureDimension::D2),
-    format: self.format,
+    format: @gpu.GpuTextureFormat::RGBA16FLOAT,
     usage: flags_color(),
     view_formats: None,
     texture_binding_view_dimension: None,
@@ -1650,7 +1638,7 @@ fn WebGPURenderer::color_target(
     mip_level_count: Some(1U),
     sample_count: Some(1U),
     dimension: Some(@gpu.GpuTextureDimension::D2),
-    format: @gpu.GpuTextureFormat::DEPTH24PLUS,
+    format: @gpu.GpuTextureFormat::DEPTH24PLUS_STENCIL8,
     usage: flags_texture(),
     view_formats: None,
     texture_binding_view_dimension: None,
@@ -3020,6 +3008,10 @@ fn WebGPURenderer::bloom_submit(
   color : GpuTextureView,
   glow : GpuTextureView,
   target : GpuTextureView,
+  hdr~ : Bool = true,
+  masked~ : Bool = false,
+  stencil~ : GpuTextureView? = None,
+  load~ : Bool = false,
 ) -> Unit {
   let tint_index = if tint_level < 0 {
     0
@@ -3052,6 +3044,23 @@ fn WebGPURenderer::bloom_submit(
     ),
   )
   let group = self.bloom_group(color, glow)
+  let use_mask = masked && stencil is Some(_)
+  let pipeline = if use_mask {
+    if hdr {
+      self.bloom_hdr_mask
+    } else {
+      self.bloom_mask
+    }
+  } else if hdr {
+    self.bloom_hdr
+  } else {
+    self.bloom
+  }
+  let load_op = if load || use_mask { @gpu.LOAD } else { @gpu.CLEAR }
+  let depth = match stencil {
+    Some(view) => if use_mask { Some(kept_stencil(view)) } else { None }
+    None => None
+  }
   let encoder = self.device.create_command_encoder(None)
   let draw = encoder.begin_render_pass({
     color_attachments: [
@@ -3060,17 +3069,20 @@ fn WebGPURenderer::bloom_submit(
         depth_slice: None,
         resolve_target: None,
         clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
-        load_op: @gpu.CLEAR,
+        load_op,
         store_op: @gpu.STORE,
       }),
     ],
-    depth_stencil_attachment: None,
+    depth_stencil_attachment: depth,
     occlusion_query_set: None,
     timestamp_writes: None,
     max_draw_count: None,
     label: Some("bloom"),
   })
-  draw.set_pipeline(self.bloom)
+  if use_mask {
+    draw.set_stencil_reference(1U)
+  }
+  draw.set_pipeline(pipeline)
   ignore(draw.set_bind_group(0U, Some(group), None, None, None))
   draw.draw(3U, Some(1U), None, None)
   draw.end()
@@ -3231,10 +3243,28 @@ fn WebGPURenderer::bloom_to(
   height : UInt32,
   pass : @post.BloomPass,
   target : GpuTextureView,
+  hdr~ : Bool = false,
+  masked~ : Bool = false,
+  stencil~ : GpuTextureView? = None,
 ) -> Unit {
   let glow = self.bloom_prepare(source, width, height, pass)
   self.bloom_submit(
-    pass, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 1.0, 0, source, glow, target,
+    pass,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    5.0,
+    6.0,
+    1.0,
+    0,
+    source,
+    glow,
+    target,
+    hdr~,
+    masked~,
+    stencil~,
+    load=masked,
   )
 }
 
@@ -3253,8 +3283,18 @@ fn WebGPURenderer::ensure_chain(
       }
     None => ()
   }
-  let a = self.bloom_color(width, height, self.format, "compose-a")
-  let b = self.bloom_color(width, height, self.format, "compose-b")
+  let a = self.bloom_color(
+    width,
+    height,
+    @gpu.GpuTextureFormat::RGBA16FLOAT,
+    "compose-a",
+  )
+  let b = self.bloom_color(
+    width,
+    height,
+    @gpu.GpuTextureFormat::RGBA16FLOAT,
+    "compose-b",
+  )
   let buffers : ChainBuffers = {
     width,
     height,
@@ -3301,13 +3341,37 @@ fn WebGPURenderer::compose_group(
 }
 
 ///|
+fn kept_stencil(
+  view : GpuTextureView,
+) -> @gpu.GpuRenderPassDepthStencilAttachment {
+  {
+    view,
+    depth_clear_value: None,
+    depth_load_op: Some(@gpu.LOAD),
+    depth_store_op: Some(@gpu.STORE),
+    depth_read_only: Some(false),
+    stencil_clear_value: None,
+    stencil_load_op: Some(@gpu.LOAD),
+    stencil_store_op: Some(@gpu.STORE),
+    stencil_read_only: Some(false),
+  }
+}
+
+///|
 fn WebGPURenderer::submit_fullscreen(
   self : WebGPURenderer,
   pipeline : GpuRenderPipeline,
   group : GpuBindGroup,
   view : GpuTextureView,
   label : String,
+  load~ : Bool = false,
+  stencil~ : GpuTextureView? = None,
 ) -> Unit {
+  let load_op = if load { @gpu.LOAD } else { @gpu.CLEAR }
+  let depth = match stencil {
+    Some(attachment) => Some(kept_stencil(attachment))
+    None => None
+  }
   let encoder = self.device.create_command_encoder(None)
   let draw = encoder.begin_render_pass({
     color_attachments: [
@@ -3316,16 +3380,20 @@ fn WebGPURenderer::submit_fullscreen(
         depth_slice: None,
         resolve_target: None,
         clear_value: Some({ r: 0.0, g: 0.0, b: 0.0, a: 1.0, }),
-        load_op: @gpu.CLEAR,
+        load_op,
         store_op: @gpu.STORE,
       }),
     ],
-    depth_stencil_attachment: None,
+    depth_stencil_attachment: depth,
     occlusion_query_set: None,
     timestamp_writes: None,
     max_draw_count: None,
     label: Some(label),
   })
+  match stencil {
+    Some(_) => draw.set_stencil_reference(1U)
+    None => ()
+  }
   draw.set_pipeline(pipeline)
   ignore(draw.set_bind_group(0U, Some(group), None, None, None))
   draw.draw(3U, Some(1U), None, None)
@@ -3341,7 +3409,11 @@ fn WebGPURenderer::compose_effect(
   target : GpuTextureView,
   width : UInt32,
   height : UInt32,
+  hdr~ : Bool = false,
+  masked~ : Bool = false,
+  stencil~ : GpuTextureView? = None,
 ) -> Unit {
+  let attachment = if masked { stencil } else { None }
   match effect {
     @post.Grayscale(pass) => {
       ignore(
@@ -3355,8 +3427,26 @@ fn WebGPURenderer::compose_effect(
           None,
         ),
       )
+      let pipeline = if masked {
+        if hdr {
+          self.post_hdr_mask
+        } else {
+          self.post_mask
+        }
+      } else if hdr {
+        self.post_hdr
+      } else {
+        self.post
+      }
       let group = self.compose_group(self.post_layout, self.post_uniform, read)
-      self.submit_fullscreen(self.post, group, target, "compose")
+      self.submit_fullscreen(
+        pipeline,
+        group,
+        target,
+        "compose",
+        load=masked,
+        stencil=attachment,
+      )
     }
     @post.Tone(pass) => {
       ignore(
@@ -3370,8 +3460,26 @@ fn WebGPURenderer::compose_effect(
           None,
         ),
       )
+      let pipeline = if masked {
+        if hdr {
+          self.tone_hdr_mask
+        } else {
+          self.tone_mask
+        }
+      } else if hdr {
+        self.tone_hdr
+      } else {
+        self.tone
+      }
       let group = self.compose_group(self.tone_layout, self.tone_uniform, read)
-      self.submit_fullscreen(self.tone, group, target, "compose")
+      self.submit_fullscreen(
+        pipeline,
+        group,
+        target,
+        "compose",
+        load=masked,
+        stencil=attachment,
+      )
     }
     @post.Copy(pass) => {
       ignore(
@@ -3385,10 +3493,39 @@ fn WebGPURenderer::compose_effect(
           None,
         ),
       )
+      let pipeline = if masked {
+        if hdr {
+          self.copy_hdr_mask
+        } else {
+          self.copy_mask
+        }
+      } else if hdr {
+        self.copy_hdr
+      } else {
+        self.copy
+      }
       let group = self.compose_group(self.copy_layout, self.copy_uniform, read)
-      self.submit_fullscreen(self.copy, group, target, "compose")
+      self.submit_fullscreen(
+        pipeline,
+        group,
+        target,
+        "compose",
+        load=masked,
+        stencil=attachment,
+      )
     }
-    @post.Bloom(pass) => self.bloom_to(read, width, height, pass, target)
+    @post.Bloom(pass) =>
+      self.bloom_to(
+        read,
+        width,
+        height,
+        pass,
+        target,
+        hdr~,
+        masked~,
+        stencil=attachment,
+      )
+    @post.Mask(_) | @post.ClearMask(_) => ()
   }
 }
 
@@ -3537,6 +3674,8 @@ fn WebGPURenderer::draw_meshes(
   environment : @textures.Texture?,
   blend : Bool,
   lines~ : Bool = false,
+  hdr~ : Bool = false,
+  mask~ : Bool = false,
 ) -> Unit {
   for item in items {
     let draw_mesh = match item.instances {
@@ -3661,7 +3800,9 @@ fn WebGPURenderer::draw_meshes(
         )
         for side in sides {
           pass.set_pipeline(
-            if lines {
+            if mask {
+              self.mask_pipeline(item.shading, side, batch is Some(_), lines)
+            } else if lines {
               self.wire_pipeline(
                 item.shading,
                 batch is Some(_),
@@ -3669,6 +3810,7 @@ fn WebGPURenderer::draw_meshes(
                 item.depth_test,
                 self.view_depth_func(item.depth_func),
                 item.color_write,
+                hdr~,
               )
             } else {
               match batch {
@@ -3682,6 +3824,7 @@ fn WebGPURenderer::draw_meshes(
                     self.view_depth_func(item.depth_func),
                     item.color_write,
                     item.premultiplied_alpha,
+                    hdr~,
                   )
                 None =>
                   self.pipeline(
@@ -3693,6 +3836,7 @@ fn WebGPURenderer::draw_meshes(
                     self.view_depth_func(item.depth_func),
                     item.color_write,
                     item.premultiplied_alpha,
+                    hdr~,
                   )
               }
             },
@@ -3882,6 +4026,8 @@ fn WebGPURenderer::draw_strokes(
   viewport_width : Double,
   viewport_height : Double,
   blend : Bool,
+  hdr~ : Bool = false,
+  mask~ : Bool = false,
 ) -> Unit {
   for item in items {
     match self.position_gpu(item.geometry) {
@@ -3946,15 +4092,20 @@ fn WebGPURenderer::draw_strokes(
             }
             if instance_count > 0 {
               pass.set_pipeline(
-                self.stroke_pipeline(
-                  item.kind,
-                  blend,
-                  item.depth_write,
-                  item.depth_test,
-                  self.view_depth_func(item.depth_func),
-                  item.color_write,
-                  item.premultiplied_alpha,
-                ),
+                if mask {
+                  self.mask_stroke(item.kind)
+                } else {
+                  self.stroke_pipeline(
+                    item.kind,
+                    blend,
+                    item.depth_write,
+                    item.depth_test,
+                    self.view_depth_func(item.depth_func),
+                    item.color_write,
+                    item.premultiplied_alpha,
+                    hdr~,
+                  )
+                },
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
               pass.set_vertex_buffer(1U, Some(instances), None, None)
@@ -3974,15 +4125,20 @@ fn WebGPURenderer::draw_strokes(
           @core.PrimitiveKind::Line =>
             self.draw_lines(
               pass,
-              self.stroke_pipeline(
-                item.kind,
-                blend,
-                item.depth_write,
-                item.depth_test,
-                self.view_depth_func(item.depth_func),
-                item.color_write,
-                item.premultiplied_alpha,
-              ),
+              if mask {
+                self.mask_stroke(item.kind)
+              } else {
+                self.stroke_pipeline(
+                  item.kind,
+                  blend,
+                  item.depth_write,
+                  item.depth_test,
+                  self.view_depth_func(item.depth_func),
+                  item.color_write,
+                  item.premultiplied_alpha,
+                  hdr~,
+                )
+              },
               geometry,
               item.draw_start,
               item.draw_count,
@@ -3990,15 +4146,20 @@ fn WebGPURenderer::draw_strokes(
           @core.PrimitiveKind::LineSegments =>
             self.draw_lines(
               pass,
-              self.stroke_pipeline(
-                item.kind,
-                blend,
-                item.depth_write,
-                item.depth_test,
-                self.view_depth_func(item.depth_func),
-                item.color_write,
-                item.premultiplied_alpha,
-              ),
+              if mask {
+                self.mask_stroke(item.kind)
+              } else {
+                self.stroke_pipeline(
+                  item.kind,
+                  blend,
+                  item.depth_write,
+                  item.depth_test,
+                  self.view_depth_func(item.depth_func),
+                  item.color_write,
+                  item.premultiplied_alpha,
+                  hdr~,
+                )
+              },
               geometry,
               item.draw_start,
               item.draw_count,
@@ -4026,6 +4187,8 @@ fn WebGPURenderer::draw_transparent(
   environment : @textures.Texture?,
   viewport_width : Double,
   viewport_height : Double,
+  hdr~ : Bool = false,
+  mask~ : Bool = false,
 ) -> Unit {
   let mut mesh_index = 0
   let mut stroke_index = 0
@@ -4052,6 +4215,8 @@ fn WebGPURenderer::draw_transparent(
         shadow_group,
         environment,
         true,
+        hdr~,
+        mask~,
       )
       mesh_index = mesh_index + 1
     } else {
@@ -4065,6 +4230,8 @@ fn WebGPURenderer::draw_transparent(
         viewport_width,
         viewport_height,
         true,
+        hdr~,
+        mask~,
       )
       stroke_index = stroke_index + 1
     }
@@ -4149,10 +4316,10 @@ pub fn WebGPURenderer::render(
       depth_load_op: Some(@gpu.CLEAR),
       depth_store_op: Some(@gpu.STORE),
       depth_read_only: Some(false),
-      stencil_clear_value: None,
-      stencil_load_op: None,
-      stencil_store_op: None,
-      stencil_read_only: None,
+      stencil_clear_value: Some(0U),
+      stencil_load_op: Some(@gpu.CLEAR),
+      stencil_store_op: Some(@gpu.STORE),
+      stencil_read_only: Some(false),
     }),
     occlusion_query_set: None,
     timestamp_writes: None,
@@ -4164,6 +4331,7 @@ pub fn WebGPURenderer::render(
     Some(shadow) => self.ensure_shadow(shadow.map_size).group
   }
   let view = @common.camera_frustum(state)
+  let hdr_target = !to_screen
   self.draw_meshes(
     pass,
     @common.collect_opaque(scene.node, frustum=view, camera~),
@@ -4176,6 +4344,7 @@ pub fn WebGPURenderer::render(
     shadow_group,
     scene.environment,
     false,
+    hdr=hdr_target,
   )
   self.draw_meshes(
     pass,
@@ -4190,6 +4359,7 @@ pub fn WebGPURenderer::render(
     scene.environment,
     false,
     lines=true,
+    hdr=hdr_target,
   )
   let viewport_width = width.reinterpret_as_int().to_double()
   let viewport_height = height.reinterpret_as_int().to_double()
@@ -4203,6 +4373,7 @@ pub fn WebGPURenderer::render(
     viewport_width,
     viewport_height,
     false,
+    hdr=hdr_target,
   )
   self.draw_transparent(
     pass,
@@ -4218,6 +4389,7 @@ pub fn WebGPURenderer::render(
     scene.environment,
     viewport_width,
     viewport_height,
+    hdr=hdr_target,
   )
   pass.end()
   self.device.queue().submit([encoder.finish(None)])

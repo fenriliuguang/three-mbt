@@ -15,6 +15,8 @@ test "compose scene chains grayscale then tone mapping" {
     @post.Tone(_) => assert_eq(false, true)
     @post.Bloom(_) => assert_eq(false, true)
     @post.Copy(_) => assert_eq(false, true)
+    @post.Mask(_) => assert_eq(false, true)
+    @post.ClearMask(_) => assert_eq(false, true)
   }
   let gray = @post.grayscale(1.0, 0.0, 0.0, 0.5)
   assert_eq(gray.r, 0.625)
