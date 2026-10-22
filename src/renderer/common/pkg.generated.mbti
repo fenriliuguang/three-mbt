@@ -37,6 +37,8 @@ pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
 
 pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
+pub fn pack_env_params(@math.Matrix4, Double, Bool) -> FixedArray[Byte]
+
 pub fn pack_f32(@core.BufferAttribute) -> FixedArray[Byte]
 
 pub fn pack_f32_values(Array[Double]) -> FixedArray[Byte]
@@ -155,6 +157,9 @@ pub(all) struct RenderItem {
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
+  env_map : @textures.Texture?
+  env_map_intensity : Double
+  env_rotation : @math.Matrix4
   instances : @core.InstanceData?
   group_start : Int
   group_count : Int

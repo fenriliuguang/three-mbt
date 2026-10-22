@@ -34,6 +34,9 @@ pub(all) struct RenderItem {
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
+  env_map : @textures.Texture?
+  env_map_intensity : Double
+  env_rotation : @math.Matrix4
   instances : @core.InstanceData?
   group_start : Int32
   group_count : Int32
@@ -100,6 +103,9 @@ fn push_binding_item(
     roughness_map: binding.roughness_map,
     metalness_map: binding.metalness_map,
     alpha_map: binding.alpha_map,
+    env_map: binding.env_map,
+    env_map_intensity: binding.env_map_intensity,
+    env_rotation: binding.env_rotation,
     instances: binding.instances,
     group_start,
     group_count,
@@ -141,6 +147,9 @@ fn push_group_item(
     roughness_map: draw.roughness_map,
     metalness_map: draw.metalness_map,
     alpha_map: draw.alpha_map,
+    env_map: draw.env_map,
+    env_map_intensity: draw.env_map_intensity,
+    env_rotation: draw.env_rotation,
     instances: binding.instances,
     group_start,
     group_count,

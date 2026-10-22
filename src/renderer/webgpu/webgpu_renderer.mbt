@@ -97,6 +97,10 @@ pub struct WebGPURenderer {
   mut compose_held : Array[GpuBindGroup]
   quad : GpuBuffer
   white : TextureGpu
+  env_layout : GpuBindGroupLayout
+  env_black : TextureGpu
+  env_fallback : GpuBindGroup
+  envs : Array[EnvGpu]
   shadow_layout : GpuBindGroupLayout
   shadow_sampler : GpuSampler
   shadow_sampler_reversed : GpuSampler
@@ -303,12 +307,50 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     ],
     label: Some("shadow"),
   })
+  let env_layout = device.create_bind_group_layout({
+    entries: [
+      {
+        binding: 0U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: None,
+        texture: Some({
+          sample_type: Some(@gpu.GpuTextureSampleType::FLOAT),
+          view_dimension: Some(@gpu.GpuTextureViewDimension::D2),
+          multisampled: Some(false),
+        }),
+        storage_texture: None,
+      },
+      {
+        binding: 1U,
+        visibility: fragment_visibility(),
+        buffer: None,
+        sampler: Some({ type_: Some(@gpu.GpuSamplerBindingType::FILTERING), }),
+        texture: None,
+        storage_texture: None,
+      },
+      {
+        binding: 2U,
+        visibility: fragment_visibility(),
+        buffer: Some({
+          type_: Some(@gpu.GpuBufferBindingType::UNIFORM),
+          has_dynamic_offset: None,
+          min_binding_size: None,
+        }),
+        sampler: None,
+        texture: None,
+        storage_texture: None,
+      },
+    ],
+    label: Some("env"),
+  })
   let pipeline_layout = device.create_pipeline_layout({
     bind_group_layouts: [
       Some(layout),
       Some(texture_layout),
       Some(shadow_layout),
       Some(surface_layout),
+      Some(env_layout),
     ],
     immediate_size: None,
     label: Some("frame"),
@@ -419,6 +461,43 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     @constants.Linear,
     None,
   )
+  let env_black = upload_texture(
+    device,
+    texture_layout,
+    1,
+    1,
+    FixedArray::make(4, b'\x00'),
+    @constants.ClampToEdge,
+    @constants.ClampToEdge,
+    @constants.Linear,
+    @constants.Linear,
+    None,
+  )
+  let env_fallback_params = pack_buffer(
+    device,
+    @common.pack_env_params(@math.Matrix4::new(), 0.0, false),
+    vertex=false,
+    index=false,
+    uniform=true,
+  )
+  let env_fallback = device.create_bind_group({
+    layout: env_layout,
+    entries: [
+      {
+        binding: 0U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(env_black.view),
+      },
+      {
+        binding: 1U,
+        resource: @gpu.GpuBindingResource::GpuSampler(env_black.sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuBuffer(env_fallback_params),
+      },
+    ],
+    label: Some("env-fallback"),
+  })
   let window = target.window()
   {
     device,
@@ -693,6 +772,10 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       uniform=false,
     ),
     white,
+    env_layout,
+    env_black,
+    env_fallback,
+    envs: [],
     shadow_layout,
     shadow_sampler,
     shadow_sampler_reversed,
@@ -2948,8 +3031,136 @@ fn WebGPURenderer::compose_effect(
 }
 
 ///|
+fn chosen_env(
+  material_map : @textures.Texture?,
+  scene_map : @textures.Texture?,
+) -> @textures.Texture? {
+  match material_map {
+    Some(map) => Some(map)
+    None => scene_map
+  }
+}
+
+///|
+fn WebGPURenderer::make_env_group(
+  self : WebGPURenderer,
+  view : GpuTextureView,
+  sampler : GpuSampler,
+  params : GpuBuffer,
+) -> GpuBindGroup {
+  self.device.create_bind_group({
+    layout: self.env_layout,
+    entries: [
+      { binding: 0U, resource: @gpu.GpuBindingResource::GpuTextureView(view), },
+      { binding: 1U, resource: @gpu.GpuBindingResource::GpuSampler(sampler), },
+      { binding: 2U, resource: @gpu.GpuBindingResource::GpuBuffer(params), },
+    ],
+    label: Some("env"),
+  })
+}
+
+///|
+fn WebGPURenderer::release_env_atlas(
+  self : WebGPURenderer,
+  atlas : @textures.Texture,
+) -> Unit {
+  let mut index = 0
+  while index < self.textures.length() {
+    let hit = match self.textures[index].source {
+      Some(stored) => physical_equal(stored, atlas)
+      None => false
+    }
+    if hit {
+      drop_texture(self.textures[index])
+      let last = self.textures.length() - 1
+      self.textures[index] = self.textures[last]
+      ignore(self.textures.pop())
+    } else {
+      index = index + 1
+    }
+  }
+}
+
+///|
+/// Standard 按节点缓存 PMREM。贴图对象或 `version` 变了就重建图集。强度和旋转每次重写 uniform。
+fn WebGPURenderer::bind_env(
+  self : WebGPURenderer,
+  node : @core.Object3D,
+  source : @textures.Texture,
+  intensity : Double,
+  rotation : @math.Matrix4,
+) -> GpuBindGroup {
+  let mut found = -1
+  let mut index = 0
+  while index < self.envs.length() {
+    if physical_equal(self.envs[index].node, node) {
+      found = index
+    }
+    index = index + 1
+  }
+  let current = if found < 0 {
+    let atlas = @materials.pmrem_atlas(source)
+    ignore(self.texture_group(Some(atlas)))
+    let (view, sampler) = self.texture_views(Some(atlas))
+    let params = pack_buffer(
+      self.device,
+      @common.pack_env_params(rotation, intensity, true),
+      vertex=false,
+      index=false,
+      uniform=true,
+    )
+    let group = self.make_env_group(view, sampler, params)
+    let created : EnvGpu = {
+      node,
+      atlas,
+      source,
+      version: source.version,
+      params,
+      group,
+    }
+    self.envs.push(created)
+    created
+  } else {
+    let cached = self.envs[found]
+    if physical_equal(cached.source, source) && cached.version == source.version {
+      cached
+    } else {
+      self.release_env_atlas(cached.atlas)
+      cached.group.drop()
+      let atlas = @materials.pmrem_atlas(source)
+      ignore(self.texture_group(Some(atlas)))
+      let (view, sampler) = self.texture_views(Some(atlas))
+      let group = self.make_env_group(view, sampler, cached.params)
+      let updated : EnvGpu = {
+        node,
+        atlas,
+        source,
+        version: source.version,
+        params: cached.params,
+        group,
+      }
+      self.envs[found] = updated
+      updated
+    }
+  }
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(
+      current.params,
+      0UL,
+      @common.pack_env_params(rotation, intensity, true),
+      None,
+      None,
+    ),
+  )
+  current.group
+}
+
+///|
 /// 先画不透明网格，再按从远到近画透明网格。`blend` 为真时用 src-alpha 管线。
 /// 透明双面且 `force_single_pass` 关闭时，同一次绘制里先画背面再画正面。
+/// Standard 绑定第 4 组环境贴图。其它着色绑定黑色的空环境。
 fn WebGPURenderer::draw_meshes(
   self : WebGPURenderer,
   pass : @gpu.GpuRenderPassEncoder,
@@ -2961,6 +3172,7 @@ fn WebGPURenderer::draw_meshes(
   width : UInt32,
   height : UInt32,
   shadow_group : GpuBindGroup,
+  environment : @textures.Texture?,
   blend : Bool,
   lines~ : Bool = false,
 ) -> Unit {
@@ -3170,6 +3382,21 @@ fn WebGPURenderer::draw_meshes(
               None,
             ),
           )
+          let env_group = match item.shading {
+            @constants.Standard =>
+              match chosen_env(item.env_map, environment) {
+                None => self.env_fallback
+                Some(map) =>
+                  self.bind_env(
+                    item.node,
+                    map,
+                    item.env_map_intensity,
+                    item.env_rotation,
+                  )
+              }
+            _ => self.env_fallback
+          }
+          ignore(pass.set_bind_group(4U, Some(env_group), None, None, None))
           if lines {
             match wire {
               None => ()
@@ -3391,6 +3618,7 @@ fn WebGPURenderer::draw_transparent(
   width : UInt32,
   height : UInt32,
   shadow_group : GpuBindGroup,
+  environment : @textures.Texture?,
   viewport_width : Double,
   viewport_height : Double,
 ) -> Unit {
@@ -3417,6 +3645,7 @@ fn WebGPURenderer::draw_transparent(
         width,
         height,
         shadow_group,
+        environment,
         true,
       )
       mesh_index = mesh_index + 1
@@ -3540,6 +3769,7 @@ pub fn WebGPURenderer::render(
     width,
     height,
     shadow_group,
+    scene.environment,
     false,
   )
   self.draw_meshes(
@@ -3552,6 +3782,7 @@ pub fn WebGPURenderer::render(
     width,
     height,
     shadow_group,
+    scene.environment,
     false,
     lines=true,
   )
@@ -3579,6 +3810,7 @@ pub fn WebGPURenderer::render(
     width,
     height,
     shadow_group,
+    scene.environment,
     viewport_width,
     viewport_height,
   )

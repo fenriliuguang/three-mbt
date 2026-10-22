@@ -31,6 +31,9 @@ pub(all) struct MeshBinding {
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
+  env_map : @textures.Texture?
+  env_map_intensity : Double
+  env_rotation : @math.Matrix4
   instances : InstanceData?
   group_sides : Array[@constants.Side]?
   group_draws : Array[MaterialDraw]?
@@ -66,6 +69,9 @@ pub(all) struct MaterialDraw {
   roughness_map : @textures.Texture?
   metalness_map : @textures.Texture?
   alpha_map : @textures.Texture?
+  env_map : @textures.Texture?
+  env_map_intensity : Double
+  env_rotation : @math.Matrix4
 }
 
 ///|

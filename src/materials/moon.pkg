@@ -3,4 +3,5 @@ import {
   "fenriliuguang/three-mbt/constants",
   "fenriliuguang/three-mbt/math",
   "fenriliuguang/three-mbt/textures",
+  "moonbitlang/core/math" @std,
 }

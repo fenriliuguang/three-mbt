@@ -57,6 +57,13 @@ test "standard material uses direct GGX and keeps ambient diffuse" {
     includes(wgsl, "((uniforms.ambient).xyz + hemisphere_term(N)) * diffuse"),
     true,
   )
+  assert_eq(
+    includes(wgsl, "env_indirect(N, V, diffuse_color, f0, roughness)"),
+    true,
+  )
+  assert_eq(includes(wgsl, "@group(4) @binding(0) var env_texture"), true)
+  assert_eq(includes(@nodes.lambert_wgsl(), "env_indirect"), false)
+  assert_eq(includes(@nodes.basic_wgsl(), "@group(4)"), false)
   assert_eq(includes(wgsl, "sample_color(input.v_uv)"), true)
   assert_eq(includes(wgsl, "input.v_color"), true)
   assert_eq(includes(wgsl, "return vec4<f32>(direct + indirect, base.w)"), true)
@@ -298,6 +305,8 @@ test "lit materials sample a directional shadow map" {
     ),
     true,
   )
+  assert_eq(includes(standard, "fn env_indirect("), true)
+  assert_eq(includes(lambert, "@group(4)"), false)
   assert_eq(
     includes(
       @nodes.shadow_wgsl(),

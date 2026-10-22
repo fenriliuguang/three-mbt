@@ -12,9 +12,9 @@ This phase has landed. `nodes` builds `MeshBasicMaterial` and `MeshLambertMateri
 
 ### 6. PBR subset
 
-`MeshStandardMaterial` with baseColor, roughness, and metalness, plus the directional light already in place. Environment maps and PMREM stay later.
+`MeshStandardMaterial` with baseColor, roughness, and metalness, plus the directional light already in place. Environment maps and PMREM have since landed for Standard.
 
-This phase has landed. `MeshStandardMaterial` defaults to roughness 1 and metalness 0. The shader is the direct Cook-Torrance term from r186: GGX distribution, Smith correlated visibility, Schlick fresnel, dielectric F0 of 0.04, and a roughness floor of 0.0525. Ambient light only multiplies the diffuse lobe. `examples/standard` is the rotating cube. The window sample is `scripts/build-standard.sh`. Host playback of that component stays out of this pass. Environment maps stay later.
+This phase has landed. `MeshStandardMaterial` defaults to roughness 1 and metalness 0. The shader is the direct Cook-Torrance term from r186: GGX distribution, Smith correlated visibility, Schlick fresnel, dielectric F0 of 0.04, and a roughness floor of 0.0525. Ambient light only multiplies the diffuse lobe. `examples/standard` is the rotating cube. The window sample is `scripts/build-standard.sh`. Host playback of that component stays out of this pass. Environment maps have since landed for Standard.
 
 ## Behavior
 
@@ -603,6 +603,8 @@ Point and line `alphaTest` reaches the shader. A points material and a line mate
 `UniformsGroup.copy` has landed. A group named `Other` with number `[9]` copies a group named `Frame`, usage `35048`, and numbers `[1, 2]`. The destination keeps its id and its `change` listener. The source `dispose` listener stays off the destination. The destination's original number array becomes `[1, 2]`. Setting the destination's first number to `8` and its name to `Renamed` leaves the source at `1` and `Frame`. `RawShaderMaterial` stays later.
 
 `RawShaderMaterial` has landed. `Material::raw` sets `is_shader_material` and `is_raw_shader_material` true, `type_name` to `RawShaderMaterial`, and shading stays Basic. `linewidth` stays `1`. `Material::shader` keeps `is_raw_shader_material` false and `type_name` `ShaderMaterial`. Copying a raw material with `lights` set true onto a shader leaves the destination flag false and stores `lights` true. Copying a shader with `lights` false onto that raw material leaves `is_raw_shader_material` true and stores `lights` false. A clone keeps the raw flag, define `FOO` = `1`, and a different id. The built-in uniform and attribute prefix stays later.
+
+Standard environment maps and PMREM have landed. `pmrem_atlas` builds a CPU equirectangular atlas, at most 16 by 8 texels per level, with five specular rows at roughness 0, 0.25, 0.5, 0.75, and 1, plus one irradiance row. Roughness 0 is a nearest copy. Higher roughness takes 8 GGX samples in linear light and writes sRGB. A constant color stays that color, including 0 and 255. The frame uniform stays 672 bytes. Group 4 holds the atlas and an 80-byte uniform: the rotation matrix, intensity, specular level count 5, a has-env flag, and irradiance row 5. Standard adds `env_indirect` to the ambient diffuse term. A material `env_map` wins. `Scene.environment` is the fallback when that map is empty. Basic and Lambert keep their shading and bind a black fallback with has-env 0. `Mesh::refresh` bakes `env_map_rotation` into the matrix copied onto the render item. GLSL `ShaderLib` stays upstream.
 
 ## Checklist
 

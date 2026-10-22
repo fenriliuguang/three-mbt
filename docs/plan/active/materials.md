@@ -8,7 +8,7 @@ Do not append another GLSL prefix paragraph here. A materials slice starts only 
 
 Scene-graph material fields stay. That includes `ShaderMaterial` and `RawShaderMaterial` source strings. The renderer still shades those materials with the built-in WebGPU programs and does not compile the stored strings.
 
-There is no current materials slice.
+Standard environment maps and PMREM have landed. There is no current materials slice.
 
 ## Checklist
 

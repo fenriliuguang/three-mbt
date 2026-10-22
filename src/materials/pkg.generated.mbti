@@ -8,6 +8,9 @@ import {
 }
 
 // Values
+pub fn pmrem_atlas(@textures.Texture) -> @textures.Texture
+
+pub fn rotate_env_direction(@math.Euler, @math.Vector3) -> @math.Vector3
 
 // Errors
 

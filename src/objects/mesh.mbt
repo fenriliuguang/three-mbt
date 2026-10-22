@@ -140,7 +140,15 @@ pub fn Mesh::clone(self : Mesh, recursive~ : Bool = true) -> Mesh {
 }
 
 ///|
-/// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、金属度贴图、透明贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。
+fn baked_env_rotation(euler : @math.Euler) -> @math.Matrix4 {
+  let matrix = @math.Matrix4::new()
+  ignore(matrix.make_rotation_from_euler(euler))
+  matrix
+}
+
+///|
+/// 把材质上的侧面、透明度、线框、透明裁切、自发光、贴图、粗糙度贴图、金属度贴图、透明贴图、环境贴图、粗糙度和金属度写回节点。颜色本身是共享的，不需要复制。
+/// `env_map_rotation` 在这里收成矩阵。
 pub fn Mesh::refresh(self : Mesh) -> Unit {
   self.node.mesh = Some(MeshBinding::{
     geometry: self.geometry,
@@ -170,6 +178,9 @@ pub fn Mesh::refresh(self : Mesh) -> Unit {
     roughness_map: self.material.roughness_map,
     metalness_map: self.material.metalness_map,
     alpha_map: self.material.alpha_map,
+    env_map: self.material.env_map,
+    env_map_intensity: self.material.env_map_intensity,
+    env_rotation: baked_env_rotation(self.material.env_map_rotation),
     instances: None,
     group_sides: material_sides(self.materials),
     group_draws: material_draws(self.materials),
@@ -244,6 +255,9 @@ fn material_draws(
           roughness_map: material.roughness_map,
           metalness_map: material.metalness_map,
           alpha_map: material.alpha_map,
+          env_map: material.env_map,
+          env_map_intensity: material.env_map_intensity,
+          env_rotation: baked_env_rotation(material.env_map_rotation),
         })
       }
       Some(draws)

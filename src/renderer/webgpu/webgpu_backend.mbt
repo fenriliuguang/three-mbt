@@ -52,6 +52,16 @@ struct InstanceGpu {
 }
 
 ///|
+struct EnvGpu {
+  node : @core.Object3D
+  atlas : @textures.Texture
+  source : @textures.Texture
+  version : Int32
+  params : GpuBuffer
+  group : GpuBindGroup
+}
+
+///|
 struct SkinGpu {
   node : @core.Object3D
   source : GpuBuffer

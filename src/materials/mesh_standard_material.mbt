@@ -2,7 +2,7 @@
 
 ///|
 /// 直接光 PBR。默认粗糙度 1、金属度 0，与 r186 `MeshStandardMaterial` 相同。
-/// 环境贴图和 PMREM 不在这一阶段。
+/// 有环境贴图时，Standard 采样 PMREM 图集。Basic 与 Lambert 不采样。
 pub fn Material::standard(
   hex~ : Int32 = 0xFFFFFF,
   roughness~ : Double = 1.0,

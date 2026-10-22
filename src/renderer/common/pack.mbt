@@ -242,6 +242,23 @@ pub fn pack_f32_values(values : Array[Double]) -> FixedArray[Byte] {
 }
 
 ///|
+/// 环境贴图第 4 组：64 字节旋转矩阵，接着强度、镜面级数 5、是否有环境、辐照度行号 5。
+/// r186: `getIBLIrradiance` https://github.com/mrdoob/three.js/blob/r186/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js#L4
+pub fn pack_env_params(
+  rotation : @math.Matrix4,
+  intensity : Double,
+  has_env : Bool,
+) -> FixedArray[Byte] {
+  let dst = FixedArray::make(80, b'\x00')
+  write_matrix4(dst, 0, rotation)
+  write_f32(dst, 64, intensity)
+  write_f32(dst, 68, 5.0)
+  write_f32(dst, 72, if has_env { 1.0 } else { 0.0 })
+  write_f32(dst, 76, 5.0)
+  dst
+}
+
+///|
 /// 蒙皮计算的 uniform：64 字节绑定逆矩阵，接着四个 `u32`。
 /// `skin_normal` 为 0 时法线原样拷贝。
 pub fn pack_skin_params(

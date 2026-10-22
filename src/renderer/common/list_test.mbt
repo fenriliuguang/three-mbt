@@ -1483,6 +1483,63 @@ test "a metalness map reaches the render list" {
 }
 
 ///|
+test "an environment map reaches the render list" {
+  let scene = @scenes.Scene::new()
+  let box = @geometries.BoxGeometry::new()
+  let material = @materials.MeshStandardMaterial::new()
+  let map = @textures.Texture::from_rgba8(1, 1, FixedArray::make(4, b'\xFF'))
+  material.material.env_map = Some(map)
+  material.material.env_map_intensity = 2.0
+  ignore(material.material.env_map_rotation.set(0.0, @std.PI / 2.0, 0.0))
+  let mesh = @objects.Mesh::new(box.geometry, material.material)
+  ignore(scene.add(mesh))
+  let drawn = @common.collect_opaque(scene.node)
+  assert_eq(drawn.length(), 1)
+  assert_eq(drawn[0].env_map_intensity, 2.0)
+  let expected = @math.Matrix4::new()
+  ignore(expected.make_rotation_from_euler(material.material.env_map_rotation))
+  let mut index = 0
+  while index < 16 {
+    assert_eq(drawn[0].env_rotation.elements[index], expected.elements[index])
+    index = index + 1
+  }
+  match drawn[0].env_map {
+    None => assert_eq(false, true)
+    Some(stored) => assert_eq(physical_equal(stored, map), true)
+  }
+}
+
+///|
+test "env params pack a matrix and four floats" {
+  let bytes = @common.pack_env_params(@math.Matrix4::new(), 2.0, true)
+  assert_eq(bytes.length(), 80)
+  assert_eq(bytes[0], b'\x00')
+  assert_eq(bytes[1], b'\x00')
+  assert_eq(bytes[2], b'\x80')
+  assert_eq(bytes[3], b'\x3F')
+  assert_eq(bytes[64], b'\x00')
+  assert_eq(bytes[65], b'\x00')
+  assert_eq(bytes[66], b'\x00')
+  assert_eq(bytes[67], b'\x40')
+  assert_eq(bytes[68], b'\x00')
+  assert_eq(bytes[69], b'\x00')
+  assert_eq(bytes[70], b'\xA0')
+  assert_eq(bytes[71], b'\x40')
+  assert_eq(bytes[72], b'\x00')
+  assert_eq(bytes[73], b'\x00')
+  assert_eq(bytes[74], b'\x80')
+  assert_eq(bytes[75], b'\x3F')
+  assert_eq(bytes[76], b'\x00')
+  assert_eq(bytes[77], b'\x00')
+  assert_eq(bytes[78], b'\xA0')
+  assert_eq(bytes[79], b'\x40')
+  let off = @common.pack_env_params(@math.Matrix4::new(), 0.0, false)
+  assert_eq(off[64], b'\x00')
+  assert_eq(off[72], b'\x00')
+  assert_eq(off[75], b'\x00')
+}
+
+///|
 test "an alpha map reaches the render list" {
   let scene = @scenes.Scene::new()
   let box = @geometries.BoxGeometry::new()
