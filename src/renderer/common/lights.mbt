@@ -13,6 +13,7 @@ pub(all) struct ShadowFrame {
   normal_bias : Double
   radius : Double
   map_size : Int32
+  blur_samples : Int32
 }
 
 ///|
@@ -110,6 +111,7 @@ fn place_shadow(
     normal_bias: shadow.normal_bias,
     radius: shadow.radius,
     map_size,
+    blur_samples: shadow.blur_samples,
   }
 }
 

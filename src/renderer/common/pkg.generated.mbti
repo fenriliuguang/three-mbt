@@ -11,13 +11,15 @@ import {
 // Values
 pub fn camera_frustum(@core.CameraState) -> @math.Frustum
 
+pub fn casts_vsm_shadow(Bool, Bool, Bool) -> Bool
+
 pub fn collect_lights(@core.Object3D, camera? : @core.Object3D, reversed_depth? : Bool) -> LightFrame
 
 pub fn collect_opaque(@core.Object3D, frustum? : @math.Frustum, camera? : @core.Object3D) -> Array[RenderItem]
 
 pub fn collect_primitives(@core.Object3D, frustum? : @math.Frustum, camera? : @core.Object3D) -> Array[PrimitiveItem]
 
-pub fn collect_shadow(@core.Object3D, camera? : @core.Object3D) -> Array[RenderItem]
+pub fn collect_shadow(@core.Object3D, camera? : @core.Object3D, vsm? : Bool) -> Array[RenderItem]
 
 pub fn collect_transparent(@core.Object3D, @core.Object3D, frustum? : @math.Frustum) -> Array[RenderItem]
 
@@ -34,6 +36,8 @@ pub let instance_color_stride : Int
 pub let instance_matrix_stride : Int
 
 pub fn model_view_projection(@core.CameraState, @core.Object3D) -> @math.Matrix4
+
+pub fn named_blend(@constants.Blending, Bool) -> BlendEquation?
 
 pub fn normal_matrix(@math.Matrix4) -> @math.Matrix4
 
@@ -69,7 +73,9 @@ pub let position_stride : Int
 
 pub fn resolve_draw(@core.BufferGeometry, Int, Int, Bool) -> (Int, Int)?
 
-pub fn shadow_cast_side(@constants.Side, @constants.Side?) -> @constants.Side
+pub fn shadow_cast_side(@constants.Side, @constants.Side?, vsm? : Bool) -> @constants.Side
+
+pub fn shadow_enabled_value(Bool, Bool, Bool) -> Double
 
 pub fn shadow_matrix(@math.Matrix4, @math.Matrix4) -> @math.Matrix4
 
@@ -83,11 +89,31 @@ pub let vertex_stride : Int
 
 pub fn view_depth(@core.Object3D, @core.Object3D) -> Double
 
+pub fn vsm_axis_moment(Array[Double], Array[Double], Int, Int, Int, Int, Int, Double, Bool) -> VsmMoment
+
+pub let vsm_sample_limit : Int
+
+pub fn vsm_shadow(Double, Double, Double, Bool) -> Double
+
 pub fn wireframe_line_indices(@core.BufferGeometry) -> Array[Int]
 
 // Errors
 
 // Types and methods
+pub(all) struct BlendEquation {
+  op : BlendOp
+  src_color : Int
+  dst_color : Int
+  src_alpha : Int
+  dst_alpha : Int
+}
+
+pub(all) enum BlendOp {
+  Additive
+  Subtractive
+  Multiply
+}
+
 pub(all) struct LightFrame {
   ambient : @math.Vector3
   color : @math.Vector3
@@ -127,6 +153,7 @@ pub(all) struct PrimitiveItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   draw_start : Int
   draw_count : Int
 }
@@ -150,6 +177,7 @@ pub(all) struct RenderItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   force_single_pass : Bool
   emissive : @math.Color
   emissive_intensity : Double
@@ -184,6 +212,12 @@ pub(all) struct ShadowFrame {
   normal_bias : Double
   radius : Double
   map_size : Int
+  blur_samples : Int
+}
+
+pub(all) struct VsmMoment {
+  mean : Double
+  std_dev : Double
 }
 
 // Type aliases

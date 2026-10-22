@@ -43,6 +43,7 @@ pub fn DirectionalLight::new(
     bias: 0.0,
     normal_bias: 0.0,
     radius: 1.0,
+    blur_samples: 8,
   }
   match node.light {
     None => ()

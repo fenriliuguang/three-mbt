@@ -127,6 +127,74 @@ fn mesh_vertex_buffers(instanced : Bool) -> Array[@gpu.GpuVertexBufferLayout?] {
 }
 
 ///|
+fn gpu_blend_factor(code : Int32) -> @gpu.GpuBlendFactor {
+  if code == @constants.ZERO_FACTOR {
+    @gpu.GpuBlendFactor::ZERO
+  } else if code == @constants.ONE_FACTOR {
+    @gpu.GpuBlendFactor::ONE
+  } else if code == @constants.SRC_COLOR_FACTOR {
+    @gpu.GpuBlendFactor::SRC
+  } else if code == @constants.ONE_MINUS_SRC_COLOR_FACTOR {
+    @gpu.GpuBlendFactor::ONE_MINUS_SRC
+  } else if code == @constants.SRC_ALPHA_FACTOR {
+    @gpu.GpuBlendFactor::SRC_ALPHA
+  } else if code == @constants.ONE_MINUS_SRC_ALPHA_FACTOR {
+    @gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA
+  } else if code == @constants.DST_COLOR_FACTOR {
+    @gpu.GpuBlendFactor::DST
+  } else {
+    @gpu.GpuBlendFactor::ONE
+  }
+}
+
+///|
+fn blend_component(
+  src : @gpu.GpuBlendFactor,
+  dst : @gpu.GpuBlendFactor,
+) -> @gpu.GpuBlendComponent {
+  {
+    operation: Some(@gpu.GpuBlendOperation::ADD),
+    src_factor: Some(src),
+    dst_factor: Some(dst),
+  }
+}
+
+///|
+fn blend_state_for(
+  blend : Bool,
+  premultiplied : Bool,
+  equation : @common.BlendEquation?,
+) -> @gpu.GpuBlendState? {
+  match equation {
+    Some(equation) =>
+      Some({
+        color: blend_component(
+          gpu_blend_factor(equation.src_color),
+          gpu_blend_factor(equation.dst_color),
+        ),
+        alpha: blend_component(
+          gpu_blend_factor(equation.src_alpha),
+          gpu_blend_factor(equation.dst_alpha),
+        ),
+      })
+    None =>
+      if blend {
+        let src = if premultiplied {
+          @gpu.GpuBlendFactor::ONE
+        } else {
+          @gpu.GpuBlendFactor::SRC_ALPHA
+        }
+        Some({
+          color: blend_component(src, @gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+          alpha: blend_component(src, @gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
+        })
+      } else {
+        None
+      }
+  }
+}
+
+///|
 fn unlit_pipeline(
   device : GpuDevice,
   shader : GpuShaderModule,
@@ -141,6 +209,7 @@ fn unlit_pipeline(
   color_write~ : Bool = true,
   premultiplied~ : Bool = false,
   stencil~ : Int32 = 0,
+  equation~ : @common.BlendEquation? = None,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -148,34 +217,7 @@ fn unlit_pipeline(
     Some(@gpu.GpuColorWrite::default())
   }
   let stencil_state = stencil_face(stencil)
-  let blend_state : @gpu.GpuBlendState? = if blend {
-    Some({
-      color: {
-        operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(
-          if premultiplied {
-            @gpu.GpuBlendFactor::ONE
-          } else {
-            @gpu.GpuBlendFactor::SRC_ALPHA
-          },
-        ),
-        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
-      },
-      alpha: {
-        operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(
-          if premultiplied {
-            @gpu.GpuBlendFactor::ONE
-          } else {
-            @gpu.GpuBlendFactor::SRC_ALPHA
-          },
-        ),
-        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
-      },
-    })
-  } else {
-    None
-  }
+  let blend_state = blend_state_for(blend, premultiplied, equation)
   device.create_render_pipeline({
     vertex: {
       buffers: Some(mesh_vertex_buffers(instanced)),
@@ -314,6 +356,7 @@ fn color_pipeline(
   color_write~ : Bool = true,
   premultiplied~ : Bool = false,
   stencil~ : Int32 = 0,
+  equation~ : @common.BlendEquation? = None,
 ) -> GpuRenderPipeline {
   let color_mask : @gpu.GpuColorWrite? = if color_write {
     None
@@ -321,34 +364,7 @@ fn color_pipeline(
     Some(@gpu.GpuColorWrite::default())
   }
   let stencil_state = stencil_face(stencil)
-  let blend_state : @gpu.GpuBlendState? = if blend {
-    Some({
-      color: {
-        operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(
-          if premultiplied {
-            @gpu.GpuBlendFactor::ONE
-          } else {
-            @gpu.GpuBlendFactor::SRC_ALPHA
-          },
-        ),
-        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
-      },
-      alpha: {
-        operation: Some(@gpu.GpuBlendOperation::ADD),
-        src_factor: Some(
-          if premultiplied {
-            @gpu.GpuBlendFactor::ONE
-          } else {
-            @gpu.GpuBlendFactor::SRC_ALPHA
-          },
-        ),
-        dst_factor: Some(@gpu.GpuBlendFactor::ONE_MINUS_SRC_ALPHA),
-      },
-    })
-  } else {
-    None
-  }
+  let blend_state = blend_state_for(blend, premultiplied, equation)
   let buffers : Array[@gpu.GpuVertexBufferLayout?] = if instanced {
     [
       Some({

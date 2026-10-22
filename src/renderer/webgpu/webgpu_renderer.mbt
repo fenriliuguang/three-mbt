@@ -23,8 +23,8 @@ using @gpu {
 /// 一帧里的网格。深度测试打开时比较来自 `depth_func`，默认 `less-equal`，近平面为 0。关掉后比较改为 `always`。
 /// `depth_write` 为假时颜色通道不写深度。`color_write` 为假时颜色通道不写颜色。
 /// `reversed_depth` 默认关闭。打开后颜色通道和阴影通道都走反向深度：比较按 `ReversedDepthFuncs` 重映射，投影反转，深度清成 0。阴影采样比较从 `less` 换成 `greater`。
-/// `shadow_side` 为空时，正面材质的阴影画背面，背面材质画正面，双面画两面。设了值就按那个面投射。
-/// 透明网格用另一组开启混合的管线。`premultiplied_alpha` 打开后，颜色和 alpha 的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。关掉时源因子保持 `SrcAlpha`。不透明和线框不混合。阴影通道没有颜色混合。
+/// `shadow_side` 为空时，正面材质的阴影画背面，背面材质画正面，双面画两面。设了值就按那个面投射。阴影类型是 VSM 且侧面为空时不翻转。
+/// 透明网格用另一组开启混合的管线。`premultiplied_alpha` 打开后，颜色和 alpha 的源因子从 `SrcAlpha` 改成 `One`，目标仍是 `OneMinusSrcAlpha`。关掉时源因子保持 `SrcAlpha`。加色、减色和相乘按各自的因子混合，不透明时也混合。阴影通道没有颜色混合。
 /// 画到场景颜色目标时用半精度管线，交换链仍用画布格式。颜色通道的深度是 `depth24plus-stencil8`，蒙版往模板里替换。
 /// 没有贴图的材质使用一张 1×1 白纹理，因此三种着色器始终采样。
 /// r186: `WebGPURenderer` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/WebGPURenderer.js#L28 ; `_getBlending` https://github.com/mrdoob/three.js/blob/r186/src/renderers/webgpu/utils/WebGPUPipelineUtils.js#L552 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3767
@@ -110,6 +110,9 @@ pub struct WebGPURenderer {
   shadow_depth_reversed : ShadowPipelines
   shadow_depth_instanced_reversed : ShadowPipelines
   mut shadow_map : ShadowMap?
+  mut shadow_map_type : @constants.ShadowMapType
+  vsm : VsmGpu
+  priv blend_cache : Array[BlendCache]
   mut depth : DepthTarget?
   mut output : @textures.RenderTarget?
   color_targets : Array[ColorTarget]
@@ -283,6 +286,8 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
         texture: None,
         storage_texture: None,
       },
+      sampled_texture_entry(2U, fragment_visibility()),
+      filtering_sampler_entry(3U, fragment_visibility()),
     ],
     label: Some("shadow"),
   })
@@ -416,6 +421,7 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
     texture_binding_view_dimension: None,
     label: Some("shadow-dummy"),
   })
+  let vsm = make_vsm(device)
   let shadow_dummy = device.create_bind_group({
     layout: shadow_layout,
     entries: [
@@ -428,6 +434,14 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       {
         binding: 1U,
         resource: @gpu.GpuBindingResource::GpuSampler(shadow_sampler),
+      },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(vsm.dummy_view),
+      },
+      {
+        binding: 3U,
+        resource: @gpu.GpuBindingResource::GpuSampler(vsm.moment_sampler),
       },
     ],
     label: Some("shadow-dummy"),
@@ -722,6 +736,9 @@ pub fn WebGPURenderer::new(target : @platform.SurfaceTarget) -> WebGPURenderer {
       compare=@gpu.GpuCompareFunction::GREATER,
     ),
     shadow_map: None,
+    shadow_map_type: @constants.PCF,
+    vsm,
+    blend_cache: [],
     depth: None,
     output: None,
     color_targets: [],
@@ -788,6 +805,188 @@ fn WebGPURenderer::wire_pipeline(
     }
   }
   modes.pick(depth_write, depth_test, depth_func, color_write)
+}
+
+///|
+priv struct BlendCache {
+  tag : Int32
+  pipeline : GpuRenderPipeline
+}
+
+///|
+fn blend_bit(value : Bool) -> Int32 {
+  if value {
+    1
+  } else {
+    0
+  }
+}
+
+///|
+fn named_blend_tag(
+  shading : Int32,
+  side : Int32,
+  instanced : Bool,
+  depth_write : Bool,
+  depth_test : Bool,
+  depth_func : Int32,
+  color_write : Bool,
+  premultiplied : Bool,
+  hdr : Bool,
+  lines : Bool,
+  stroke : Int32,
+  op : Int32,
+) -> Int32 {
+  let mut tag = shading
+  tag = tag * 4 + side
+  tag = tag * 2 + blend_bit(instanced)
+  tag = tag * 2 + blend_bit(depth_write)
+  tag = tag * 2 + blend_bit(depth_test)
+  tag = tag * 8 + depth_func
+  tag = tag * 2 + blend_bit(color_write)
+  tag = tag * 2 + blend_bit(premultiplied)
+  tag = tag * 2 + blend_bit(hdr)
+  tag = tag * 2 + blend_bit(lines)
+  tag = tag * 8 + stroke
+  tag = tag * 4 + op
+  tag
+}
+
+///|
+fn shading_wgsl(shading : @constants.Shading, instanced : Bool) -> String {
+  if instanced {
+    match shading {
+      @constants.Basic => @nodes.basic_instanced_wgsl()
+      @constants.Lambert => @nodes.lambert_instanced_wgsl()
+      @constants.Standard => @nodes.standard_instanced_wgsl()
+    }
+  } else {
+    match shading {
+      @constants.Basic => @nodes.basic_wgsl()
+      @constants.Lambert => @nodes.lambert_wgsl()
+      @constants.Standard => @nodes.standard_wgsl()
+    }
+  }
+}
+
+///|
+fn WebGPURenderer::ensure_named_blend(
+  self : WebGPURenderer,
+  shading : @constants.Shading,
+  side : @constants.Side,
+  instanced : Bool,
+  depth_write : Bool,
+  depth_test : Bool,
+  depth_func : @constants.DepthFunc,
+  color_write : Bool,
+  premultiplied : Bool,
+  hdr : Bool,
+  lines : Bool,
+  stroke : @core.PrimitiveKind?,
+  equation : @common.BlendEquation,
+) -> GpuRenderPipeline {
+  let stroke_tag : Int32 = match stroke {
+    None => if lines { 1 } else { 0 }
+    Some(kind) =>
+      match kind {
+        @core.PrimitiveKind::Points => 2
+        @core.PrimitiveKind::Line => 3
+        @core.PrimitiveKind::LineSegments => 4
+      }
+  }
+  let op : Int32 = match equation.op {
+    @common.BlendOp::Additive => 0
+    @common.BlendOp::Subtractive => 1
+    @common.BlendOp::Multiply => 2
+  }
+  let shading_tag : Int32 = match shading {
+    @constants.Basic => 0
+    @constants.Lambert => 1
+    @constants.Standard => 2
+  }
+  let tag = named_blend_tag(
+    shading_tag,
+    side.to_int(),
+    instanced,
+    depth_write,
+    depth_test,
+    depth_func.to_int(),
+    color_write,
+    premultiplied,
+    hdr,
+    lines,
+    stroke_tag,
+    op,
+  )
+  for cached in self.blend_cache {
+    if cached.tag == tag {
+      return cached.pipeline
+    }
+  }
+  let format = if hdr {
+    @gpu.GpuTextureFormat::RGBA16FLOAT
+  } else {
+    self.format
+  }
+  let compare = gpu_depth_compare(depth_test, depth_func)
+  let pipeline = match stroke {
+    None => {
+      let shader = shader_module(
+        self.device,
+        shading_wgsl(shading, instanced),
+        "named-blend",
+      )
+      let cull = match side {
+        @constants.Front => GpuCullMode::BACK
+        @constants.Back => GpuCullMode::FRONT
+        @constants.Double => GpuCullMode::NONE
+      }
+      unlit_pipeline(
+        self.device,
+        shader,
+        self.mesh_layout,
+        format,
+        cull,
+        instanced~,
+        blend=true,
+        lines~,
+        depth_write~,
+        depth_compare=compare,
+        color_write~,
+        premultiplied~,
+        equation=Some(equation),
+      )
+    }
+    Some(kind) => {
+      let code = match kind {
+        @core.PrimitiveKind::Points => @nodes.points_wgsl()
+        _ => @nodes.line_wgsl()
+      }
+      let topology = match kind {
+        @core.PrimitiveKind::Points => @gpu.GpuPrimitiveTopology::TRIANGLE_LIST
+        @core.PrimitiveKind::Line => @gpu.GpuPrimitiveTopology::LINE_STRIP
+        @core.PrimitiveKind::LineSegments =>
+          @gpu.GpuPrimitiveTopology::LINE_LIST
+      }
+      let shader = shader_module(self.device, code, "named-stroke")
+      color_pipeline(
+        self.device,
+        shader,
+        self.stroke_layout,
+        format,
+        topology,
+        kind is @core.PrimitiveKind::Points,
+        blend=true,
+        depth_write~,
+        depth_compare=compare,
+        color_write~,
+        premultiplied~,
+        equation=Some(equation),
+      )
+    }
+  }
+  self.blend_cache.push({ tag, pipeline, })
+  pipeline
 }
 
 ///|
@@ -2116,7 +2315,12 @@ fn fog_pack(fog : @scenes.Fog?, receive : Bool) -> FogPack {
 }
 
 ///|
-fn shadow_pack(lights : @common.LightFrame, receive : Bool) -> ShadowPack {
+fn shadow_pack(
+  lights : @common.LightFrame,
+  receive : Bool,
+  vsm : Bool,
+  reversed : Bool,
+) -> ShadowPack {
   match lights.shadow {
     None =>
       {
@@ -2131,14 +2335,57 @@ fn shadow_pack(lights : @common.LightFrame, receive : Bool) -> ShadowPack {
         matrix: shadow.matrix,
         bias: shadow.bias,
         normal_bias: shadow.normal_bias,
-        enabled: if receive {
-          1.0
-        } else {
-          0.0
-        },
+        enabled: @common.shadow_enabled_value(receive, vsm, reversed),
         texel: shadow.radius / shadow.map_size.to_double(),
       }
   }
+}
+
+///|
+fn drop_shadow_map(map : ShadowMap) -> Unit {
+  map.group.drop()
+  map.view.drop()
+  map.texture.drop()
+  match map.vertical_group {
+    Some(group) => group.drop()
+    None => ()
+  }
+  match map.horizontal_group {
+    Some(group) => group.drop()
+    None => ()
+  }
+  match map.vertical_view {
+    Some(view) => view.drop()
+    None => ()
+  }
+  match map.horizontal_view {
+    Some(view) => view.drop()
+    None => ()
+  }
+  match map.vertical {
+    Some(texture) => texture.drop()
+    None => ()
+  }
+  match map.horizontal {
+    Some(texture) => texture.drop()
+    None => ()
+  }
+}
+
+///|
+fn WebGPURenderer::shadow_is_vsm(self : WebGPURenderer) -> Bool {
+  ignore(self.vsm.dummy_texture)
+  self.shadow_map_type is @constants.VSM
+}
+
+///|
+/// 阴影贴图算法。默认 `PCF`，采样仍是 3×3 比较。`VSM` 改用矩贴图。
+/// r186: `shadowMap` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L713
+pub fn WebGPURenderer::set_shadow_map_type(
+  self : WebGPURenderer,
+  kind : @constants.ShadowMapType,
+) -> Unit {
+  self.shadow_map_type = kind
 }
 
 ///|
@@ -2148,14 +2395,13 @@ fn WebGPURenderer::ensure_shadow(
 ) -> ShadowMap {
   let extent = if size < 1 { 1U } else { size.reinterpret_as_uint() }
   let reversed = self.reversed_depth
+  let vsm = self.shadow_is_vsm()
   match self.shadow_map {
     Some(map) =>
-      if map.size == extent && map.reversed == reversed {
+      if map.size == extent && map.reversed == reversed && map.vsm == vsm {
         return map
       } else {
-        map.group.drop()
-        map.view.drop()
-        map.texture.drop()
+        drop_shadow_map(map)
       }
     None => ()
   }
@@ -2175,6 +2421,80 @@ fn WebGPURenderer::ensure_shadow(
     label: Some("shadow"),
   })
   let view = texture.create_view(None)
+  let mut vertical : GpuTexture? = None
+  let mut vertical_view : GpuTextureView? = None
+  let mut horizontal : GpuTexture? = None
+  let mut horizontal_view : GpuTextureView? = None
+  let mut vertical_group : GpuBindGroup? = None
+  let mut horizontal_group : GpuBindGroup? = None
+  if vsm {
+    let (vertical_texture, vertical_target) = moment_target(
+      self.device,
+      extent,
+      "vsm-vertical",
+    )
+    let (horizontal_texture, horizontal_target) = moment_target(
+      self.device,
+      extent,
+      "vsm-horizontal",
+    )
+    vertical = Some(vertical_texture)
+    vertical_view = Some(vertical_target)
+    horizontal = Some(horizontal_texture)
+    horizontal_view = Some(horizontal_target)
+    vertical_group = Some(
+      self.device.create_bind_group({
+        layout: self.vsm.vertical_layout,
+        entries: [
+          {
+            binding: 0U,
+            resource: @gpu.GpuBindingResource::GpuTextureView(view),
+          },
+          {
+            binding: 1U,
+            resource: @gpu.GpuBindingResource::GpuSampler(
+              self.vsm.depth_sampler,
+            ),
+          },
+          {
+            binding: 2U,
+            resource: @gpu.GpuBindingResource::GpuBuffer(
+              self.vsm.vertical_uniform,
+            ),
+          },
+        ],
+        label: Some("vsm-vertical"),
+      }),
+    )
+    horizontal_group = Some(
+      self.device.create_bind_group({
+        layout: self.vsm.horizontal_layout,
+        entries: [
+          {
+            binding: 0U,
+            resource: @gpu.GpuBindingResource::GpuTextureView(vertical_target),
+          },
+          {
+            binding: 1U,
+            resource: @gpu.GpuBindingResource::GpuSampler(
+              self.vsm.moment_sampler,
+            ),
+          },
+          {
+            binding: 2U,
+            resource: @gpu.GpuBindingResource::GpuBuffer(
+              self.vsm.horizontal_uniform,
+            ),
+          },
+        ],
+        label: Some("vsm-horizontal"),
+      }),
+    )
+  }
+  let moment_view = match horizontal_view {
+    Some(target) => target
+    None => self.vsm.dummy_view
+  }
   let group = self.device.create_bind_group({
     layout: self.shadow_layout,
     entries: [
@@ -2189,10 +2509,31 @@ fn WebGPURenderer::ensure_shadow(
           },
         ),
       },
+      {
+        binding: 2U,
+        resource: @gpu.GpuBindingResource::GpuTextureView(moment_view),
+      },
+      {
+        binding: 3U,
+        resource: @gpu.GpuBindingResource::GpuSampler(self.vsm.moment_sampler),
+      },
     ],
     label: Some("shadow"),
   })
-  let map = { texture, view, group, size: extent, reversed, }
+  let map = {
+    texture,
+    view,
+    group,
+    size: extent,
+    reversed,
+    vsm,
+    vertical,
+    vertical_view,
+    horizontal,
+    horizontal_view,
+    vertical_group,
+    horizontal_group,
+  }
   self.shadow_map = Some(map)
   map
 }
@@ -2524,11 +2865,82 @@ fn detail_uniforms(item : @common.RenderItem) -> DetailUniforms {
 }
 
 ///|
+fn vsm_pass(
+  encoder : @gpu.GpuCommandEncoder,
+  view : GpuTextureView,
+  pipeline : GpuRenderPipeline,
+  group : GpuBindGroup,
+  label : String,
+) -> Unit {
+  let pass = encoder.begin_render_pass({
+    color_attachments: [
+      Some({
+        view,
+        depth_slice: None,
+        resolve_target: None,
+        clear_value: Some({ r: 1.0, g: 0.0, b: 0.0, a: 1.0, }),
+        load_op: @gpu.CLEAR,
+        store_op: @gpu.STORE,
+      }),
+    ],
+    depth_stencil_attachment: None,
+    occlusion_query_set: None,
+    timestamp_writes: None,
+    max_draw_count: None,
+    label: Some(label),
+  })
+  pass.set_pipeline(pipeline)
+  ignore(pass.set_bind_group(0U, Some(group), None, None, None))
+  pass.draw(3U, Some(1U), None, None)
+  pass.end()
+}
+
+///|
+fn WebGPURenderer::blur_vsm(
+  self : WebGPURenderer,
+  encoder : @gpu.GpuCommandEncoder,
+  map : ShadowMap,
+  samples : Int32,
+  radius : Double,
+) -> Unit {
+  let count = if samples < 1 {
+    1.0
+  } else if samples > @common.vsm_sample_limit {
+    @common.vsm_sample_limit.to_double()
+  } else {
+    samples.to_double()
+  }
+  let size = map.size.reinterpret_as_int().to_double()
+  let bytes = @common.pack_f32_values([count, radius, size, size])
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(self.vsm.vertical_uniform, 0UL, bytes, None, None),
+  )
+  ignore(
+    self.device
+    .queue()
+    .write_buffer_with_copy(self.vsm.horizontal_uniform, 0UL, bytes, None, None),
+  )
+  match (map.vertical_view, map.vertical_group) {
+    (Some(view), Some(group)) =>
+      vsm_pass(encoder, view, self.vsm.vertical, group, "vsm-vertical")
+    _ => ()
+  }
+  match (map.horizontal_view, map.horizontal_group) {
+    (Some(view), Some(group)) =>
+      vsm_pass(encoder, view, self.vsm.horizontal, group, "vsm-horizontal")
+    _ => ()
+  }
+}
+
+///|
 fn WebGPURenderer::draw_shadow(
   self : WebGPURenderer,
   scene : @scenes.Scene,
   shadow : @common.ShadowFrame,
 ) -> Unit {
+  let vsm = self.shadow_is_vsm()
   let map = self.ensure_shadow(shadow.map_size)
   let state = match shadow.camera.camera {
     None => return
@@ -2566,9 +2978,13 @@ fn WebGPURenderer::draw_shadow(
     enabled: 0.0,
     texel: 0.0,
   }
-  let items = @common.collect_shadow(scene.node, camera=shadow.camera)
+  let items = @common.collect_shadow(scene.node, camera=shadow.camera, vsm~)
   for item in items {
-    if !item.node.cast_shadow {
+    if !@common.casts_vsm_shadow(
+        item.node.cast_shadow,
+        item.node.receive_shadow,
+        vsm,
+      ) {
       continue
     }
     let draw_mesh = match item.instances {
@@ -2646,7 +3062,7 @@ fn WebGPURenderer::draw_shadow(
           }
         }
         pass.set_pipeline(
-          match @common.shadow_cast_side(item.side, item.shadow_side) {
+          match @common.shadow_cast_side(item.side, item.shadow_side, vsm~) {
             @constants.Back => shadow_group.back
             @constants.Front => shadow_group.front
             @constants.Double => shadow_group.double
@@ -2735,6 +3151,9 @@ fn WebGPURenderer::draw_shadow(
     }
   }
   pass.end()
+  if vsm {
+    self.blur_vsm(encoder, map, shadow.blur_samples, shadow.radius)
+  }
   self.device.queue().submit([encoder.finish(None)])
 }
 
@@ -3657,6 +4076,118 @@ fn WebGPURenderer::bind_env(
 }
 
 ///|
+fn WebGPURenderer::mesh_color_pipeline(
+  self : WebGPURenderer,
+  item : @common.RenderItem,
+  side : @constants.Side,
+  blend : Bool,
+  lines : Bool,
+  hdr : Bool,
+  mask : Bool,
+  instanced : Bool,
+) -> GpuRenderPipeline {
+  if mask {
+    return self.mask_pipeline(item.shading, side, instanced, lines)
+  }
+  let depth_func = self.view_depth_func(item.depth_func)
+  match @common.named_blend(item.blending, item.premultiplied_alpha) {
+    Some(equation) =>
+      self.ensure_named_blend(
+        item.shading,
+        side,
+        instanced,
+        item.depth_write,
+        item.depth_test,
+        depth_func,
+        item.color_write,
+        item.premultiplied_alpha,
+        hdr,
+        lines,
+        None,
+        equation,
+      )
+    None =>
+      if lines {
+        self.wire_pipeline(
+          item.shading,
+          instanced,
+          item.depth_write,
+          item.depth_test,
+          depth_func,
+          item.color_write,
+          hdr~,
+        )
+      } else if instanced {
+        self.instanced_pipeline(
+          item.shading,
+          side,
+          blend,
+          item.depth_write,
+          item.depth_test,
+          depth_func,
+          item.color_write,
+          item.premultiplied_alpha,
+          hdr~,
+        )
+      } else {
+        self.pipeline(
+          item.shading,
+          side,
+          blend,
+          item.depth_write,
+          item.depth_test,
+          depth_func,
+          item.color_write,
+          item.premultiplied_alpha,
+          hdr~,
+        )
+      }
+  }
+}
+
+///|
+fn WebGPURenderer::stroke_color_pipeline(
+  self : WebGPURenderer,
+  item : @common.PrimitiveItem,
+  blend : Bool,
+  hdr : Bool,
+  mask : Bool,
+) -> GpuRenderPipeline {
+  if mask {
+    return self.mask_stroke(item.kind)
+  }
+  let depth_func = self.view_depth_func(item.depth_func)
+  match @common.named_blend(item.blending, item.premultiplied_alpha) {
+    Some(equation) =>
+      self.ensure_named_blend(
+        @constants.Basic,
+        @constants.Front,
+        false,
+        item.depth_write,
+        item.depth_test,
+        depth_func,
+        item.color_write,
+        item.premultiplied_alpha,
+        hdr,
+        false,
+        Some(item.kind),
+        equation,
+      )
+    None =>
+      self.stroke_pipeline(
+        item.kind,
+        blend,
+        item.depth_write,
+        item.depth_test,
+        depth_func,
+        item.color_write,
+        item.premultiplied_alpha,
+        hdr~,
+      )
+  }
+}
+
+///|
 /// 先画不透明网格，再按从远到近画透明网格。`blend` 为真时用 src-alpha 管线。
 /// 透明双面且 `force_single_pass` 关闭时，同一次绘制里先画背面再画正面。
 /// Standard 绑定第 4 组环境贴图。其它着色绑定黑色的空环境。
@@ -3695,7 +4226,12 @@ fn WebGPURenderer::draw_meshes(
         let mvp = @common.model_view_projection(state, item.node)
         let gpu = self.object_gpu(item.node)
         let eye = camera.matrix_world.elements
-        let shade = shadow_pack(lights, item.node.receive_shadow)
+        let shade = shadow_pack(
+          lights,
+          item.node.receive_shadow,
+          self.shadow_is_vsm(),
+          self.reversed_depth,
+        )
         let haze = fog_pack(fog, item.fog)
         let detail = detail_uniforms(item)
         let uniforms = @common.pack_uniforms(
@@ -3800,46 +4336,15 @@ fn WebGPURenderer::draw_meshes(
         )
         for side in sides {
           pass.set_pipeline(
-            if mask {
-              self.mask_pipeline(item.shading, side, batch is Some(_), lines)
-            } else if lines {
-              self.wire_pipeline(
-                item.shading,
-                batch is Some(_),
-                item.depth_write,
-                item.depth_test,
-                self.view_depth_func(item.depth_func),
-                item.color_write,
-                hdr~,
-              )
-            } else {
-              match batch {
-                Some(_) =>
-                  self.instanced_pipeline(
-                    item.shading,
-                    side,
-                    blend,
-                    item.depth_write,
-                    item.depth_test,
-                    self.view_depth_func(item.depth_func),
-                    item.color_write,
-                    item.premultiplied_alpha,
-                    hdr~,
-                  )
-                None =>
-                  self.pipeline(
-                    item.shading,
-                    side,
-                    blend,
-                    item.depth_write,
-                    item.depth_test,
-                    self.view_depth_func(item.depth_func),
-                    item.color_write,
-                    item.premultiplied_alpha,
-                    hdr~,
-                  )
-              }
-            },
+            self.mesh_color_pipeline(
+              item,
+              side,
+              blend,
+              lines,
+              hdr,
+              mask,
+              batch is Some(_),
+            ),
           )
           pass.set_vertex_buffer(
             0U,
@@ -4042,7 +4547,12 @@ fn WebGPURenderer::draw_strokes(
           0.0
         }
         let eye = camera.matrix_world.elements
-        let shade = shadow_pack(lights, false)
+        let shade = shadow_pack(
+          lights,
+          false,
+          self.shadow_is_vsm(),
+          self.reversed_depth,
+        )
         let haze = fog_pack(fog, item.fog)
         let uniforms = @common.pack_uniforms(
           mvp,
@@ -4092,20 +4602,7 @@ fn WebGPURenderer::draw_strokes(
             }
             if instance_count > 0 {
               pass.set_pipeline(
-                if mask {
-                  self.mask_stroke(item.kind)
-                } else {
-                  self.stroke_pipeline(
-                    item.kind,
-                    blend,
-                    item.depth_write,
-                    item.depth_test,
-                    self.view_depth_func(item.depth_func),
-                    item.color_write,
-                    item.premultiplied_alpha,
-                    hdr~,
-                  )
-                },
+                self.stroke_color_pipeline(item, blend, hdr, mask),
               )
               pass.set_vertex_buffer(0U, Some(self.quad), None, None)
               pass.set_vertex_buffer(1U, Some(instances), None, None)
@@ -4125,20 +4622,7 @@ fn WebGPURenderer::draw_strokes(
           @core.PrimitiveKind::Line =>
             self.draw_lines(
               pass,
-              if mask {
-                self.mask_stroke(item.kind)
-              } else {
-                self.stroke_pipeline(
-                  item.kind,
-                  blend,
-                  item.depth_write,
-                  item.depth_test,
-                  self.view_depth_func(item.depth_func),
-                  item.color_write,
-                  item.premultiplied_alpha,
-                  hdr~,
-                )
-              },
+              self.stroke_color_pipeline(item, blend, hdr, mask),
               geometry,
               item.draw_start,
               item.draw_count,
@@ -4146,20 +4630,7 @@ fn WebGPURenderer::draw_strokes(
           @core.PrimitiveKind::LineSegments =>
             self.draw_lines(
               pass,
-              if mask {
-                self.mask_stroke(item.kind)
-              } else {
-                self.stroke_pipeline(
-                  item.kind,
-                  blend,
-                  item.depth_write,
-                  item.depth_test,
-                  self.view_depth_func(item.depth_func),
-                  item.color_write,
-                  item.premultiplied_alpha,
-                  hdr~,
-                )
-              },
+              self.stroke_color_pipeline(item, blend, hdr, mask),
               geometry,
               item.draw_start,
               item.draw_count,

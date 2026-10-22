@@ -105,6 +105,8 @@ pub fn emit_wgsl(program : Program) -> String {
     lines.push(
       "@group(2) @binding(1) var shadow_sampler : sampler_comparison;\n",
     )
+    lines.push("@group(2) @binding(2) var vsm_map : texture_2d<f32>;\n")
+    lines.push("@group(2) @binding(3) var vsm_sampler : sampler;\n")
   }
   if program.emissive {
     lines.push(

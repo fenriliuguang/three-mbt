@@ -60,7 +60,7 @@ pub(all) enum WireframeJoin {
 /// `allow_override` 默认打开。渲染器仍不用场景覆盖材质替换它。
 /// `blend_alpha` 默认 `0`。混合仍不用常量 alpha。
 /// `blend_color` 默认黑色 `(0, 0, 0)`。混合仍不用常量颜色。
-/// `blending` 默认 `Normal`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
+/// `blending` 默认 `Normal`。透明绘制仍用源 alpha 混合。加色、减色和相乘会换成对应因子，不透明时也混合。自定义因子留在上游。
 /// `blend_src` 默认 `SrcAlpha`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
 /// `blend_dst` 默认 `OneMinusSrcAlpha`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。
 /// `blend_equation` 默认 `Add`。透明绘制仍用现有的源 alpha 混合，管线仍不读这个字段。

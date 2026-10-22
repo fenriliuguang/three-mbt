@@ -362,6 +362,7 @@ pub(all) struct MaterialDraw {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   force_single_pass : Bool
   emissive : @math.Color
   emissive_intensity : Double
@@ -406,6 +407,7 @@ pub(all) struct MeshBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   mut visible : Bool
   force_single_pass : Bool
   emissive : @math.Color
@@ -583,6 +585,7 @@ pub(all) struct PrimitiveBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   visible : Bool
   group_draws : Array[PrimitiveDraw]?
 }
@@ -600,6 +603,7 @@ pub(all) struct PrimitiveDraw {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   visible : Bool
 }
 
@@ -647,6 +651,7 @@ pub(all) struct ShadowState {
   mut bias : Double
   mut normal_bias : Double
   mut radius : Double
+  mut blur_samples : Int
 }
 
 pub(all) struct SkinState {

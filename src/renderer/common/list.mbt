@@ -27,6 +27,7 @@ pub(all) struct RenderItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   force_single_pass : Bool
   emissive : @math.Color
   emissive_intensity : Double
@@ -68,6 +69,7 @@ fn kept_for_queue(
   transparent : Bool,
   wireframe : Bool,
   queue : MeshQueue,
+  vsm : Bool,
 ) -> Bool {
   if !visible {
     false
@@ -75,7 +77,7 @@ fn kept_for_queue(
     match queue {
       MeshQueue::Opaque => !transparent && !wireframe
       MeshQueue::Transparent => transparent && !wireframe
-      MeshQueue::Shadow => !transparent
+      MeshQueue::Shadow => if vsm { true } else { !transparent }
       MeshQueue::Wire => wireframe
     }
   }
@@ -108,6 +110,7 @@ fn push_binding_item(
     depth_func: binding.depth_func,
     color_write: binding.color_write,
     premultiplied_alpha: binding.premultiplied_alpha,
+    blending: binding.blending,
     force_single_pass: binding.force_single_pass,
     emissive: binding.emissive,
     emissive_intensity: binding.emissive_intensity,
@@ -164,6 +167,7 @@ fn push_group_item(
     depth_func: draw.depth_func,
     color_write: draw.color_write,
     premultiplied_alpha: draw.premultiplied_alpha,
+    blending: draw.blending,
     force_single_pass: draw.force_single_pass,
     emissive: draw.emissive,
     emissive_intensity: draw.emissive_intensity,
@@ -294,6 +298,7 @@ fn append_mesh(
   node : Object3D,
   binding : @core.MeshBinding,
   queue : MeshQueue,
+  vsm : Bool,
 ) -> Unit {
   match binding.group_draws {
     None =>
@@ -302,6 +307,7 @@ fn append_mesh(
           binding.transparent,
           binding.wireframe,
           queue,
+          vsm,
         ) {
         match resolved_span(binding.geometry, 0, -1, queue) {
           None => ()
@@ -318,6 +324,7 @@ fn append_mesh(
               draw.transparent,
               draw.wireframe,
               queue,
+              vsm,
             ) {
             match
               resolved_span(binding.geometry, group.start, group.count, queue) {
@@ -351,7 +358,7 @@ pub fn collect_opaque(
           Some(binding) =>
             if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              append_mesh(items, node, binding, MeshQueue::Opaque)
+              append_mesh(items, node, binding, MeshQueue::Opaque, false)
             }
         }
       _ => ()
@@ -379,19 +386,24 @@ pub fn color_sides(
 
 ///|
 /// 阴影通道实际绘制的面。`shadow_side` 有值时直接用它。
-/// 否则正面材质画背面，背面材质画正面，双面仍画双面。没有 VSM，所以不走那条不翻转的路径。
-/// r186: `_shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L50 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3767
+/// 否则正面材质画背面，背面材质画正面，双面仍画双面。`vsm` 为真且侧面为空时不翻转，沿用材质的面。
+/// r186: `_shadowSide` https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L50 ; shadow pass side https://github.com/mrdoob/three.js/blob/r186/src/renderers/common/Renderer.js#L3761
 pub fn shadow_cast_side(
   side : @constants.Side,
   shadow_side : @constants.Side?,
+  vsm~ : Bool = false,
 ) -> @constants.Side {
   match shadow_side {
     Some(explicit) => explicit
     None =>
-      match side {
-        @constants.Front => @constants.Back
-        @constants.Back => @constants.Front
-        @constants.Double => @constants.Double
+      if vsm {
+        side
+      } else {
+        match side {
+          @constants.Front => @constants.Back
+          @constants.Back => @constants.Front
+          @constants.Double => @constants.Double
+        }
       }
   }
 }
@@ -399,7 +411,11 @@ pub fn shadow_cast_side(
 ///|
 /// 阴影投射体。线框也包含在内，几何仍是三角形，边列表只给颜色通道。
 /// 不按 `render_order` 排，保持遍历顺序。
-pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] {
+pub fn collect_shadow(
+  root : Object3D,
+  camera? : Object3D,
+  vsm~ : Bool = false,
+) -> Array[RenderItem] {
   let items = []
   root.traverse_visible(fn(node) {
     match node.kind {
@@ -409,7 +425,7 @@ pub fn collect_shadow(root : Object3D, camera? : Object3D) -> Array[RenderItem] 
           Some(binding) =>
             if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, None) {
-              append_mesh(items, node, binding, MeshQueue::Shadow)
+              append_mesh(items, node, binding, MeshQueue::Shadow, vsm)
             }
         }
       _ => ()
@@ -437,7 +453,7 @@ pub fn collect_wireframe(
           Some(binding) =>
             if on_camera_layer(node, camera) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              append_mesh(items, node, binding, MeshQueue::Wire)
+              append_mesh(items, node, binding, MeshQueue::Wire, false)
             }
         }
       _ => ()
@@ -507,6 +523,7 @@ pub(all) struct PrimitiveItem {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   draw_start : Int32
   draw_count : Int32
 }
@@ -529,6 +546,7 @@ fn emit_primitive(
   depth_func : @constants.DepthFunc,
   color_write : Bool,
   premultiplied_alpha : Bool,
+  blending : @constants.Blending,
   group_start : Int32,
   group_count : Int32,
 ) -> Unit {
@@ -550,6 +568,7 @@ fn emit_primitive(
         depth_func,
         color_write,
         premultiplied_alpha,
+        blending,
         draw_start: start,
         draw_count: count,
       })
@@ -584,6 +603,7 @@ fn push_primitive(
           binding.depth_func,
           binding.color_write,
           binding.premultiplied_alpha,
+          binding.blending,
           0,
           -1,
         )
@@ -609,6 +629,7 @@ fn push_primitive(
               draw.depth_func,
               draw.color_write,
               draw.premultiplied_alpha,
+              draw.blending,
               group.start,
               group.count,
             )
@@ -864,7 +885,7 @@ pub fn collect_transparent(
           Some(binding) =>
             if on_camera_layer(node, Some(camera)) &&
               kept_by_frustum(node, binding.geometry, frustum) {
-              append_mesh(items, node, binding, MeshQueue::Transparent)
+              append_mesh(items, node, binding, MeshQueue::Transparent, false)
             }
         }
       _ => ()

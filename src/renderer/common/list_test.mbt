@@ -517,6 +517,7 @@ test "a casting directional light builds a shadow matrix" {
   sun.set_shadow_bounds(-2.0, 2.0, 2.0, -2.0, 1.0, 21.0)
   assert_eq(sun.shadow.map_size, 512)
   assert_eq(sun.shadow.bias, 0.0)
+  assert_eq(sun.shadow.blur_samples, 8)
   ignore(scene.add(sun))
   @common.update_frame(scene.node, scene.node)
   let lights = @common.collect_lights(scene.node)
@@ -524,6 +525,7 @@ test "a casting directional light builds a shadow matrix" {
     None => panic()
     Some(shadow) => {
       assert_eq(shadow.map_size, 512)
+      assert_eq(shadow.blur_samples, 8)
       assert_eq(shadow.matrix.elements[12] > 0.49, true)
       assert_eq(shadow.matrix.elements[12] < 0.51, true)
       assert_eq(shadow.matrix.elements[13] > 0.49, true)

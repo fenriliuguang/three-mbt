@@ -23,6 +23,7 @@ pub(all) struct MeshBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   mut visible : Bool
   force_single_pass : Bool
   emissive : @math.Color
@@ -74,6 +75,7 @@ pub(all) struct MaterialDraw {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   force_single_pass : Bool
   emissive : @math.Color
   emissive_intensity : Double
@@ -185,6 +187,7 @@ pub(all) struct PrimitiveBinding {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   visible : Bool
   group_draws : Array[PrimitiveDraw]?
 }
@@ -205,18 +208,20 @@ pub(all) struct PrimitiveDraw {
   depth_func : @constants.DepthFunc
   color_write : Bool
   premultiplied_alpha : Bool
+  blending : @constants.Blending
   visible : Bool
 }
 
 ///|
-/// 平行光的阴影相机和参数。`camera` 是正交相机节点。
-/// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18
+/// 平行光的阴影相机和参数。`camera` 是正交相机节点。`blur_samples` 默认 8，只给 VSM 模糊。
+/// r186: `LightShadow` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L18 ; `blurSamples` https://github.com/mrdoob/three.js/blob/r186/src/lights/LightShadow.js#L95
 pub(all) struct ShadowState {
   camera : Object3D
   mut map_size : Int32
   mut bias : Double
   mut normal_bias : Double
   mut radius : Double
+  mut blur_samples : Int32
 }
 
 ///|

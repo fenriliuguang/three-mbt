@@ -20,6 +20,8 @@ pub const BACK_SIDE : Int = 1
 
 pub const BASIC_DEPTH_PACKING : Int = 3200
 
+pub const BASIC_SHADOW_MAP : Int = 0
+
 pub const CINEON_TONE_MAPPING : Int = 3
 
 pub const CLAMP_TO_EDGE_WRAPPING : Int = 1001
@@ -152,6 +154,10 @@ pub const ONE_MINUS_SRC_ALPHA_FACTOR : Int = 205
 
 pub const ONE_MINUS_SRC_COLOR_FACTOR : Int = 203
 
+pub const PCF_SHADOW_MAP : Int = 1
+
+pub const PCF_SOFT_SHADOW_MAP : Int = 2
+
 pub const REINHARD_TONE_MAPPING : Int = 2
 
 pub const REPEAT_WRAPPING : Int = 1000
@@ -189,6 +195,8 @@ pub const SUBTRACTIVE_BLENDING : Int = 3
 pub const SUBTRACT_EQUATION : Int = 101
 
 pub const TANGENT_SPACE_NORMAL_MAP : Int = 0
+
+pub const VSM_SHADOW_MAP : Int = 3
 
 pub const WEBGL_COORDINATE_SYSTEM : Int = 2000
 
@@ -322,6 +330,14 @@ pub(all) enum Shading {
   Lambert
   Standard
 }
+
+pub(all) enum ShadowMapType {
+  Basic
+  PCF
+  PCFSoft
+  VSM
+}
+pub fn ShadowMapType::to_int(Self) -> Int
 
 pub(all) enum Side {
   Front

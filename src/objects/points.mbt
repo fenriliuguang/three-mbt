@@ -118,6 +118,7 @@ pub fn Points::refresh(self : Points) -> Unit {
       self.material.depth_func,
       self.material.color_write,
       self.material.premultiplied_alpha,
+      self.material.blending,
       self.material.visible,
       point_draws(self.materials),
     ),

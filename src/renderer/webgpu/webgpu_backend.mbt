@@ -93,6 +93,13 @@ struct ShadowMap {
   group : GpuBindGroup
   size : UInt32
   reversed : Bool
+  vsm : Bool
+  vertical : GpuTexture?
+  vertical_view : GpuTextureView?
+  horizontal : GpuTexture?
+  horizontal_view : GpuTextureView?
+  vertical_group : GpuBindGroup?
+  horizontal_group : GpuBindGroup?
 }
 
 ///|

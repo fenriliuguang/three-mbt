@@ -36,6 +36,10 @@ Material `visible` has landed. It defaults to true. A mesh, point, or line with 
 
 `Object3D.render_order` is honored inside each color list. A lower value is drawn first. Opaque meshes, wireframe meshes, and opaque points and lines use that as their only sort key and keep traverse order on a tie. They are not sorted by depth. Transparent meshes and transparent points and lines compare `render_order` before view-space depth. The shadow list stays in traverse order. There is no `groupOrder`.
 
+Additive, subtractive, and multiply blending have landed. `No` and `Normal` keep the landed source-alpha pipeline: a transparent draw blends, an opaque draw does not. Custom source and destination factors stay upstream. Additive, subtractive, and multiply blend on the opaque list as well as the transparent list, for meshes, wireframes, points, and lines. Premultiplied additive uses `One, One` on both color and alpha. Straight additive uses `SrcAlpha, One` for color and `One, One` for alpha. Subtractive uses `Zero, OneMinusSrc` for color and `Zero, One` for alpha. Multiply uses `Dst, OneMinusSrcAlpha` for color and `Zero, One` for alpha. The operation is add. Subtractive and multiply use the premultiplied factor set from r186 `_getBlending` for either premultiplied flag.
+
+VSM shadow maps have landed. `WebGPURenderer.set_shadow_map_type` defaults to `PCF`. `Basic`, `PCF`, and the deprecated `PCFSoft` keep the one directional `depth32float` map and the 3×3 comparison sample. `VSM` renders that depth, then a vertical pass and a horizontal pass into `rg16float` targets. Each pass uses at most 64 samples and writes the mean and the standard deviation. The lit shader samples the horizontal target with the Chebyshev bound: variance is `max(0.0000001, std²)`, and light bleeding remaps with `(p - 0.3) / 0.65`. The shadow uniform `z` is 0 when the object does not receive, 1 for the comparison sample, 2 for VSM, and 3 for reversed-depth VSM. A null `shadowSide` does not flip while the type is VSM; a set value is used as-is. Receivers also cast. `blurSamples` defaults to 8.
+
 ## Checklist
 
 | status | phase | item | packages |

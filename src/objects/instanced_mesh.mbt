@@ -76,6 +76,7 @@ pub fn InstancedMesh::refresh(self : InstancedMesh) -> Unit {
     depth_func: self.material.depth_func,
     color_write: self.material.color_write,
     premultiplied_alpha: self.material.premultiplied_alpha,
+    blending: self.material.blending,
     visible: self.material.visible,
     force_single_pass: self.material.force_single_pass,
     emissive: self.material.emissive,

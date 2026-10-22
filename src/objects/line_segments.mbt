@@ -167,6 +167,7 @@ pub fn LineSegments::refresh(self : LineSegments) -> Unit {
       self.material.depth_func,
       self.material.color_write,
       self.material.premultiplied_alpha,
+      self.material.blending,
       self.material.visible,
       line_draws(self.materials),
     ),

@@ -103,6 +103,42 @@ pub fn Blending::to_int(self : Blending) -> Int32 {
 }
 
 ///|
+/// 不做百分比滤波。对齐 `BasicShadowMap`（0）。
+pub const BASIC_SHADOW_MAP : Int32 = 0
+
+///|
+/// 百分比接近滤波。对齐 `PCFShadowMap`（1）。
+pub const PCF_SHADOW_MAP : Int32 = 1
+
+///|
+/// 已弃用的软百分比滤波。对齐 `PCFSoftShadowMap`（2）。
+pub const PCF_SOFT_SHADOW_MAP : Int32 = 2
+
+///|
+/// 方差阴影贴图。对齐 `VSMShadowMap`（3）。
+pub const VSM_SHADOW_MAP : Int32 = 3
+
+///|
+/// 阴影贴图算法。数值与 r186 `src/constants.js` 一致。渲染器默认是 `PCF`，采样仍是已经落地的 3×3 比较。
+/// r186: `BasicShadowMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L57 ; `PCFShadowMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L65 ; `PCFSoftShadowMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L75 ; `VSMShadowMap` https://github.com/mrdoob/three.js/blob/r186/src/constants.js#L84
+pub(all) enum ShadowMapType {
+  Basic
+  PCF
+  PCFSoft
+  VSM
+}
+
+///|
+pub fn ShadowMapType::to_int(self : ShadowMapType) -> Int32 {
+  match self {
+    Basic => BASIC_SHADOW_MAP
+    PCF => PCF_SHADOW_MAP
+    PCFSoft => PCF_SOFT_SHADOW_MAP
+    VSM => VSM_SHADOW_MAP
+  }
+}
+
+///|
 /// 混合因子乘 `0`。对齐 `ZeroFactor`（200）。
 pub const ZERO_FACTOR : Int32 = 200
 

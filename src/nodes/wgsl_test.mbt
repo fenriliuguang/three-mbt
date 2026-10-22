@@ -302,6 +302,23 @@ test "lit materials sample a directional shadow map" {
     true,
   )
   assert_eq(includes(@nodes.basic_wgsl(), "shadow_map"), false)
+  assert_eq(includes(@nodes.basic_wgsl(), "vsm_map"), false)
+  assert_eq(includes(lambert, "fn vsm_shadow("), true)
+  assert_eq(
+    includes(lambert, "max(0.0000001, distribution.y * distribution.y)"),
+    true,
+  )
+  assert_eq(includes(lambert, "(p_max - 0.3) / 0.65"), true)
+  assert_eq(includes(lambert, "(uniforms.shadow).z > 1.5"), true)
+  assert_eq(includes(@nodes.vsm_vertical_wgsl(), "depth * depth"), true)
+  assert_eq(includes(@nodes.vsm_vertical_wgsl(), "i < 64"), true)
+  assert_eq(
+    includes(
+      @nodes.vsm_horizontal_wgsl(),
+      "distribution.y * distribution.y + distribution.x * distribution.x",
+    ),
+    true,
+  )
   assert_eq(includes(standard, "direct_shadow(world, N)"), true)
   assert_eq(
     includes(

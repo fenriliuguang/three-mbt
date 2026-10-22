@@ -34,6 +34,10 @@ pub fn standard_program(instanced? : Bool) -> Program
 
 pub fn standard_wgsl() -> String
 
+pub fn vsm_horizontal_wgsl() -> String
+
+pub fn vsm_vertical_wgsl() -> String
+
 // Errors
 
 // Types and methods

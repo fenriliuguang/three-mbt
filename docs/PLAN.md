@@ -208,7 +208,6 @@ The next slice is the WebGPU work named at the end of the last paragraph under `
 ### Later
 
 - [materials](plan/later/materials.md)
-- [renderer](plan/later/renderer.md)
 - [textures](plan/later/textures.md)
 
 ## Phases
